@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'settings/settings_screen.dart';
 
 class PatientApp extends StatelessWidget {
   const PatientApp({super.key});
@@ -22,7 +23,19 @@ class _HomeScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Patient')),
+      appBar: AppBar(
+        title: const Text('Patient'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              );
+            },
+          )
+        ],
+      ),
       body: const Center(
         child: Text('Welcome to Patient App'),
       ),
@@ -30,3 +43,4 @@ class _HomeScaffold extends StatelessWidget {
   }
 }
 
+// End
