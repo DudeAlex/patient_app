@@ -1,12 +1,11 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 
 import '../../core/auth/auth_client.dart';
 import '../../core/auth/google_auth.dart';
-import '../../core/backup/backup_service.dart';
+import '../../core/backup/backup_service.dart' if (dart.library.html) '../../core/backup/backup_service_web.dart';
 import '../../core/crypto/key_manager.dart';
 import '../../core/sync/drive_sync.dart';
 
@@ -119,6 +118,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isWeb = kIsWeb;
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: AbsorbPointer(
@@ -138,17 +138,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
             const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: _backupToDrive,
-              icon: const Icon(Icons.backup),
-              label: const Text('Backup to Google Drive'),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton.icon(
-              onPressed: _restoreFromDrive,
-              icon: const Icon(Icons.restore),
-              label: const Text('Restore from Google Drive'),
-            ),
+            if (!isWeb) ...[
+              ElevatedButton.icon(
+                onPressed: _backupToDrive,
+                icon: const Icon(Icons.backup),
+                label: const Text('Backup to Google Drive'),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: _restoreFromDrive,
+                icon: const Icon(Icons.restore),
+                label: const Text('Restore from Google Drive'),
+              ),
+            ] else ...[
+              const Text(
+                'Drive backup/restore is available on mobile builds.\nThe web build cannot access app files due to browser sandbox.',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
             if (_busy) const Padding(
               padding: EdgeInsets.only(top: 24),
               child: Center(child: CircularProgressIndicator()),
@@ -159,4 +166,3 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 }
-

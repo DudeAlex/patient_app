@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:googleapis/drive/v3.dart' as drive;
-import 'package:http/http.dart' as http;
 
 class DriveSyncService {
   final http.Client client;
@@ -38,8 +36,14 @@ class DriveSyncService {
     final api = drive.DriveApi(client);
     final existing = await _findOrNull(api);
     if (existing?.id == null) return null;
-    final media = await api.files.get(existing!.id!, downloadOptions: drive.DownloadOptions.fullMedia) as http.Response;
-    return Uint8List.fromList(media.bodyBytes);
+    final media = await api.files.get(
+      existing!.id!,
+      downloadOptions: drive.DownloadOptions.fullMedia,
+    ) as drive.Media;
+    final chunks = <int>[];
+    await for (final chunk in media.stream) {
+      chunks.addAll(chunk);
+    }
+    return Uint8List.fromList(chunks);
   }
 }
-
