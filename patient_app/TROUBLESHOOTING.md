@@ -26,7 +26,11 @@ NDK Mismatch
 - Workaround applied during setup by patching plugin cache; re-run build if seen
 
 Google Sign-In Errors
-- Android: ensure OAuth client with package `com.example.patient_app` and correct debug SHA‑1
+- Android: ensure OAuth client with package `com.example.patient_app` and correct debug SHA-1
+- Error: `serverClientId must be provided on Android`
+  - Cause: google_sign_in v7 requires a server client id on Android.
+  - Fix: create a Web application OAuth client in GCP and run with:
+    `flutter run -d <device_id> --dart-define=GOOGLE_ANDROID_SERVER_CLIENT_ID=YOUR_WEB_CLIENT_ID`
 - Web: pass `--dart-define=GOOGLE_WEB_CLIENT_ID=...` and add localhost origins in GCP
 
 OneDrive Interference

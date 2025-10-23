@@ -53,11 +53,12 @@ Google OAuth Setup (Android)
 1) Google Cloud Console:
    - Enable “Google Drive API”
    - Configure OAuth consent screen (External)
-   - Create OAuth Client ID → Android
-     - Package name: `com.example.patient_app`
-     - Debug SHA‑1: run
-       `keytool -list -v -alias androiddebugkey -keystore %USERPROFILE%\.android\debug.keystore -storepass android -keypass android`
-2) Build and run; use Settings → Sign in → Backup/Restore
+   - Create OAuth Client IDs:
+     - Android client (Package name: `com.example.patient_app`; Debug SHA‑1: `keytool -list -v -alias androiddebugkey -keystore %USERPROFILE%\.android\debug.keystore -storepass android -keypass android`)
+     - Web application client (this is used as the Android server client id)
+2) Run on Android with the server client id (the Web client id):
+   - `flutter run -d <device_id> --dart-define=GOOGLE_ANDROID_SERVER_CLIENT_ID=YOUR_WEB_CLIENT_ID`
+3) In app: Settings → Sign in → Backup/Restore
 
 Google OAuth Setup (Web)
 - Create OAuth Client ID → Web application
