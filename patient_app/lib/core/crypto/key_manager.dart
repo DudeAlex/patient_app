@@ -13,10 +13,9 @@ class KeyManager {
     if (existing != null) {
       return Uint8List.fromList(base64Decode(existing));
     }
-    final rnd = SecureRandom();
-    final bytes = rnd.nextBytes(32);
+    final secretKey = await AesGcm.with256bits().newSecretKey();
+    final bytes = await secretKey.extractBytes();
     await _storage.write(key: _keyName, value: base64Encode(bytes));
     return Uint8List.fromList(bytes);
     }
 }
-

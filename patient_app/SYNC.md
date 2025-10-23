@@ -1,0 +1,34 @@
+# Sync & Backup
+
+Goal
+- Provide zero-cost sync using the user’s Google Drive App Data folder without running servers.
+
+Mobile Backup Format (v1)
+- Filename: `patient-backup-v1.enc`
+- Content: ZIP of the entire app documents directory (Isar DB files + attachments)
+- Encryption: AES-GCM, 12-byte random nonce, key from `flutter_secure_storage`
+
+Operations
+- Backup (export):
+  1) Zip app docs dir
+  2) Encrypt bytes
+  3) Upload to Drive App Data (create or update)
+- Restore (import):
+  1) Download from Drive App Data
+  2) Decrypt bytes
+  3) Unzip to app docs dir (replace)
+
+Auth
+- Google Sign-In v7 API
+  - Initialize via `GoogleSignIn.instance.initialize`
+  - Interactive login via `authenticate`
+  - Headers via `authorizationClient.authorizationHeaders([Drive appData scope])`
+
+Conflict Policy (MVP)
+- Manual: user triggers backup or restore
+- Future auto-sync: last-write-wins using Drive `modifiedTime` vs local `SyncState`
+
+Web Behavior
+- Web uses a stub: backup/restore hidden by default (browser FS sandbox)
+- Optional future: JSON-only export/import of records with a distinct filename
+

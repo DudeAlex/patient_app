@@ -8,7 +8,15 @@ plugins {
 android {
     namespace = "com.example.patient_app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // Override to match plugin requirements
+    ndkVersion = "27.0.12077973"
+
+    // Ensure native libs are extracted for maximum compatibility (incl. 16KB page size)
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

@@ -1,21 +1,21 @@
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 
-class GoogleAuthClient extends http.BaseClient {
-  final GoogleSignIn _signIn;
-  final http.Client _inner;
+typedef AuthHeadersProvider = Future<Map<String, String>?> Function();
 
-  GoogleAuthClient(this._signIn, [http.Client? inner]) : _inner = inner ?? http.Client();
+class GoogleAuthClient extends http.BaseClient {
+  final http.Client _inner;
+  final AuthHeadersProvider _headersProvider;
+
+  GoogleAuthClient(this._headersProvider, [http.Client? inner])
+      : _inner = inner ?? http.Client();
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    final account = _signIn.currentUser ?? await _signIn.signInSilently();
-    if (account == null) {
-      throw StateError('Google user not signed in');
+    final headers = await _headersProvider();
+    if (headers == null || headers.isEmpty) {
+      throw StateError('No Google auth headers available');
     }
-    final headers = await account.authHeaders;
     request.headers.addAll(headers);
     return _inner.send(request);
   }
 }
-

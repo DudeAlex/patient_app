@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:http/http.dart' as http;
 
 class DriveSyncService {
   final http.Client client;

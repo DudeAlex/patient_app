@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 
-import '../../core/auth/auth_client.dart';
-import '../../core/auth/google_auth.dart';
+import '../../core/auth/auth_client.dart' if (dart.library.html) '../../core/auth/auth_client_web.dart';
+import '../../core/auth/google_auth.dart' if (dart.library.html) '../../core/auth/google_auth_web.dart';
 import '../../core/backup/backup_service.dart' if (dart.library.html) '../../core/backup/backup_service_web.dart';
 import '../../core/crypto/key_manager.dart';
 import '../../core/sync/drive_sync.dart';
@@ -18,7 +17,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final _auth = GoogleAuthService();
-  GoogleSignInAccount? _account;
+  String? _email;
   bool _busy = false;
 
   @override
@@ -28,17 +27,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _restoreAccount() async {
-    final acc = await GoogleSignIn(scopes: const [
-      'https://www.googleapis.com/auth/drive.appdata',
-    ]).signInSilently();
-    setState(() => _account = acc);
+    final email = await _auth.tryGetEmail();
+    setState(() => _email = email);
   }
 
   Future<void> _signIn() async {
     setState(() => _busy = true);
     try {
-      final acc = await _auth.signIn();
-      setState(() => _account = acc);
+      await _auth.signIn();
+      final email = await _auth.tryGetEmail();
+      setState(() => _email = email);
     } finally {
       setState(() => _busy = false);
     }
@@ -48,14 +46,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _busy = true);
     try {
       await _auth.signOut();
-      setState(() => _account = null);
+      setState(() => _email = null);
     } finally {
       setState(() => _busy = false);
     }
   }
 
   Future<void> _backupToDrive() async {
-    if (_account == null) {
+    if (_email == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please sign in first')));
       }
@@ -65,9 +63,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final key = await KeyManager.getOrCreateKey();
       final encrypted = await BackupService.exportEncrypted(key);
-      final client = GoogleAuthClient(GoogleSignIn(scopes: const [
-        'https://www.googleapis.com/auth/drive.appdata',
-      ]), http.Client());
+      final client = GoogleAuthClient(() async => await _auth.getAuthHeaders(), http.Client());
       final drive = DriveSyncService(client);
       await drive.uploadEncrypted(encrypted);
       if (mounted) {
@@ -83,7 +79,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _restoreFromDrive() async {
-    if (_account == null) {
+    if (_email == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please sign in first')));
       }
@@ -92,9 +88,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _busy = true);
     try {
       final key = await KeyManager.getOrCreateKey();
-      final client = GoogleAuthClient(GoogleSignIn(scopes: const [
-        'https://www.googleapis.com/auth/drive.appdata',
-      ]), http.Client());
+      final client = GoogleAuthClient(() async => await _auth.getAuthHeaders(), http.Client());
       final drive = DriveSyncService(client);
       final bytes = await drive.downloadEncrypted();
       if (bytes == null) {
@@ -129,11 +123,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Row(
               children: [
                 Expanded(
-                  child: Text(_account != null ? 'Signed in: ${_account!.email}' : 'Not signed in'),
+                  child: Text(_email != null ? 'Signed in: $_email' : 'Not signed in'),
                 ),
                 ElevatedButton(
-                  onPressed: _account == null ? _signIn : _signOut,
-                  child: Text(_account == null ? 'Sign in' : 'Sign out'),
+                  onPressed: _email == null ? _signIn : _signOut,
+                  child: Text(_email == null ? 'Sign in' : 'Sign out'),
                 ),
               ],
             ),
