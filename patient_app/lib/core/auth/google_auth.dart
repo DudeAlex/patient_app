@@ -9,36 +9,55 @@ class GoogleAuthService {
 
   Future<void> _ensureInitialized() async {
     if (_initialized) return;
+    debugPrint('[Auth] Initializing GoogleSignIn');
     await GoogleSignIn.instance.initialize(
       clientId: kIsWeb && _webClientId.isNotEmpty ? _webClientId : null,
     );
     _initialized = true;
+    debugPrint('[Auth] GoogleSignIn initialized');
   }
 
   Future<GoogleSignInAccount?> signIn() async {
     await _ensureInitialized();
     try {
-      return await GoogleSignIn.instance.authenticate(
+      debugPrint('[Auth] Starting interactive authenticate');
+      final acc = await GoogleSignIn.instance.authenticate(
         scopeHint: const ['https://www.googleapis.com/auth/drive.appdata'],
       );
-    } catch (_) {
+      if (acc == null) {
+        debugPrint('[Auth] authenticate returned null (cancelled or failed)');
+      } else {
+        debugPrint('[Auth] authenticate success for: ' + acc.email);
+      }
+      return acc;
+    } catch (e) {
+      debugPrint('[Auth] authenticate error: ' + e.toString());
       return null;
     }
   }
 
   Future<void> signOut() async {
     await _ensureInitialized();
+    debugPrint('[Auth] Signing out');
     await GoogleSignIn.instance.disconnect();
   }
 
   Future<Map<String, String>?> getAuthHeaders({bool promptIfNecessary = false}) async {
     await _ensureInitialized();
     try {
-      return await GoogleSignIn.instance.authorizationClient.authorizationHeaders(
+      debugPrint('[Auth] Fetching auth headers (promptIfNecessary: ' + promptIfNecessary.toString() + ')');
+      final headers = await GoogleSignIn.instance.authorizationClient.authorizationHeaders(
         const ['https://www.googleapis.com/auth/drive.appdata'],
         promptIfNecessary: promptIfNecessary,
       );
-    } catch (_) {
+      if (headers.isEmpty) {
+        debugPrint('[Auth] authorizationHeaders returned empty map');
+      } else {
+        debugPrint('[Auth] authorizationHeaders success');
+      }
+      return headers;
+    } catch (e) {
+      debugPrint('[Auth] authorizationHeaders error: ' + e.toString());
       return null;
     }
   }
@@ -48,8 +67,14 @@ class GoogleAuthService {
     try {
       final fut = GoogleSignIn.instance.attemptLightweightAuthentication();
       final acc = await (fut ?? Future<GoogleSignInAccount?>.value(null));
+      if (acc?.email != null) {
+        debugPrint('[Auth] Lightweight auth success for: ' + acc!.email);
+      } else {
+        debugPrint('[Auth] Lightweight auth returned null');
+      }
       return acc?.email;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[Auth] Lightweight auth error: ' + e.toString());
       return null;
     }
   }

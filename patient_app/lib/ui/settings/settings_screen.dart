@@ -34,9 +34,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _signIn() async {
     setState(() => _busy = true);
     try {
-      await _auth.signIn();
+      final acc = await _auth.signIn();
       final email = await _auth.tryGetEmail();
       setState(() => _email = email);
+      if (email == null || acc == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Sign-in cancelled or failed. Check logs.')),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Signed in as $email')),
+          );
+        }
+      }
     } finally {
       setState(() => _busy = false);
     }
@@ -63,8 +76,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final key = await KeyManager.getOrCreateKey();
       final encrypted = await BackupService.exportEncrypted(key);
-      final client = GoogleAuthClient(() async => await _auth.getAuthHeaders(), http.Client());
+      final client = GoogleAuthClient(() async => await _auth.getAuthHeaders(promptIfNecessary: true), http.Client());
       final drive = DriveSyncService(client);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uploading backup to Drive...')));
+      }
       await drive.uploadEncrypted(encrypted);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Backup uploaded to Drive')));
@@ -88,7 +104,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _busy = true);
     try {
       final key = await KeyManager.getOrCreateKey();
-      final client = GoogleAuthClient(() async => await _auth.getAuthHeaders(), http.Client());
+      final client = GoogleAuthClient(() async => await _auth.getAuthHeaders(promptIfNecessary: true), http.Client());
       final drive = DriveSyncService(client);
       final bytes = await drive.downloadEncrypted();
       if (bytes == null) {
@@ -96,6 +112,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No backup found in Drive')));
         }
         return;
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Restoring backup...')));
       }
       await BackupService.importEncrypted(bytes, key);
       if (mounted) {
