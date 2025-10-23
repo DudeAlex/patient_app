@@ -20,6 +20,7 @@ Project Layout
 - `lib/ui/` app shell and screens
 - `lib/core/` auth, crypto, backup, sync, db helpers
 - `lib/features/records/` Isar models + repo (CRUD wiring to UI pending)
+- Specs: see `SPEC.md` for detailed, living requirements
 
 Prerequisites
 - Flutter stable ≥ 3.32

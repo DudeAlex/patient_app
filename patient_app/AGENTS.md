@@ -26,6 +26,7 @@ Documentation Checklist (update as applicable)
 - SYNC.md: backup/sync behavior or formats.
 - TROUBLESHOOTING.md: known issues, workarounds, environment caveats.
 - TODO.md: milestones, next steps, follow‑ups created by your change.
+ - SPEC.md: detailed product requirements, acceptance criteria, manual test plan.
 
 Coding Style
 - Follow existing patterns; avoid introducing new frameworks/structures unless necessary.
@@ -35,4 +36,3 @@ Coding Style
 When in Doubt
 - Ask for confirmation before large changes.
 - Split work into multiple small patches instead of one big patch.
-
