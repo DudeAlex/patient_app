@@ -5,8 +5,7 @@ import 'dart:typed_data';
 
 class BackupService {
   static Future<Uint8List> exportZip() async => throw UnsupportedError('Backup not supported on web');
-  static Future<void> importZip(Uint8List _) async => throw UnsupportedError('Restore not supported on web');
-  static Future<Uint8List> exportEncrypted(Uint8List _) async => throw UnsupportedError('Backup not supported on web');
-  static Future<void> importEncrypted(Uint8List __, Uint8List ___) async => throw UnsupportedError('Restore not supported on web');
+  static Future<void> importZip(Uint8List bytes) async => throw UnsupportedError('Restore not supported on web');
+  static Future<Uint8List> exportEncrypted(Uint8List key) async => throw UnsupportedError('Backup not supported on web');
+  static Future<void> importEncrypted(Uint8List encrypted, Uint8List key) async => throw UnsupportedError('Restore not supported on web');
 }
-

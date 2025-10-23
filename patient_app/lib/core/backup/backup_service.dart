@@ -22,7 +22,7 @@ class BackupService {
         archive.addFile(ArchiveFile(rel, data.length, data));
       }
     }
-    final zipData = ZipEncoder().encode(archive) ?? <int>[];
+    final zipData = ZipEncoder().encode(archive);
     return Uint8List.fromList(zipData);
   }
 
@@ -56,4 +56,3 @@ class BackupService {
     await importZip(zip);
   }
 }
-

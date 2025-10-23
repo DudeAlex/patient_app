@@ -12,7 +12,7 @@ class DriveSyncService {
   Future<drive.File?> _findOrNull(drive.DriveApi api) async {
     final res = await api.files.list(
       spaces: 'appDataFolder',
-      q: "name='" + fileName + "'",
+      q: "name='$fileName'",
       $fields: 'files(id, name, modifiedTime)',
       pageSize: 1,
     );
