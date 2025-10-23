@@ -38,3 +38,11 @@ Notes
 - NDK: `android/app/build.gradle.kts` pins `ndkVersion = "27.0.12077973"`
 - Web build hides Drive backup (browser filesystem limitations)
 
+Debugging
+- Emulator type: use a Google Play image (Device Manager shows Play badge). Add a Google account in Settings → Passwords & accounts.
+- Android sign-in: google_sign_in v7 requires a server client ID (the Web client ID). Run with:
+  - `flutter run -d <device> --dart-define=GOOGLE_ANDROID_SERVER_CLIENT_ID=YOUR_WEB_CLIENT_ID`
+- Logs: the app prints `[Auth] ...` logs during initialization, interactive sign-in, and header fetching. Look for messages like `serverClientId must be provided on Android`.
+- OAuth setup: ensure Drive API enabled, consent screen configured, Android client (package `com.example.patient_app`, correct debug SHA‑1), and a Web client (used as server client ID).
+- OneDrive locks: if builds fail or files are locked, pause OneDrive or move the project outside OneDrive.
+- Reset state: uninstall the app on the emulator or clear app data; then rerun.
