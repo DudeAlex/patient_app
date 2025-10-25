@@ -23,6 +23,9 @@ Auth
   - Initialize via `GoogleSignIn.instance.initialize`
   - Interactive login via `authenticate`
   - Headers via `authorizationClient.authorizationHeaders([Drive appData scope])`
+  - Android requires a Web OAuth client id passed as `--dart-define=GOOGLE_ANDROID_SERVER_CLIENT_ID=...`
+  - Use a Google Play AVD and sign into a Google account on the emulator
+  - In‑app: use Settings → Run Auth Diagnostics to test auth flows and header retrieval (safe logs, no tokens)
 
 Conflict Policy (MVP)
 - Manual: user triggers backup or restore
@@ -31,4 +34,3 @@ Conflict Policy (MVP)
 Web Behavior
 - Web uses a stub: backup/restore hidden by default (browser FS sandbox)
 - Optional future: JSON-only export/import of records with a distinct filename
-

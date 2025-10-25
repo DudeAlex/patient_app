@@ -8,6 +8,7 @@ Features
 - Local storage with Isar (encrypted backup archive, on‑device DB not encrypted yet)
 - Attachments folder for files (mobile only at this stage)
 - Settings screen with Google sign‑in and Drive backup/restore (mobile)
+- In‑app Auth Diagnostics (runs sign‑in and header checks; logs safe details)
 - Web build boots the app and hides backup/restore (browser sandbox)
 
 Tech Stack
@@ -36,6 +37,8 @@ First Run (Web)
 
 First Run (Android Emulator)
 1) Create/start an emulator in Android Studio (Pixel, API 34/35 x86_64)
+   - Prefer a Google Play system image so you can add a Google account (required for sign‑in)
+   - Sign into a Google account inside the emulator (Settings → Passwords & accounts)
 2) In elevated PowerShell:
    - `cd "C:\\Users\\<you>\\OneDrive\\Desktop\\AI Projects\\Patient\\patient_app"`
    - `flutter clean`
@@ -44,6 +47,15 @@ First Run (Android Emulator)
    - `flutter emulators --launch <emulator_id>` (e.g., `Pixel_9a`)
    - `flutter devices` (note device id, e.g., `emulator-5554`)
    - `flutter run -d emulator-5554`
+   - For Google Sign‑In (Android): add your Web OAuth client id (no quotes in PowerShell):
+     `flutter run -d emulator-5554 --dart-define=GOOGLE_ANDROID_SERVER_CLIENT_ID=YOUR_WEB_CLIENT_ID`
+   - Optional verbose auth logs:
+     add `--dart-define=GOOGLE_AUTH_DEBUG=true` (default true; set false to reduce logs)
+
+One‑command helper (PowerShell)
+- From `patient_app/` you can use the helper script:
+  - `./run_pixel.ps1 -EmulatorId "Pixel 6 Play" -ServerClientId YOUR_WEB_CLIENT_ID`
+  - Re‑runs after first build: add `-SkipBuildRunner` for faster startup
 
 Android Build Notes
 - `android/app/build.gradle.kts` pins `ndkVersion = "27.0.12077973"` to satisfy plugin requirements.
@@ -59,6 +71,14 @@ Google OAuth Setup (Android)
 2) Run on Android with the server client id (the Web client id):
    - `flutter run -d <device_id> --dart-define=GOOGLE_ANDROID_SERVER_CLIENT_ID=YOUR_WEB_CLIENT_ID`
 3) In app: Settings → Sign in → Backup/Restore
+
+Auth Diagnostics
+- In the app: Settings → Run Auth Diagnostics
+- It exercises:
+  - Lightweight auth (attempt without UI)
+  - Interactive authenticate (account chooser)
+  - Authorization headers for `email` and `drive.appdata`
+- All output is safe (no tokens) and printed as `[Auth] [Diag] ...` in logs, plus shown in a dialog.
 
 Google OAuth Setup (Web)
 - Create OAuth Client ID → Web application
@@ -77,6 +97,11 @@ Common Issues
 - Symlink/Plugin errors on Windows: use elevated terminal or enable Developer Mode.
 - Emulator fails to boot: ensure virtualization + Emulator Hypervisor Driver are enabled; try `-gpu angle_indirect`.
 - Google sign‑in errors: verify Android OAuth client (package + SHA‑1) or web client id; ensure internet on emulator.
+  - If you see `GoogleSignInExceptionCode.canceled, [16] Account reauth failed.`, see TROUBLESHOOTING.md for a full checklist (Play services/account, consent screen test users, Drive API enabled, Android client SHA‑1/256).
+
+Notes
+- Android manifest enables back gesture API (`android:enableOnBackInvokedCallback="true"`).
+- The app sanitizes `GOOGLE_ANDROID_SERVER_CLIENT_ID` to avoid accidental surrounding quotes from shells.
 
 Development Scripts
 - Update codegen after model changes:

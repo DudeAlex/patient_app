@@ -38,11 +38,21 @@ Notes
 - NDK: `android/app/build.gradle.kts` pins `ndkVersion = "27.0.12077973"`
 - Web build hides Drive backup (browser filesystem limitations)
 
+PowerShell Helper (Android)
+- From `patient_app/`: `.\u200brun_pixel.ps1 -EmulatorId Pixel`
+- With Google Sign-In (Android server client id):
+  - `.\u200brun_pixel.ps1 -EmulatorId Pixel -ServerClientId YOUR_WEB_CLIENT_ID`
+- Flags:
+  - `-SkipBuildRunner` to skip `build_runner` codegen (faster subsequent runs)
+
 Debugging
 - Emulator type: use a Google Play image (Device Manager shows Play badge). Add a Google account in Settings → Passwords & accounts.
 - Android sign-in: google_sign_in v7 requires a server client ID (the Web client ID). Run with:
+  - Do not wrap the client id in quotes when using PowerShell.
   - `flutter run -d <device> --dart-define=GOOGLE_ANDROID_SERVER_CLIENT_ID=YOUR_WEB_CLIENT_ID`
+  - Optional: `--dart-define=GOOGLE_AUTH_DEBUG=true` for verbose auth logs (default true)
 - Logs: the app prints `[Auth] ...` logs during initialization, interactive sign-in, and header fetching. Look for messages like `serverClientId must be provided on Android`.
+- In-app: Settings → Run Auth Diagnostics to exercise lightweight auth, interactive picker, and header requests; results are dialog + console logs.
 - OAuth setup: ensure Drive API enabled, consent screen configured, Android client (package `com.example.patient_app`, correct debug SHA‑1), and a Web client (used as server client ID).
 - OneDrive locks: if builds fail or files are locked, pause OneDrive or move the project outside OneDrive.
 - Reset state: uninstall the app on the emulator or clear app data; then rerun.

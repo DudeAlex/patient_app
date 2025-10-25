@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart'
+    show GoogleSignInException;
+import 'dart:io' show Platform; // only used on mobile; web uses google_auth_web.dart
 
 class GoogleAuthService {
   // Provide a web client ID at build time:
@@ -9,46 +12,86 @@ class GoogleAuthService {
   // flutter run -d <android_device> --dart-define=GOOGLE_ANDROID_SERVER_CLIENT_ID=YOUR_WEB_CLIENT_ID
   static const _androidServerClientId = String.fromEnvironment('GOOGLE_ANDROID_SERVER_CLIENT_ID');
   bool _initialized = false;
+  static const bool _debug = bool.fromEnvironment('GOOGLE_AUTH_DEBUG', defaultValue: true);
+
+  void _log(String msg) {
+    if (_debug) debugPrint('[Auth] ' + msg);
+  }
+
+  String _sanitize(String v) {
+    final t = v.trim();
+    if (t.length >= 2 &&
+        ((t.startsWith('"') && t.endsWith('"')) ||
+            (t.startsWith('\'') && t.endsWith('\'')))) {
+      return t.substring(1, t.length - 1);
+    }
+    return t;
+  }
+
+  String get androidServerClientIdTail {
+    final sanitized = _sanitize(_androidServerClientId);
+    return sanitized.length > 10 ? sanitized.substring(sanitized.length - 10) : sanitized;
+  }
 
   Future<void> _ensureInitialized() async {
     if (_initialized) return;
-    debugPrint('[Auth] Initializing GoogleSignIn');
+    _log('Initializing GoogleSignIn');
     if (kIsWeb) {
       await GoogleSignIn.instance.initialize(
         clientId: _webClientId.isNotEmpty ? _webClientId : null,
       );
       if (_webClientId.isEmpty) {
-        debugPrint('[Auth] WARN: GOOGLE_WEB_CLIENT_ID not provided; web sign-in may fail');
+        _log('WARN: GOOGLE_WEB_CLIENT_ID not provided; web sign-in may fail');
       }
     } else {
+      // Log environment/platform basics for diagnostics
+      try {
+        _log('Platform: ' + Platform.operatingSystem + ' | OS version: ' + (Platform.operatingSystemVersion.split('\n').first));
+      } catch (_) {}
+      final sanitized = _sanitize(_androidServerClientId);
       await GoogleSignIn.instance.initialize(
-        serverClientId: _androidServerClientId.isNotEmpty ? _androidServerClientId : null,
+        serverClientId: sanitized.isNotEmpty ? sanitized : null,
       );
-      if (_androidServerClientId.isEmpty) {
-        debugPrint('[Auth] ERROR: GOOGLE_ANDROID_SERVER_CLIENT_ID not provided; Android sign-in will fail');
+      if (sanitized.isEmpty) {
+        _log('ERROR: GOOGLE_ANDROID_SERVER_CLIENT_ID not provided; Android sign-in will fail');
       } else {
-        debugPrint('[Auth] Using Android server client id');
+        final suffix = sanitized.length > 10 ? sanitized.substring(sanitized.length - 10) : sanitized;
+        _log('Using Android server client id (...$suffix)');
+        // Validate expected format to catch copy/paste issues early
+        if (!(sanitized.endsWith('.apps.googleusercontent.com') && sanitized.contains('-'))) {
+          _log('WARN: serverClientId does not look like a Web OAuth client id (*.apps.googleusercontent.com)');
+        }
       }
     }
     _initialized = true;
-    debugPrint('[Auth] GoogleSignIn initialized');
+    _log('GoogleSignIn initialized');
   }
 
   Future<GoogleSignInAccount?> signIn() async {
     await _ensureInitialized();
     try {
-      debugPrint('[Auth] Starting interactive authenticate');
-      final acc = await GoogleSignIn.instance.authenticate(
-        scopeHint: const ['https://www.googleapis.com/auth/drive.appdata'],
-      );
+      _log('Starting interactive authenticate');
+      // Do not request Drive scope during account pick; request
+      // scopes later via authorizationHeaders(promptIfNecessary: true).
+      final acc = await GoogleSignIn.instance.authenticate();
       if (acc == null) {
-        debugPrint('[Auth] authenticate returned null (cancelled or failed)');
+        _log('authenticate returned null (cancelled or failed)');
       } else {
-        debugPrint('[Auth] authenticate success for: ' + acc.email);
+        _log('authenticate success for: ' + acc.email);
       }
       return acc;
-    } catch (e) {
-      debugPrint('[Auth] authenticate error: ' + e.toString());
+    } on GoogleSignInException catch (e, st) {
+      final msg = e.toString();
+      _log('authenticate error: code=' + e.code.toString() + ', message=' + msg);
+      if (msg.toLowerCase().contains('reauth failed') ||
+          e.code.toString().toLowerCase().contains('canceled')) {
+        _log('HINT: Ensure the emulator has a signed-in Google account, Play services are up to date, and your account is added as a Test user in the OAuth consent screen.');
+      }
+      _log('STACK: ' + st.toString().split('\n').first);
+      return null;
+    } catch (e, st) {
+      _log('authenticate error (unexpected): ' + e.toString());
+      _log('STACK: ' + st.toString().split('\n').first);
       return null;
     }
   }
@@ -62,23 +105,28 @@ class GoogleAuthService {
   Future<Map<String, String>?> getAuthHeaders({bool promptIfNecessary = false}) async {
     await _ensureInitialized();
     try {
-      debugPrint('[Auth] Fetching auth headers (promptIfNecessary: ' + promptIfNecessary.toString() + ')');
+      _log('Fetching auth headers (promptIfNecessary: ' + promptIfNecessary.toString() + ')');
       final headers = await GoogleSignIn.instance.authorizationClient.authorizationHeaders(
         const ['https://www.googleapis.com/auth/drive.appdata'],
         promptIfNecessary: promptIfNecessary,
       );
       if (headers == null) {
-        debugPrint('[Auth] authorizationHeaders returned null');
+        _log('authorizationHeaders returned null');
         return null;
       }
       if (headers.isEmpty) {
-        debugPrint('[Auth] authorizationHeaders returned empty map');
+        _log('authorizationHeaders returned empty map');
         return headers;
       }
-      debugPrint('[Auth] authorizationHeaders success');
+      _log('authorizationHeaders success; keys: ' + headers.keys.join(', '));
       return headers;
-    } catch (e) {
-      debugPrint('[Auth] authorizationHeaders error: ' + e.toString());
+    } on GoogleSignInException catch (e, st) {
+      _log('authorizationHeaders error: code=' + e.code.toString() + ', message=' + e.toString());
+      _log('STACK: ' + st.toString().split('\n').first);
+      return null;
+    } catch (e, st) {
+      _log('authorizationHeaders error (unexpected): ' + e.toString());
+      _log('STACK: ' + st.toString().split('\n').first);
       return null;
     }
   }
@@ -89,14 +137,84 @@ class GoogleAuthService {
       final fut = GoogleSignIn.instance.attemptLightweightAuthentication();
       final acc = await (fut ?? Future<GoogleSignInAccount?>.value(null));
       if (acc?.email != null) {
-        debugPrint('[Auth] Lightweight auth success for: ' + acc!.email);
+        _log('Lightweight auth success for: ' + acc!.email);
       } else {
-        debugPrint('[Auth] Lightweight auth returned null');
+        _log('Lightweight auth returned null');
       }
       return acc?.email;
-    } catch (e) {
-      debugPrint('[Auth] Lightweight auth error: ' + e.toString());
+    } on GoogleSignInException catch (e, st) {
+      _log('Lightweight auth error: code=' + e.code.toString() + ', message=' + e.toString());
+      _log('STACK: ' + st.toString().split('\n').first);
+      return null;
+    } catch (e, st) {
+      _log('Lightweight auth error (unexpected): ' + e.toString());
+      _log('STACK: ' + st.toString().split('\n').first);
       return null;
     }
+  }
+
+  Future<String> diagnostics() async {
+    final buf = StringBuffer();
+    buf.writeln('Diagnostics start');
+    buf.writeln('kIsWeb: ' + kIsWeb.toString());
+    if (!kIsWeb) {
+      try { buf.writeln('Platform: ' + Platform.operatingSystem + ' | ' + Platform.operatingSystemVersion.split('\n').first); } catch (_) {}
+      final cid = _sanitize(_androidServerClientId);
+      buf.writeln('ServerClientId set: ' + (cid.isNotEmpty).toString() + ' (tail: ...' + (androidServerClientIdTail) + ')');
+    } else {
+      buf.writeln('WebClientId set: ' + (_webClientId.isNotEmpty).toString());
+    }
+    buf.writeln('Initialized: ' + _initialized.toString());
+
+    await _ensureInitialized();
+
+    // 1) Lightweight auth
+    try {
+      final fut = GoogleSignIn.instance.attemptLightweightAuthentication();
+      final acc = await (fut ?? Future<GoogleSignInAccount?>.value(null));
+      buf.writeln('Lightweight: ' + (acc?.email ?? 'null'));
+    } catch (e) {
+      buf.writeln('Lightweight EX: ' + e.toString());
+    }
+
+    // 2) Interactive authenticate
+    try {
+      final acc = await GoogleSignIn.instance.authenticate();
+      buf.writeln('Authenticate: ' + (acc?.email ?? 'null'));
+    } on GoogleSignInException catch (e) {
+      buf.writeln('Authenticate EX: code=' + e.code.toString() + ' msg=' + e.toString());
+    } catch (e) {
+      buf.writeln('Authenticate EX: ' + e.toString());
+    }
+
+    // 3) Authorization headers with a light scope
+    try {
+      final headers = await GoogleSignIn.instance.authorizationClient.authorizationHeaders(
+        const ['email'],
+        promptIfNecessary: true,
+      );
+      buf.writeln('AuthHeaders(email): ' + (headers == null ? 'null' : 'ok keys=' + headers.keys.join(',')));
+    } on GoogleSignInException catch (e) {
+      buf.writeln('AuthHeaders(email) EX: code=' + e.code.toString() + ' msg=' + e.toString());
+    } catch (e) {
+      buf.writeln('AuthHeaders(email) EX: ' + e.toString());
+    }
+
+    // 4) Authorization headers for Drive AppData (what the app needs)
+    try {
+      final headers = await GoogleSignIn.instance.authorizationClient.authorizationHeaders(
+        const ['https://www.googleapis.com/auth/drive.appdata'],
+        promptIfNecessary: true,
+      );
+      buf.writeln('AuthHeaders(drive.appdata): ' + (headers == null ? 'null' : 'ok keys=' + headers.keys.join(',')));
+    } on GoogleSignInException catch (e) {
+      buf.writeln('AuthHeaders(drive.appdata) EX: code=' + e.code.toString() + ' msg=' + e.toString());
+    } catch (e) {
+      buf.writeln('AuthHeaders(drive.appdata) EX: ' + e.toString());
+    }
+
+    final s = buf.toString();
+    for (final line in s.split('\n')) { if (line.isNotEmpty) _log('[Diag] ' + line); }
+    return s;
   }
 }

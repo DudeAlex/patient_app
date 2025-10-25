@@ -19,6 +19,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _auth = GoogleAuthService();
   String? _email;
   bool _busy = false;
+  String? _diag;
 
   @override
   void initState() {
@@ -129,6 +130,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _runAuthDiagnostics() async {
+    setState(() => _busy = true);
+    try {
+      final s = await _auth.diagnostics();
+      setState(() => _diag = s);
+      if (!mounted) return;
+      await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Auth Diagnostics'),
+          content: SingleChildScrollView(child: Text(s)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Close'),
+            )
+          ],
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isWeb = kIsWeb;
@@ -152,6 +177,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 24),
             if (!isWeb) ...[
+              ElevatedButton.icon(
+                onPressed: _runAuthDiagnostics,
+                icon: const Icon(Icons.bug_report),
+                label: const Text('Run Auth Diagnostics'),
+              ),
+              const SizedBox(height: 12),
               ElevatedButton.icon(
                 onPressed: _backupToDrive,
                 icon: const Icon(Icons.backup),
