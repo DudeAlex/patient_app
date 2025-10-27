@@ -1,18 +1,25 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart'
     show GoogleSignInException;
-import 'dart:io' show Platform; // only used on mobile; web uses google_auth_web.dart
 
+/// Wrapper around google_sign_in v7 that centralises initialization, diagnostics,
+/// and Drive scope header retrieval.
 class GoogleAuthService {
-  // Provide a web client ID at build time:
-  // flutter run -d chrome --dart-define=GOOGLE_WEB_CLIENT_ID=YOUR_WEB_CLIENT_ID
+  /// Provide a web client ID at build time:
+  /// flutter run -d chrome --dart-define=GOOGLE_WEB_CLIENT_ID=YOUR_WEB_CLIENT_ID
   static const _webClientId = String.fromEnvironment('GOOGLE_WEB_CLIENT_ID');
-  // Provide an Android server client ID (Web client ID) at build time:
-  // flutter run -d <android_device> --dart-define=GOOGLE_ANDROID_SERVER_CLIENT_ID=YOUR_WEB_CLIENT_ID
-  static const _androidServerClientId = String.fromEnvironment('GOOGLE_ANDROID_SERVER_CLIENT_ID');
+
+  /// Provide an Android server client ID (Web client ID) at build time:
+  /// flutter run -d <android_device> --dart-define=GOOGLE_ANDROID_SERVER_CLIENT_ID=YOUR_WEB_CLIENT_ID
+  static const _androidServerClientId =
+      String.fromEnvironment('GOOGLE_ANDROID_SERVER_CLIENT_ID');
+
   bool _initialized = false;
-  static const bool _debug = bool.fromEnvironment('GOOGLE_AUTH_DEBUG', defaultValue: true);
+  static const bool _debug =
+      bool.fromEnvironment('GOOGLE_AUTH_DEBUG', defaultValue: true);
   static String? _cachedEmail;
 
   void _log(String msg) {
@@ -41,7 +48,9 @@ class GoogleAuthService {
 
   String get androidServerClientIdTail {
     final sanitized = _sanitize(_androidServerClientId);
-    return sanitized.length > 10 ? sanitized.substring(sanitized.length - 10) : sanitized;
+    return sanitized.length > 10
+        ? sanitized.substring(sanitized.length - 10)
+        : sanitized;
   }
 
   Future<void> _ensureInitialized() async {
@@ -57,7 +66,10 @@ class GoogleAuthService {
     } else {
       // Log environment/platform basics for diagnostics
       try {
-        _log('Platform: ' + Platform.operatingSystem + ' | OS version: ' + (Platform.operatingSystemVersion.split('\n').first));
+        _log('Platform: ' +
+            Platform.operatingSystem +
+            ' | OS version: ' +
+            (Platform.operatingSystemVersion.split('\n').first));
       } catch (_) {}
       final sanitized = _sanitize(_androidServerClientId);
       await GoogleSignIn.instance.initialize(
@@ -66,10 +78,12 @@ class GoogleAuthService {
       if (sanitized.isEmpty) {
         _log('ERROR: GOOGLE_ANDROID_SERVER_CLIENT_ID not provided; Android sign-in will fail');
       } else {
-        final suffix = sanitized.length > 10 ? sanitized.substring(sanitized.length - 10) : sanitized;
+        final suffix = sanitized.length > 10
+            ? sanitized.substring(sanitized.length - 10)
+            : sanitized;
         _log('Using Android server client id (...$suffix)');
-        // Validate expected format to catch copy/paste issues early
-        if (!(sanitized.endsWith('.apps.googleusercontent.com') && sanitized.contains('-'))) {
+        if (!(sanitized.endsWith('.apps.googleusercontent.com') &&
+            sanitized.contains('-'))) {
           _log('WARN: serverClientId does not look like a Web OAuth client id (*.apps.googleusercontent.com)');
         }
       }
@@ -82,8 +96,6 @@ class GoogleAuthService {
     await _ensureInitialized();
     try {
       _log('Starting interactive authenticate');
-      // Do not request Drive scope during account pick; request
-      // scopes later via authorizationHeaders(promptIfNecessary: true).
       final acc = await GoogleSignIn.instance.authenticate();
       if (acc == null) {
         _log('authenticate returned null (cancelled or failed)');
@@ -115,11 +127,16 @@ class GoogleAuthService {
     await GoogleSignIn.instance.disconnect();
   }
 
-  Future<Map<String, String>?> getAuthHeaders({bool promptIfNecessary = false}) async {
+  Future<Map<String, String>?> getAuthHeaders({
+    bool promptIfNecessary = false,
+  }) async {
     await _ensureInitialized();
     try {
-      _log('Fetching auth headers (promptIfNecessary: ' + promptIfNecessary.toString() + ')');
-      final headers = await GoogleSignIn.instance.authorizationClient.authorizationHeaders(
+      _log('Fetching auth headers (promptIfNecessary: ' +
+          promptIfNecessary.toString() +
+          ')');
+      final headers =
+          await GoogleSignIn.instance.authorizationClient.authorizationHeaders(
         const ['https://www.googleapis.com/auth/drive.appdata'],
         promptIfNecessary: promptIfNecessary,
       );
@@ -134,7 +151,10 @@ class GoogleAuthService {
       _log('authorizationHeaders success; keys: ' + headers.keys.join(', '));
       return headers;
     } on GoogleSignInException catch (e, st) {
-      _log('authorizationHeaders error: code=' + e.code.toString() + ', message=' + e.toString());
+      _log('authorizationHeaders error: code=' +
+          e.code.toString() +
+          ', message=' +
+          e.toString());
       _log('STACK: ' + st.toString().split('\n').first);
       return null;
     } catch (e, st) {
@@ -162,7 +182,10 @@ class GoogleAuthService {
       }
       return acc?.email;
     } on GoogleSignInException catch (e, st) {
-      _log('Lightweight auth error: code=' + e.code.toString() + ', message=' + e.toString());
+      _log('Lightweight auth error: code=' +
+          e.code.toString() +
+          ', message=' +
+          e.toString());
       _log('STACK: ' + st.toString().split('\n').first);
       return null;
     } catch (e, st) {
@@ -177,9 +200,18 @@ class GoogleAuthService {
     buf.writeln('Diagnostics start');
     buf.writeln('kIsWeb: ' + kIsWeb.toString());
     if (!kIsWeb) {
-      try { buf.writeln('Platform: ' + Platform.operatingSystem + ' | ' + Platform.operatingSystemVersion.split('\n').first); } catch (_) {}
+      try {
+        buf.writeln('Platform: ' +
+            Platform.operatingSystem +
+            ' | ' +
+            Platform.operatingSystemVersion.split('\n').first);
+      } catch (_) {}
       final cid = _sanitize(_androidServerClientId);
-      buf.writeln('ServerClientId set: ' + (cid.isNotEmpty).toString() + ' (tail: ...' + (androidServerClientIdTail) + ')');
+      buf.writeln('ServerClientId set: ' +
+          (cid.isNotEmpty).toString() +
+          ' (tail: ...' +
+          (androidServerClientIdTail) +
+          ')');
     } else {
       buf.writeln('WebClientId set: ' + (_webClientId.isNotEmpty).toString());
     }
@@ -187,7 +219,6 @@ class GoogleAuthService {
 
     await _ensureInitialized();
 
-    // 1) Lightweight auth
     try {
       final fut = GoogleSignIn.instance.attemptLightweightAuthentication();
       final acc = await (fut ?? Future<GoogleSignInAccount?>.value(null));
@@ -197,45 +228,57 @@ class GoogleAuthService {
       buf.writeln('Lightweight EX: ' + e.toString());
     }
 
-    // 2) Interactive authenticate
     try {
       final acc = await GoogleSignIn.instance.authenticate();
       buf.writeln('Authenticate: ' + (acc?.email ?? 'null'));
       if (acc?.email != null) _rememberEmail(acc!.email);
     } on GoogleSignInException catch (e) {
-      buf.writeln('Authenticate EX: code=' + e.code.toString() + ' msg=' + e.toString());
+      buf.writeln('Authenticate EX: code=' +
+          e.code.toString() +
+          ' msg=' +
+          e.toString());
     } catch (e) {
       buf.writeln('Authenticate EX: ' + e.toString());
     }
 
-    // 3) Authorization headers with a light scope
     try {
-      final headers = await GoogleSignIn.instance.authorizationClient.authorizationHeaders(
+      final headers =
+          await GoogleSignIn.instance.authorizationClient.authorizationHeaders(
         const ['email'],
         promptIfNecessary: true,
       );
-      buf.writeln('AuthHeaders(email): ' + (headers == null ? 'null' : 'ok keys=' + headers.keys.join(',')));
+      buf.writeln('AuthHeaders(email): ' +
+          (headers == null ? 'null' : 'ok keys=' + headers.keys.join(',')));
     } on GoogleSignInException catch (e) {
-      buf.writeln('AuthHeaders(email) EX: code=' + e.code.toString() + ' msg=' + e.toString());
+      buf.writeln('AuthHeaders(email) EX: code=' +
+          e.code.toString() +
+          ' msg=' +
+          e.toString());
     } catch (e) {
       buf.writeln('AuthHeaders(email) EX: ' + e.toString());
     }
 
-    // 4) Authorization headers for Drive AppData (what the app needs)
     try {
-      final headers = await GoogleSignIn.instance.authorizationClient.authorizationHeaders(
+      final headers =
+          await GoogleSignIn.instance.authorizationClient.authorizationHeaders(
         const ['https://www.googleapis.com/auth/drive.appdata'],
         promptIfNecessary: true,
       );
-      buf.writeln('AuthHeaders(drive.appdata): ' + (headers == null ? 'null' : 'ok keys=' + headers.keys.join(',')));
+      buf.writeln('AuthHeaders(drive.appdata): ' +
+          (headers == null ? 'null' : 'ok keys=' + headers.keys.join(',')));
     } on GoogleSignInException catch (e) {
-      buf.writeln('AuthHeaders(drive.appdata) EX: code=' + e.code.toString() + ' msg=' + e.toString());
+      buf.writeln('AuthHeaders(drive.appdata) EX: code=' +
+          e.code.toString() +
+          ' msg=' +
+          e.toString());
     } catch (e) {
       buf.writeln('AuthHeaders(drive.appdata) EX: ' + e.toString());
     }
 
     final s = buf.toString();
-    for (final line in s.split('\n')) { if (line.isNotEmpty) _log('[Diag] ' + line); }
+    for (final line in s.split('\n')) {
+      if (line.isNotEmpty) _log('[Diag] ' + line);
+    }
     return s;
   }
 }

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart' as http;
 
+/// Uploads and downloads encrypted archives in the user's Drive App Data space.
 class DriveSyncService {
   final http.Client client;
   DriveSyncService(this.client);

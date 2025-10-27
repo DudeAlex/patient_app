@@ -7,8 +7,9 @@ import 'package:path_provider/path_provider.dart';
 
 import '../crypto/encryption.dart';
 
+/// Handles exporting/importing the application documents directory as an
+/// encrypted archive suitable for uploading to Google Drive.
 class BackupService {
-  // Creates a ZIP of the app documents directory (including Isar DB and attachments).
   static Future<Uint8List> exportZip() async {
     final doc = await getApplicationDocumentsDirectory();
     final root = Directory(doc.path);

@@ -2,6 +2,8 @@ import 'package:http/http.dart' as http;
 
 typedef AuthHeadersProvider = Future<Map<String, String>?> Function();
 
+/// HTTP client that injects Google authorization headers fetched from a
+/// provided async callback. Throws if the callback returns null/empty headers.
 class GoogleAuthClient extends http.BaseClient {
   final http.Client _inner;
   final AuthHeadersProvider _headersProvider;

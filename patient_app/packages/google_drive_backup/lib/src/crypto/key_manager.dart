@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+/// Persists a 32-byte AES key in platform secure storage.
 class KeyManager {
   static const _keyName = 'backup_key_v1';
   static const _storage = FlutterSecureStorage();
@@ -17,5 +18,5 @@ class KeyManager {
     final bytes = await secretKey.extractBytes();
     await _storage.write(key: _keyName, value: base64Encode(bytes));
     return Uint8List.fromList(bytes);
-    }
+  }
 }

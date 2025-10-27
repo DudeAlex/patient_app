@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-
-import '../../core/auth/auth_client.dart' if (dart.library.html) '../../core/auth/auth_client_web.dart';
-import '../../core/auth/google_auth.dart' if (dart.library.html) '../../core/auth/google_auth_web.dart';
-import '../../core/backup/backup_service.dart' if (dart.library.html) '../../core/backup/backup_service_web.dart';
-import '../../core/crypto/key_manager.dart';
-import '../../core/sync/drive_sync.dart';
+import 'package:google_drive_backup/google_drive_backup.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -16,7 +10,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final _auth = GoogleAuthService();
+  final _manager = DriveBackupManager();
   String? _email;
   bool _busy = false;
   String? _diag;
@@ -28,26 +22,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _restoreAccount() async {
-    final cached = _auth.cachedEmail;
+    final cached = _manager.auth.cachedEmail;
     if (cached != null) {
       setState(() => _email = cached);
     }
-    final email = await _auth.tryGetEmail();
+    final email = await _manager.restoreAccount();
     if (!mounted) return;
     setState(() => _email = email ?? cached);
     // Warm up auth headers silently to reduce latency when the user
     // triggers backup/restore shortly after opening Settings.
     final effectiveEmail = email ?? cached;
     if (effectiveEmail != null) {
-      Future.microtask(() => _auth.getAuthHeaders(promptIfNecessary: false));
+      Future.microtask(
+        () => _manager.auth.getAuthHeaders(promptIfNecessary: false),
+      );
     }
   }
 
   Future<void> _signIn() async {
     setState(() => _busy = true);
     try {
-      final acc = await _auth.signIn();
-      final email = await _auth.tryGetEmail();
+      final acc = await _manager.auth.signIn();
+      final email = await _manager.restoreAccount();
       setState(() => _email = email);
       if (email == null || acc == null) {
         if (mounted) {
@@ -70,7 +66,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _signOut() async {
     setState(() => _busy = true);
     try {
-      await _auth.signOut();
+      await _manager.auth.signOut();
       setState(() => _email = null);
     } finally {
       setState(() => _busy = false);
@@ -86,14 +82,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     setState(() => _busy = true);
     try {
-      final key = await KeyManager.getOrCreateKey();
-      final encrypted = await BackupService.exportEncrypted(key);
-      final client = GoogleAuthClient(() async => await _auth.getAuthHeaders(promptIfNecessary: true), http.Client());
-      final drive = DriveSyncService(client);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uploading backup to Drive...')));
       }
-      await drive.uploadEncrypted(encrypted);
+      await _manager.backupToDrive();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Backup uploaded to Drive')));
       }
@@ -115,20 +107,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     setState(() => _busy = true);
     try {
-      final key = await KeyManager.getOrCreateKey();
-      final client = GoogleAuthClient(() async => await _auth.getAuthHeaders(promptIfNecessary: true), http.Client());
-      final drive = DriveSyncService(client);
-      final bytes = await drive.downloadEncrypted();
-      if (bytes == null) {
+      try {
+        await _manager.restoreFromDrive();
+      } on StateError catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No backup found in Drive')));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? 'Restore failed')));
         }
         return;
       }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Restoring backup...')));
       }
-      await BackupService.importEncrypted(bytes, key);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Restore completed')));
       }
@@ -144,7 +133,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _runAuthDiagnostics() async {
     setState(() => _busy = true);
     try {
-      final s = await _auth.diagnostics();
+      final s = await _manager.auth.diagnostics();
       setState(() => _diag = s);
       if (!mounted) return;
       await showDialog(

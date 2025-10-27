@@ -1,0 +1,19 @@
+name: google_drive_backup_example
+description: Minimal example for google_drive_backup package.
+publish_to: none
+
+environment:
+  sdk: '>=3.8.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_drive_backup:
+    path: ..
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
