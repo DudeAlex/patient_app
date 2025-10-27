@@ -24,12 +24,13 @@ class DriveSyncService {
     final api = drive.DriveApi(client);
     final existing = await _findOrNull(api);
     final media = drive.Media(Stream<List<int>>.fromIterable([bytes]), bytes.length);
-    final file = drive.File()
-      ..name = fileName
-      ..parents = ['appDataFolder'];
+    final file = drive.File()..name = fileName;
     if (existing?.id != null) {
+      // Updating metadata cannot modify parents directly; keep the file in its
+      // existing appDataFolder location.
       return await api.files.update(file, existing!.id!, uploadMedia: media);
     } else {
+      file.parents = ['appDataFolder'];
       return await api.files.create(file, uploadMedia: media);
     }
   }
