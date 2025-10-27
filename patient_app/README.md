@@ -8,6 +8,7 @@ Features
 - Local storage with Isar (encrypted backup archive, on‑device DB not encrypted yet)
 - Attachments folder for files (mobile only at this stage)
 - Settings screen with Google sign‑in and Drive backup/restore (mobile)
+- Settings caches the signed‑in account to avoid re-showing the Google sign-in sheet when reopening the screen
 - In‑app Auth Diagnostics (runs sign‑in and header checks; logs safe details)
 - Web build boots the app and hides backup/restore (browser sandbox)
 

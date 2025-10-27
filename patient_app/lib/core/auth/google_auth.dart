@@ -13,9 +13,20 @@ class GoogleAuthService {
   static const _androidServerClientId = String.fromEnvironment('GOOGLE_ANDROID_SERVER_CLIENT_ID');
   bool _initialized = false;
   static const bool _debug = bool.fromEnvironment('GOOGLE_AUTH_DEBUG', defaultValue: true);
+  static String? _cachedEmail;
 
   void _log(String msg) {
     if (_debug) debugPrint('[Auth] ' + msg);
+  }
+
+  String? get cachedEmail => _cachedEmail;
+
+  void _rememberEmail(String? email) {
+    if (email == null || email.isEmpty) {
+      _cachedEmail = null;
+    } else {
+      _cachedEmail = email;
+    }
   }
 
   String _sanitize(String v) {
@@ -78,6 +89,7 @@ class GoogleAuthService {
         _log('authenticate returned null (cancelled or failed)');
       } else {
         _log('authenticate success for: ' + acc.email);
+        _rememberEmail(acc.email);
       }
       return acc;
     } on GoogleSignInException catch (e, st) {
@@ -99,6 +111,7 @@ class GoogleAuthService {
   Future<void> signOut() async {
     await _ensureInitialized();
     debugPrint('[Auth] Signing out');
+    _rememberEmail(null);
     await GoogleSignIn.instance.disconnect();
   }
 
@@ -134,10 +147,16 @@ class GoogleAuthService {
   Future<String?> tryGetEmail() async {
     await _ensureInitialized();
     try {
+      final cached = _cachedEmail;
+      if (cached != null) {
+        _log('Using cached email: ' + cached);
+        return cached;
+      }
       final fut = GoogleSignIn.instance.attemptLightweightAuthentication();
       final acc = await (fut ?? Future<GoogleSignInAccount?>.value(null));
       if (acc?.email != null) {
         _log('Lightweight auth success for: ' + acc!.email);
+        _rememberEmail(acc.email);
       } else {
         _log('Lightweight auth returned null');
       }
@@ -173,6 +192,7 @@ class GoogleAuthService {
       final fut = GoogleSignIn.instance.attemptLightweightAuthentication();
       final acc = await (fut ?? Future<GoogleSignInAccount?>.value(null));
       buf.writeln('Lightweight: ' + (acc?.email ?? 'null'));
+      if (acc?.email != null) _rememberEmail(acc!.email);
     } catch (e) {
       buf.writeln('Lightweight EX: ' + e.toString());
     }
@@ -181,6 +201,7 @@ class GoogleAuthService {
     try {
       final acc = await GoogleSignIn.instance.authenticate();
       buf.writeln('Authenticate: ' + (acc?.email ?? 'null'));
+      if (acc?.email != null) _rememberEmail(acc!.email);
     } on GoogleSignInException catch (e) {
       buf.writeln('Authenticate EX: code=' + e.code.toString() + ' msg=' + e.toString());
     } catch (e) {

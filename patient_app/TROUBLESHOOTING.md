@@ -48,6 +48,7 @@ Google Sign-In Errors
         - Get SHA report: `cd android; .\gradlew signingReport` (PowerShell)
     - If still stuck, clear data: Settings → Apps → Google Play services → Storage → Clear all data → Reboot
   - In-app help: Settings → Run Auth Diagnostics and review `[Auth] [Diag] ...` logs
+  - Once signed in, the app caches the email so reopening Settings should be instant; if the Google bottom sheet reappears repeatedly, sign out and sign back in to refresh the cache.
 - Web: pass `--dart-define=GOOGLE_WEB_CLIENT_ID=...` and add localhost origins in GCP
 
 Emulator Performance (Windows)

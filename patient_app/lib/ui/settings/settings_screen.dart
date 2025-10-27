@@ -28,8 +28,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _restoreAccount() async {
+    final cached = _auth.cachedEmail;
+    if (cached != null) {
+      setState(() => _email = cached);
+    }
     final email = await _auth.tryGetEmail();
-    setState(() => _email = email);
+    if (!mounted) return;
+    setState(() => _email = email ?? cached);
+    // Warm up auth headers silently to reduce latency when the user
+    // triggers backup/restore shortly after opening Settings.
+    final effectiveEmail = email ?? cached;
+    if (effectiveEmail != null) {
+      Future.microtask(() => _auth.getAuthHeaders(promptIfNecessary: false));
+    }
   }
 
   Future<void> _signIn() async {
