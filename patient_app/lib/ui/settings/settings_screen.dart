@@ -13,7 +13,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _manager = DriveBackupManager();
   String? _email;
   bool _busy = false;
-  String? _diag;
 
   @override
   void initState() {
@@ -111,7 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await _manager.restoreFromDrive();
       } on StateError catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? 'Restore failed')));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
         }
         return;
       }
@@ -134,7 +133,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _busy = true);
     try {
       final s = await _manager.auth.diagnostics();
-      setState(() => _diag = s);
       if (!mounted) return;
       await showDialog(
         context: context,

@@ -28,8 +28,9 @@ class DriveBackupManager {
 
   Future<void> backupToDrive({bool promptIfNecessary = true}) async {
     final encrypted = await _ensureEncryptedExport();
-    final headersProvider = () =>
-        auth.getAuthHeaders(promptIfNecessary: promptIfNecessary);
+    Future<Map<String, String>?> headersProvider() {
+      return auth.getAuthHeaders(promptIfNecessary: promptIfNecessary);
+    }
     final client = GoogleAuthClient(headersProvider, http.Client());
     try {
       final drive = DriveSyncService(client);
@@ -40,8 +41,9 @@ class DriveBackupManager {
   }
 
   Future<void> restoreFromDrive({bool promptIfNecessary = true}) async {
-    final headersProvider = () =>
-        auth.getAuthHeaders(promptIfNecessary: promptIfNecessary);
+    Future<Map<String, String>?> headersProvider() {
+      return auth.getAuthHeaders(promptIfNecessary: promptIfNecessary);
+    }
     final client = GoogleAuthClient(headersProvider, http.Client());
     try {
       final drive = DriveSyncService(client);

@@ -1,5 +1,3 @@
-library google_drive_backup;
-
 export 'src/auth/auth_client.dart'
     if (dart.library.html) 'src/auth/auth_client_web.dart';
 export 'src/auth/google_auth.dart'
