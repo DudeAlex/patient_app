@@ -10,8 +10,13 @@ Local-first personal health records app. Mobile stores data on-device (Isar), wi
 - Settings screen with Google sign-in and Drive backup/restore (mobile)
 - Settings caches the signed-in account to avoid re-showing the Google sign-in sheet when reopening the screen
 - Shared `google_drive_backup` package provides reusable Google auth + encrypted Drive backup helpers
-- In‑app Auth Diagnostics (runs sign‑in and header checks; logs safe details)
+- In-app Auth Diagnostics (runs sign-in and header checks; logs safe details)
 - Web build boots the app and hides backup/restore (browser sandbox)
+- Upcoming multi-modal “Add Record” flow (photo, voice dictation, keyboard, future device inputs)
+- Dual operating modes: local-only storage by default, opt-in AI-assisted companion (Together AI: Llama 70B text, Apriel image) for extraction, organization, and encouragement
+- Compassionate companion experience with contextual follow-ups, safety hints, and morale support (design underway)
+- Support network & emergency contacts for quick outreach (design underway)
+- Multilingual UX with focus on English, Russian, and Central Asian languages (localization pipeline planned)
 
 Tech Stack
 - Flutter (Material 3)
@@ -25,6 +30,7 @@ Project Layout
 - `lib/features/records/` Isar models + repo (CRUD wiring to UI pending)
 - `packages/google_drive_backup/` reusable Google Drive backup + auth library (consumed by the app)
 - Specs: see `SPEC.md` for detailed, living requirements
+- Strategy & compassionate AI roadmap: see `AI_ASSISTED_PATIENT_APP_PLAN.md`
 
 Prerequisites
 - Flutter stable ≥ 3.32
@@ -110,10 +116,10 @@ Development Scripts
 - Update codegen after model changes:
   `dart run build_runner build --delete-conflicting-outputs`
 
-Status & Next Steps
-- Implement Records CRUD UI (Home/Add/Detail) and wire Isar repo
-- Add auto-sync hooks (on resume/exit) using current backup format
-- Optional: web JSON backup/restore to Drive appData
+ Status & Next Steps
+- Immediate focus: Records CRUD UI + auto-sync groundwork.
+- In discovery: multi-modal Add Record flow and opt-in AI companion (Together AI).
+- Full roadmap (support network, localisation, wellness companion): see `TODO.md` for the living milestones.
 
 
 Contributing & Process

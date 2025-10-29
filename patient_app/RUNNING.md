@@ -53,6 +53,13 @@ Debugging
   - Optional: `--dart-define=GOOGLE_AUTH_DEBUG=true` for verbose auth logs (default true)
 - Logs: the app prints `[Auth] ...` logs during initialization, interactive sign-in, and header fetching. Look for messages like `serverClientId must be provided on Android`.
 - In-app: Settings → Run Auth Diagnostics to exercise lightweight auth, interactive picker, and header requests; results are dialog + console logs.
-- OAuth setup: ensure Drive API enabled, consent screen configured, Android client (package `com.example.patient_app`, correct debug SHA‑1), and a Web client (used as server client ID).
+- OAuth setup: ensure Drive API enabled, consent screen configured, Android client (package `com.example.patient_app`, correct debug SHA-1), and a Web client (used as server client ID).
 - OneDrive locks: if builds fail or files are locked, pause OneDrive or move the project outside OneDrive.
 - Reset state: uninstall the app on the emulator or clear app data; then rerun.
+
+AI-Assisted Companion (Preview)
+- The opt-in AI workflow uses Together AI (Llama 70B, Apriel) for text/image understanding.
+- Keep the app in local-only mode unless the user provides informed consent.
+- When integration lands, expect to supply a secret (e.g., `TOGETHER_API_KEY`) via secure storage or a proxy service; never commit keys to the repo.
+- Offline behavior should fall back to manual entry; queued AI jobs will retry once connectivity returns.
+- See `AI_ASSISTED_PATIENT_APP_PLAN.md` for the current integration roadmap.
