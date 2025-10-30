@@ -7,7 +7,7 @@ Purpose
 
 Golden Rules
 - Move slowly: prefer small, focused updates over big refactors.
-- Validate manually: after each meaningful change, outline how to run and what to check; request approval before running commands when required by the environment.
+- Validate manually: after each meaningful change, outline how to run and what to check; request approval before running commands when required by the environment, and record the outcome in `TESTING.md`.
 - Comment your code: when adding/modifying code, include short, clear comments explaining intent and non-obvious choices.
 - Keep docs in sync: whenever you change behavior, update the relevant info files (README, RUNNING, ARCHITECTURE, SYNC, TROUBLESHOOTING, TODO).
 - Stay synced with docs: begin every work session by reading `AI_AGENT_START_HERE.md` and the listed documents; finish by revisiting them to confirm they reflect the final state.
@@ -19,7 +19,7 @@ Before Step 1, refresh context by reading `AI_AGENT_START_HERE.md` and opening e
 1) Plan: Create or update a short plan with concrete steps.
 2) Implement incrementally: small patches that are easy to review and revert.
 3) Document: update info files in the same patch (what changed, why, how to run/verify).
-4) Validate: describe manual checks or tests performed; run analyzers/tests only with approval when needed.
+4) Validate: describe manual checks or tests performed; run analyzers/tests only with approval when needed. Append the new scenario and result to `TESTING.md` so the manual log stays current.
 5) Summarize: provide a brief, scannable summary in the final message (affected files, commands to run, known limitations).
 
 Documentation Checklist (update as applicable)

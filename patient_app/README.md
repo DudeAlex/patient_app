@@ -113,6 +113,7 @@ Common Issues
 Notes
 - Android manifest enables back gesture API (`android:enableOnBackInvokedCallback="true"`).
 - The app sanitizes `GOOGLE_ANDROID_SERVER_CLIENT_ID` to avoid accidental surrounding quotes from shells.
+- Manual test history is tracked in `TESTING.md`.
 
 Development Scripts
 - Update codegen after model changes:

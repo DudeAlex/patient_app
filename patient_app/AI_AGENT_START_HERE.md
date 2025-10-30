@@ -20,6 +20,6 @@ Purpose: give any AI or contributor a single launchpad to the repo’s must-read
 1. At the start of every work session, read through this index and open each must-read document to refresh the current expectations before making changes.
 2. If you are just beginning work on this project (or a brand-new feature area), generate or refresh the core docs/specs first so everyone has an up-to-date reference frame.
 3. After reviewing the docs, study the specific code, tests, and assets you intend to modify so you fully understand current behavior—especially in large or critical areas—before drafting changes.
-4. While implementing, keep the referenced documents in sync; record updates as soon as behavior or requirements shift.
+4. While implementing, keep the referenced documents in sync; record updates as soon as behavior or requirements shift. Log any new manual verification steps and outcomes in `TESTING.md`.
 5. Before delivering the final summary, revisit every must-read document and confirm they reflect the final state of the work, making edits where necessary.
 6. Update this index whenever a new "must read" document is introduced so agents always have a single authoritative entry point.
