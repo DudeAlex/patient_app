@@ -16,6 +16,8 @@ Key Modules
   - `core/storage/attachments.dart` manage attachments directory
   - Planned: `core/ai/ai_processing_service.dart` encapsulates Together AI calls, consent checks, retries, schema validation
   - Planned: `core/support/support_network.dart` manages trusted contacts, emergency actions, and sharing audit trail
+  - Planned: `core/import/email_ingest.dart` handles OAuth/IMAP connectors, mailbox sync, and structured message parsing
+  - Planned: `core/vitals/vitals_service.dart` powers camera PPG capture, cuff integrations, and signal analysis
 - `packages/google_drive_backup/`
   - `auth/` Google Sign-In wrapper + injected HTTP client (v7 API)
   - `crypto/` AES-GCM helpers + secure key management
@@ -26,6 +28,7 @@ Key Modules
   - `model/record.dart`, `attachment.dart`, `insight.dart`, `sync_state.dart`
   - `repo/records_repo.dart`
   - Planned: `model/support_contact.dart`, `model/wellness_check_in.dart` to persist support networks and wellness check-ins
+  - Planned: `model/vital_measurement.dart` for pulse/blood-pressure readings linked to records
 
 Data Model (Isar)
 - Record: id, type, date, title, text?, tags[], createdAt, updatedAt, deletedAt?
@@ -45,8 +48,9 @@ Platform Behavior
 - AI-assisted features target Android/iOS first; web companion requires dedicated consent UX and may ship later.
 
 Future Work
-- Implement multi-modal Add Record flow with contextual prompts and accessible design.
+- Implement expanded multi-modal Add Record flow (photo, scan, voice, keyboard, file upload, email import) with accessible review.
 - Build `AiProcessingService` + background queue for Together AI enrichment.
+- Deliver camera-based pulse capture + blood pressure integrations via `vitals_service`.
 - Add support network/emergency modules and integrate with home/emergency UI.
 - Ship compassionate notifications, wellness check-ins, and localisation via Flutter `gen-l10n`.
 - See `TODO.md` for the detailed milestone breakdown.

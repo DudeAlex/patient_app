@@ -23,15 +23,26 @@ Status: draft (concept validation in progress)
 ## Multi-Modal Add Record Flow
 - **Entry Point**
   - Single, high-contrast "Add Record" button on home screen.
-  - Opens a friendly modal with large buttons: Photo/Image, Dictate, Keyboard/Text, (future) Barcode/Device.
+  - Opens a friendly modal with large buttons: Photo/Image, Document Scan, Dictate, Keyboard/Text, Upload File, Import from Email.
 - **Photo/Image**
   - Capture or import images; upload (if AI-enabled) to Apriel for text extraction and classification.
   - Provide local OCR fallback for users in local-only mode.
+  - Run immediate clarity/OCR checks and prompt patients to retake if text or key fields are unreadable before advancing.
+- **Document Scan**
+  - Auto-detect edges, correct perspective, and reduce glare for paper records.
+  - Run on-device OCR; send enhanced captures to AI (if enabled) for structured extraction.
+  - Offer guided rescan when glare/blur lowers confidence, with manual cropping as a fallback.
 - **Voice Dictation**
   - Simple record/stop UI with live transcription where possible.
   - AI parses transcripts to fill structured fields, highlight uncertainties, and request clarifications.
 - **Keyboard/Text**
   - Guided forms with big inputs, templates per record type, and optional freeform note area.
+- **Upload File**
+  - Accept PDFs and common medical image formats; preserve originals as attachments with metadata (source, upload date).
+  - Offer inline previews and prompt for tagging before save.
+- **Import from Email**
+  - Allow patients to connect a read-only Gmail label (Gmail API, restricted scope) or forwarding address dedicated to health records.
+  - Parse medical summaries, keep original message headers, and highlight extracted fields for confirmation.
 - **Contextual Follow-Up**
   - AI and rule-based prompts ask for missing details ("When did the prescription start?").
   - Allow skip/defer; unresolved prompts surface in the review panel.
@@ -39,6 +50,12 @@ Status: draft (concept validation in progress)
   - Combines photo, transcript, and manual edits.
   - Shows AI confidence badges and keeps original artifacts for reference.
   - Large "Save" confirmation with voice narration option.
+
+## Phone-Based Vitals Capture
+- Provide quick actions for pulse and blood pressure checks from the dashboard or Add Record flow.
+- Support camera-based photoplethysmography (finger over camera/flash) with real-time signal quality feedback and safety disclaimers.
+- Allow pairing with compatible cuffs/sensors for blood pressure; store calibration info and confidence scoring.
+- Save vitals as structured entries linked to records, and surface trends or alerts via the AI companion when enabled.
 
 ## AI Service Integration (Together AI)
 - **Abstraction**

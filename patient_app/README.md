@@ -12,10 +12,11 @@ Local-first personal health records app. Mobile stores data on-device (Isar), wi
 - Shared `google_drive_backup` package provides reusable Google auth + encrypted Drive backup helpers
 - In-app Auth Diagnostics (runs sign-in and header checks; logs safe details)
 - Web build boots the app and hides backup/restore (browser sandbox)
-- Upcoming multi-modal “Add Record” flow (photo, voice dictation, keyboard, future device inputs)
+- Upcoming multi-modal "Add Record" flow (photo with on-device retake checks, document scan, voice dictation, keyboard, file upload, Gmail label import)
 - Dual operating modes: local-only storage by default, opt-in AI-assisted companion (Together AI: Llama 70B text, Apriel image) for extraction, organization, and encouragement
 - Compassionate companion experience with contextual follow-ups, safety hints, and morale support (design underway)
 - Support network & emergency contacts for quick outreach (design underway)
+- Planned phone-based vitals capture (camera-based pulse and connected-cuff blood pressure) with patient consent
 - Multilingual UX with focus on English, Russian, and Central Asian languages (localization pipeline planned)
 
 Tech Stack
@@ -29,6 +30,7 @@ Project Layout
 - `lib/core/` database/storage helpers shared across features
 - `lib/features/records/` Isar models + repo (CRUD wiring to UI pending)
 - `packages/google_drive_backup/` reusable Google Drive backup + auth library (consumed by the app)
+- Contributors and AI agents: start every session with `AI_AGENT_START_HERE.md` to review the must-read guidance before making changes.
 - Specs: see `SPEC.md` for detailed, living requirements
 - Strategy & compassionate AI roadmap: see `AI_ASSISTED_PATIENT_APP_PLAN.md`
 

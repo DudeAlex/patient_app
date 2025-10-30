@@ -14,11 +14,12 @@ In scope (MVP)
 - Optional attachments (mobile only initially).
 - Backup/restore: manual, encrypted archive to Drive App Data.
 - Platforms: Android, iOS (primary), Web (runs without backup/restore).
-- Support for multi-modal record creation (photo, dictation, keyboard) with a unified review step.
+- Support for multi-modal record creation (photo, document scan, dictation, keyboard, file upload, email import) with a unified review step.
 - Optional AI-assisted mode (Together AI) that patients may opt into for extraction, organisation, and wellness guidance.
 - Support network contact storage with quick emergency access.
 - Accessibility-first UX tuned for older, non-technical users.
 - Multilingual UX (English + Russian first; pathway to Central Asian languages).
+- Phone-based vitals capture (pulse and blood pressure) using camera PPG or connected peripherals (planned extension).
 
 Out of scope (for MVP)
 - Real-time sync/collaboration, multi-account.
@@ -56,26 +57,37 @@ Out of scope (for MVP)
 - Detail view; delete moves to trash or sets `deletedAt`.
 - Acceptance: operations persist in Isar; list updates; timestamps set appropriately.
 
-4.6 Multi-Modal “Add Record” Flow (planned M2+)
-- Entry modal offers: Photo/Image, Voice Dictation, Keyboard/Text (extensible to device/barcode inputs).
-- Each capture mode stores raw artefacts locally, then funnels into a unified review panel.
+4.6 Multi-Modal "Add Record" Flow (planned M2+)
+- Entry modal offers: Photo/Image, Document Scan, Voice Dictation, Keyboard/Text, File Upload, and Email Import.
+- Each capture or import mode stores raw artefacts locally, then funnels into a unified review panel.
 - Voice dictation provides live transcription (where supported) and allows manual corrections.
+- Photo capture runs instant clarity/OCR checks; if text or key fields are unreadable, prompt the patient to retake before leaving the flow.
+- Document scan auto-detects edges, cleans glare, and extracts text for review; if OCR confidence is low, offer guided rescan before continuing, with manual adjustments as fallback.
+- File upload supports PDFs and common image formats, preserving attachments for mobile and web parity.
+- Email import connects to a patient-approved Gmail account via the Gmail API (read-only, restricted label), parses medical summaries, and surfaces source metadata.
 - Contextual follow-up prompts request missing details; patients can skip or answer later.
 - Save step confirms merged data, tags, attachments, and shows accessible success feedback.
+- No video capture is planned for this milestone.
 
-4.7 AI-Assisted Companion (Opt-In, planned M3)
+4.7 Phone-Based Vitals Capture (planned M3+)
+- Patients can measure pulse and blood pressure directly on supported phones (camera-based PPG or connected peripherals).
+- Flow guides placement (finger over camera/flash or cuff pairing), validates signal quality, and shares safety disclaimers.
+- Measurements persist as structured records with timestamp, method, and confidence score; readings can be linked to existing records.
+- Offline operation required; AI suggestions may annotate results when assistance is enabled.
+
+4.8 AI-Assisted Companion (Opt-In, planned M3)
 - Settings exposes `AiProcessingMode` toggle: Local Only (default), AI Assisted.
 - When enabled (with explicit consent), photos and transcripts may be sent to Together AI (Llama 70B text, Apriel image) via `AiProcessingService`.
 - AI returns structured fields, suggested tags, safety notes, confidence scores, and compassionate messages.
 - Raw inputs are saved before AI processing; suggestions require patient confirmation before overwriting.
 - Offline behaviour: queue requests and notify the patient; manual completion is always available.
 
-4.8 Support Network & Emergency Assist (planned M3)
+4.9 Support Network & Emergency Assist (planned M3)
 - Patients can store trusted contacts (name, relationship, phone, preferred channel, priority).
 - Home dashboard shows quick actions for top contacts; dedicated emergency screen with large “Call / Message / Share summary” buttons and optional countdown auto-call.
 - Sharing requires explicit confirmation; audit log records who was notified and when.
 
-4.9 Wellness Companion & Check-Ins (planned M4)
+4.10 Wellness Companion & Check-Ins (planned M4)
 - Daily/weekly prompts capture mood, energy, concerns (voice or text).
 - AI generates empathetic encouragement, practical suggestions, and curated resources (e.g., breathing exercises).
 - Notifications use friendly tone, can be snoozed or muted.
@@ -85,16 +97,18 @@ Out of scope (for MVP)
 - Record
   - id (auto), type, date, title, text?, tags[], createdAt, updatedAt, deletedAt?
   - Index: `typeDateIndex`
-- Attachment
-  - id (auto), recordId, path, kind (image/pdf), ocrText?, createdAt
+  - Attachment
+    - id (auto), recordId, path, kind (image/pdf/audio/email), ocrText?, createdAt, sourceMetadata?
   - Index: `recordIndex`
 - Insight
   - id (auto), recordId?, kind, text, createdAt
 - SupportContact (planned)
   - id (auto), name, relationship, priority, preferredChannel, phone?, messagingHandle?, timeZone?, notes?, createdAt, updatedAt
-- WellnessCheckIn (planned)
-  - id (auto), moodScore?, energyScore?, notes, createdAt, aiSummary?, aiConfidence?
-- SyncState (singleton id=1)
+  - WellnessCheckIn (planned)
+    - id (auto), moodScore?, energyScore?, notes, createdAt, aiSummary?, aiConfidence?
+  - VitalMeasurement (planned)
+    - id (auto), kind (`pulse` | `blood_pressure`), primaryValue, secondaryValue?, unit, method, confidence?, capturedAt, linkedRecordId?
+  - SyncState (singleton id=1)
   - lastSyncedAt?, lastRemoteModified?, localChangeCounter, deviceId
 
 Source of truth: definitions in `lib/features/records/model/*.dart`.
@@ -143,7 +157,7 @@ Source of truth: definitions in `lib/features/records/model/*.dart`.
 - AI pending: "Processing with AI; we'll notify you soon."
 - AI failure: "AI review failed: <reason>. Your original record is saved."
 
-## 11. Manual Test Plan (MVP)
+## 11. Manual Test Plan (MVP + Planned Extensions)
 T-01 Sign-In/Out
 - Open Settings → Sign in; verify email displayed. Sign out; verify cleared.
 
@@ -162,11 +176,17 @@ T‑05 Web Behavior
 T-06 Failure Paths
 - Simulate offline during backup/restore; expect error SnackBar; local files unchanged.
 - Corrupt downloaded file; expect decrypt error; local files unchanged.
-- Future AI Tests (outline)
-  - AI-01 Consent Opt-In: enable AI mode, capture record, verify consent banner and toggle persistence.
-  - AI-02 Offline Queue: disable network, capture record, ensure AI task queues and manual record saved.
-  - AI-03 Review Merge: accept/reject AI suggestions and confirm original artefacts remain accessible.
-  - ACC-01 Accessibility Audit: run with large fonts/screen reader to ensure multi-modal flow is usable.
+- Future AI & Capture Tests (outline)
+    - AI-01 Consent Opt-In: enable AI mode, capture record, verify consent banner and toggle persistence.
+    - AI-02 Offline Queue: disable network, capture record, ensure AI task queues and manual record saved.
+    - AI-03 Review Merge: accept/reject AI suggestions and confirm original artefacts remain accessible.
+    - ACC-01 Accessibility Audit: run with large fonts/screen reader to ensure multi-modal flow is usable.
+    - CAP-01 Document Scan: scan a paper record, verify auto-crop, OCR text, and attachment persistence.
+    - CAP-02 Email Import: import a forwarded visit summary, confirm metadata attribution and record creation.
+    - CAP-03 File Upload (Web/Mobile): attach PDF lab results, ensure backup includes the file.
+    - CAP-04 Photo Retake Prompt: capture a blurry photo, confirm the flow requests a retake until clarity/OCR thresholds pass or manual override selected.
+    - VIT-01 Pulse Capture: measure pulse via camera, verify value, timestamp, and confidence stored.
+    - VIT-02 Blood Pressure Capture: pair or simulate cuff input, ensure readings link to the correct record.
 
 ## 12. Open Questions / Decisions Log
 - Should Isar DB be encrypted at rest using `KeyManager`? Current README says "not encrypted yet". Decision TBD.
@@ -176,6 +196,8 @@ T-06 Failure Paths
 - How to store/share audio recordings securely (encryption at rest, retention policy).
 - Approach for multilingual medical terminology (glossary ownership, translator workflow).
 - Rules for AI-triggered safety escalations (when to prompt emergency contact suggestions).
+- Gmail import implementation: define required label/forwarding setup, retained message window, and consent copy for scoped read-only access.
+- Camera-based blood pressure accuracy: acceptable error tolerance, calibration flow, and device compatibility matrix.
 
 ## 13. Release Checklist (MVP)
 - Records CRUD UI implemented and validated.

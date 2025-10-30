@@ -18,6 +18,7 @@ Operations
   1) Download from Drive App Data
   2) Decrypt bytes
   3) Unzip to app docs dir (replace)
+  - Imported assets now include scanned PDFs, uploaded documents, email attachments, and audio clips alongside photos.
 
 Auth
 - Google Sign-In v7 API
@@ -38,12 +39,16 @@ Web Behavior
 
 AI Processing Queue (Planned)
 - `AiProcessingService` stores pending tasks in local Isar so requests survive restarts and are included in backups.
-- Each task references source artefacts (photo, audio, text) and the mode (photo/voice/keyboard).
+- Each task references source artefacts (photo, audio, text) and the mode (photo/scan/voice/keyboard/file/email/vitals).
 - When online and consented, the queue sends payloads to Together AI and persists structured responses + confidence + prompts.
 - Failures mark tasks for retry and notify the patient; originals remain untouched.
+  - Email-derived tasks capture headers, message ids, and source mailbox labels for traceability.
+  - Vitals readings keep raw sensor traces local while enqueueing structured pulse/blood-pressure data for AI annotations.
 
 Consent & Privacy
 - Local-only mode never transmits PHI off-device.
-- AI-assisted mode requires explicit toggle and displays per-request notices (“This photo will be analysed via Together AI”).
+- AI-assisted mode requires explicit toggle and displays per-request notices ("This photo will be analysed via Together AI").
 - API keys are stored in secure storage or mediated via a proxy; never shipped in binaries.
 - Logs capture only non-PII telemetry (request ids, durations, error codes) to aid troubleshooting.
+- Email import uses minimal scopes (read-only forwarding label) and records headers so patients can audit access.
+- Phone-based vitals capture reminds patients readings are informational and keeps raw video streams on-device unless consented for diagnostics.
