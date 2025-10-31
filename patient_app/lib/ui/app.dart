@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+
+import '../features/records/data/records_service.dart';
+import '../features/records/repo/records_repo.dart';
+import '../features/records/ui/records_home_placeholder.dart';
 import 'settings/settings_screen.dart';
 
 class PatientApp extends StatelessWidget {
@@ -12,13 +16,48 @@ class PatientApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
-      home: const _HomeScaffold(),
+      home: const _RecordsLoader(),
+    );
+  }
+}
+
+class _RecordsLoader extends StatelessWidget {
+  const _RecordsLoader();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<RecordsService>(
+      future: RecordsService.instance(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (snapshot.hasError) {
+          return Scaffold(
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'Failed to initialise records service.\n${snapshot.error}',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          );
+        }
+        final service = snapshot.data!;
+        return _HomeScaffold(repository: service.records);
+      },
     );
   }
 }
 
 class _HomeScaffold extends StatelessWidget {
-  const _HomeScaffold();
+  const _HomeScaffold({required this.repository});
+
+  final RecordsRepository repository;
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +75,7 @@ class _HomeScaffold extends StatelessWidget {
           )
         ],
       ),
-      body: const Center(
-        child: Text('Welcome to Patient App'),
-      ),
+      body: RecordsHomePlaceholder(repository: repository),
     );
   }
 }

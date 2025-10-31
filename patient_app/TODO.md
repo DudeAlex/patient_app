@@ -6,6 +6,7 @@ M1: Core App + Settings (done)
 - Wire Isar schemas and open helper
 
 M2: Records CRUD UI (next)
+- See `M2_RECORDS_CRUD_PLAN.md` for the step-by-step breakdown.
 - Home list of recent records
 - Add/Edit Record (type, date, title, text, tags)
 - Record detail screen

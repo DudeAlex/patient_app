@@ -13,3 +13,14 @@
   - Restore workflow: Deleted the test file with `adb shell "run-as com.example.patient_app rm app_flutter/attachments/TEST.txt"`. Triggered "Restore from Google Drive"; snackbar reported completion and the file contents (`sentinel`) were present again in the attachments directory.
 - **Result**
   - All manual checks above passed. Emulator is ready for further feature work.
+
+## 2025-10-30
+- **Environment**
+  - Windows 11 dev box
+  - Flutter 3.32.7  Dart 3.8.1
+  - Android emulator: Pixel 4 (Android 14, Google Play image)
+- **Tests**
+  - Launched app with `flutter run -d emulator-5554`. Observed loading spinner while `RecordsService` initialised, then empty-state message ("No records yet. Use the Add Record flow to get started.").
+- Pulled to refresh the empty list; refresh indicator displayed and dismissed cleanly, returning to the empty-state message.
+- **Result**
+  - Passed. Home screen wiring displays the expected empty state with manual refresh feedback working.
