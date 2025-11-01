@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../model/record.dart';
 import '../repo/records_repo.dart';
+import 'record_detail_screen.dart';
 import 'records_home_state.dart';
 
 /// Temporary widget that will evolve into the records home list. For now it
@@ -75,17 +76,14 @@ class _RecordListTile extends StatelessWidget {
     final theme = Theme.of(context);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-      title: Text(
-        record.title,
-        style: theme.textTheme.titleMedium,
-      ),
+      title: Text(record.title, style: theme.textTheme.titleMedium),
       subtitle: Text(
         '${_formatType(record.type)} · ${_formatDate(record.date)}',
       ),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Record detail coming soon.')),
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => RecordDetailScreen(record: record)),
         );
       },
     );
