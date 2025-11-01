@@ -14,6 +14,7 @@ M2: Records CRUD UI (in progress)
 - Status: CRUD flows (add/edit/delete) implemented with shared provider refreshing list/detail automatically; attachments still placeholder. Final QA sweep + docs pending before closing milestone.
 
 M3: Retrieval & Search Foundation
+- See `M3_RETRIEVAL_SEARCH_PLAN.md` for the detailed breakdown.
 - Implement structured queries (filters by type/date/tag) with fast Isar indexes
 - Add full-text/attachment search with OCR text ingestion
 - Introduce patient-friendly tags/facets and saved views
