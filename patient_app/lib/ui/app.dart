@@ -52,8 +52,30 @@ class _RecordsLoader extends StatelessWidget {
           );
         }
         final service = snapshot.data!;
-        seedDebugRecordsIfEmpty(service.records);
-        return _HomeScaffold(repository: service.records);
+        return FutureBuilder<void>(
+          future: seedDebugRecordsIfEmpty(service.records),
+          builder: (context, seedSnapshot) {
+            if (seedSnapshot.connectionState != ConnectionState.done) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+            if (seedSnapshot.hasError) {
+              return Scaffold(
+                body: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(
+                      'Failed to seed debug records.\n${seedSnapshot.error}',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              );
+            }
+            return _HomeScaffold(repository: service.records);
+          },
+        );
       },
     );
   }
