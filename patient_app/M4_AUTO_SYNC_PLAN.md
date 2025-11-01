@@ -5,7 +5,9 @@ Auto sync ensures local changes are backed up to Google Drive App Data automatic
 ## 1. Requirements & Constraints
 - [ ] Review README/TODO/SPEC sections touching backup/restore to collect expectations for auto sync (when to trigger, error handling, consent).
 - [ ] Capture any open questions: frequency limits, battery/network constraints, and UI messaging.
-- [ ] Default to Wi-Fi-only auto sync; defer when on cellular unless user opts in (note copy for Settings).
+- [x] Default to Wi-Fi-only auto sync; defer when on cellular unless user opts in (note copy for Settings).
+- [ ] Define what counts as a “critical” change (e.g., attachments, visits) vs routine notes and only auto-sync on critical events; queue routine changes until threshold/manual request.
+- [ ] Plan for safety nets: keep soft-deleted records (`deletedAt`), retain previous backup file on Drive for rollback, and surface recovery guidance in docs/UI.
 
 ## 2. Track Dirty State
 - [ ] Extend `RecordsHomeState`/repository to flag when local data changes (add/edit/delete) and expose a simple dirty counter.
