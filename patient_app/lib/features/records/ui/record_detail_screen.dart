@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../model/record.dart';
+import '../model/record_types.dart';
 
 /// Temporary detail screen that shows the core fields for the selected record.
 /// This keeps navigation wiring incremental while the full detail design is
@@ -13,25 +14,38 @@ class RecordDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final dateFormatter = DateFormat.yMMMMd();
+    final dateTimeFormatter = DateFormat.yMMMMd().add_jm();
+
     return Scaffold(
       appBar: AppBar(title: Text(record.title)),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _DetailRow(label: 'Type', value: record.type),
+            _DetailRow(label: 'Type', value: _formatType(record.type)),
+            const SizedBox(height: 12),
+            _DetailRow(label: 'Date', value: dateFormatter.format(record.date)),
             const SizedBox(height: 12),
             _DetailRow(
-              label: 'Date',
-              value: DateFormat.yMMMMd().format(record.date),
+              label: 'Created',
+              value: dateTimeFormatter.format(record.createdAt),
+            ),
+            const SizedBox(height: 12),
+            _DetailRow(
+              label: 'Last updated',
+              value: dateTimeFormatter.format(record.updatedAt),
             ),
             if (record.text != null && record.text!.isNotEmpty) ...[
               const SizedBox(height: 24),
-              Text(record.text!, style: Theme.of(context).textTheme.bodyLarge),
+              Text(record.text!, style: theme.textTheme.bodyLarge),
             ],
             if (record.tags.isNotEmpty) ...[
               const SizedBox(height: 24),
+              Text('Tags', style: theme.textTheme.titleSmall),
+              const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -40,10 +54,32 @@ class RecordDetailScreen extends StatelessWidget {
                     .toList(growable: false),
               ),
             ],
+            const SizedBox(height: 32),
+            Text('Attachments', style: theme.textTheme.titleSmall),
+            const SizedBox(height: 8),
+            const Text(
+              'Attachment support is coming soon.',
+              style: TextStyle(color: Colors.grey),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  String _formatType(String type) {
+    switch (type) {
+      case RecordTypes.visit:
+        return 'Visit';
+      case RecordTypes.lab:
+        return 'Lab';
+      case RecordTypes.medication:
+        return 'Medication';
+      case RecordTypes.note:
+        return 'Note';
+      default:
+        return type;
+    }
   }
 }
 

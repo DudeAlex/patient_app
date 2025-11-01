@@ -24,3 +24,14 @@
 - Pulled to refresh the empty list; refresh indicator displayed and dismissed cleanly, returning to the empty-state message.
 - **Result**
   - Passed. Home screen wiring displays the expected empty state with manual refresh feedback working.
+
+## 2025-10-31
+- **Environment**
+  - Windows 11 dev box
+  - Flutter 3.32.7 / Dart 3.8.1
+  - Android emulator: Pixel 9 (Android 16, debug build)
+- **Tests**
+  - Uninstalled the app, reran `flutter run -d emulator-5554` to trigger the debug seeding helper.
+  - Opened each seeded record and confirmed the detail screen shows formatted type, date, created/updated timestamps, body text, tags, and the attachment placeholder note.
+- **Result**
+  - Passed. Detail view wiring renders seeded data as expected and provides a clear placeholder for upcoming attachments.
