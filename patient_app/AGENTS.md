@@ -20,7 +20,7 @@ Before Step 1, refresh context by reading `AI_AGENT_START_HERE.md` and opening e
 2) Implement incrementally: small patches that are easy to review and revert.
 3) Document: update info files in the same patch (what changed, why, how to run/verify).
 4) Validate: describe manual checks or tests performed; run analyzers/tests only with approval when needed. Append the new scenario and result to `TESTING.md` so the manual log stays current.
-5) Summarize: provide a brief, scannable summary in the final message (affected files, commands to run, known limitations).
+5) Summarize: provide a brief, scannable summary in the final message (affected files, commands to run, known limitations). Before ending a session (especially when stepping away), sweep relevant docs (`README`, `SPEC`, `TODO`, milestone plans, etc.) to confirm they reflect the latest changes.
 
 Documentation Checklist (update as applicable)
 - README.md: high‑level capabilities or user‑visible behavior.

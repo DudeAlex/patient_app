@@ -11,6 +11,7 @@ M2: Records CRUD UI (next)
 - Add/Edit Record (type, date, title, text, tags)
 - Record detail screen
 - Repository wiring + basic state management
+- Status: home list placeholder with loading/error/refresh scaffolding landed (2025-10-30); CRUD forms/detail still pending.
 
 M3: Retrieval & Search Foundation
 - Implement structured queries (filters by type/date/tag) with fast Isar indexes
