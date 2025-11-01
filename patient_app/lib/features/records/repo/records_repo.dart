@@ -32,7 +32,6 @@ class RecordsRepository {
       return db.records
           .where()
           .sortByDateDesc()
-          .thenByIdDesc()
           .offset(offset)
           .limit(limit)
           .findAll();
@@ -47,7 +46,6 @@ class RecordsRepository {
               .textContains(trimmed, caseSensitive: false),
         )
         .sortByDateDesc()
-        .thenByIdDesc()
         .offset(offset)
         .limit(limit)
         .findAll();
