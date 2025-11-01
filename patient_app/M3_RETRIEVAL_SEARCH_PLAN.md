@@ -10,30 +10,27 @@ This plan expands the M3 milestone into incremental slices so we can introduce s
   - Pagination requirements once result sets grow?
 
 ## 2. Prepare Isar Indexing & Queries
-- [ ] Add required Isar indexes (type/date/tag/title/text) and regenerate code.
-- [ ] extend `RecordsRepository` with query builders for:
-  - [ ] Type/date range filtering.
-  - [ ] Text search (initial simple `contains`/`startsWith`) with pagination.
-  - [ ] Tag intersection support.
+- [ ] Add/update indexes to support date ordering and case-insensitive text search across `title` + `text`.
+- [ ] Extend `RecordsRepository` with:
+  - [ ] Paged `recent` query (`offset` + `limit`) for load-more lists.
+  - [ ] Simple text search (`contains` on title/notes) with pagination.
 
 ## 3. Search State & Repository Abstractions
-- [ ] Introduce `RecordsSearchState` (ChangeNotifier/Riverpod equivalent) that holds filters, executes queries, and exposes loading/error/results.
-- [ ] Integrate with existing `RecordsHomeState` (shared repository) to reuse caching and listen for CRUD updates.
+- [ ] Enhance `RecordsHomeState` (or companion notifier) with search text, results list, and pagination state.
+- [ ] Ensure CRUD operations invalidate/refresh search results when needed.
 
-## 4. UI Exploration & Stubs
-- [ ] Add search entry point to the home screen (search icon or persistent field).
-- [ ] Create a temporary search sheet/page with inputs for text, type filter, and date range.
-- [ ] Display search results list (reusing existing record tile) and empty/error placeholders.
+## 4. UI Adjustments
+- [ ] Add a search field atop the home screen; executing search filters the list.
+- [ ] Provide a “Load more records” button or auto-fetch when scrolled near the end (keeps vertical scrolling familiar).
+- [ ] Show empty/error states for search results.
 
-## 5. Filter Chips & Query Persistence
-- [ ] Surface active filters (chips or summary bar) with clear/remove affordances.
-- [ ] Remember last-used filters during the session so navigating back and forth preserves state.
+## 5. Testing & Performance
+- [ ] Add manual scenarios to `TESTING.md` for:
+  - Search by title/notes keyword (e.g., “blood test”).
+  - Load-more behavior (multiple batches).
+- [ ] Validate query performance with seeded data (target under ~50ms per fetch on emulator).
+- [ ] Document limitations (no tag filters yet, attachments/OCR deferred) and list follow-ups for later milestones.
 
-## 6. Testing & Performance
-- [ ] Add manual scenarios to `TESTING.md` for type/date/tag searches and keyword matches.
-- [ ] Validate query performance with seeded data (target sub-50ms per query on emulator).
-- [ ] Document any limitations (e.g., text search scope) and plan follow-ups for full-text/OCR integration.
-
-## 7. Documentation & Follow-ups
-- [ ] Update README/TODO to reflect the delivered search capabilities and remaining M3 goals (attachment OCR, vector search).
-- [ ] Note open questions for the next phase (e.g., attachment indexing, pagination UI, multi-filter UX polish).
+## 6. Documentation & Follow-ups
+- [ ] Update README/TODO once search + pagination ship.
+- [ ] Capture deferred tasks: multi-filter UI, attachment/OCR indexing, saved views.
