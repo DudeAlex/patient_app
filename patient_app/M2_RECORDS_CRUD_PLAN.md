@@ -45,6 +45,6 @@ This stage expands milestone M2 into actionable steps so implementation can prog
 - Keep copy centralized for future localization (keys/constants where practical).
 
 ## 10. QA Checklist Before Closing M2
-- Smoke test CRUD flows on emulator/devices and confirm list refresh.
-- Validate timestamps populate correctly in Isar.
-- Capture follow-up gaps feeding into M3 (search, filters, indexing adjustments).
+- [x] Smoke test CRUD flows on emulator/devices and confirm list refresh (2025-10-31 Pixel 9 run; see TESTING.md).
+- [x] Validate timestamps populate correctly in Isar (created/updated verified during add/edit flows).
+- [x] Capture follow-up gaps feeding into M3 (search filters, attachment ingestion) in TODO.md.
