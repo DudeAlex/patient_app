@@ -5,21 +5,15 @@ M1: Core App + Settings (done)
 - Add Settings screen with Google sign-in + Drive backup/restore buttons
 - Wire Isar schemas and open helper
 
-M2: Records CRUD UI (in progress)
-- See `M2_RECORDS_CRUD_PLAN.md` for the step-by-step breakdown.
-- Home list of recent records
-- Add/Edit Record (type, date, title, text, tags)
-- Record detail screen
-- Repository wiring + basic state management
-- Status: CRUD flows (add/edit/delete) implemented with shared provider refreshing list/detail automatically; attachments still placeholder. Final QA sweep + docs pending before closing milestone.
+M2: Records CRUD UI (done)
+- See `M2_RECORDS_CRUD_PLAN.md` for the delivered breakdown.
+- CRUD flows (add/edit/delete) implemented with shared provider refreshing list/detail automatically.
+- Attachments remain placeholder stubs; follow-up to wire real attachment capture in a future milestone.
 
-M3: Retrieval & Search Foundation
+M3: Retrieval & Search Foundation (in progress)
 - See `M3_RETRIEVAL_SEARCH_PLAN.md` for the detailed breakdown.
-- Implement structured queries (filters by type/date/tag) with fast Isar indexes
-- Add full-text/attachment search with OCR text ingestion
-- Introduce patient-friendly tags/facets and saved views
-- Stand up local embedding pipeline + lightweight vector index to power RAG prompts
-- Build retrieval service that merges structured + semantic matches for advisor prompts
+- Delivered: date-sorted pagination, title/notes search, shared state refresh.
+- Deferred for later phases: tag filters, attachment/OCR search, saved views, semantic retrieval.
 
 M4: Auto Sync
 - Track local dirty state (changes increment counter)
