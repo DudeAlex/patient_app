@@ -31,11 +31,12 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
     super.initState();
     _original = widget.existing;
     if (_original != null) {
-      _type = _original!.type;
-      _date = _original!.date;
-      _titleController.text = _original!.title;
-      _notesController.text = _original!.text ?? '';
-      _tagsController.text = _original!.tags.join(', ');
+      final original = _original!;
+      _type = original.type;
+      _date = original.date;
+      _titleController.text = original.title;
+      _notesController.text = original.text ?? '';
+      _tagsController.text = original.tags.join(', ');
     }
   }
 
@@ -77,9 +78,10 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
       ..updatedAt = now;
 
     if (_original != null) {
-      record.id = _original!.id;
-      record.createdAt = _original!.createdAt;
-      record.deletedAt = _original!.deletedAt;
+      final original = _original!;
+      record.id = original.id;
+      record.createdAt = original.createdAt;
+      record.deletedAt = original.deletedAt;
     } else {
       record.createdAt = now;
     }
@@ -186,7 +188,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
             Text('Attachments', style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 8),
             Card(
-              color: Theme.of(context).colorScheme.surfaceVariant,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(

@@ -60,6 +60,7 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     }
 
     final theme = Theme.of(context);
+    final containerColor = theme.colorScheme.surfaceContainerHighest;
     final dateFormatter = DateFormat.yMMMMd();
     final dateTimeFormatter = DateFormat.yMMMMd().add_jm();
 
@@ -117,7 +118,7 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
             Text('Attachments', style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
             Card(
-              color: theme.colorScheme.surfaceVariant,
+              color: containerColor,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -187,6 +188,7 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
           ),
         ) ??
         false;
+    if (!context.mounted) return;
     if (!confirmed) return;
 
     try {
