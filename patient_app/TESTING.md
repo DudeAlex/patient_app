@@ -47,5 +47,6 @@
   - Entered type/date/title/notes/tags, saved, and confirmed the new record appeared in the home list after returning.
 - Opened an existing record, tapped Edit, adjusted fields, saved, and verified the detail view refreshed with new values; returning to the list showed the updated entry.
 - Confirmed both add and detail screens show the attachment placeholder card and disabled action button.
+- Verified shared provider: added, edited, and deleted records; list and detail updated instantly without manual refresh.
 - **Result**
-  - Passed. Add flow creates a record in Isar and the home screen refreshes automatically. Edit flow persists updates and refreshes both detail and list views. Attachment placeholder surfaces on both add and detail screens.
+  - Passed. Add flow creates a record in Isar and the home screen refreshes automatically. Edit flow persists updates and refreshes both detail and list views. Attachment placeholder surfaces on both add and detail screens. Shared provider keeps UI in sync after CRUD events.

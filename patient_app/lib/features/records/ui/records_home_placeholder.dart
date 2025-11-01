@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../model/record.dart';
-import '../repo/records_repo.dart';
 import 'record_detail_screen.dart';
 import 'records_home_state.dart';
 
@@ -52,10 +51,7 @@ class _RecordsHomeBody extends StatelessWidget {
         return RefreshIndicator(
           onRefresh: () => state.load(force: true),
           child: state.hasData
-              ? _RecordsList(
-                  records: state.records,
-                  repository: state.repository,
-                )
+              ? _RecordsList(records: state.records)
               : const _EmptyRecordsList(),
         );
       },
@@ -64,10 +60,9 @@ class _RecordsHomeBody extends StatelessWidget {
 }
 
 class _RecordListTile extends StatelessWidget {
-  const _RecordListTile({required this.record, required this.repository});
+  const _RecordListTile({required this.record});
 
   final Record record;
-  final RecordsRepository repository;
 
   @override
   Widget build(BuildContext context) {
@@ -81,18 +76,14 @@ class _RecordListTile extends StatelessWidget {
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
         final state = context.read<RecordsHomeState>();
-        Navigator.of(context)
-            .push<bool>(
-              MaterialPageRoute(
-                builder: (_) =>
-                    RecordDetailScreen(record: record, repository: repository),
-              ),
-            )
-            .then((wasDeleted) {
-              if (wasDeleted == true) {
-                state.load(force: true);
-              }
-            });
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ChangeNotifierProvider.value(
+              value: state,
+              child: RecordDetailScreen(recordId: record.id),
+            ),
+          ),
+        );
       },
     );
   }
@@ -116,10 +107,9 @@ class _RecordListTile extends StatelessWidget {
 }
 
 class _RecordsList extends StatelessWidget {
-  const _RecordsList({required this.records, required this.repository});
+  const _RecordsList({required this.records});
 
   final List<Record> records;
-  final RecordsRepository repository;
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +120,7 @@ class _RecordsList extends StatelessWidget {
       separatorBuilder: (context, _) => const Divider(height: 24),
       itemBuilder: (context, index) {
         final record = records[index];
-        return _RecordListTile(record: record, repository: repository);
+        return _RecordListTile(record: record);
       },
     );
   }

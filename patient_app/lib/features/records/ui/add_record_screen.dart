@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../model/record.dart';
 import '../model/record_types.dart';
-import '../repo/records_repo.dart';
+import 'records_home_state.dart';
 
 class AddRecordScreen extends StatefulWidget {
-  const AddRecordScreen({super.key, required this.repository, this.existing});
+  const AddRecordScreen({super.key, this.existing});
 
-  final RecordsRepository repository;
   final Record? existing;
 
   @override
@@ -83,10 +83,11 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
     } else {
       record.createdAt = now;
     }
+    final state = context.read<RecordsHomeState>();
     try {
-      await widget.repository.add(record);
+      await state.saveRecord(record);
       if (!mounted) return;
-      Navigator.of(context).pop(true);
+      Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
@@ -225,7 +226,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                   child: OutlinedButton(
                     onPressed: _submitting
                         ? null
-                        : () => Navigator.of(context).pop(false),
+                        : () => Navigator.of(context).pop(),
                     child: const Text('Cancel'),
                   ),
                 ),

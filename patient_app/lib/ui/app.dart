@@ -86,14 +86,15 @@ class _HomeScaffold extends StatelessWidget {
           body: const RecordsHomePlaceholder(),
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
-              final added = await Navigator.of(context).push<bool>(
+              final state = context.read<RecordsHomeState>();
+              await Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (_) => AddRecordScreen(repository: repository),
+                  builder: (_) => ChangeNotifierProvider.value(
+                    value: state,
+                    child: const AddRecordScreen(),
+                  ),
                 ),
               );
-              if (added == true) {
-                context.read<RecordsHomeState>().load(force: true);
-              }
             },
             child: const Icon(Icons.add),
           ),

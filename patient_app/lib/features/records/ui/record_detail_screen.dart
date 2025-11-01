@@ -1,143 +1,143 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:isar/isar.dart';
+import 'package:provider/provider.dart';
 
 import '../model/record.dart';
 import '../model/record_types.dart';
-import '../repo/records_repo.dart';
 import 'add_record_screen.dart';
+import 'records_home_state.dart';
 
 /// Temporary detail screen that shows the core fields for the selected record.
 /// This keeps navigation wiring incremental while the full detail design is
 /// still in progress (see M2 plan).
 class RecordDetailScreen extends StatefulWidget {
-  const RecordDetailScreen({
-    super.key,
-    required this.record,
-    required this.repository,
-  });
+  const RecordDetailScreen({super.key, required this.recordId});
 
-  final Record record;
-  final RecordsRepository repository;
+  final Id recordId;
 
   @override
   State<RecordDetailScreen> createState() => _RecordDetailScreenState();
 }
 
 class _RecordDetailScreenState extends State<RecordDetailScreen> {
-  late Record _record;
-  bool _modified = false;
-  bool _popping = false;
+  Record? _record;
 
   @override
   void initState() {
     super.initState();
-    _record = widget.record;
+    final state = context.read<RecordsHomeState>();
+    _record = state.recordById(widget.recordId);
   }
 
-  String get _title => _record.title;
+  String get _title => _record?.title ?? 'Record';
 
   Future<void> _refreshRecord() async {
-    final latest = await widget.repository.byId(_record.id);
+    final state = context.read<RecordsHomeState>();
+    final latest = state.recordById(widget.recordId);
     if (latest != null && mounted) {
       setState(() {
         _record = latest;
-        _modified = true;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<RecordsHomeState>();
+    _record = state.recordById(widget.recordId) ?? _record;
+    final record = _record;
+    if (record == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Record')),
+        body: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Text('This record is no longer available.'),
+          ),
+        ),
+      );
+    }
+
     final theme = Theme.of(context);
     final dateFormatter = DateFormat.yMMMMd();
     final dateTimeFormatter = DateFormat.yMMMMd().add_jm();
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (_popping) return true;
-        _popping = true;
-        Navigator.of(context).pop(_modified);
-        return false;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(_title),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.edit_outlined),
-              tooltip: 'Edit record',
-              onPressed: () => _editRecord(context),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            tooltip: 'Edit record',
+            onPressed: () => _editRecord(context, record),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            tooltip: 'Delete record',
+            onPressed: () => _confirmDelete(context, record),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _DetailRow(label: 'Type', value: _formatType(record.type)),
+            const SizedBox(height: 12),
+            _DetailRow(label: 'Date', value: dateFormatter.format(record.date)),
+            const SizedBox(height: 12),
+            _DetailRow(
+              label: 'Created',
+              value: dateTimeFormatter.format(record.createdAt),
             ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline),
-              tooltip: 'Delete record',
-              onPressed: () => _confirmDelete(context),
+            const SizedBox(height: 12),
+            _DetailRow(
+              label: 'Last updated',
+              value: dateTimeFormatter.format(record.updatedAt),
             ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _DetailRow(label: 'Type', value: _formatType(_record.type)),
-              const SizedBox(height: 12),
-              _DetailRow(
-                label: 'Date',
-                value: dateFormatter.format(_record.date),
-              ),
-              const SizedBox(height: 12),
-              _DetailRow(
-                label: 'Created',
-                value: dateTimeFormatter.format(_record.createdAt),
-              ),
-              const SizedBox(height: 12),
-              _DetailRow(
-                label: 'Last updated',
-                value: dateTimeFormatter.format(_record.updatedAt),
-              ),
-              if (_record.text != null && _record.text!.isNotEmpty) ...[
-                const SizedBox(height: 24),
-                Text(_record.text!, style: theme.textTheme.bodyLarge),
-              ],
-              if (_record.tags.isNotEmpty) ...[
-                const SizedBox(height: 24),
-                Text('Tags', style: theme.textTheme.titleSmall),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: _record.tags
-                      .map((tag) => Chip(label: Text(tag)))
-                      .toList(growable: false),
-                ),
-              ],
-              const SizedBox(height: 32),
-              Text('Attachments', style: theme.textTheme.titleSmall),
+            if (record.text != null && record.text!.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              Text(record.text!, style: theme.textTheme.bodyLarge),
+            ],
+            if (record.tags.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              Text('Tags', style: theme.textTheme.titleSmall),
               const SizedBox(height: 8),
-              Card(
-                color: theme.colorScheme.surfaceVariant,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Attachment support is coming soon.',
-                        style: TextStyle(color: Colors.black54),
-                      ),
-                      const SizedBox(height: 12),
-                      OutlinedButton.icon(
-                        onPressed: null,
-                        icon: const Icon(Icons.attach_file),
-                        label: const Text('Add attachment (coming soon)'),
-                      ),
-                    ],
-                  ),
-                ),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: record.tags
+                    .map((tag) => Chip(label: Text(tag)))
+                    .toList(growable: false),
               ),
             ],
-          ),
+            const SizedBox(height: 32),
+            Text('Attachments', style: theme.textTheme.titleSmall),
+            const SizedBox(height: 8),
+            Card(
+              color: theme.colorScheme.surfaceVariant,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Attachment support is coming soon.',
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: null,
+                      icon: const Icon(Icons.attach_file),
+                      label: const Text('Add attachment (coming soon)'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -158,19 +158,14 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     }
   }
 
-  Future<void> _editRecord(BuildContext context) async {
-    final updated = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        builder: (_) =>
-            AddRecordScreen(repository: widget.repository, existing: _record),
-      ),
+  Future<void> _editRecord(BuildContext context, Record record) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => AddRecordScreen(existing: record)),
     );
-    if (updated == true) {
-      await _refreshRecord();
-    }
+    await _refreshRecord();
   }
 
-  Future<void> _confirmDelete(BuildContext context) async {
+  Future<void> _confirmDelete(BuildContext context, Record record) async {
     final confirmed =
         await showDialog<bool>(
           context: context,
@@ -195,21 +190,15 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     if (!confirmed) return;
 
     try {
-      await widget.repository.delete(_record.id);
+      await context.read<RecordsHomeState>().deleteRecord(record.id);
       if (!context.mounted) return;
-      _popWithResult(true);
+      Navigator.of(context).pop();
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Failed to delete record: $e')));
     }
-  }
-
-  void _popWithResult(bool result) {
-    if (!mounted) return;
-    _popping = true;
-    Navigator.of(context).pop(result);
   }
 }
 
