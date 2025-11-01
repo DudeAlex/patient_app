@@ -5,6 +5,7 @@ Auto sync ensures local changes are backed up to Google Drive App Data automatic
 ## 1. Requirements & Constraints
 - [ ] Review README/TODO/SPEC sections touching backup/restore to collect expectations for auto sync (when to trigger, error handling, consent).
 - [ ] Capture any open questions: frequency limits, battery/network constraints, and UI messaging.
+- [ ] Default to Wi-Fi-only auto sync; defer when on cellular unless user opts in (note copy for Settings).
 
 ## 2. Track Dirty State
 - [ ] Extend `RecordsHomeState`/repository to flag when local data changes (add/edit/delete) and expose a simple dirty counter.
