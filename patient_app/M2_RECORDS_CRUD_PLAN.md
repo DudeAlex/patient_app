@@ -23,6 +23,7 @@ This stage expands milestone M2 into actionable steps so implementation can prog
 - [x] Wire a delete/archive action to `RecordsRepository.delete` with confirmation dialog.
 
 ## 5. Add/Edit Record Flow
+- [x] Route from home FAB to a stub add screen.
 - Design the form layout (type picker, date selector, title, text, tags).
 - Implement validation and save path to Isar (insert/update with timestamps).
 - Support editing: pre-fill form fields, persist updates, and refresh upstream state.

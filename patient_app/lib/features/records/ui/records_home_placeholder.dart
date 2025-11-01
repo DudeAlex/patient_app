@@ -10,17 +10,10 @@ import 'records_home_state.dart';
 /// Temporary widget that will evolve into the records home list. For now it
 /// simply fetches recent records and shows an empty-state placeholder.
 class RecordsHomePlaceholder extends StatelessWidget {
-  const RecordsHomePlaceholder({super.key, required this.repository});
-
-  final RecordsRepository repository;
+  const RecordsHomePlaceholder({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => RecordsHomeState(repository)..load(),
-      child: const _RecordsHomeBody(),
-    );
-  }
+  Widget build(BuildContext context) => const _RecordsHomeBody();
 }
 
 class _RecordsHomeBody extends StatelessWidget {
@@ -55,6 +48,7 @@ class _RecordsHomeBody extends StatelessWidget {
             ),
           );
         }
+
         return RefreshIndicator(
           onRefresh: () => state.load(force: true),
           child: state.hasData
@@ -78,12 +72,12 @@ class _RecordListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final subtitle =
+        '${_formatType(record.type)} - ${_formatDate(record.date)}';
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 8),
       title: Text(record.title, style: theme.textTheme.titleMedium),
-      subtitle: Text(
-        '${_formatType(record.type)} · ${_formatDate(record.date)}',
-      ),
+      subtitle: Text(subtitle),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
         final state = context.read<RecordsHomeState>();
@@ -118,9 +112,7 @@ class _RecordListTile extends StatelessWidget {
     }
   }
 
-  String _formatDate(DateTime date) {
-    return DateFormat.yMMMd().format(date);
-  }
+  String _formatDate(DateTime date) => DateFormat.yMMMd().format(date);
 }
 
 class _RecordsList extends StatelessWidget {

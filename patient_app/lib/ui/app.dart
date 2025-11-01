@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../features/records/data/debug_seed.dart';
 import '../features/records/data/records_service.dart';
 import '../features/records/repo/records_repo.dart';
+import '../features/records/ui/add_record_screen.dart';
 import '../features/records/ui/records_home_placeholder.dart';
-import '../features/records/data/debug_seed.dart';
+import '../features/records/ui/records_home_state.dart';
 import 'settings/settings_screen.dart';
 
 class PatientApp extends StatelessWidget {
@@ -63,21 +66,39 @@ class _HomeScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Patient'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
-            },
+    return ChangeNotifierProvider(
+      create: (_) => RecordsHomeState(repository)..load(),
+      child: Builder(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: const Text('Patient'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                  );
+                },
+              ),
+            ],
           ),
-        ],
+          body: const RecordsHomePlaceholder(),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              final added = await Navigator.of(context).push<bool>(
+                MaterialPageRoute(
+                  builder: (_) => AddRecordScreen(repository: repository),
+                ),
+              );
+              if (added == true) {
+                context.read<RecordsHomeState>().load(force: true);
+              }
+            },
+            child: const Icon(Icons.add),
+          ),
+        ),
       ),
-      body: RecordsHomePlaceholder(repository: repository),
     );
   }
 }
