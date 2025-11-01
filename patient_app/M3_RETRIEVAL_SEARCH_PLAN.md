@@ -32,5 +32,5 @@ This plan expands the M3 milestone into incremental slices so we can introduce s
 - [x] Document limitations (no tag filters yet, attachments/OCR deferred) and list follow-ups for later milestones.
 
 ## 6. Documentation & Follow-ups
-- [ ] Update README/TODO once search + pagination ship.
-- [ ] Capture deferred tasks: multi-filter UI, attachment/OCR indexing, saved views.
+- [x] Update README/TODO once search + pagination ship.
+- [x] Capture deferred tasks: multi-filter UI, attachment/OCR indexing, saved views.

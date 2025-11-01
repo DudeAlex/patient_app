@@ -10,12 +10,13 @@ M2: Records CRUD UI (done)
 - CRUD flows (add/edit/delete) implemented with shared provider refreshing list/detail automatically.
 - Attachments remain placeholder stubs; follow-up to wire real attachment capture in a future milestone.
 
-M3: Retrieval & Search Foundation (in progress)
+M3: Retrieval & Search Foundation (done)
 - See `M3_RETRIEVAL_SEARCH_PLAN.md` for the detailed breakdown.
 - Delivered: date-sorted pagination, title/notes search, shared state refresh.
 - Deferred for later phases: tag filters, attachment/OCR search, saved views, semantic retrieval.
 
 M4: Auto Sync
+- See `M4_AUTO_SYNC_PLAN.md` for the breakdown.
 - Track local dirty state (changes increment counter)
 - On app resume/exit: export/encrypt/upload if dirty
 - Conflict: last-write-wins with banner
