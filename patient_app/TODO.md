@@ -5,13 +5,13 @@ M1: Core App + Settings (done)
 - Add Settings screen with Google sign-in + Drive backup/restore buttons
 - Wire Isar schemas and open helper
 
-M2: Records CRUD UI (next)
+M2: Records CRUD UI (in progress)
 - See `M2_RECORDS_CRUD_PLAN.md` for the step-by-step breakdown.
 - Home list of recent records
 - Add/Edit Record (type, date, title, text, tags)
 - Record detail screen
 - Repository wiring + basic state management
-- Status: home list placeholder with loading/error/refresh scaffolding landed (2025-10-30); CRUD forms/detail still pending.
+- Status: CRUD flows (add/edit/delete) implemented with shared provider refreshing list/detail automatically; attachments still placeholder. Final QA sweep + docs pending before closing milestone.
 
 M3: Retrieval & Search Foundation
 - Implement structured queries (filters by type/date/tag) with fast Isar indexes
