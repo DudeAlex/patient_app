@@ -121,7 +121,8 @@ Development Scripts
   `dart run build_runner build --delete-conflicting-outputs`
 
  Status & Next Steps
-- Immediate focus: Records CRUD UI + auto-sync groundwork.
+- Immediate focus: Auto sync (M4) — add Wi-Fi-friendly backup triggers and patient feedback.
+- Recently delivered: Records CRUD, search, and pagination (M2/M3).
 - In discovery: multi-modal Add Record flow and opt-in AI companion (Together AI).
 - Full roadmap (support network, localisation, wellness companion): see `TODO.md` for the living milestones.
 
