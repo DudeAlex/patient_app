@@ -115,9 +115,26 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
               const SizedBox(height: 32),
               Text('Attachments', style: theme.textTheme.titleSmall),
               const SizedBox(height: 8),
-              const Text(
-                'Attachment support is coming soon.',
-                style: TextStyle(color: Colors.grey),
+              Card(
+                color: theme.colorScheme.surfaceVariant,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Attachment support is coming soon.',
+                        style: TextStyle(color: Colors.black54),
+                      ),
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        onPressed: null,
+                        icon: const Icon(Icons.attach_file),
+                        label: const Text('Add attachment (coming soon)'),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),

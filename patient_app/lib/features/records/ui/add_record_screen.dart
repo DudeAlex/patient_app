@@ -182,6 +182,30 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
               ),
             ),
             const SizedBox(height: 24),
+            Text('Attachments', style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 8),
+            Card(
+              color: Theme.of(context).colorScheme.surfaceVariant,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Capture photos, scans, and files here once attachments are enabled.',
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: null,
+                      icon: const Icon(Icons.attach_file),
+                      label: const Text('Add attachment (coming soon)'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
             Row(
               children: [
                 Expanded(

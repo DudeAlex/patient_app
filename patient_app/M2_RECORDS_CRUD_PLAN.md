@@ -33,8 +33,8 @@ This stage expands milestone M2 into actionable steps so implementation can prog
 - Ensure list/detail screens react to CRUD events without requiring manual reloads.
 
 ## 7. Attachments Placeholder
-- Surface stub UI elements indicating attachment support is coming.
-- Keep save logic ready for attachment integration (avoid schema/UI churn later).
+- [x] Surface stub UI elements indicating attachment support is coming.
+- [x] Keep save logic ready for attachment integration (avoid schema/UI churn later).
 
 ## 8. Testing & Documentation
 - Add new manual scenarios to `TESTING.md` (create, edit, delete flows).
