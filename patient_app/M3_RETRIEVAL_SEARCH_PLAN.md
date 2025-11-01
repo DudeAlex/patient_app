@@ -3,8 +3,11 @@
 This plan expands the M3 milestone into incremental slices so we can introduce structured search and retrieval with confidence.
 
 ## 1. Clarify Retrieval Requirements
-- [ ] Re-read SPEC/TODO sections on search to capture use cases (type/date/tag filters, keyword match, future OCR hooks).
-- [ ] Inventory current data model gaps (e.g., missing indexes, record text fields) and list open questions about attachments/OCR timing.
+- [x] Re-read TODO/M3 milestone notes: initial scope is structured filters (type/date/tag, keyword) with hooks for future OCR/indexing and saved views.
+- [x] Inventory gaps: need Isar indexes on `type`, `date`, `tags`, `title`, `text`; attachments/OCR deferred to later phases. Open questions:
+  - How to handle multi-tag queries (intersection vs union)?
+  - Should free-text search cover both `title` and `text` immediately?
+  - Pagination requirements once result sets grow?
 
 ## 2. Prepare Isar Indexing & Queries
 - [ ] Add required Isar indexes (type/date/tag/title/text) and regenerate code.
@@ -34,4 +37,3 @@ This plan expands the M3 milestone into incremental slices so we can introduce s
 ## 7. Documentation & Follow-ups
 - [ ] Update README/TODO to reflect the delivered search capabilities and remaining M3 goals (attachment OCR, vector search).
 - [ ] Note open questions for the next phase (e.g., attachment indexing, pagination UI, multi-filter UX polish).
-
