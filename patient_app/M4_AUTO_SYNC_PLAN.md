@@ -1,31 +1,36 @@
-# M4 - Auto Sync Breakdown
+# M4 - Auto Sync Plan
 
-Auto sync ensures local changes are backed up to Google Drive App Data automatically, while keeping users informed. We'll deliver this in incremental, testable steps.
+Auto sync ensures local changes are backed up to Google Drive App Data automatically, while keeping patients in control and mindful of data usage. Work is split into a minimal MVP and future enhancements.
 
-## 1. Requirements & Constraints
-- [ ] Review README/TODO/SPEC sections touching backup/restore to collect expectations for auto sync (when to trigger, error handling, consent).
-- [ ] Capture any open questions: frequency limits, battery/network constraints, and UI messaging.
-- [x] Default to Wi-Fi-only auto sync; defer when on cellular unless user opts in (note copy for Settings).
-- [ ] Define what counts as a “critical” change (e.g., attachments, visits) vs routine notes and only auto-sync on critical events; queue routine changes until threshold/manual request.
-- [ ] Plan for safety nets: keep soft-deleted records (`deletedAt`), retain previous backup file on Drive for rollback, and surface recovery guidance in docs/UI.
+## MVP Scope (Release Now)
 
-## 2. Track Dirty State
-- [ ] Extend `RecordsHomeState`/repository to flag when local data changes (add/edit/delete) and expose a simple dirty counter.
-- [ ] Persist dirty metadata in Isar (e.g., update `SyncState` model) so state survives restarts.
+### 1. Requirements & Constraints
+- [ ] Review README/TODO/SPEC backup sections to confirm expectations (when to trigger, consent, error messaging).
+- [x] Default to Wi-Fi-only auto sync; defer when on cellular unless the patient opts in.
+- [ ] Define a lightweight “critical vs routine” rule (e.g., attachments, visit summaries = critical) so only critical changes trigger auto sync; queue routine notes until a critical change or manual request.
 
-## 3. Sync Trigger Mechanics
-- [ ] Add an app lifecycle hook (resume/exit) to check dirty state and kick off backup if conditions are met.
-- [ ] Ensure triggers respect user consent (backup enabled + signed in) and avoid overlapping sync runs.
+### 2. Track Dirty State
+- [ ] Extend repository/state to flag dirty changes whenever records mutate.
+- [ ] Persist dirty metadata in Isar (`SyncState`) so the flag survives restarts.
 
-## 4. Backup Orchestration Enhancements
-- [ ] Wrap the existing manual backup call in a reusable service that can run silently, report status, and provide callbacks for UI.
-- [ ] Handle failure scenarios gracefully (network, auth) and schedule retry with exponential backoff.
+### 3. Sync Trigger Mechanics
+- [ ] Hook into app lifecycle (resume/exit) to check dirty state and launch backup when Wi-Fi + consent conditions are met.
+- [ ] Prevent overlapping runs and honour manual toggles (backup enabled + signed in).
 
-## 5. User Feedback
-- [ ] Surface non-intrusive status cues (snackbar/toast/log) when auto sync runs or fails.
-- [ ] Provide a settings switch to enable/disable auto sync and a way to review last sync timestamp.
+### 4. Backup Orchestration
+- [ ] Wrap the existing manual backup call in a service capable of silent execution and reporting status back to UI/state.
+- [ ] Handle failures gracefully (network/auth) and schedule a retry with basic exponential backoff.
 
-## 6. Testing & Documentation
-- [ ] Add manual scenarios to `TESTING.md` (dirty change + app resume, failure -> retry).
-- [ ] Update README/TODO once auto sync MVP ships, noting limitations (e.g., only on resume, not background daemon).
-- [ ] Record follow-ups for advanced scheduling (battery/network awareness, background isolates).
+### 5. Patient Feedback
+- [ ] Surface gentle status cues (snackbar/toast/log) when auto sync succeeds or fails.
+- [ ] Add a Settings switch to enable/disable auto sync and display the last successful sync timestamp.
+
+### 6. Testing & Documentation
+- [ ] Add manual scenarios to `TESTING.md` (dirty change + resume, failure then retry, manual toggle).
+- [ ] Update README/TODO after shipping the MVP noting limitations (Wi-Fi only, triggers on critical changes, batch routine notes).
+
+## Deferred Enhancements (Future Releases)
+- Advanced safety nets: expose a “Recently Deleted” view using `deletedAt`, retain the previous backup file (`patient-backup-v1-prev.enc`) for rollback, and document recovery flows.
+- Smarter scheduling: battery/network awareness, true incremental uploads, background isolates.
+- Explicit queue management for routine changes (e.g., patient can “sync now” or see queued items).
+- Cellular auto-sync opt-in (with data usage warnings) once the MVP proves reliable.
