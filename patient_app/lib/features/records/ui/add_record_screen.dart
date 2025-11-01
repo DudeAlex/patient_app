@@ -6,9 +6,10 @@ import '../model/record_types.dart';
 import '../repo/records_repo.dart';
 
 class AddRecordScreen extends StatefulWidget {
-  const AddRecordScreen({super.key, required this.repository});
+  const AddRecordScreen({super.key, required this.repository, this.existing});
 
   final RecordsRepository repository;
+  final Record? existing;
 
   @override
   State<AddRecordScreen> createState() => _AddRecordScreenState();
@@ -23,6 +24,20 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
   String _type = RecordTypes.note;
   DateTime _date = DateTime.now();
   bool _submitting = false;
+  late final Record? _original;
+
+  @override
+  void initState() {
+    super.initState();
+    _original = widget.existing;
+    if (_original != null) {
+      _type = _original!.type;
+      _date = _original!.date;
+      _titleController.text = _original!.title;
+      _notesController.text = _original!.text ?? '';
+      _tagsController.text = _original!.tags.join(', ');
+    }
+  }
 
   @override
   void dispose() {
@@ -50,25 +65,33 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _submitting = true);
     final now = DateTime.now();
+    final cleanedNotes = _notesController.text.trim();
+    final tags = _parseTags(_tagsController.text);
+
     final record = Record()
       ..type = _type
       ..date = _date
       ..title = _titleController.text.trim()
-      ..text = _notesController.text.trim().isEmpty
-          ? null
-          : _notesController.text.trim()
-      ..tags = _parseTags(_tagsController.text)
-      ..createdAt = now
+      ..text = cleanedNotes.isEmpty ? null : cleanedNotes
+      ..tags = tags
       ..updatedAt = now;
+
+    if (_original != null) {
+      record.id = _original!.id;
+      record.createdAt = _original!.createdAt;
+      record.deletedAt = _original!.deletedAt;
+    } else {
+      record.createdAt = now;
+    }
     try {
       await widget.repository.add(record);
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save record: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to save record: $e')));
       setState(() => _submitting = false);
     }
   }
@@ -83,11 +106,10 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isEdit = _original != null;
     final dateLabel = DateFormat.yMMMMd().format(_date);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Record'),
-      ),
+      appBar: AppBar(title: Text(isEdit ? 'Edit Record' : 'Add Record')),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -95,9 +117,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
           children: [
             DropdownButtonFormField<String>(
               value: _type,
-              decoration: const InputDecoration(
-                labelText: 'Type',
-              ),
+              decoration: const InputDecoration(labelText: 'Type'),
               items: RecordTypes.values
                   .map(
                     (value) => DropdownMenuItem(
@@ -123,10 +143,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(dateLabel),
-                  TextButton(
-                    onPressed: _pickDate,
-                    child: const Text('Change'),
-                  ),
+                  TextButton(onPressed: _pickDate, child: const Text('Change')),
                 ],
               ),
             ),
@@ -176,7 +193,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('Save'),
+                        : Text(isEdit ? 'Update' : 'Save'),
                   ),
                 ),
                 const SizedBox(width: 16),

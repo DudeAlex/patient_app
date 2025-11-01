@@ -26,7 +26,7 @@ This stage expands milestone M2 into actionable steps so implementation can prog
 - [x] Route from home FAB to a stub add screen.
 - [x] Design the add form layout (type picker, date selector, title, text, tags).
 - [x] Implement validation and add-path to Isar (insert with timestamps).
-- Support editing: pre-fill form fields, persist updates, and refresh upstream state.
+- [x] Support editing: pre-fill form fields, persist updates, and refresh upstream state.
 
 ## 6. State Management Pattern
 - Choose a state management approach aligned with existing conventions.

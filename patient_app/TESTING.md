@@ -45,5 +45,6 @@
 - **Tests**
   - Launched app with seeded data, tapped the `+` FAB to open the add record form.
   - Entered type/date/title/notes/tags, saved, and confirmed the new record appeared in the home list after returning.
+- Opened an existing record, tapped Edit, adjusted fields, saved, and verified the detail view refreshed with new values; returning to the list showed the updated entry.
 - **Result**
-  - Passed. Add flow creates a record in Isar and the home screen refreshes automatically.
+  - Passed. Add flow creates a record in Isar and the home screen refreshes automatically. Edit flow persists updates and refreshes both detail and list views.

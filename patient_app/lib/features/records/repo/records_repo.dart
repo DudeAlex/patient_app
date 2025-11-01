@@ -14,8 +14,11 @@ class RecordsRepository {
     return db.records.where().sortByDateDesc().limit(limit).findAll();
   }
 
+  Future<Record?> byId(Id id) {
+    return db.records.get(id);
+  }
+
   Future<void> delete(Id id) async {
     await db.writeTxn(() => db.records.delete(id));
   }
 }
-
