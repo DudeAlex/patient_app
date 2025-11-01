@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../features/records/data/records_service.dart';
 import '../features/records/repo/records_repo.dart';
 import '../features/records/ui/records_home_placeholder.dart';
+import '../features/records/data/debug_seed.dart';
 import 'settings/settings_screen.dart';
 
 class PatientApp extends StatelessWidget {
@@ -48,6 +49,7 @@ class _RecordsLoader extends StatelessWidget {
           );
         }
         final service = snapshot.data!;
+        seedDebugRecordsIfEmpty(service.records);
         return _HomeScaffold(repository: service.records);
       },
     );
@@ -68,11 +70,11 @@ class _HomeScaffold extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const SettingsScreen()),
-              );
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
             },
-          )
+          ),
         ],
       ),
       body: RecordsHomePlaceholder(repository: repository),
