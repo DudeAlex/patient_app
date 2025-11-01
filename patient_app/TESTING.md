@@ -36,3 +36,14 @@
 - After wiring delete: opened a record, tapped the delete icon, confirmed via dialog, and verified the home list refreshed without the record.
 - **Result**
   - Passed. Detail view wiring renders seeded data as expected and provides a clear placeholder for upcoming attachments. Delete flow removes records and refreshes the list.
+
+## 2025-10-31
+- **Environment**
+  - Windows 11 dev box
+  - Flutter 3.32.7 / Dart 3.8.1
+  - Android emulator: Pixel 9 (Android 16, debug build)
+- **Tests**
+  - Launched app with seeded data, tapped the `+` FAB to open the add record form.
+  - Entered type/date/title/notes/tags, saved, and confirmed the new record appeared in the home list after returning.
+- **Result**
+  - Passed. Add flow creates a record in Isar and the home screen refreshes automatically.

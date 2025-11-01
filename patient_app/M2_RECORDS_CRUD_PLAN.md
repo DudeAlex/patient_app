@@ -24,8 +24,8 @@ This stage expands milestone M2 into actionable steps so implementation can prog
 
 ## 5. Add/Edit Record Flow
 - [x] Route from home FAB to a stub add screen.
-- Design the form layout (type picker, date selector, title, text, tags).
-- Implement validation and save path to Isar (insert/update with timestamps).
+- [x] Design the add form layout (type picker, date selector, title, text, tags).
+- [x] Implement validation and add-path to Isar (insert with timestamps).
 - Support editing: pre-fill form fields, persist updates, and refresh upstream state.
 
 ## 6. State Management Pattern
