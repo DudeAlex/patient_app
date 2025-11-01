@@ -10,6 +10,8 @@ class RecordsHomeState extends ChangeNotifier {
 
   final RecordsRepository _repository;
 
+  RecordsRepository get repository => _repository;
+
   List<Record> _records = const [];
   Object? _error;
   bool _loading = false;

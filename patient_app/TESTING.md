@@ -33,5 +33,6 @@
 - **Tests**
   - Uninstalled the app, reran `flutter run -d emulator-5554` to trigger the debug seeding helper.
   - Opened each seeded record and confirmed the detail screen shows formatted type, date, created/updated timestamps, body text, tags, and the attachment placeholder note.
+- After wiring delete: opened a record, tapped the delete icon, confirmed via dialog, and verified the home list refreshed without the record.
 - **Result**
-  - Passed. Detail view wiring renders seeded data as expected and provides a clear placeholder for upcoming attachments.
+  - Passed. Detail view wiring renders seeded data as expected and provides a clear placeholder for upcoming attachments. Delete flow removes records and refreshes the list.

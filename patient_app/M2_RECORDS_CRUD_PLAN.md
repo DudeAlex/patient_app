@@ -20,7 +20,7 @@ This stage expands milestone M2 into actionable steps so implementation can prog
 ## 4. Record Detail Screen
 - [x] Define navigation from the home list into a detail route (stub detail screen loads with selected record).
 - [x] Display full text, tags, timestamps, and attachment placeholders.
-- Wire a delete/archive action to `RecordsRepository.delete`.
+- [x] Wire a delete/archive action to `RecordsRepository.delete` with confirmation dialog.
 
 ## 5. Add/Edit Record Flow
 - Design the form layout (type picker, date selector, title, text, tags).

@@ -3,14 +3,20 @@ import 'package:intl/intl.dart';
 
 import '../model/record.dart';
 import '../model/record_types.dart';
+import '../repo/records_repo.dart';
 
 /// Temporary detail screen that shows the core fields for the selected record.
 /// This keeps navigation wiring incremental while the full detail design is
 /// still in progress (see M2 plan).
 class RecordDetailScreen extends StatelessWidget {
-  const RecordDetailScreen({super.key, required this.record});
+  const RecordDetailScreen({
+    super.key,
+    required this.record,
+    required this.repository,
+  });
 
   final Record record;
+  final RecordsRepository repository;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +25,16 @@ class RecordDetailScreen extends StatelessWidget {
     final dateTimeFormatter = DateFormat.yMMMMd().add_jm();
 
     return Scaffold(
-      appBar: AppBar(title: Text(record.title)),
+      appBar: AppBar(
+        title: Text(record.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            tooltip: 'Delete record',
+            onPressed: () => _confirmDelete(context),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -79,6 +94,42 @@ class RecordDetailScreen extends StatelessWidget {
         return 'Note';
       default:
         return type;
+    }
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final confirmed =
+        await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Delete record?'),
+            content: const Text(
+              'This will permanently remove the record from your device.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text('Cancel'),
+              ),
+              FilledButton.tonal(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                child: const Text('Delete'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (!confirmed) return;
+
+    try {
+      await repository.delete(record.id);
+      if (!context.mounted) return;
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to delete record: $e')));
     }
   }
 }

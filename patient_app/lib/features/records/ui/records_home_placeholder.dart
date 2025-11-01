@@ -58,7 +58,10 @@ class _RecordsHomeBody extends StatelessWidget {
         return RefreshIndicator(
           onRefresh: () => state.load(force: true),
           child: state.hasData
-              ? _RecordsList(records: state.records)
+              ? _RecordsList(
+                  records: state.records,
+                  repository: state.repository,
+                )
               : const _EmptyRecordsList(),
         );
       },
@@ -67,9 +70,10 @@ class _RecordsHomeBody extends StatelessWidget {
 }
 
 class _RecordListTile extends StatelessWidget {
-  const _RecordListTile({required this.record});
+  const _RecordListTile({required this.record, required this.repository});
 
   final Record record;
+  final RecordsRepository repository;
 
   @override
   Widget build(BuildContext context) {
@@ -82,9 +86,19 @@ class _RecordListTile extends StatelessWidget {
       ),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => RecordDetailScreen(record: record)),
-        );
+        final state = context.read<RecordsHomeState>();
+        Navigator.of(context)
+            .push<bool>(
+              MaterialPageRoute(
+                builder: (_) =>
+                    RecordDetailScreen(record: record, repository: repository),
+              ),
+            )
+            .then((wasDeleted) {
+              if (wasDeleted == true) {
+                state.load(force: true);
+              }
+            });
       },
     );
   }
@@ -110,9 +124,10 @@ class _RecordListTile extends StatelessWidget {
 }
 
 class _RecordsList extends StatelessWidget {
-  const _RecordsList({required this.records});
+  const _RecordsList({required this.records, required this.repository});
 
   final List<Record> records;
+  final RecordsRepository repository;
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +138,7 @@ class _RecordsList extends StatelessWidget {
       separatorBuilder: (context, _) => const Divider(height: 24),
       itemBuilder: (context, index) {
         final record = records[index];
-        return _RecordListTile(record: record);
+        return _RecordListTile(record: record, repository: repository);
       },
     );
   }
