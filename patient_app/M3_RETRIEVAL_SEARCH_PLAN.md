@@ -10,26 +10,26 @@ This plan expands the M3 milestone into incremental slices so we can introduce s
   - Pagination requirements once result sets grow?
 
 ## 2. Prepare Isar Indexing & Queries
-- [ ] Add/update indexes to support date ordering and case-insensitive text search across `title` + `text`.
-- [ ] Extend `RecordsRepository` with:
-  - [ ] Paged `recent` query (`offset` + `limit`) for load-more lists.
-  - [ ] Simple text search (`contains` on title/notes) with pagination.
+- [x] Add/update indexes to support date ordering and case-insensitive text search across `title` + `text`.
+- [x] Extend `RecordsRepository` with:
+  - [x] Paged `recent` query (`offset` + `limit`) for load-more lists.
+  - [x] Simple text search (`contains` on title/notes) with pagination.
 
 ## 3. Search State & Repository Abstractions
-- [ ] Enhance `RecordsHomeState` (or companion notifier) with search text, results list, and pagination state.
-- [ ] Ensure CRUD operations invalidate/refresh search results when needed.
+- [x] Enhance `RecordsHomeState` with search text, results list, and pagination state.
+- [x] Ensure CRUD operations invalidate/refresh search results when needed.
 
 ## 4. UI Adjustments
-- [ ] Add a search field atop the home screen; executing search filters the list.
-- [ ] Provide a “Load more records” button or auto-fetch when scrolled near the end (keeps vertical scrolling familiar).
-- [ ] Show empty/error states for search results.
+- [x] Add a search field atop the home screen; executing search filters the list.
+- [x] Provide a “Load more records” button or auto-fetch when scrolled near the end (keeps vertical scrolling familiar).
+- [x] Show empty/error states for search results.
 
 ## 5. Testing & Performance
-- [ ] Add manual scenarios to `TESTING.md` for:
+- [x] Add manual scenarios to `TESTING.md` for:
   - Search by title/notes keyword (e.g., “blood test”).
   - Load-more behavior (multiple batches).
-- [ ] Validate query performance with seeded data (target under ~50ms per fetch on emulator).
-- [ ] Document limitations (no tag filters yet, attachments/OCR deferred) and list follow-ups for later milestones.
+- [x] Validate query performance with seeded data (target under ~50ms per fetch on emulator).
+- [x] Document limitations (no tag filters yet, attachments/OCR deferred) and list follow-ups for later milestones.
 
 ## 6. Documentation & Follow-ups
 - [ ] Update README/TODO once search + pagination ship.
