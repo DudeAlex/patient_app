@@ -6,8 +6,7 @@ import '../model/record.dart';
 import 'record_detail_screen.dart';
 import 'records_home_state.dart';
 
-/// Temporary widget that will evolve into the records home list. For now it
-/// simply fetches recent records and shows an empty-state placeholder.
+/// Records list with simple title/notes search and load-more pagination.
 class RecordsHomePlaceholder extends StatelessWidget {
   const RecordsHomePlaceholder({super.key});
 
@@ -15,45 +14,156 @@ class RecordsHomePlaceholder extends StatelessWidget {
   Widget build(BuildContext context) => const _RecordsHomeBody();
 }
 
-class _RecordsHomeBody extends StatelessWidget {
+class _RecordsHomeBody extends StatefulWidget {
   const _RecordsHomeBody();
+
+  @override
+  State<_RecordsHomeBody> createState() => _RecordsHomeBodyState();
+}
+
+class _RecordsHomeBodyState extends State<_RecordsHomeBody> {
+  late final TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<RecordsHomeState>().load(force: true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _submitSearch(String query) {
+    context.read<RecordsHomeState>().load(query: query, force: true);
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    _submitSearch('');
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<RecordsHomeState>(
       builder: (context, state, _) {
-        if (state.isLoading && !state.hasData && state.error == null) {
-          return const Center(child: CircularProgressIndicator());
+        if (_searchController.text != state.searchQuery) {
+          _searchController.value = _searchController.value.copyWith(
+            text: state.searchQuery,
+            selection: TextSelection.collapsed(
+              offset: state.searchQuery.length,
+            ),
+          );
         }
-        if (state.error != null) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Unable to load records.\n${state.error}',
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    onPressed: () => state.load(force: true),
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Try again'),
-                  ),
-                ],
+
+        Widget body;
+        if (state.isLoading && !state.hasData && state.error == null) {
+          body = const Center(child: CircularProgressIndicator());
+        } else if (state.error != null && !state.hasData) {
+          body = _ErrorView(
+            message: 'Unable to load records.\n${state.error}',
+            onRetry: () => state.load(force: true),
+          );
+        } else {
+          body = RefreshIndicator(
+            onRefresh: () => state.load(force: true),
+            child: _RecordsList(
+              records: state.records,
+              hasMore: state.hasMore,
+              isLoadingMore: state.isLoadingMore,
+              onLoadMore: state.loadMore,
+            ),
+          );
+        }
+
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: TextField(
+                controller: _searchController,
+                textInputAction: TextInputAction.search,
+                onSubmitted: _submitSearch,
+                decoration: InputDecoration(
+                  labelText: 'Search records',
+                  hintText: 'Search title or notes',
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _searchController.text.isEmpty
+                      ? null
+                      : IconButton(
+                          onPressed: _clearSearch,
+                          icon: const Icon(Icons.clear),
+                          tooltip: 'Clear search',
+                        ),
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+            ),
+            Expanded(child: body),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _RecordsList extends StatelessWidget {
+  const _RecordsList({
+    required this.records,
+    required this.hasMore,
+    required this.isLoadingMore,
+    required this.onLoadMore,
+  });
+
+  final List<Record> records;
+  final bool hasMore;
+  final bool isLoadingMore;
+  final VoidCallback onLoadMore;
+
+  @override
+  Widget build(BuildContext context) {
+    if (records.isEmpty) {
+      return const _EmptyRecordsList();
+    }
+
+    final itemCount = records.length + (hasMore ? 1 : 0);
+    return ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      itemCount: itemCount,
+      separatorBuilder: (context, index) {
+        if (index >= records.length) {
+          return const SizedBox.shrink();
+        }
+        return const Divider(height: 24);
+      },
+      itemBuilder: (context, index) {
+        if (index >= records.length) {
+          if (isLoadingMore) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Center(
+              child: OutlinedButton.icon(
+                onPressed: onLoadMore,
+                icon: const Icon(Icons.expand_more),
+                label: const Text('Load more records'),
               ),
             ),
           );
         }
 
-        return RefreshIndicator(
-          onRefresh: () => state.load(force: true),
-          child: state.hasData
-              ? _RecordsList(records: state.records)
-              : const _EmptyRecordsList(),
-        );
+        final record = records[index];
+        return _RecordListTile(record: record);
       },
     );
   }
@@ -106,26 +216,6 @@ class _RecordListTile extends StatelessWidget {
   String _formatDate(DateTime date) => DateFormat.yMMMd().format(date);
 }
 
-class _RecordsList extends StatelessWidget {
-  const _RecordsList({required this.records});
-
-  final List<Record> records;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      itemCount: records.length,
-      separatorBuilder: (context, _) => const Divider(height: 24),
-      itemBuilder: (context, index) {
-        final record = records[index];
-        return _RecordListTile(record: record);
-      },
-    );
-  }
-}
-
 class _EmptyRecordsList extends StatelessWidget {
   const _EmptyRecordsList();
 
@@ -142,6 +232,34 @@ class _EmptyRecordsList extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
       ],
+    );
+  }
+}
+
+class _ErrorView extends StatelessWidget {
+  const _ErrorView({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(message, textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Try again'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

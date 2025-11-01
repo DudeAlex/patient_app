@@ -30,8 +30,8 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
   void initState() {
     super.initState();
     _original = widget.existing;
-    if (_original != null) {
-      final original = _original!;
+    final original = _original;
+    if (original != null) {
       _type = original.type;
       _date = original.date;
       _titleController.text = original.title;
@@ -77,8 +77,8 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
       ..tags = tags
       ..updatedAt = now;
 
-    if (_original != null) {
-      final original = _original!;
+    final original = _original;
+    if (original != null) {
       record.id = original.id;
       record.createdAt = original.createdAt;
       record.deletedAt = original.deletedAt;

@@ -9,17 +9,25 @@ import '../repo/records_repo.dart';
 class RecordsHomeState extends ChangeNotifier {
   RecordsHomeState(this._repository);
 
+  static const int _pageSize = 20;
+
   final RecordsRepository _repository;
 
   List<Record> _records = const [];
   Object? _error;
   bool _loading = false;
-  Future<void>? _pendingLoad;
+  bool _loadingMore = false;
+  bool _hasMore = true;
+  bool _initialised = false;
+  String _searchQuery = '';
 
   List<Record> get records => _records;
   Object? get error => _error;
   bool get isLoading => _loading;
+  bool get isLoadingMore => _loadingMore;
+  bool get hasMore => _hasMore;
   bool get hasData => _records.isNotEmpty;
+  String get searchQuery => _searchQuery;
 
   RecordsRepository get repository => _repository;
 
@@ -30,54 +38,69 @@ class RecordsHomeState extends ChangeNotifier {
     return null;
   }
 
-  Future<void> load({int limit = 50, bool force = false}) {
-    final current = _pendingLoad;
-    if (current != null && !force) {
-      return current;
-    }
-    final future = _performLoad(limit);
-    _pendingLoad = future;
-    future.whenComplete(() {
-      if (identical(_pendingLoad, future)) {
-        _pendingLoad = null;
-      }
-    });
-    return future;
+  Future<void> load({String? query, bool force = false}) async {
+    final normalized = (query ?? _searchQuery).trim();
+    final shouldReset = force || !_initialised || normalized != _searchQuery;
+    if (!shouldReset && _records.isNotEmpty) return;
+
+    _searchQuery = normalized;
+    _initialised = true;
+    _records = const [];
+    _hasMore = true;
+    _error = null;
+    _loading = true;
+    notifyListeners();
+
+    await _fetchPage(reset: true);
+  }
+
+  Future<void> loadMore() async {
+    await _fetchPage(reset: false);
   }
 
   Future<Record> saveRecord(Record record) async {
     final savedId = await _repository.add(record);
     record.id = savedId;
-
-    final updated = List<Record>.from(_records);
-    final index = updated.indexWhere((r) => r.id == record.id);
-    if (index >= 0) {
-      updated[index] = record;
-    } else {
-      updated.add(record);
-    }
-    updated.sort((a, b) => b.date.compareTo(a.date));
-    _records = updated;
-    notifyListeners();
+    await load(query: _searchQuery, force: true);
     return record;
   }
 
   Future<void> deleteRecord(Id id) async {
     await _repository.delete(id);
-    _records = _records.where((r) => r.id != id).toList(growable: false);
-    notifyListeners();
+    await load(query: _searchQuery, force: true);
   }
 
-  Future<void> _performLoad(int limit) async {
-    _loading = true;
-    _error = null;
+  Future<void> _fetchPage({required bool reset}) async {
+    if (_loadingMore) return;
+    if (!reset && !_hasMore) return;
+
+    if (!reset && _loading) return;
+
+    _loadingMore = true;
     notifyListeners();
+
     try {
-      _records = await _repository.recent(limit: limit);
+      final offset = reset ? 0 : _records.length;
+      final results = await _repository.fetchPage(
+        offset: offset,
+        limit: _pageSize,
+        query: _searchQuery,
+      );
+      if (reset) {
+        _records = results;
+      } else {
+        _records = [..._records, ...results];
+      }
+      _hasMore = results.length == _pageSize;
+      _error = null;
     } catch (e) {
       _error = e;
+      if (reset) {
+        _records = const [];
+      }
     } finally {
       _loading = false;
+      _loadingMore = false;
       notifyListeners();
     }
   }
