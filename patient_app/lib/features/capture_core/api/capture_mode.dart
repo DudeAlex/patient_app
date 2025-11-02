@@ -6,6 +6,7 @@ class CaptureContext {
     required this.sessionId,
     required this.locale,
     this.isAccessibilityEnabled = false,
+    this.promptRetake,
   });
 
   /// Unique identifier for the overall capture session.
@@ -16,6 +17,9 @@ class CaptureContext {
 
   /// Indicates whether accessibility services (screen reader, large fonts) are active.
   final bool isAccessibilityEnabled;
+
+  /// Optional handler that allows capture modes to ask the patient if they'd like to retry.
+  final Future<bool> Function(String title, String message)? promptRetake;
 }
 
 /// Describes a capture mode that can be displayed in the launcher.

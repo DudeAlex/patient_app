@@ -4,11 +4,12 @@ import '../api/capture_controller.dart';
 import '../api/capture_mode.dart';
 import '../api/capture_result.dart';
 
-typedef CaptureResultCallback = Future<void> Function(
-  BuildContext context,
-  CaptureMode mode,
-  CaptureResult result,
-);
+typedef CaptureResultCallback =
+    Future<void> Function(
+      BuildContext context,
+      CaptureMode mode,
+      CaptureResult result,
+    );
 
 typedef CaptureFallbackCallback = Future<void> Function(BuildContext context);
 
@@ -34,20 +35,19 @@ class CaptureLauncherScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final modes = controller.modes.where((m) => m.isAvailable()).toList();
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Record'),
-      ),
+      appBar: AppBar(title: const Text('Add Record')),
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
               child: modes.isEmpty
                   ? (emptyStateBuilder?.call(context) ??
-                      _DefaultEmptyState(onKeyboardEntry: onKeyboardEntry))
+                        _DefaultEmptyState(onKeyboardEntry: onKeyboardEntry))
                   : ListView.separated(
                       padding: const EdgeInsets.all(16),
                       itemCount: modes.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final mode = modes[index];
                         return _CaptureModeTile(
@@ -77,6 +77,8 @@ class CaptureLauncherScreen extends StatelessWidget {
       sessionId: sessionId,
       locale: locale.toLanguageTag(),
       isAccessibilityEnabled: isAccessibilityEnabled,
+      promptRetake: (title, message) =>
+          _showRetakeDialog(context, title, message),
     );
     try {
       final result = await controller.startMode(
@@ -93,13 +95,35 @@ class CaptureLauncherScreen extends StatelessWidget {
       await controller.discardSession(sessionId);
     }
   }
+
+  Future<bool> _showRetakeDialog(
+    BuildContext context,
+    String title,
+    String message,
+  ) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Keep'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Retake'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
 }
 
 class _CaptureModeTile extends StatelessWidget {
-  const _CaptureModeTile({
-    required this.mode,
-    required this.onPressed,
-  });
+  const _CaptureModeTile({required this.mode, required this.onPressed});
 
   final CaptureMode mode;
   final VoidCallback onPressed;

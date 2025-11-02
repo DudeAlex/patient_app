@@ -48,8 +48,9 @@ dependencies:
   googleapis: ^15.0.0
   http: ^1.2.2
   file_picker: ^10.3.3
-  image_picker: ^1.0.7
-  archive: ^4.0.7
+  image_picker: 1.0.7
+  archive: 4.0.7
+  image: ^4.5.4
   google_drive_backup:
     path: packages/google_drive_backup
 
@@ -107,3 +108,5 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+

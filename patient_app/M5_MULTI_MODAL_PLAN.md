@@ -17,7 +17,7 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 - [x] Provide safe exit and "switch to keyboard entry" fallback at every step.
 
 ### 3. Photo & Document Scan Pipelines
-- [ ] Integrate camera capture (still photo) including permission prompts and local save into attachments storage.
+- [x] Integrate camera capture (still photo) including permission prompts and local save into attachments storage.
 - [ ] Add clarity/OCR checks (basic blur detection + text presence heuristic) with retry guidance; allow override if patient insists on keeping a blurry image.
 - [ ] Implement document scan flow (edge detection, multi-page support, contrast cleanup) using an appropriate package; persist both original image(s) and cleaned PDF/image output.
 - [ ] Store extracted OCR text for review; surface in the review panel for editing/tagging.
@@ -70,6 +70,7 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 - Storage footprint management: retention policy, compression, deletion workflow.
 - Encryption-at-rest decision for attachments (currently plaintext on device).
 - How to gate advanced modes on low-end devices (performance, storage).
+
 
 
 

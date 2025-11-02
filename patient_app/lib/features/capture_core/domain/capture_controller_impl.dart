@@ -6,11 +6,9 @@ import '../api/capture_mode.dart';
 import '../api/capture_result.dart';
 
 class CaptureControllerImpl implements CaptureController {
-  CaptureControllerImpl(
-    List<CaptureMode> modes, {
-    Uuid? uuid,
-  })  : _modes = List.unmodifiable(modes),
-        _uuid = uuid ?? const Uuid();
+  CaptureControllerImpl(List<CaptureMode> modes, {Uuid? uuid})
+    : _modes = List.unmodifiable(modes),
+      _uuid = uuid ?? const Uuid();
 
   final List<CaptureMode> _modes;
   final Uuid _uuid;

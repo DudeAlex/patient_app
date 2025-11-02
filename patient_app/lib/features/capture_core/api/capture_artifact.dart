@@ -1,11 +1,5 @@
 /// Enumeration of artefact types produced by capture modes.
-enum CaptureArtifactType {
-  photo,
-  documentScan,
-  audio,
-  file,
-  email,
-}
+enum CaptureArtifactType { photo, documentScan, audio, file, email }
 
 /// Metadata describing a captured asset that should be persisted as an
 /// attachment alongside the final record.
@@ -44,4 +38,28 @@ class CaptureArtifact {
 
   /// Arbitrary mode-specific metadata serialized as primitives/strings.
   final Map<String, Object?> metadata;
+
+  CaptureArtifact copyWith({
+    String? id,
+    CaptureArtifactType? type,
+    String? relativePath,
+    DateTime? createdAt,
+    String? mimeType,
+    int? sizeBytes,
+    int? durationMs,
+    int? pageCount,
+    Map<String, Object?>? metadata,
+  }) {
+    return CaptureArtifact(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      relativePath: relativePath ?? this.relativePath,
+      createdAt: createdAt ?? this.createdAt,
+      mimeType: mimeType ?? this.mimeType,
+      sizeBytes: sizeBytes ?? this.sizeBytes,
+      durationMs: durationMs ?? this.durationMs,
+      pageCount: pageCount ?? this.pageCount,
+      metadata: metadata ?? this.metadata,
+    );
+  }
 }

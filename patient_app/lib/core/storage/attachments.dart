@@ -44,6 +44,14 @@ class AttachmentsStorage {
     return relative;
   }
 
+  static Future<void> deleteRelativeFile(String relativePath) async {
+    final root = await rootDir();
+    final file = File('${root.path}/$relativePath');
+    if (await file.exists()) {
+      await file.delete();
+    }
+  }
+
   /// Deletes all temporary files for a capture session.
   static Future<void> deleteSession(String sessionId) async {
     final dir = await sessionDir(sessionId);

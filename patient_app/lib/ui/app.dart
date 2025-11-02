@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../features/capture_core/capture_core.dart' as capture_core;
 import '../features/capture_core/ui/capture_launcher_screen.dart';
+import '../features/capture_modes/photo/photo_capture_module.dart';
 import '../features/records/data/debug_seed.dart';
 import '../features/records/data/records_service.dart';
 import '../features/records/ui/add_record_screen.dart';
@@ -89,8 +90,9 @@ class _HomeScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final captureController =
-        capture_core.buildCaptureController(const <capture_core.CaptureModule>[]);
+    final captureController = capture_core.buildCaptureController([
+      PhotoCaptureModule(),
+    ]);
     return ChangeNotifierProvider(
       create: (_) => RecordsHomeState(
         service.records,
@@ -126,8 +128,7 @@ class _HomeScaffold extends StatelessWidget {
                     controller: captureController,
                     locale: locale,
                     isAccessibilityEnabled: accessibilityEnabled,
-                    onResult:
-                        (BuildContext ctx, mode, result) async {
+                    onResult: (BuildContext ctx, mode, result) async {
                       if (!result.completed) {
                         ScaffoldMessenger.of(ctx).showSnackBar(
                           SnackBar(
