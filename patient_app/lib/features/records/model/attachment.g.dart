@@ -17,35 +17,70 @@ const AttachmentSchema = CollectionSchema(
   name: r'Attachment',
   id: -4393071635214178716,
   properties: {
-    r'createdAt': PropertySchema(
+    r'capturedAt': PropertySchema(
       id: 0,
+      name: r'capturedAt',
+      type: IsarType.dateTime,
+    ),
+    r'createdAt': PropertySchema(
+      id: 1,
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
+    r'durationMs': PropertySchema(
+      id: 2,
+      name: r'durationMs',
+      type: IsarType.long,
+    ),
     r'kind': PropertySchema(
-      id: 1,
+      id: 3,
       name: r'kind',
       type: IsarType.string,
     ),
+    r'metadataJson': PropertySchema(
+      id: 4,
+      name: r'metadataJson',
+      type: IsarType.string,
+    ),
+    r'mimeType': PropertySchema(
+      id: 5,
+      name: r'mimeType',
+      type: IsarType.string,
+    ),
     r'ocrText': PropertySchema(
-      id: 2,
+      id: 6,
       name: r'ocrText',
       type: IsarType.string,
     ),
+    r'pageCount': PropertySchema(
+      id: 7,
+      name: r'pageCount',
+      type: IsarType.long,
+    ),
     r'path': PropertySchema(
-      id: 3,
+      id: 8,
       name: r'path',
       type: IsarType.string,
     ),
     r'recordId': PropertySchema(
-      id: 4,
+      id: 9,
       name: r'recordId',
       type: IsarType.long,
     ),
     r'recordIndex': PropertySchema(
-      id: 5,
+      id: 10,
       name: r'recordIndex',
       type: IsarType.long,
+    ),
+    r'sizeBytes': PropertySchema(
+      id: 11,
+      name: r'sizeBytes',
+      type: IsarType.long,
+    ),
+    r'source': PropertySchema(
+      id: 12,
+      name: r'source',
+      type: IsarType.string,
     )
   },
   estimateSize: _attachmentEstimateSize,
@@ -84,12 +119,30 @@ int _attachmentEstimateSize(
   var bytesCount = offsets.last;
   bytesCount += 3 + object.kind.length * 3;
   {
+    final value = object.metadataJson;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.mimeType;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.ocrText;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
     }
   }
   bytesCount += 3 + object.path.length * 3;
+  {
+    final value = object.source;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -99,12 +152,19 @@ void _attachmentSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeDateTime(offsets[0], object.createdAt);
-  writer.writeString(offsets[1], object.kind);
-  writer.writeString(offsets[2], object.ocrText);
-  writer.writeString(offsets[3], object.path);
-  writer.writeLong(offsets[4], object.recordId);
-  writer.writeLong(offsets[5], object.recordIndex);
+  writer.writeDateTime(offsets[0], object.capturedAt);
+  writer.writeDateTime(offsets[1], object.createdAt);
+  writer.writeLong(offsets[2], object.durationMs);
+  writer.writeString(offsets[3], object.kind);
+  writer.writeString(offsets[4], object.metadataJson);
+  writer.writeString(offsets[5], object.mimeType);
+  writer.writeString(offsets[6], object.ocrText);
+  writer.writeLong(offsets[7], object.pageCount);
+  writer.writeString(offsets[8], object.path);
+  writer.writeLong(offsets[9], object.recordId);
+  writer.writeLong(offsets[10], object.recordIndex);
+  writer.writeLong(offsets[11], object.sizeBytes);
+  writer.writeString(offsets[12], object.source);
 }
 
 Attachment _attachmentDeserialize(
@@ -114,12 +174,19 @@ Attachment _attachmentDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Attachment();
-  object.createdAt = reader.readDateTime(offsets[0]);
+  object.capturedAt = reader.readDateTimeOrNull(offsets[0]);
+  object.createdAt = reader.readDateTime(offsets[1]);
+  object.durationMs = reader.readLongOrNull(offsets[2]);
   object.id = id;
-  object.kind = reader.readString(offsets[1]);
-  object.ocrText = reader.readStringOrNull(offsets[2]);
-  object.path = reader.readString(offsets[3]);
-  object.recordId = reader.readLong(offsets[4]);
+  object.kind = reader.readString(offsets[3]);
+  object.metadataJson = reader.readStringOrNull(offsets[4]);
+  object.mimeType = reader.readStringOrNull(offsets[5]);
+  object.ocrText = reader.readStringOrNull(offsets[6]);
+  object.pageCount = reader.readLongOrNull(offsets[7]);
+  object.path = reader.readString(offsets[8]);
+  object.recordId = reader.readLong(offsets[9]);
+  object.sizeBytes = reader.readLongOrNull(offsets[11]);
+  object.source = reader.readStringOrNull(offsets[12]);
   return object;
 }
 
@@ -131,17 +198,31 @@ P _attachmentDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readDateTime(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 1:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 2:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 3:
       return (reader.readString(offset)) as P;
     case 4:
-      return (reader.readLong(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 5:
+      return (reader.readStringOrNull(offset)) as P;
+    case 6:
+      return (reader.readStringOrNull(offset)) as P;
+    case 7:
+      return (reader.readLongOrNull(offset)) as P;
+    case 8:
+      return (reader.readString(offset)) as P;
+    case 9:
       return (reader.readLong(offset)) as P;
+    case 10:
+      return (reader.readLong(offset)) as P;
+    case 11:
+      return (reader.readLongOrNull(offset)) as P;
+    case 12:
+      return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -337,6 +418,79 @@ extension AttachmentQueryWhere
 
 extension AttachmentQueryFilter
     on QueryBuilder<Attachment, Attachment, QFilterCondition> {
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      capturedAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'capturedAt',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      capturedAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'capturedAt',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> capturedAtEqualTo(
+      DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'capturedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      capturedAtGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'capturedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      capturedAtLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'capturedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> capturedAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'capturedAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Attachment, Attachment, QAfterFilterCondition> createdAtEqualTo(
       DateTime value) {
     return QueryBuilder.apply(this, (query) {
@@ -383,6 +537,79 @@ extension AttachmentQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
         property: r'createdAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      durationMsIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'durationMs',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      durationMsIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'durationMs',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> durationMsEqualTo(
+      int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'durationMs',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      durationMsGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'durationMs',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      durationMsLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'durationMs',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> durationMsBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'durationMs',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -574,6 +801,311 @@ extension AttachmentQueryFilter
     });
   }
 
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      metadataJsonIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'metadataJson',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      metadataJsonIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'metadataJson',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      metadataJsonEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'metadataJson',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      metadataJsonGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'metadataJson',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      metadataJsonLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'metadataJson',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      metadataJsonBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'metadataJson',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      metadataJsonStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'metadataJson',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      metadataJsonEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'metadataJson',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      metadataJsonContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'metadataJson',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      metadataJsonMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'metadataJson',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      metadataJsonIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'metadataJson',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      metadataJsonIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'metadataJson',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> mimeTypeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'mimeType',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      mimeTypeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'mimeType',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> mimeTypeEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'mimeType',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      mimeTypeGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'mimeType',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> mimeTypeLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'mimeType',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> mimeTypeBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'mimeType',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      mimeTypeStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'mimeType',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> mimeTypeEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'mimeType',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> mimeTypeContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'mimeType',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> mimeTypeMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'mimeType',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      mimeTypeIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'mimeType',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      mimeTypeIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'mimeType',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<Attachment, Attachment, QAfterFilterCondition> ocrTextIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -719,6 +1251,78 @@ extension AttachmentQueryFilter
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'ocrText',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      pageCountIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'pageCount',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      pageCountIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'pageCount',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> pageCountEqualTo(
+      int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'pageCount',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      pageCountGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'pageCount',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> pageCountLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'pageCount',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> pageCountBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'pageCount',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -962,6 +1566,226 @@ extension AttachmentQueryFilter
       ));
     });
   }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      sizeBytesIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'sizeBytes',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      sizeBytesIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'sizeBytes',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> sizeBytesEqualTo(
+      int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'sizeBytes',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      sizeBytesGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'sizeBytes',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> sizeBytesLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'sizeBytes',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> sizeBytesBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'sizeBytes',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> sourceIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'source',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      sourceIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'source',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> sourceEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'source',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> sourceGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'source',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> sourceLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'source',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> sourceBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'source',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> sourceStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'source',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> sourceEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'source',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> sourceContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'source',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> sourceMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'source',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition> sourceIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'source',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterFilterCondition>
+      sourceIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'source',
+        value: '',
+      ));
+    });
+  }
 }
 
 extension AttachmentQueryObject
@@ -972,6 +1796,18 @@ extension AttachmentQueryLinks
 
 extension AttachmentQuerySortBy
     on QueryBuilder<Attachment, Attachment, QSortBy> {
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> sortByCapturedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'capturedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> sortByCapturedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'capturedAt', Sort.desc);
+    });
+  }
+
   QueryBuilder<Attachment, Attachment, QAfterSortBy> sortByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.asc);
@@ -981,6 +1817,18 @@ extension AttachmentQuerySortBy
   QueryBuilder<Attachment, Attachment, QAfterSortBy> sortByCreatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> sortByDurationMs() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'durationMs', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> sortByDurationMsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'durationMs', Sort.desc);
     });
   }
 
@@ -996,6 +1844,30 @@ extension AttachmentQuerySortBy
     });
   }
 
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> sortByMetadataJson() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'metadataJson', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> sortByMetadataJsonDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'metadataJson', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> sortByMimeType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'mimeType', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> sortByMimeTypeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'mimeType', Sort.desc);
+    });
+  }
+
   QueryBuilder<Attachment, Attachment, QAfterSortBy> sortByOcrText() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'ocrText', Sort.asc);
@@ -1005,6 +1877,18 @@ extension AttachmentQuerySortBy
   QueryBuilder<Attachment, Attachment, QAfterSortBy> sortByOcrTextDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'ocrText', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> sortByPageCount() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pageCount', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> sortByPageCountDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pageCount', Sort.desc);
     });
   }
 
@@ -1043,10 +1927,46 @@ extension AttachmentQuerySortBy
       return query.addSortBy(r'recordIndex', Sort.desc);
     });
   }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> sortBySizeBytes() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sizeBytes', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> sortBySizeBytesDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sizeBytes', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> sortBySource() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'source', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> sortBySourceDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'source', Sort.desc);
+    });
+  }
 }
 
 extension AttachmentQuerySortThenBy
     on QueryBuilder<Attachment, Attachment, QSortThenBy> {
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> thenByCapturedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'capturedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> thenByCapturedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'capturedAt', Sort.desc);
+    });
+  }
+
   QueryBuilder<Attachment, Attachment, QAfterSortBy> thenByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.asc);
@@ -1056,6 +1976,18 @@ extension AttachmentQuerySortThenBy
   QueryBuilder<Attachment, Attachment, QAfterSortBy> thenByCreatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> thenByDurationMs() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'durationMs', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> thenByDurationMsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'durationMs', Sort.desc);
     });
   }
 
@@ -1083,6 +2015,30 @@ extension AttachmentQuerySortThenBy
     });
   }
 
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> thenByMetadataJson() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'metadataJson', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> thenByMetadataJsonDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'metadataJson', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> thenByMimeType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'mimeType', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> thenByMimeTypeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'mimeType', Sort.desc);
+    });
+  }
+
   QueryBuilder<Attachment, Attachment, QAfterSortBy> thenByOcrText() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'ocrText', Sort.asc);
@@ -1092,6 +2048,18 @@ extension AttachmentQuerySortThenBy
   QueryBuilder<Attachment, Attachment, QAfterSortBy> thenByOcrTextDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'ocrText', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> thenByPageCount() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pageCount', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> thenByPageCountDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pageCount', Sort.desc);
     });
   }
 
@@ -1130,13 +2098,49 @@ extension AttachmentQuerySortThenBy
       return query.addSortBy(r'recordIndex', Sort.desc);
     });
   }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> thenBySizeBytes() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sizeBytes', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> thenBySizeBytesDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sizeBytes', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> thenBySource() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'source', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QAfterSortBy> thenBySourceDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'source', Sort.desc);
+    });
+  }
 }
 
 extension AttachmentQueryWhereDistinct
     on QueryBuilder<Attachment, Attachment, QDistinct> {
+  QueryBuilder<Attachment, Attachment, QDistinct> distinctByCapturedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'capturedAt');
+    });
+  }
+
   QueryBuilder<Attachment, Attachment, QDistinct> distinctByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'createdAt');
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QDistinct> distinctByDurationMs() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'durationMs');
     });
   }
 
@@ -1147,10 +2151,30 @@ extension AttachmentQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Attachment, Attachment, QDistinct> distinctByMetadataJson(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'metadataJson', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QDistinct> distinctByMimeType(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'mimeType', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Attachment, Attachment, QDistinct> distinctByOcrText(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'ocrText', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QDistinct> distinctByPageCount() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'pageCount');
     });
   }
 
@@ -1172,6 +2196,19 @@ extension AttachmentQueryWhereDistinct
       return query.addDistinctBy(r'recordIndex');
     });
   }
+
+  QueryBuilder<Attachment, Attachment, QDistinct> distinctBySizeBytes() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'sizeBytes');
+    });
+  }
+
+  QueryBuilder<Attachment, Attachment, QDistinct> distinctBySource(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'source', caseSensitive: caseSensitive);
+    });
+  }
 }
 
 extension AttachmentQueryProperty
@@ -1182,9 +2219,21 @@ extension AttachmentQueryProperty
     });
   }
 
+  QueryBuilder<Attachment, DateTime?, QQueryOperations> capturedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'capturedAt');
+    });
+  }
+
   QueryBuilder<Attachment, DateTime, QQueryOperations> createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
+    });
+  }
+
+  QueryBuilder<Attachment, int?, QQueryOperations> durationMsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'durationMs');
     });
   }
 
@@ -1194,9 +2243,27 @@ extension AttachmentQueryProperty
     });
   }
 
+  QueryBuilder<Attachment, String?, QQueryOperations> metadataJsonProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'metadataJson');
+    });
+  }
+
+  QueryBuilder<Attachment, String?, QQueryOperations> mimeTypeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'mimeType');
+    });
+  }
+
   QueryBuilder<Attachment, String?, QQueryOperations> ocrTextProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'ocrText');
+    });
+  }
+
+  QueryBuilder<Attachment, int?, QQueryOperations> pageCountProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'pageCount');
     });
   }
 
@@ -1215,6 +2282,18 @@ extension AttachmentQueryProperty
   QueryBuilder<Attachment, int, QQueryOperations> recordIndexProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'recordIndex');
+    });
+  }
+
+  QueryBuilder<Attachment, int?, QQueryOperations> sizeBytesProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'sizeBytes');
+    });
+  }
+
+  QueryBuilder<Attachment, String?, QQueryOperations> sourceProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'source');
     });
   }
 }

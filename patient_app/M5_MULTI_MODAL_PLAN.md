@@ -7,14 +7,14 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 ### 1. Foundational Decisions & Infrastructure
 - [ ] Finalise capture UX requirements with design/PM (entry points, modal vs full-screen flow, back/exit affordances).
 - [ ] Audit privacy/consent copy for each capture mode (camera/mic/storage/email scopes).
-- [ ] Extend attachments storage to support photos, scans, audio, PDFs, and general files with predictable naming + metadata (size, type, capturedAt).
-- [ ] Define artefact schema updates in Isar (Attachment model fields, linking to records, OCR transcripts, audio duration).
+- [x] Extend attachments storage to support photos, scans, audio, PDFs, and general files with predictable naming + metadata (size, type, capturedAt).
+- [x] Define artefact schema updates in Isar (Attachment model fields, linking to records, OCR transcripts, audio duration).
 - [ ] Confirm minimum platform support (Android baseline API, iOS availability, web fallbacks) and flag per-mode limitations.
 
 ### 2. Capture Launcher & Accessibility Shell
-- [ ] Replace current FAB → `AddRecordScreen` navigation with a multimodal launcher surface (large buttons, high contrast, voice-over friendly).
-- [ ] Ensure launcher respects accessibility: focus order, screen-reader labels, large text scaling, high contrast theme.
-- [ ] Provide safe exit and “switch to keyboard entry” fallback at every step.
+- [x] Replace current FAB ? `AddRecordScreen` navigation with a multimodal launcher surface (large buttons, high contrast, voice-over friendly).
+- [x] Ensure launcher respects accessibility: focus order, screen-reader labels, large text scaling, high contrast theme.
+- [x] Provide safe exit and "switch to keyboard entry" fallback at every step.
 
 ### 3. Photo & Document Scan Pipelines
 - [ ] Integrate camera capture (still photo) including permission prompts and local save into attachments storage.
@@ -70,4 +70,7 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 - Storage footprint management: retention policy, compression, deletion workflow.
 - Encryption-at-rest decision for attachments (currently plaintext on device).
 - How to gate advanced modes on low-end devices (performance, storage).
+
+
+
 

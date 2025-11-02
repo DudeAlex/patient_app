@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../features/capture_core/capture_core.dart' as capture_core;
+import '../features/capture_core/ui/capture_launcher_screen.dart';
 import '../features/records/data/debug_seed.dart';
 import '../features/records/data/records_service.dart';
 import '../features/records/ui/add_record_screen.dart';
@@ -87,6 +89,8 @@ class _HomeScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final captureController =
+        capture_core.buildCaptureController(const <capture_core.CaptureModule>[]);
     return ChangeNotifierProvider(
       create: (_) => RecordsHomeState(
         service.records,
@@ -112,11 +116,53 @@ class _HomeScaffold extends StatelessWidget {
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
               final state = context.read<RecordsHomeState>();
+              final locale = Localizations.localeOf(context);
+              final mediaQuery = MediaQuery.maybeOf(context);
+              final accessibilityEnabled =
+                  mediaQuery?.accessibleNavigation ?? false;
               await Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (_) => ChangeNotifierProvider.value(
-                    value: state,
-                    child: const AddRecordScreen(),
+                  builder: (launcherContext) => CaptureLauncherScreen(
+                    controller: captureController,
+                    locale: locale,
+                    isAccessibilityEnabled: accessibilityEnabled,
+                    onResult:
+                        (BuildContext ctx, mode, result) async {
+                      if (!result.completed) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '${mode.displayName} capture cancelled.',
+                            ),
+                          ),
+                        );
+                        return;
+                      }
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            '${mode.displayName} capture completed. Review flow coming soon.',
+                          ),
+                        ),
+                      );
+                      if (ctx.mounted) {
+                        Navigator.of(ctx).pop();
+                      }
+                    },
+                    onKeyboardEntry: (ctx) async {
+                      await Navigator.of(ctx).push(
+                        MaterialPageRoute(
+                          builder: (_) => ChangeNotifierProvider.value(
+                            value: state,
+                            child: const AddRecordScreen(),
+                          ),
+                        ),
+                      );
+                      if (ctx.mounted) {
+                        Navigator.of(ctx).pop();
+                      }
+                    },
+                    emptyStateBuilder: (_) => const _LauncherEmptyState(),
                   ),
                 ),
               );
@@ -130,3 +176,27 @@ class _HomeScaffold extends StatelessWidget {
 }
 
 // End
+
+class _LauncherEmptyState extends StatelessWidget {
+  const _LauncherEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Icon(Icons.grid_view, size: 48, color: Colors.grey),
+            SizedBox(height: 12),
+            Text(
+              'Capture options are coming soon. You can still use the keyboard form.',
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
