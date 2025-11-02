@@ -7,6 +7,7 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 ### 1. Foundational Decisions & Infrastructure
 - [ ] Finalise capture UX requirements with design/PM (entry points, modal vs full-screen flow, back/exit affordances).
 - [ ] Audit privacy/consent copy for each capture mode (camera/mic/storage/email scopes).
+- [ ] Catalogue patient-facing strings and register localisation keys (no hard-coded copy in modules).
 - [x] Extend attachments storage to support photos, scans, audio, PDFs, and general files with predictable naming + metadata (size, type, capturedAt).
 - [x] Define artefact schema updates in Isar (Attachment model fields, linking to records, OCR transcripts, audio duration).
 - [ ] Confirm minimum platform support (Android baseline API, iOS availability, web fallbacks) and flag per-mode limitations.
@@ -21,6 +22,7 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 - [ ] Add clarity/OCR checks (basic blur detection + text presence heuristic) with retry guidance; allow override if patient insists on keeping a blurry image.
 - [ ] Implement document scan flow (edge detection, multi-page support, contrast cleanup) using an appropriate package; persist both original image(s) and cleaned PDF/image output.
 - [ ] Store extracted OCR text for review; surface in the review panel for editing/tagging.
+- [ ] Expose AI-assist hooks (clarity scoring, OCR, guidance) through replaceable interfaces documented in the module README.
 
 ### 4. Voice Dictation Capture
 - [ ] Add audio recording UI with large record/stop controls, progress indicator, and explicit consent copy.

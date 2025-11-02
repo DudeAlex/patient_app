@@ -131,4 +131,6 @@ Contributing & Process
 - Please make small, incremental changes and validate manually after each step.
 - Add clear comments to any new or modified code to explain intent.
 - Keep docs in sync: update README, RUNNING, ARCHITECTURE, SYNC, TROUBLESHOOTING, and TODO with relevant changes.
+- Stage all patient-facing strings for localisation (`gen_l10n` ready). Avoid hard-coded prose inside widgets or controllers.
+- Highlight AI-extension points when adding features, and prefer interface-based hooks so AI services can plug in cleanly.
 - See `AGENTS.md` for the full set of repo guidelines for LLMs and contributors.

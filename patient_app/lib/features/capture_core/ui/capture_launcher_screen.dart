@@ -37,36 +37,27 @@ class CaptureLauncherScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Add Record')),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: modes.isEmpty
-                  ? (emptyStateBuilder?.call(context) ??
-                        _DefaultEmptyState(onKeyboardEntry: onKeyboardEntry))
-                  : ListView.separated(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: modes.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final mode = modes[index];
-                        return _CaptureModeTile(
-                          mode: mode,
-                          onPressed: () => _startMode(context, mode),
-                        );
-                      },
-                    ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-              child: OutlinedButton.icon(
-                onPressed: () => onKeyboardEntry(context),
-                icon: const Icon(Icons.keyboard),
-                label: const Text('Use keyboard entry instead'),
+        child: modes.isEmpty
+            ? (emptyStateBuilder?.call(context) ??
+                  _DefaultEmptyState(onKeyboardEntry: onKeyboardEntry))
+            : ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemCount: modes.length + 1,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  if (index < modes.length) {
+                    final mode = modes[index];
+                    return _CaptureModeTile(
+                      mode: mode,
+                      onPressed: () => _startMode(context, mode),
+                    );
+                  }
+                  return _CaptureFallbackTile(
+                    onPressed: () => onKeyboardEntry(context),
+                  );
+                },
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -161,6 +152,31 @@ const Map<String, IconData> _materialIconMap = {
   'email': Icons.email,
 };
 
+class _CaptureFallbackTile extends StatelessWidget {
+  const _CaptureFallbackTile({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          alignment: Alignment.centerLeft,
+        ),
+        icon: const Icon(Icons.keyboard),
+        label: Text(
+          'Use keyboard entry instead',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+      ),
+    );
+  }
+}
+
 class _DefaultEmptyState extends StatelessWidget {
   const _DefaultEmptyState({required this.onKeyboardEntry});
 
@@ -181,10 +197,7 @@ class _DefaultEmptyState extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () => onKeyboardEntry(context),
-              child: const Text('Open keyboard entry'),
-            ),
+            _CaptureFallbackTile(onPressed: () => onKeyboardEntry(context)),
           ],
         ),
       ),

@@ -32,6 +32,8 @@ We design every milestone as a collection of modules that can be composed, repla
 - **Minimal Coupling**: Avoid direct imports across sibling modules. If cross-module communication is required, use events/notifiers, callbacks, or well-defined service interfaces.
 - **Documentation**: Each module includes a `README.md` or section explaining responsibilities, APIs, dependencies, and extension points. Plans (e.g., `Mx_<feature>_PLAN.md`) should list module boundaries and contracts.
 - **Migration Safety**: Schema changes are owned by the module author. Provide migrations/backfills that do not break inactive modules.
+- **Localization-Ready**: Never hard-code patient-facing copy inside business logic or widgets. Surface strings through a localisation layer (see below) so future languages can drop in without editing module internals.
+- **AI Hook Awareness**: When a workflow can benefit from AI assistance, define clear extension points (interfaces, events) so AI modules can plug in without rewriting the base experience.
 
 ### Module Contracts & Examples
 
@@ -58,6 +60,27 @@ Data Model (Isar)
 - Insight: id, recordId?, kind, text, createdAt
 - SyncState (singleton): lastSyncedAt?, lastRemoteModified?, localChangeCounter, deviceId
 - Planned: SupportContact, WellnessCheckIn collections (see SPEC.md for fields)
+
+## Localization & Internationalisation
+
+All patient-facing strings, accessibility labels, and menu items must be routed through a localisation mechanism (`intl`/`gen_l10n`). Modules should:
+
+- Define copy keys or string providers inside the module’s `api/` surface.
+- Avoid embedding prose inside widgets; instead request text from the localisation layer so language packs can be swapped at runtime.
+- Keep structured data (menu configuration, prompts) in JSON/config files where possible to simplify translation workflows.
+
+Until the `gen_l10n` workflow lands, stage new strings in a shared constants file with TODO markers so they are easy to extract later. New features must document any copy they introduce and note if translations are pending.
+
+## AI-First Design Principles
+
+The app is an AI-enabled assistant. For every new module:
+
+- Identify decision points where AI can assist (e.g., clarity checks, OCR, data entry suggestions) and expose those via replaceable strategy interfaces.
+- Ensure AI integrations respect consent: modules must work offline/local-first and emit events so the AI layer can attach when the patient opts in.
+- Capture enough context (metadata, artefact descriptors) so future AI models can reason about the patient action without altering the core module.
+- Document AI hooks in the module README and plans so contributors know where to extend functionality.
+
+Existing modules should note in their README which extension points AI services consume today (e.g., photo OCR, voice dictation transcription) and which are planned.
 
 Security
 - Backup encryption: AES-GCM with random nonce; key stored in platform secure storage
