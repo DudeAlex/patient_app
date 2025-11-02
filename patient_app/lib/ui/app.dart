@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../features/records/data/debug_seed.dart';
 import '../features/records/data/records_service.dart';
-import '../features/records/repo/records_repo.dart';
 import '../features/records/ui/add_record_screen.dart';
 import '../features/records/ui/records_home_placeholder.dart';
 import '../features/records/ui/records_home_state.dart';
@@ -73,7 +72,7 @@ class _RecordsLoader extends StatelessWidget {
                 ),
               );
             }
-            return _HomeScaffold(repository: service.records);
+            return _HomeScaffold(service: service);
           },
         );
       },
@@ -82,14 +81,18 @@ class _RecordsLoader extends StatelessWidget {
 }
 
 class _HomeScaffold extends StatelessWidget {
-  const _HomeScaffold({required this.repository});
+  const _HomeScaffold({required this.service});
 
-  final RecordsRepository repository;
+  final RecordsService service;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => RecordsHomeState(repository)..load(),
+      create: (_) => RecordsHomeState(
+        service.records,
+        service.dirtyTracker,
+        service.syncState,
+      )..load(),
       child: Builder(
         builder: (context) => Scaffold(
           appBar: AppBar(

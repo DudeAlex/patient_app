@@ -5,9 +5,12 @@ Auto sync ensures local changes are backed up to Google Drive App Data automatic
 ## MVP Scope (Release Now)
 
 ### 1. Requirements & Constraints
-- [ ] Review README/TODO/SPEC backup sections to confirm expectations (when to trigger, consent, error messaging).
+- [x] Review README/TODO/SPEC backup sections to confirm expectations (auto sync runs only when signed in, reuses the encrypted Drive backup flow, and surfaces SnackBar errors when failures occur).
+  - Notes: default to Wi-Fi, honor patient consent toggles, queue retries on recoverable failures.
 - [x] Default to Wi-Fi-only auto sync; defer when on cellular unless the patient opts in.
-- [ ] Define a lightweight “critical vs routine” rule (e.g., attachments, visit summaries = critical) so only critical changes trigger auto sync; queue routine notes until a critical change or manual request.
+- [x] Define a lightweight "critical vs routine" rule so only critical changes trigger auto sync; queue routine notes until a critical change or manual request.
+  - Critical triggers: saving or deleting a record of type `visit`, `lab`, or `med`, any attachment add/remove, or a manual "backup now" request.
+  - Routine backlog: `note`-only edits accumulate until a critical trigger fires or the patient runs a manual backup.
 
 ### 2. Track Dirty State
 - [ ] Extend repository/state to flag dirty changes whenever records mutate.
@@ -34,3 +37,9 @@ Auto sync ensures local changes are backed up to Google Drive App Data automatic
 - Smarter scheduling: battery/network awareness, true incremental uploads, background isolates.
 - Explicit queue management for routine changes (e.g., patient can “sync now” or see queued items).
 - Cellular auto-sync opt-in (with data usage warnings) once the MVP proves reliable.
+
+
+
+
+
+

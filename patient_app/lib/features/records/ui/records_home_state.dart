@@ -1,17 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 
+import '../../sync/dirty_tracker.dart';
+import '../../sync/sync_state_repository.dart';
 import '../model/record.dart';
 import '../repo/records_repo.dart';
 
 /// Simple [ChangeNotifier] that loads recent records and exposes loading/error
 /// states. This keeps UI widgets focused on presentation.
 class RecordsHomeState extends ChangeNotifier {
-  RecordsHomeState(this._repository);
+  RecordsHomeState(this._repository, this._dirtyTracker, this._syncStateRepository);
 
   static const int _pageSize = 20;
 
   final RecordsRepository _repository;
+  final AutoSyncDirtyTracker _dirtyTracker;
+  final SyncStateRepository _syncStateRepository;
 
   List<Record> _records = const [];
   Object? _error;
@@ -30,6 +34,7 @@ class RecordsHomeState extends ChangeNotifier {
   String get searchQuery => _searchQuery;
 
   RecordsRepository get repository => _repository;
+  SyncStateRepository get syncStateRepository => _syncStateRepository;
 
   Record? recordById(Id id) {
     for (final record in _records) {
@@ -61,12 +66,15 @@ class RecordsHomeState extends ChangeNotifier {
   Future<Record> saveRecord(Record record) async {
     final savedId = await _repository.add(record);
     record.id = savedId;
+    await _dirtyTracker.recordRecordSave(record);
     await load(query: _searchQuery, force: true);
     return record;
   }
 
   Future<void> deleteRecord(Id id) async {
+    final existing = recordById(id) ?? await _repository.byId(id);
     await _repository.delete(id);
+    await _dirtyTracker.recordRecordDelete(existing);
     await load(query: _searchQuery, force: true);
   }
 

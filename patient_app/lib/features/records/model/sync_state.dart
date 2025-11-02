@@ -8,6 +8,10 @@ class SyncState {
   DateTime? lastSyncedAt;
   DateTime? lastRemoteModified;
   int localChangeCounter = 0;
+  bool autoSyncEnabled = false;
+  int pendingCriticalChanges = 0;
+  int pendingRoutineChanges = 0;
   late String deviceId;
 }
+
 

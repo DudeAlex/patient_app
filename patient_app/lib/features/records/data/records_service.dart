@@ -3,16 +3,20 @@ import 'dart:async';
 import 'package:isar/isar.dart';
 
 import '../../../core/db/isar.dart' as db_helpers;
+import '../../sync/dirty_tracker.dart';
+import '../../sync/sync_state_repository.dart';
 import '../repo/records_repo.dart';
 
 /// Singleton wrapper that exposes a shared [RecordsRepository] backed by the
 /// Isar database. Consumers call [RecordsService.instance] to obtain the lazy
 /// loaded service rather than opening Isar manually.
 class RecordsService {
-  RecordsService._(this.db, this.records);
+  RecordsService._(this.db, this.records, this.syncState, this.dirtyTracker);
 
   final Isar db;
   final RecordsRepository records;
+  final SyncStateRepository syncState;
+  final AutoSyncDirtyTracker dirtyTracker;
 
   static Future<RecordsService>? _pending;
 
@@ -36,6 +40,9 @@ class RecordsService {
       encryptionKey: List<int>.filled(32, 0),
     );
     final repo = RecordsRepository(isar);
-    return RecordsService._(isar, repo);
+    final syncRepo = SyncStateRepository(isar);
+    await syncRepo.ensureInitialized();
+    final tracker = AutoSyncDirtyTracker(syncRepo);
+    return RecordsService._(isar, repo, syncRepo, tracker);
   }
 }

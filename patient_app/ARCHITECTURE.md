@@ -7,28 +7,50 @@ Overview
 - Dual operating modes: Local Only (default) and AI-Assisted (opt-in via Together AI) for analysis and encouragement.
 
 Key Modules
-- `lib/ui/` app shell and screens
-  - `ui/app.dart` Material app + Settings entry
-  - `ui/settings/settings_screen.dart` wires UI to the reusable backup manager
-  - Planned: `ui/records/add_record/` multi-modal capture flow + accessibility-first review panel
-- `lib/core/`
+- `lib/ui/` feature wiring + navigation shell
+  - `ui/app.dart` Material app, dependency injection, route registration
+  - `ui/settings/settings_screen.dart` coordinates settings module surfaces
+- `lib/core/` shared infrastructure (no feature-specific logic)
   - `core/db/isar.dart` open Isar with schemas
-  - `core/storage/attachments.dart` manage attachments directory
-  - Planned: `core/ai/ai_processing_service.dart` encapsulates Together AI calls, consent checks, retries, schema validation
-  - Planned: `core/support/support_network.dart` manages trusted contacts, emergency actions, and sharing audit trail
-  - Planned: `core/import/email_ingest.dart` handles OAuth/IMAP connectors, mailbox sync, and structured message parsing
-  - Planned: `core/vitals/vitals_service.dart` powers camera PPG capture, cuff integrations, and signal analysis
-- `packages/google_drive_backup/`
-  - `auth/` Google Sign-In wrapper + injected HTTP client (v7 API)
-  - `crypto/` AES-GCM helpers + secure key management
-  - `backup/` zip/encrypt/export + decrypt/unzip/import (with web stubs)
-  - `drive/` Drive API upload/download in appData
-  - `backup_manager.dart` orchestrates auth, encryption, and Drive sync for consumers
-- `lib/features/records/`
-  - `model/record.dart`, `attachment.dart`, `insight.dart`, `sync_state.dart`
-  - `repo/records_repo.dart`
-  - Planned: `model/support_contact.dart`, `model/wellness_check_in.dart` to persist support networks and wellness check-ins
-  - Planned: `model/vital_measurement.dart` for pulse/blood-pressure readings linked to records
+  - `core/storage/attachments.dart` manage attachments root directory
+  - Planned: `core/ai/ai_processing_service.dart`, `core/support/support_network.dart`, `core/import/email_ingest.dart`, `core/vitals/vitals_service.dart` (cross-feature services exposed via interfaces)
+- `packages/google_drive_backup/` reusable backup/auth library (fully encapsulated module)
+- Feature modules live under `lib/features/<module>/`
+  - `features/records/` (models, repository, UI state, add/list/detail screens)
+  - `features/sync/` (SyncState repository, dirty tracking, future auto-sync runner)
+  - Planned: `features/capture_core/`, `features/capture_modes/photo|scan|voice|file|email/`, `features/support_network/`, `features/vitals/`, etc. Each module owns its models/services/UI and exposes a compact API for other modules to consume.
+
+## Feature Module Methodology (“Lego” Architecture)
+
+We design every milestone as a collection of modules that can be composed, replaced, or extended without touching unrelated code. Contributors should adhere to the following principles:
+
+- **Clear Boundaries**: Keep all code for a feature inside `lib/features/<feature>/...`. A module may expose public entry points (e.g., services, providers, routes) via `lib/features/<feature>/<feature>.dart` or a dedicated `api/` folder. Other modules import only these entry points.
+- **Interfaces over Implementations**: Define service/repository interfaces in the module and inject them where needed. When a module depends on another module, it should do so through interfaces or simple function contracts rather than concrete classes.
+- **Dependency Injection**: Pass dependencies via constructors or a thin DI container initialised in `ui/app.dart`. Avoid global singletons; modules register their services during app boot (e.g., `CaptureModule.register(container)`).
+- **Stable Data Contracts**: Shared data structures live in `core/` only if they are truly cross-cutting. If a module needs to publish data, provide DTOs or value objects in its public API.
+- **Testable Modules**: Each module owns its tests and may substitute dependencies with mocks. Modules should not rely on global state or static singletons to remain test-friendly.
+- **Minimal Coupling**: Avoid direct imports across sibling modules. If cross-module communication is required, use events/notifiers, callbacks, or well-defined service interfaces.
+- **Documentation**: Each module includes a `README.md` or section explaining responsibilities, APIs, dependencies, and extension points. Plans (e.g., `Mx_<feature>_PLAN.md`) should list module boundaries and contracts.
+- **Migration Safety**: Schema changes are owned by the module author. Provide migrations/backfills that do not break inactive modules.
+
+### Module Contracts & Examples
+
+| Module | Responsibility | Public Surface | Depends On |
+| --- | --- | --- | --- |
+| `features/records` | CRUD operations, record list/detail UI | `RecordsRepository`, `RecordsService`, `RecordsHomeState`, routes for add/edit/detail screens | `core/db`, `core/storage` |
+| `features/sync` | Dirty tracking, SyncState persistence, auto-sync orchestration (planned) | `SyncStateRepository`, `AutoSyncDirtyTracker`, future `AutoSyncCoordinator` | `features/records` (via interfaces), `google_drive_backup` |
+| `features/capture_core` (planned) | Multi-modal capture launcher, review flow orchestration | `CaptureController`, route/widget surfaces | `features/records` (to save), `core/storage` |
+| `features/capture_modes/<mode>` (planned) | Concrete capture flows (photo, scan, voice, file, email) | `CaptureMode` implementations registered with `capture_core` | `core/storage`, optional platform APIs |
+| `packages/google_drive_backup` | Google auth + encrypted backup plumbing | `DriveBackupManager` class | `http`, `googleapis` |
+
+During M5 we will introduce `features/capture_core` and its sibling mode modules. Each mode provides a `CaptureMode` implementation describing how to start/complete capture, required permissions, and the payload returned to the review panel. The core module coordinates mode discovery, routing, and final commit into the records module. This approach lets us update or replace a single mode (e.g., swap camera implementation) without touching the rest of the codebase.
+
+All new modules must document:
+- Public API (classes/functions exposed to other modules)
+- Required dependencies and how they are injected
+- Events/notifications emitted
+- Storage schema owned by the module
+- Tests/manual scenarios
 
 Data Model (Isar)
 - Record: id, type, date, title, text?, tags[], createdAt, updatedAt, deletedAt?
