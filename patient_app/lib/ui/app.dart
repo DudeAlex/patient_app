@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../features/capture_core/capture_core.dart' as capture_core;
 import '../features/capture_core/ui/capture_launcher_screen.dart';
+import '../features/capture_core/ui/capture_review_screen.dart';
 import '../features/capture_modes/document_scan/document_scan_module.dart';
 import '../features/capture_modes/photo/photo_capture_module.dart';
 import '../features/records/data/debug_seed.dart';
@@ -141,10 +142,11 @@ class _HomeScaffold extends StatelessWidget {
                         );
                         return;
                       }
-                      ScaffoldMessenger.of(ctx).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            '${mode.displayName} capture completed. Review flow coming soon.',
+                      await Navigator.of(ctx).push(
+                        MaterialPageRoute(
+                          builder: (_) => CaptureReviewScreen(
+                            mode: mode,
+                            result: result,
                           ),
                         ),
                       );

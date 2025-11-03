@@ -61,5 +61,6 @@
   - Repeat with an intentionally blurred page; confirm the "Page looks blurry" prompt appears, exercise both Retake and Keep paths, and check metadata (`clarityIsSharp`, `clarityUserAccepted`).
   - Observe that a "Checking clarity…" overlay blocks interaction until the prompt appears, preventing premature navigation.
   - After completion, inspect the resulting draft data (e.g., via debug logs) to confirm the analysis pipeline stub added placeholder details/tags.
+  - Confirm the review screen opens automatically after capture, shows suggested summary/tags, lists artefacts, and allows closing back to the records screen.
 - **Status**
   - Pending. Execute once emulator access is available to confirm multi-page capture and storage hygiene.

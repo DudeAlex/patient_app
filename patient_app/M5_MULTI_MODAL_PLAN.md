@@ -42,6 +42,7 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 
 ### 7. Unified Review & Save Flow
 - [ ] Build review panel that merges captured artefacts, extracted text, suggested tags, and patient edits before saving.
+  - Read-only review screen scaffold added (captures artefacts + AI stub output; editing/saving pending).
 - [ ] Allow reordering or removing attachments and editing metadata prior to commit.
 - [ ] Ensure saving creates/updates Record + Attachment documents atomically; hook dirty tracking for auto-sync when that feature resumes.
 - [ ] Surface success/Failure feedback that meets accessibility guidelines (snackbar, haptics, voice prompt).
@@ -72,7 +73,6 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 - Storage footprint management: retention policy, compression, deletion workflow.
 - Encryption-at-rest decision for attachments (currently plaintext on device).
 - How to gate advanced modes on low-end devices (performance, storage).
-
 
 
 
