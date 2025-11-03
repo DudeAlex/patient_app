@@ -7,6 +7,7 @@ class CaptureContext {
     required this.locale,
     this.isAccessibilityEnabled = false,
     this.promptRetake,
+    this.promptChoice,
   });
 
   /// Unique identifier for the overall capture session.
@@ -20,6 +21,14 @@ class CaptureContext {
 
   /// Optional handler that allows capture modes to ask the patient if they'd like to retry.
   final Future<bool> Function(String title, String message)? promptRetake;
+
+  /// Optional handler for generic yes/no prompts with custom button labels.
+  final Future<bool> Function(
+    String title,
+    String message, {
+    String confirmLabel,
+    String cancelLabel,
+  })? promptChoice;
 }
 
 /// Describes a capture mode that can be displayed in the launcher.

@@ -42,7 +42,9 @@ We design every milestone as a collection of modules that can be composed, repla
 | `features/records` | CRUD operations, record list/detail UI | `RecordsRepository`, `RecordsService`, `RecordsHomeState`, routes for add/edit/detail screens | `core/db`, `core/storage` |
 | `features/sync` | Dirty tracking, SyncState persistence, auto-sync orchestration (planned) | `SyncStateRepository`, `AutoSyncDirtyTracker`, future `AutoSyncCoordinator` | `features/records` (via interfaces), `google_drive_backup` |
 | `features/capture_core` (planned) | Multi-modal capture launcher, review flow orchestration | `CaptureController`, route/widget surfaces | `features/records` (to save), `core/storage` |
-| `features/capture_modes/<mode>` (planned) | Concrete capture flows (photo, scan, voice, file, email) | `CaptureMode` implementations registered with `capture_core` | `core/storage`, optional platform APIs |
+| `features/capture_modes/photo` | Camera capture with clarity analysis and OCR stubs | `PhotoCaptureModule`, `PhotoCaptureService` | `core/storage`, `image_picker`, optional analyzers |
+| `features/capture_modes/document_scan` | Multi-page document scanning with baseline enhancement | `DocumentScanModule`, `DocumentScanService` | `core/storage`, `image_picker`, `image` |
+| `features/capture_modes/<mode>` (planned) | Concrete capture flows (voice, file, email) | `CaptureMode` implementations registered with `capture_core` | `core/storage`, optional platform APIs |
 | `packages/google_drive_backup` | Google auth + encrypted backup plumbing | `DriveBackupManager` class | `http`, `googleapis` |
 
 During M5 we will introduce `features/capture_core` and its sibling mode modules. Each mode provides a `CaptureMode` implementation describing how to start/complete capture, required permissions, and the payload returned to the review panel. The core module coordinates mode discovery, routing, and final commit into the records module. This approach lets us update or replace a single mode (e.g., swap camera implementation) without touching the rest of the codebase.

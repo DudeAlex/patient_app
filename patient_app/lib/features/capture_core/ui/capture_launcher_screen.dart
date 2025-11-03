@@ -68,8 +68,22 @@ class CaptureLauncherScreen extends StatelessWidget {
       sessionId: sessionId,
       locale: locale.toLanguageTag(),
       isAccessibilityEnabled: isAccessibilityEnabled,
-      promptRetake: (title, message) =>
-          _showRetakeDialog(context, title, message),
+      promptRetake: (title, message) => _showDecisionDialog(
+        context,
+        title: title,
+        message: message,
+        confirmLabel: 'Retake',
+        cancelLabel: 'Keep',
+      ),
+      promptChoice: (title, message,
+              {String confirmLabel = 'OK', String cancelLabel = 'Cancel'}) =>
+          _showDecisionDialog(
+        context,
+        title: title,
+        message: message,
+        confirmLabel: confirmLabel,
+        cancelLabel: cancelLabel,
+      ),
     );
     try {
       final result = await controller.startMode(
@@ -87,11 +101,13 @@ class CaptureLauncherScreen extends StatelessWidget {
     }
   }
 
-  Future<bool> _showRetakeDialog(
-    BuildContext context,
-    String title,
-    String message,
-  ) async {
+  Future<bool> _showDecisionDialog(
+    BuildContext context, {
+    required String title,
+    required String message,
+    required String confirmLabel,
+    required String cancelLabel,
+  }) async {
     final result = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -100,11 +116,11 @@ class CaptureLauncherScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Keep'),
+            child: Text(cancelLabel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Retake'),
+            child: Text(confirmLabel),
           ),
         ],
       ),

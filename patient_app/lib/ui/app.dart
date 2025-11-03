@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../features/capture_core/capture_core.dart' as capture_core;
 import '../features/capture_core/ui/capture_launcher_screen.dart';
+import '../features/capture_modes/document_scan/document_scan_module.dart';
 import '../features/capture_modes/photo/photo_capture_module.dart';
 import '../features/records/data/debug_seed.dart';
 import '../features/records/data/records_service.dart';
@@ -92,6 +93,7 @@ class _HomeScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final captureController = capture_core.buildCaptureController([
       PhotoCaptureModule(),
+      DocumentScanModule(),
     ]);
     return ChangeNotifierProvider(
       create: (_) => RecordsHomeState(
