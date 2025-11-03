@@ -44,6 +44,7 @@ We design every milestone as a collection of modules that can be composed, repla
 | `features/capture_core` (planned) | Multi-modal capture launcher, review flow orchestration | `CaptureController`, route/widget surfaces | `features/records` (to save), `core/storage` |
 | `features/capture_modes/photo` | Camera capture with clarity analysis and OCR stubs | `PhotoCaptureModule`, `PhotoCaptureService` | `core/storage`, `image_picker`, optional analyzers |
 | `features/capture_modes/document_scan` | Multi-page document scanning with baseline enhancement + clarity prompts and analysis hooks | `DocumentScanModule`, `DocumentScanService` | `core/storage`, `image_picker`, `image` |
+| `features/capture_modes/voice` (planned) | Voice dictation capture and shared audio pipeline for AI conversations | `VoiceCaptureModule` (planned), `VoiceCaptureService` (planned), `VoiceAssistantBridge` (planned) | `core/storage`, microphone permissions, optional STT/TTS providers |
 | `features/capture_modes/<mode>` (planned) | Concrete capture flows (voice, file, email) | `CaptureMode` implementations registered with `capture_core` | `core/storage`, optional platform APIs |
 | `packages/google_drive_backup` | Google auth + encrypted backup plumbing | `DriveBackupManager` class | `http`, `googleapis` |
 

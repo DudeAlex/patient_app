@@ -24,10 +24,16 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 - [ ] Use AI vision/LLM extraction to produce structured text/summary for review; surface in the review UI for editing/tagging.
 - [x] Expose AI-assist hooks (clarity scoring, document analysis pipeline stubs) through replaceable interfaces documented in the module README.
 
-### 4. Voice Dictation Capture
-- [ ] Add audio recording UI with large record/stop controls, progress indicator, and explicit consent copy.
-- [ ] Convert audio to text (on-device STT if available; otherwise stub & document) while saving the raw audio attachment.
-- [ ] Allow manual text editing before review and handle retries or background noise gracefully.
+### 4. Voice Dictation & Assistant Audio Pipeline
+- Capture UX
+  - [ ] Add voice capture module with large start/stop controls, input level indicator, and explicit consent copy.
+  - [ ] Persist recorded audio in the session directory with duration + waveform metadata.
+  - [ ] Convert audio to text via an injectable `VoiceTranscriptionPipeline` (stub first; note on/offline providers).
+  - [ ] Feed transcription results into the review screen (suggested details/tags) with retry prompts for noisy recordings.
+- Assistant & Command Layer
+  - [ ] Define a shared `VoiceIntentRouter` so recorded snippets can either populate dictation, trigger app commands (“start scan”), or forward to the AI companion for dialogue.
+  - [ ] Expose streaming APIs for future real-time conversations (LLM request/response, optional TTS playback).
+  - [ ] Document required permissions, privacy copy, and opt-in flows for always-on voice interactions.
 
 ### 5. Keyboard/Text Entry Enhancements
 - [ ] Modernise the existing form for the new flow (step-by-step layout, better defaults, quick tag suggestions).
@@ -73,6 +79,5 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 - Storage footprint management: retention policy, compression, deletion workflow.
 - Encryption-at-rest decision for attachments (currently plaintext on device).
 - How to gate advanced modes on low-end devices (performance, storage).
-
 
 
