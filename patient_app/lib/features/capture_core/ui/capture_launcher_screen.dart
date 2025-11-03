@@ -13,7 +13,7 @@ typedef CaptureResultCallback =
 
 typedef CaptureFallbackCallback = Future<void> Function(BuildContext context);
 
-class CaptureLauncherScreen extends StatelessWidget {
+class CaptureLauncherScreen extends StatefulWidget {
   const CaptureLauncherScreen({
     super.key,
     required this.controller,
@@ -32,42 +32,67 @@ class CaptureLauncherScreen extends StatelessWidget {
   final WidgetBuilder? emptyStateBuilder;
 
   @override
+  State<CaptureLauncherScreen> createState() => _CaptureLauncherScreenState();
+}
+
+class _CaptureLauncherScreenState extends State<CaptureLauncherScreen> {
+  final ValueNotifier<bool> _processingNotifier = ValueNotifier<bool>(false);
+
+  @override
+  void dispose() {
+    _processingNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final modes = controller.modes.where((m) => m.isAvailable()).toList();
-    return Scaffold(
-      appBar: AppBar(title: const Text('Add Record')),
-      body: SafeArea(
-        child: modes.isEmpty
-            ? (emptyStateBuilder?.call(context) ??
-                  _DefaultEmptyState(onKeyboardEntry: onKeyboardEntry))
-            : ListView.separated(
-                padding: const EdgeInsets.all(16),
-                itemCount: modes.length + 1,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  if (index < modes.length) {
-                    final mode = modes[index];
-                    return _CaptureModeTile(
-                      mode: mode,
-                      onPressed: () => _startMode(context, mode),
+    final modes = widget.controller.modes.where((m) => m.isAvailable()).toList();
+    return ValueListenableBuilder<bool>(
+      valueListenable: _processingNotifier,
+      builder: (context, isProcessing, child) {
+        return Stack(
+          children: [
+            child!,
+            if (isProcessing) const _ProcessingOverlay(),
+          ],
+        );
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Add Record')),
+        body: SafeArea(
+          child: modes.isEmpty
+              ? (widget.emptyStateBuilder?.call(context) ??
+                    _DefaultEmptyState(onKeyboardEntry: widget.onKeyboardEntry))
+              : ListView.separated(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: modes.length + 1,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    if (index < modes.length) {
+                      final mode = modes[index];
+                      return _CaptureModeTile(
+                        mode: mode,
+                        onPressed: () => _startMode(context, mode),
+                      );
+                    }
+                    return _CaptureFallbackTile(
+                      onPressed: () => widget.onKeyboardEntry(context),
                     );
-                  }
-                  return _CaptureFallbackTile(
-                    onPressed: () => onKeyboardEntry(context),
-                  );
-                },
-              ),
+                  },
+                ),
+        ),
       ),
     );
   }
 
   Future<void> _startMode(BuildContext context, CaptureMode mode) async {
-    final sessionId = controller.createSession();
+    final sessionId = widget.controller.createSession();
     final captureContext = CaptureContext(
+      onProcessing: (processing) => _processingNotifier.value = processing,
       sessionId: sessionId,
-      locale: locale.toLanguageTag(),
-      isAccessibilityEnabled: isAccessibilityEnabled,
+      locale: widget.locale.toLanguageTag(),
+      isAccessibilityEnabled: widget.isAccessibilityEnabled,
       promptRetake: (title, message) => _showDecisionDialog(
         context,
         title: title,
@@ -86,18 +111,26 @@ class CaptureLauncherScreen extends StatelessWidget {
       ),
     );
     try {
-      final result = await controller.startMode(
+      final result = await widget.controller.startMode(
         modeId: mode.id,
         context: captureContext,
       );
-      if (!context.mounted) return;
-      await onResult(context, mode, result);
+      if (!mounted || !context.mounted) return;
+      await widget.onResult(context, mode, result);
     } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      if (!mounted || !context.mounted) {
+        await widget.controller.discardSession(sessionId);
+        return;
+      }
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.showSnackBar(
         SnackBar(content: Text('Unable to start ${mode.displayName}: $e')),
       );
-      await controller.discardSession(sessionId);
+      await widget.controller.discardSession(sessionId);
+    } finally {
+      if (_processingNotifier.value) {
+        _processingNotifier.value = false;
+      }
     }
   }
 
@@ -187,6 +220,34 @@ class _CaptureFallbackTile extends StatelessWidget {
         label: Text(
           'Use keyboard entry instead',
           style: Theme.of(context).textTheme.titleMedium,
+        ),
+      ),
+    );
+  }
+}
+
+class _ProcessingOverlay extends StatelessWidget {
+  const _ProcessingOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: AbsorbPointer(
+        child: DecoratedBox(
+          decoration: const BoxDecoration(color: Colors.black45),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                CircularProgressIndicator(),
+                SizedBox(height: 12),
+                Text(
+                  'Checking clarity…',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

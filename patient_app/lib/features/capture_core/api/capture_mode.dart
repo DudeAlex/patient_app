@@ -8,6 +8,7 @@ class CaptureContext {
     this.isAccessibilityEnabled = false,
     this.promptRetake,
     this.promptChoice,
+    this.onProcessing,
   });
 
   /// Unique identifier for the overall capture session.
@@ -29,6 +30,9 @@ class CaptureContext {
     String confirmLabel,
     String cancelLabel,
   })? promptChoice;
+
+  /// Optional callback to signal long-running work (e.g., clarity analysis).
+  final void Function(bool isProcessing)? onProcessing;
 }
 
 /// Describes a capture mode that can be displayed in the launcher.

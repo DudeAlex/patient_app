@@ -1,11 +1,17 @@
 import '../../capture_core/api/capture_module.dart';
 
+import 'analysis/document_analysis_pipeline.dart';
+import 'analysis/document_clarity_analyzer.dart';
 import 'document_scan_mode.dart';
 import 'document_scan_service.dart';
 
 class DocumentScanModule implements CaptureModule {
   DocumentScanModule({DocumentScanService? service})
-    : _service = service ?? DocumentScanService();
+    : _service = service ??
+            DocumentScanService(
+              clarityAnalyzer: LaplacianDocumentClarityAnalyzer(),
+              analysisPipeline: const StubDocumentAnalysisPipeline(),
+            );
 
   final DocumentScanService _service;
 

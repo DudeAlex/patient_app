@@ -19,10 +19,10 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 
 ### 3. Photo & Document Scan Pipelines
 - [x] Integrate camera capture (still photo) including permission prompts and local save into attachments storage.
-- [ ] Add clarity checks (blur detection + LLM-based guidance) with retry prompts; allow override if the patient insists on keeping a blurry image.
+- [x] Add baseline clarity checks (Laplacian blur detection + retry prompts); allow override if the patient insists on keeping a blurry image.
 - [x] Implement baseline document scan flow (multi-page capture with grayscale enhancement) using the camera; persist both original and cleaned page images (edge detection/advanced cleanup remains TODO).
 - [ ] Use AI vision/LLM extraction to produce structured text/summary for review; surface in the review UI for editing/tagging.
-- [ ] Expose AI-assist hooks (clarity scoring, vision LLM, guidance) through replaceable interfaces documented in the module README.
+- [x] Expose AI-assist hooks (clarity scoring, document analysis pipeline stubs) through replaceable interfaces documented in the module README.
 
 ### 4. Voice Dictation Capture
 - [ ] Add audio recording UI with large record/stop controls, progress indicator, and explicit consent copy.
@@ -72,8 +72,6 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 - Storage footprint management: retention policy, compression, deletion workflow.
 - Encryption-at-rest decision for attachments (currently plaintext on device).
 - How to gate advanced modes on low-end devices (performance, storage).
-
-
 
 
 

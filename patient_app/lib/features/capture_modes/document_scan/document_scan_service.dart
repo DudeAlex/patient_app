@@ -9,6 +9,8 @@ import '../../../core/storage/attachments.dart';
 import '../../capture_core/api/capture_artifact.dart';
 import '../../capture_core/api/capture_draft.dart';
 import '../../capture_core/api/capture_mode.dart';
+import 'analysis/document_analysis_pipeline.dart';
+import 'analysis/document_clarity_analyzer.dart';
 import 'analysis/document_enhancer.dart';
 import 'models/document_scan_outcome.dart';
 
@@ -16,13 +18,19 @@ class DocumentScanService {
   DocumentScanService({
     ImagePicker? picker,
     DocumentEnhancer? enhancer,
+    DocumentClarityAnalyzer? clarityAnalyzer,
+    DocumentAnalysisPipeline? analysisPipeline,
     Uuid? uuid,
   })  : _picker = picker ?? ImagePicker(),
         _enhancer = enhancer ?? const DocumentEnhancer(),
+        _clarityAnalyzer = clarityAnalyzer,
+        _analysisPipeline = analysisPipeline,
         _uuid = uuid ?? const Uuid();
 
   final ImagePicker _picker;
   final DocumentEnhancer _enhancer;
+  final DocumentClarityAnalyzer? _clarityAnalyzer;
+  final DocumentAnalysisPipeline? _analysisPipeline;
   final Uuid _uuid;
 
   static const int _maxPages = 10;
@@ -61,12 +69,57 @@ class DocumentScanService {
         break;
       }
 
-      final artifacts = await _processPage(
+      final pageArtifacts = await _processPage(
         sessionId: context.sessionId,
         file: xfile,
         pageIndex: pages.length,
       );
-      pages.add(artifacts);
+      var augmented = pageArtifacts;
+      var userAcceptedBlurry = false;
+      DocumentClarityResult? clarityResult;
+      final analyzer = _clarityAnalyzer;
+      if (analyzer != null) {
+        final onProcessing = context.onProcessing;
+        onProcessing?.call(true);
+        try {
+          final originalFile = await AttachmentsStorage.resolveRelativePath(
+            pageArtifacts.original.relativePath,
+          );
+          clarityResult = await analyzer.analyze(originalFile);
+        } finally {
+          onProcessing?.call(false);
+        }
+        if (clarityResult.isSharp == false) {
+          final prompt = context.promptChoice ?? (
+              context.promptRetake == null
+                  ? null
+                  : (String title, String message,
+                          {String confirmLabel = 'Retake',
+                          String cancelLabel = 'Keep'}) =>
+                      context.promptRetake!(title, message));
+          if (prompt != null) {
+            final retry = await prompt(
+              'Page looks blurry',
+              clarityResult.reason ??
+                  'This page might be hard to read. Retake the photo?',
+              confirmLabel: 'Retake page',
+              cancelLabel: 'Keep page',
+            );
+            if (retry) {
+              await _discardArtifacts(pageArtifacts);
+              continue;
+            }
+            userAcceptedBlurry = true;
+          }
+        }
+        augmented = _applyClarityMetadata(
+          pageArtifacts,
+          clarityResult: clarityResult,
+          userAcceptedBlurry: userAcceptedBlurry,
+        );
+      }
+
+      pages.add(augmented);
 
       if (pages.length >= _maxPages) {
         break;
@@ -89,14 +142,43 @@ class DocumentScanService {
       artifacts.add(page.enhanced.copyWith(pageCount: totalPages));
     }
 
-    final draft = CaptureDraft(
+    var draft = const CaptureDraft(
       suggestedTags: {'scan', 'document'},
     );
+
+    Map<String, Object?> analysisMetadata = const {};
+    final pipeline = _analysisPipeline;
+    if (pipeline != null) {
+      final onProcessing = context.onProcessing;
+      onProcessing?.call(true);
+      try {
+        final request = DocumentAnalysisRequest(
+          sessionId: context.sessionId,
+          localeTag: context.locale,
+          pages: List.generate(
+            pages.length,
+            (index) => DocumentAnalysisPage(
+              index: index,
+              original: pages[index].original,
+              enhanced: pages[index].enhanced,
+            ),
+          ),
+        );
+        final result = await pipeline.analyze(request);
+        if (result.draft != null) {
+          draft = draft.merge(result.draft!);
+        }
+        analysisMetadata = Map.unmodifiable(result.metadata);
+      } finally {
+        onProcessing?.call(false);
+      }
+    }
 
     return DocumentScanOutcome(
       artifacts: artifacts,
       pageCount: totalPages,
       draft: draft,
+      metadata: analysisMetadata,
     );
   }
 
@@ -234,6 +316,52 @@ class DocumentScanService {
       confirmLabel: 'Add page',
       cancelLabel: 'Finish',
     );
+  }
+
+  Future<void> _discardArtifacts(_PageArtifacts artifacts) async {
+    await AttachmentsStorage.deleteRelativeFile(artifacts.original.relativePath);
+    await AttachmentsStorage.deleteRelativeFile(artifacts.enhanced.relativePath);
+  }
+
+  _PageArtifacts _applyClarityMetadata(
+    _PageArtifacts artifacts, {
+    DocumentClarityResult? clarityResult,
+    required bool userAcceptedBlurry,
+  }) {
+    if (clarityResult == null) return artifacts;
+    final updatedOriginal = _artifactWithClarity(
+      artifacts.original,
+      clarityResult,
+      userAcceptedBlurry,
+    );
+    final updatedEnhanced = _artifactWithClarity(
+      artifacts.enhanced,
+      clarityResult,
+      userAcceptedBlurry,
+    );
+    return _PageArtifacts(original: updatedOriginal, enhanced: updatedEnhanced);
+  }
+
+  CaptureArtifact _artifactWithClarity(
+    CaptureArtifact artifact,
+    DocumentClarityResult clarity,
+    bool userAcceptedBlurry,
+  ) {
+    final metadata = Map<String, Object?>.from(artifact.metadata);
+    metadata['claritySource'] = 'laplacian';
+    if (clarity.score != null) {
+      metadata['clarityScore'] = clarity.score;
+    }
+    if (clarity.isSharp != null) {
+      metadata['clarityIsSharp'] = clarity.isSharp;
+    }
+    if (clarity.reason != null && clarity.reason!.isNotEmpty) {
+      metadata['clarityReason'] = clarity.reason;
+    }
+    if (userAcceptedBlurry) {
+      metadata['clarityUserAccepted'] = true;
+    }
+    return artifact.copyWith(metadata: Map.unmodifiable(metadata));
   }
 
   String _buildArtifactId(int pageIndex, String variant) {

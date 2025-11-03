@@ -58,5 +58,8 @@
   - Open Add Record → tap "Scan Document".
   - Capture two pages, accepting the enhanced preview and finishing the session.
   - On return to the launcher snackbar, verify session folder contains paired original/enhanced images for each page.
+  - Repeat with an intentionally blurred page; confirm the "Page looks blurry" prompt appears, exercise both Retake and Keep paths, and check metadata (`clarityIsSharp`, `clarityUserAccepted`).
+  - Observe that a "Checking clarity…" overlay blocks interaction until the prompt appears, preventing premature navigation.
+  - After completion, inspect the resulting draft data (e.g., via debug logs) to confirm the analysis pipeline stub added placeholder details/tags.
 - **Status**
   - Pending. Execute once emulator access is available to confirm multi-page capture and storage hygiene.
