@@ -38,6 +38,13 @@ class CaptureLauncherScreen extends StatefulWidget {
 class _CaptureLauncherScreenState extends State<CaptureLauncherScreen> {
   final ValueNotifier<bool> _processingNotifier = ValueNotifier<bool>(false);
 
+  Future<T?> _withUiContext<T>(
+    Future<T?> Function(BuildContext context) action,
+  ) async {
+    if (!mounted) return null;
+    return action(context);
+  }
+
   @override
   void dispose() {
     _processingNotifier.dispose();
@@ -90,6 +97,7 @@ class _CaptureLauncherScreenState extends State<CaptureLauncherScreen> {
     final sessionId = widget.controller.createSession();
     final captureContext = CaptureContext(
       onProcessing: (processing) => _processingNotifier.value = processing,
+      withUiContext: _withUiContext,
       sessionId: sessionId,
       locale: widget.locale.toLanguageTag(),
       isAccessibilityEnabled: widget.isAccessibilityEnabled,

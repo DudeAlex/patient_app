@@ -26,10 +26,10 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 
 ### 4. Voice Dictation & Assistant Audio Pipeline
 - Capture UX
-  - [ ] Add voice capture module with large start/stop controls, input level indicator, and explicit consent copy.
-  - [ ] Persist recorded audio in the session directory with duration + waveform metadata.
-  - [ ] Convert audio to text via an injectable `VoiceTranscriptionPipeline` (stub first; note on/offline providers).
-  - [ ] Feed transcription results into the review screen (suggested details/tags) with retry prompts for noisy recordings.
+  - [x] Add voice capture module with consent-first controls and start/stop UI scaffold (waveform and input level TBD).
+  - [x] Persist recorded audio in the session directory with duration metadata; plan waveform stats extraction as a follow-up.
+  - [x] Convert audio to text via an injectable `VoiceTranscriptionPipeline` (stubbed for now, ready for providers).
+  - [x] Feed transcription results into the review screen (suggested details/tags) with retry/discard options.
 - Assistant & Command Layer
   - [ ] Define a shared `VoiceIntentRouter` so recorded snippets can either populate dictation, trigger app commands (“start scan”), or forward to the AI companion for dialogue.
   - [ ] Expose streaming APIs for future real-time conversations (LLM request/response, optional TTS playback).
@@ -79,5 +79,4 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 - Storage footprint management: retention policy, compression, deletion workflow.
 - Encryption-at-rest decision for attachments (currently plaintext on device).
 - How to gate advanced modes on low-end devices (performance, storage).
-
 

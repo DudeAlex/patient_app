@@ -64,3 +64,12 @@
   - Confirm the review screen opens automatically after capture, shows suggested summary/tags, lists artefacts, and allows closing back to the records screen.
 - **Status**
   - Pending. Execute once emulator access is available to confirm multi-page capture and storage hygiene.
+
+## 2025-11-02 (Planned)
+- **Scenario**
+  - Launch app, open the capture launcher, and tap "Voice Note".
+  - Grant microphone permission when prompted; verify the bottom sheet shows timer + record controls.
+  - Record a short note, stop, and choose "Use recording"; ensure spinner appears during transcription and the review screen lists the audio artefact with placeholder summary.
+  - Repeat and discard recording to confirm files are cleaned up.
+- **Status**
+  - Pending transcription pipeline integration.

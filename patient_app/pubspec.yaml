@@ -51,6 +51,7 @@ dependencies:
   image_picker: 1.0.7
   archive: 4.0.7
   image: ^4.5.4
+  record: ^5.0.8
   google_drive_backup:
     path: packages/google_drive_backup
 

@@ -6,6 +6,7 @@ import '../features/capture_core/ui/capture_launcher_screen.dart';
 import '../features/capture_core/ui/capture_review_screen.dart';
 import '../features/capture_modes/document_scan/document_scan_module.dart';
 import '../features/capture_modes/photo/photo_capture_module.dart';
+import '../features/capture_modes/voice/voice_capture_module.dart';
 import '../features/records/data/debug_seed.dart';
 import '../features/records/data/records_service.dart';
 import '../features/records/ui/add_record_screen.dart';
@@ -95,6 +96,7 @@ class _HomeScaffold extends StatelessWidget {
     final captureController = capture_core.buildCaptureController([
       PhotoCaptureModule(),
       DocumentScanModule(),
+      VoiceCaptureModule(),
     ]);
     return ChangeNotifierProvider(
       create: (_) => RecordsHomeState(

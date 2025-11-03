@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+
 import 'capture_result.dart';
 
 /// Context passed to capture modes when invoked.
@@ -9,6 +11,7 @@ class CaptureContext {
     this.promptRetake,
     this.promptChoice,
     this.onProcessing,
+    this.withUiContext,
   });
 
   /// Unique identifier for the overall capture session.
@@ -33,6 +36,10 @@ class CaptureContext {
 
   /// Optional callback to signal long-running work (e.g., clarity analysis).
   final void Function(bool isProcessing)? onProcessing;
+
+  /// Provides temporary access to a `BuildContext` for UI interactions.
+  final Future<T?> Function<T>(Future<T?> Function(BuildContext context) action)?
+      withUiContext;
 }
 
 /// Describes a capture mode that can be displayed in the launcher.
