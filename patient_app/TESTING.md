@@ -92,3 +92,14 @@
   - Toggle auto backup off again and confirm subsequent resumes no longer print backup attempts.
 - **Status**
   - Pending; verify once emulator access is available to confirm lifecycle hooks fire and status text appears.
+
+## 2025-11-05 (Planned)
+- **Scenario**
+  - With auto backup enabled and a signed-in account, perform a critical record update to trigger dirty counters and allow one automatic backup to complete.
+  - Within six hours of that run, make another critical update and resume the app; expect logs to show the new throttle message (`Last backup Xm ago; deferring…`) and no Drive upload.
+  - After the six-hour window elapses, resume again and confirm the backup proceeds along with the usual success log entries.
+- **Status**
+  - **2025-11-04** — Executed edit on a `visit` record, resumed app, observed:
+    - `[AutoSync] Starting background Drive backup for bilimus.comet@gmail.com`
+    - `[AutoSync] Backup completed successfully.`
+  - Post-run status card showed `Last sync: Nov 4, 2025 12:46 PM` with `critical: 0, routine: 0`.

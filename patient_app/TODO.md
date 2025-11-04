@@ -21,6 +21,8 @@ M4: Auto Sync
 - On app resume/exit: export/encrypt/upload if dirty
 - Conflict: last-write-wins with banner
 - Auto backup toggle now available in Settings (resume-triggered backup for critical changes). Upcoming refactor: switch default cadence to weekly background backups with patient-configurable triggers, add Wi-Fi gating, and surface conflict banner.
+- Add a minimal patient profile hub exposing account info, manual “Backup now,” auto backup cadence presets (6h/12h/daily/weekly/manual), theme mode (light/dark/auto), text size options (small/medium/large), and the AI consent toggle so patients control core settings themselves.
+- Deliver a secure backup-key portability solution (patient passphrase/mnemonic, offline QR/file export, or platform secure backup integration) so encrypted archives restore on replacement devices before production launch.
 
 M5: Multi-Modal Capture & Accessibility
 - Design modal with Photo, Document Scan, Voice Dictation, Keyboard, File Upload, and Email Import options (no video capture)

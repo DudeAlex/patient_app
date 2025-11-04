@@ -31,10 +31,11 @@ Out of scope (for MVP)
 - Goals: capture records quickly, keep them private, restore on device loss.
 
 ## 4. Feature Requirements & Acceptance Criteria
-4.1 Settings → Google Sign‑In
+4.1 Settings / Profile Hub
 - Must allow sign‑in/out using Google Sign‑In v7.
 - Shows current email when signed in.
 - Errors surface via SnackBar with actionable hints.
+- Minimal production UX: surface the essentials in a compact profile hub — account identity, manual “Backup now” action, auto backup cadence picker, AI consent toggle, and display preferences (light/dark/auto theme and small/medium/large text size) — avoiding dense menus.
 
 4.2 Backup to Google Drive (mobile)
 - Preconditions: user signed in; device online.
@@ -47,6 +48,11 @@ Out of scope (for MVP)
 - Default cadence: one automatic backup per week. Patients can opt into alternative triggers (e.g., on-resume after critical changes) once the scheduling UI ships.
 - Current implementation (Nov 2025) still relies on resume-after-critical-change triggers; moving to weekly cadence requires refactoring the lifecycle coordinator and scheduler.
 - When the weekly cadence lands and the patient is signed in, the app silently attempts a Drive backup using the configured schedule; ad-hoc triggers should remain available.
+- Patients can turn auto backup off at any time; when disabled, only manual backups run.
+- To limit redundant uploads, background auto sync enforces a minimum six-hour interval between successful runs while still queuing pending changes for the next window.
+- Production UX requirement: keep cadence controls lightweight — offer a small set of presets (e.g., 6h/12h/daily/weekly/manual) within the profile hub alongside the manual backup button, with adjacent toggles for theme mode (light/dark/auto) and text size (small/medium/large) to preserve accessibility.
+- Production readiness blocker: provide a secure key portability flow (e.g., patient passphrase or hardware transfer) so encrypted backups can be restored on a replacement device; current implementation binds the AES key to a single phone.
+  - Candidate approaches: patient-managed passphrase/mnemonic kept offline, one-time QR/file export that can be scanned on the new device, or OS-assisted secure storage (Android Keystore/iCloud Keychain) as an optional layer.
 - Resume trigger must skip if no critical changes are pending, another backup is running, or auth headers would prompt UI.
 - Auto backup writes `lastSyncedAt` on success so Settings can display “Last sync” timestamp and pending change counts.
 - Failure: log debug output and leave dirty counters intact for the next attempt; UI feedback for failures is planned in later M4 tasks.
@@ -199,6 +205,8 @@ T-06 Failure Paths
 
 ## 12. Open Questions / Decisions Log
 - Should Isar DB be encrypted at rest using `KeyManager`? Current README says "not encrypted yet". Decision TBD.
+- Backup key portability strategy for device migration (must land before production).
+  - Explore passphrase-based recovery, offline QR/file export, and platform key backup integration as options.
 - Auto-sync triggers (on resume/exit) and dirty tracking semantics (planned M3).
 - Web JSON export/import format (optional milestone): filename, schema versioning.
 - Together AI usage limits/pricing strategy and whether a proxy service is required.

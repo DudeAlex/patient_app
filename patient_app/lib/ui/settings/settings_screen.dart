@@ -94,8 +94,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SnackBar(content: Text('Failed to update auto backup: $e')),
       );
     } finally {
-      if (!mounted) return;
-      setState(() => _autoSyncBusy = false);
+      if (mounted) {
+        setState(() => _autoSyncBusy = false);
+      }
     }
   }
 

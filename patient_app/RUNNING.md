@@ -51,6 +51,8 @@ Debugging
   - Do not wrap the client id in quotes when using PowerShell.
   - `flutter run -d <device> --dart-define=GOOGLE_ANDROID_SERVER_CLIENT_ID=YOUR_WEB_CLIENT_ID`
   - Optional: `--dart-define=GOOGLE_AUTH_DEBUG=true` for verbose auth logs (default true)
+  - Project quick command (PowerShell example):
+    - `flutter run -d emulator-5554 --dart-define=GOOGLE_ANDROID_SERVER_CLIENT_ID=283237214247-8qs81ij8r4tg3n9upg2v6ikr4mrjhv0m.apps.googleusercontent.com`
 - Logs: the app prints `[Auth] ...` logs during initialization, interactive sign-in, and header fetching. Look for messages like `serverClientId must be provided on Android`.
 - In-app: Settings → Run Auth Diagnostics to exercise lightweight auth, interactive picker, and header requests; results are dialog + console logs.
 - OAuth setup: ensure Drive API enabled, consent screen configured, Android client (package `com.example.patient_app`, correct debug SHA-1), and a Web client (used as server client ID).

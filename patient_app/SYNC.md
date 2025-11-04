@@ -19,7 +19,11 @@ Operations
   2) Decrypt bytes
   3) Unzip to app docs dir (replace)
   - Imported assets now include scanned PDFs, uploaded documents, email attachments, and audio clips alongside photos.
+- Patients can disable auto backup entirely from Settings; when the toggle is off, only manual backups and restores run.
+- Auto sync batches critical-only edits by throttling background backups to at most once every six hours; pending changes remain queued until the next run or a manual backup.
 - Auto backup toggle lives in Settings (Android/iOS). Product target is a weekly background backup by default with patient-configurable cadence; the current implementation still uses resume-after-critical-change triggers and will be refactored to the weekly scheduler in a follow-up.
+- Future production UX: a minimal profile panel should expose the manual “Backup now” button plus a small set of cadence presets (6h/12h/daily/weekly/manual), alongside display preferences (light/dark/auto theme and small/medium/large text size), so patients control cadence and readability without extra screens.
+- Production blocker: implement a secure key portability flow so the AES encryption key travels with the patient when they replace or reset devices; Drive restores currently work only on the original device. Consider patient-held passphrases/mnemonics, offline QR/file exports, and optional platform key backup integration (Android Keystore/iCloud Keychain).
 
 Auth
 - Google Sign-In v7 API

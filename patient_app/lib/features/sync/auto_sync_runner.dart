@@ -16,12 +16,17 @@ class AutoSyncRunner {
     this._syncStateRepository, {
     DriveBackupManager? backupManager,
     DateTime Function()? clock,
+    Duration? minInterval,
   })  : _backupManager = backupManager ?? DriveBackupManager(),
-        _clock = clock ?? DateTime.now;
+        _clock = clock ?? DateTime.now,
+        _minInterval = minInterval ?? const Duration(hours: 6);
 
   final SyncStateRepository _syncStateRepository;
   final DriveBackupManager _backupManager;
   final DateTime Function() _clock;
+  /// Minimum delay between background backups to avoid re-uploading the full
+  /// archive multiple times within a short window.
+  final Duration _minInterval;
 
   bool _running = false;
 
@@ -46,6 +51,19 @@ class AutoSyncRunner {
         '[AutoSync] Only routine changes pending; waiting for critical trigger.',
       );
       return;
+    }
+    final lastSyncedAt = status.lastSyncedAt;
+    final now = _clock();
+    if (lastSyncedAt != null) {
+      final elapsed = now.difference(lastSyncedAt);
+      if (elapsed < _minInterval) {
+        final remaining = _minInterval - elapsed;
+        debugPrint(
+          '[AutoSync] Last backup ${elapsed.inMinutes}m ago; deferring for '
+          '${remaining.inMinutes}m to reduce duplicate uploads.',
+        );
+        return;
+      }
     }
     final email = _backupManager.auth.cachedEmail;
     if (email == null || email.isEmpty) {

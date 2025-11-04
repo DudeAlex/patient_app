@@ -11,6 +11,8 @@ Auto sync ensures local changes are backed up to Google Drive App Data automatic
 - [x] Define a lightweight "critical vs routine" rule so only critical changes trigger auto sync; queue routine notes until a critical change or manual request.
   - Critical triggers: saving or deleting a record of type `visit`, `lab`, or `med`, any attachment add/remove, or a manual "backup now" request.
   - Routine backlog: `note`-only edits accumulate until a critical trigger fires or the patient runs a manual backup.
+- [x] Document clearly that patients can disable auto sync entirely from Settings when they prefer manual backups only.
+- [ ] Flesh out a minimal patient profile/settings hub so patients can see account status, tap “Backup now,” adjust cadence presets (6h/12h/daily/weekly/manual), choose display preferences (light/dark/auto theme plus small/medium/large text), and manage backup-key portability (patient passphrase/mnemonic, offline QR/file export, or platform secure backup) before production.
 
 ### 2. Track Dirty State
 - [ ] Extend repository/state to flag dirty changes whenever records mutate.
@@ -20,6 +22,7 @@ Auto sync ensures local changes are backed up to Google Drive App Data automatic
 - [ ] Hook into app lifecycle (resume/exit) to check dirty state and launch backup when Wi-Fi + consent conditions are met.
   - [x] Introduced `AutoSyncCoordinator` to watch lifecycle resume events and emit pending-change diagnostics (backup invocation still TODO).
   - [x] Connected resume trigger to an `AutoSyncRunner` that performs background Drive backups when auto sync is enabled and critical dirty changes exist (Wi-Fi gating still TODO).
+  - [x] Added a minimum interval throttle so background backups run at most once every six hours, batching critical text edits without resending the full archive repeatedly.
   - [ ] Shift default cadence to weekly background backups with patient-configurable overrides (requires refactoring the current resume-trigger model).
 - [ ] Prevent overlapping runs and honour manual toggles (backup enabled + signed in).
 
