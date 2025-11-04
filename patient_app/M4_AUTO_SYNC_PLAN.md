@@ -18,6 +18,9 @@ Auto sync ensures local changes are backed up to Google Drive App Data automatic
 
 ### 3. Sync Trigger Mechanics
 - [ ] Hook into app lifecycle (resume/exit) to check dirty state and launch backup when Wi-Fi + consent conditions are met.
+  - [x] Introduced `AutoSyncCoordinator` to watch lifecycle resume events and emit pending-change diagnostics (backup invocation still TODO).
+  - [x] Connected resume trigger to an `AutoSyncRunner` that performs background Drive backups when auto sync is enabled and critical dirty changes exist (Wi-Fi gating still TODO).
+  - [ ] Shift default cadence to weekly background backups with patient-configurable overrides (requires refactoring the current resume-trigger model).
 - [ ] Prevent overlapping runs and honour manual toggles (backup enabled + signed in).
 
 ### 4. Backup Orchestration
@@ -26,7 +29,7 @@ Auto sync ensures local changes are backed up to Google Drive App Data automatic
 
 ### 5. Patient Feedback
 - [ ] Surface gentle status cues (snackbar/toast/log) when auto sync succeeds or fails.
-- [ ] Add a Settings switch to enable/disable auto sync and display the last successful sync timestamp.
+- [x] Add a Settings switch to enable/disable auto sync and display the last successful sync timestamp.
 
 ### 6. Testing & Documentation
 - [ ] Add manual scenarios to `TESTING.md` (dirty change + resume, failure then retry, manual toggle).

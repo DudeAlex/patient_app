@@ -19,6 +19,7 @@ Operations
   2) Decrypt bytes
   3) Unzip to app docs dir (replace)
   - Imported assets now include scanned PDFs, uploaded documents, email attachments, and audio clips alongside photos.
+- Auto backup toggle lives in Settings (Android/iOS). Product target is a weekly background backup by default with patient-configurable cadence; the current implementation still uses resume-after-critical-change triggers and will be refactored to the weekly scheduler in a follow-up.
 
 Auth
 - Google Sign-In v7 API

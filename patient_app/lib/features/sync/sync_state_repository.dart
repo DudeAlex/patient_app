@@ -2,6 +2,7 @@ import 'package:isar/isar.dart';
 import 'package:uuid/uuid.dart';
 
 import '../records/model/sync_state.dart';
+import 'auto_sync_status.dart';
 
 /// Persists and exposes the singleton [SyncState] record that tracks pending
 /// changes and auto sync preferences.
@@ -25,6 +26,32 @@ class SyncStateRepository {
       _deviceIdCache ??= state.deviceId;
     }
     return state;
+  }
+
+  /// Returns an immutable view of the current sync state, ensuring the backing
+  /// row exists before converting it.
+  Future<AutoSyncStatus> readStatus() async {
+    final existing = await read();
+    if (existing != null) {
+      return _mapToStatus(existing);
+    }
+    final ensured = await ensureInitialized();
+    return _mapToStatus(ensured);
+  }
+
+  /// Emits status updates whenever the underlying sync state changes.
+  Stream<AutoSyncStatus> watchStatus({bool fireImmediately = true}) async* {
+    await for (final state in _db.syncStates.watchObject(
+      1,
+      fireImmediately: fireImmediately,
+    )) {
+      if (state != null) {
+        yield _mapToStatus(state);
+      } else {
+        final ensured = await ensureInitialized();
+        yield _mapToStatus(ensured);
+      }
+    }
   }
 
   /// Updates the auto-sync toggle persisted in Isar.
@@ -97,5 +124,17 @@ class SyncStateRepository {
     }
     _deviceIdCache ??= state.deviceId;
     return state;
+  }
+
+  AutoSyncStatus _mapToStatus(SyncState state) {
+    return AutoSyncStatus(
+      autoSyncEnabled: state.autoSyncEnabled,
+      pendingCriticalChanges: state.pendingCriticalChanges,
+      pendingRoutineChanges: state.pendingRoutineChanges,
+      localChangeCounter: state.localChangeCounter,
+      lastSyncedAt: state.lastSyncedAt,
+      lastRemoteModified: state.lastRemoteModified,
+      deviceId: state.deviceId,
+    );
   }
 }

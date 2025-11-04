@@ -80,6 +80,10 @@ Together AI Connectivity
 - Large payload errors -> compress images before upload; set max resolution for photo capture (e.g., 12MP) to keep token usage manageable.
 - If Together AI is unreachable, keep patient in local-only flow and provide manual guidance instead of blocking save.
 
+Auto Backup
+- Auto backup does not run -> confirm the Settings toggle is enabled, the patient is signed in, and a record of type visit/lab/med was saved or deleted since the last sync.
+- Background resumes still skip backups -> toggle off/on to refresh state; check logs for `[AutoSync]` messages to see why the trigger was ignored (e.g., no critical changes, auth headers unavailable).
+
 Voice Dictation & Accessibility
 - Microphone permission denied -> show friendly dialog explaining why voice helps and how to enable it in system settings.
 - Transcription inaccurate -> fall back to manual edit screen and tag the field as "Needs review".

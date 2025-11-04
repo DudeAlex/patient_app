@@ -20,6 +20,7 @@ M4: Auto Sync
 - Track local dirty state (changes increment counter)
 - On app resume/exit: export/encrypt/upload if dirty
 - Conflict: last-write-wins with banner
+- Auto backup toggle now available in Settings (resume-triggered backup for critical changes). Upcoming refactor: switch default cadence to weekly background backups with patient-configurable triggers, add Wi-Fi gating, and surface conflict banner.
 
 M5: Multi-Modal Capture & Accessibility
 - Design modal with Photo, Document Scan, Voice Dictation, Keyboard, File Upload, and Email Import options (no video capture)

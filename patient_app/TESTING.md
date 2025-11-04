@@ -82,3 +82,13 @@
   - `flutter analyze`
 - **Result**
   - Passed. Analyzer reports clean after adjusting voice capture context usage and adding the missing `path` dependency.
+
+## 2025-11-04 (Planned)
+- **Scenario**
+  - Launch on Android emulator with seeded records.
+  - Add or edit a record to increment dirty counters.
+  - Toggle `autoSyncEnabled` to true (temporary debug hook) and ensure a Google account is signed in within Settings.
+  - Background the app, then resume it and observe console logs from `AutoSyncCoordinator`/`AutoSyncRunner` noting the backup attempt (`Starting background Drive backup` … `Backup completed successfully.`).
+  - Toggle auto backup off again and confirm subsequent resumes no longer print backup attempts.
+- **Status**
+  - Pending; verify once emulator access is available to confirm lifecycle hooks fire and status text appears.

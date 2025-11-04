@@ -1,6 +1,12 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:google_drive_backup/google_drive_backup.dart';
+import 'package:intl/intl.dart';
+
+import '../../features/records/data/records_service.dart';
+import '../../features/sync/auto_sync_status.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -13,11 +19,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _manager = DriveBackupManager();
   String? _email;
   bool _busy = false;
+  RecordsService? _recordsService;
+  StreamSubscription<AutoSyncStatus>? _autoSyncSubscription;
+  AutoSyncStatus? _autoSyncStatus;
+  bool _autoSyncBusy = false;
+  bool _autoSyncInitialised = false;
 
   @override
   void initState() {
     super.initState();
     _restoreAccount();
+    if (!kIsWeb) {
+      _initAutoSync();
+    }
+  }
+
+  @override
+  void dispose() {
+    _autoSyncSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _restoreAccount() async {
@@ -36,6 +56,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
         () => _manager.auth.getAuthHeaders(promptIfNecessary: false),
       );
     }
+  }
+
+  Future<void> _initAutoSync() async {
+    try {
+      final service = await RecordsService.instance();
+      if (!mounted) return;
+      _recordsService = service;
+      final initialStatus =
+          service.autoSync.latestStatus ?? await service.syncState.readStatus();
+      setState(() {
+        _autoSyncStatus = initialStatus;
+        _autoSyncInitialised = true;
+      });
+      _autoSyncSubscription =
+          service.autoSync.statusStream.listen((AutoSyncStatus status) {
+        if (!mounted) return;
+        setState(() => _autoSyncStatus = status);
+      });
+    } catch (e, st) {
+      debugPrint('[Settings] Failed to initialise auto sync: $e');
+      debugPrint('[Settings] STACK: ${st.toString().split('\n').first}');
+      if (!mounted) return;
+      setState(() => _autoSyncInitialised = true);
+    }
+  }
+
+  Future<void> _toggleAutoSync(bool value) async {
+    final service = _recordsService;
+    if (service == null) return;
+    setState(() => _autoSyncBusy = true);
+    try {
+      await service.syncState.setAutoSyncEnabled(value);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update auto backup: $e')),
+      );
+    } finally {
+      if (!mounted) return;
+      setState(() => _autoSyncBusy = false);
+    }
+  }
+
+  String _formatLastSynced(DateTime? timestamp) {
+    if (timestamp == null) return 'Last sync: never';
+    final formatter = DateFormat.yMMMd().add_jm();
+    return 'Last sync: ${formatter.format(timestamp)}';
+  }
+
+  String _pendingSummary(AutoSyncStatus status) {
+    return 'Pending changes — critical: ${status.pendingCriticalChanges}, routine: ${status.pendingRoutineChanges}';
   }
 
   Future<void> _signIn() async {
@@ -155,6 +226,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final isWeb = kIsWeb;
+    final status = _autoSyncStatus;
+    final autoSyncEnabled = status?.autoSyncEnabled ?? false;
+    final autoSyncSubtitle = !_autoSyncInitialised
+        ? 'Checking auto backup status…'
+        : [
+            'Automatically backs up after important changes when enabled.',
+            _formatLastSynced(status?.lastSyncedAt),
+            if (status != null) _pendingSummary(status),
+          ].join('\n');
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: AbsorbPointer(
@@ -171,15 +251,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onPressed: _email == null ? _signIn : _signOut,
                   child: Text(_email == null ? 'Sign in' : 'Sign out'),
                 ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            if (!isWeb) ...[
-              ElevatedButton.icon(
-                onPressed: _runAuthDiagnostics,
-                icon: const Icon(Icons.bug_report),
-                label: const Text('Run Auth Diagnostics'),
+            ],
+          ),
+          const SizedBox(height: 24),
+          if (!isWeb) ...[
+            Card(
+              child: SwitchListTile.adaptive(
+                title: const Text('Auto backup (beta)'),
+                subtitle: Text(autoSyncSubtitle),
+                value: autoSyncEnabled,
+                onChanged: (!_autoSyncBusy && _autoSyncInitialised && status != null)
+                    ? _toggleAutoSync
+                    : null,
+                secondary: _autoSyncBusy
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.sync),
               ),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: _runAuthDiagnostics,
+              icon: const Icon(Icons.bug_report),
+              label: const Text('Run Auth Diagnostics'),
+            ),
               const SizedBox(height: 12),
               ElevatedButton.icon(
                 onPressed: _backupToDrive,

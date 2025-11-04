@@ -160,8 +160,14 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
   }
 
   Future<void> _editRecord(BuildContext context, Record record) async {
+    final state = context.read<RecordsHomeState>();
     await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => AddRecordScreen(existing: record)),
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider.value(
+          value: state,
+          child: AddRecordScreen(existing: record),
+        ),
+      ),
     );
     await _refreshRecord();
   }

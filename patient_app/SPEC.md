@@ -42,6 +42,15 @@ Out of scope (for MVP)
 - Success criteria: user sees confirmation; Drive file exists; no plaintext written to cloud.
 - Failure cases: no auth, network error, quota; show SnackBar with friendly message. No partial restore/overwrite occurs on failure.
 
+4.2a Auto Backup Toggle (mobile, beta)
+- Settings exposes “Auto backup” switch (default off) when Drive backup is supported.
+- Default cadence: one automatic backup per week. Patients can opt into alternative triggers (e.g., on-resume after critical changes) once the scheduling UI ships.
+- Current implementation (Nov 2025) still relies on resume-after-critical-change triggers; moving to weekly cadence requires refactoring the lifecycle coordinator and scheduler.
+- When the weekly cadence lands and the patient is signed in, the app silently attempts a Drive backup using the configured schedule; ad-hoc triggers should remain available.
+- Resume trigger must skip if no critical changes are pending, another backup is running, or auth headers would prompt UI.
+- Auto backup writes `lastSyncedAt` on success so Settings can display “Last sync” timestamp and pending change counts.
+- Failure: log debug output and leave dirty counters intact for the next attempt; UI feedback for failures is planned in later M4 tasks.
+
 4.3 Restore from Google Drive (mobile)
 - Preconditions: user signed in; backup exists.
 - Behavior: download → AES‑GCM decrypt → unzip into app docs dir, replacing contents.

@@ -7,7 +7,7 @@ Local-first personal health records app. Mobile stores data on-device (Isar), wi
 - Features
 - Local storage with Isar (encrypted backup archive, on-device DB not encrypted yet)
 - Attachments folder for files (mobile only at this stage)
-- Settings screen with Google sign-in and Drive backup/restore (mobile)
+- Settings screen with Google sign-in, Drive backup/restore, and auto backup toggle (mobile — weekly cadence planned; currently resume-triggered after critical changes)
 - Settings caches the signed-in account to avoid re-showing the Google sign-in sheet when reopening the screen
 - Shared `google_drive_backup` package provides reusable Google auth + encrypted Drive backup helpers
 - In-app Auth Diagnostics (runs sign-in and header checks; logs safe details)
