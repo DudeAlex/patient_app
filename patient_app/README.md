@@ -134,3 +134,5 @@ Contributing & Process
 - Stage all patient-facing strings for localisation (`gen_l10n` ready). Avoid hard-coded prose inside widgets or controllers.
 - Highlight AI-extension points when adding features, and prefer interface-based hooks so AI services can plug in cleanly.
 - See `AGENTS.md` for the full set of repo guidelines for LLMs and contributors.
+- Write code with Clean Code principles in mind: descriptive names, single-purpose functions, and straightforward control flow.
+- Balance OOP and functional techniques: keep module APIs encapsulated, apply SOLID where it clarifies responsibilities, and prefer immutable data/pure helpers for state transformations when practical.

@@ -35,6 +35,8 @@ Coding Style
 - Follow existing patterns; avoid introducing new frameworks/structures unless necessary.
 - Add concise comments for new logic blocks and tricky sections.
 - No sweeping renames or “drive‑by” fixes outside the change scope.
+- Apply Clean Code practices: clear intent-revealing names, small focused functions, and minimal side effects so the code stays easy to read and maintain.
+- Respect core OOP principles (SOLID, encapsulation) when shaping module interfaces, and lean on functional patterns (immutability, pure helpers) where they simplify state or side-effect handling.
 
 When in Doubt
 - Ask for confirmation before large changes.

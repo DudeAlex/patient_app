@@ -5,12 +5,14 @@ class VoiceTranscriptionRequest {
     required this.sessionId,
     required this.localeTag,
     required this.relativePath,
+    required this.filePath,
     required this.durationMs,
   });
 
   final String sessionId;
   final String localeTag;
   final String relativePath;
+  final String filePath;
   final int durationMs;
 }
 
@@ -46,6 +48,7 @@ class StubVoiceTranscriptionPipeline implements VoiceTranscriptionPipeline {
       metadata: {
         'transcription': 'stub',
         'durationMs': request.durationMs,
+        'filePath': request.filePath,
       },
     );
   }

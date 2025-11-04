@@ -34,6 +34,7 @@ We design every milestone as a collection of modules that can be composed, repla
 - **Migration Safety**: Schema changes are owned by the module author. Provide migrations/backfills that do not break inactive modules.
 - **Localization-Ready**: Never hard-code patient-facing copy inside business logic or widgets. Surface strings through a localisation layer (see below) so future languages can drop in without editing module internals.
 - **AI Hook Awareness**: When a workflow can benefit from AI assistance, define clear extension points (interfaces, events) so AI modules can plug in without rewriting the base experience.
+- **OOP & Functional Balance**: Encapsulate behavior behind SOLID-friendly interfaces, and prefer immutable data structures or pure helpers when transforming state so modules stay predictable and testable.
 
 ### Module Contracts & Examples
 

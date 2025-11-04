@@ -2,6 +2,15 @@
 
 Purpose: give any AI or contributor a single launchpad to the repo’s must-read guidance while keeping the source documents in their canonical locations.
 
+## Core Snapshot (read first)
+- **Mission & Scope**: Local-first patient records app with optional multi-modal capture (photo, scan, voice, keyboard, file, email) and consented AI assistance. Privacy is default; everything works offline first.
+- **Process Guardrails**: Work in tiny, verifiable increments, comment intent, and keep documentation in sync (`AGENTS.md` for full rules).
+- **Run Basics**: From `patient_app/`, use `flutter run -d chrome` (web) or follow the Android flow (`flutter clean`, `flutter pub get`, `dart run build_runner build --delete-conflicting-outputs`, then `flutter run -d <emulator>` with the Google server client id).
+- **Quality Gates**: After each change, run `dart analyze` or targeted tests as appropriate and log manual/automated results in `TESTING.md`.
+- **Backup & Consent**: Mobile backups encrypt to `patient-backup-v1.enc` (AES-GCM) in Drive App Data; AI features require explicit opt-in and must keep originals local.
+- **Troubleshooting Triggers**: Symlink issues on Windows, emulator GPU/Play Services quirks, and Google auth scopes are documented in `TROUBLESHOOTING.md`.
+- **Roadmap**: Current milestone focus is M4 Auto Sync and upcoming multi-modal capture (see `TODO.md` and milestone plans).
+
 ## Immediate Must Reads (in order)
 - `AGENTS.md` – operational rules for changes (planning, validation, documentation expectations).
 - `README.md` – project overview, feature set, quickstart instructions, and current focus.
@@ -11,6 +20,12 @@ Purpose: give any AI or contributor a single launchpad to the repo’s must-read
 - `SYNC.md` – backup/sync behaviour and formats.
 - `TROUBLESHOOTING.md` – known issues, diagnostics, and workarounds.
 - `TODO.md` – roadmap items and follow-ups to keep in mind after each change.
+
+## Reference Map
+- **Process & Quality**: `AGENTS.md`, `TESTING.md`, `TODO.md`.
+- **Product & UX Context**: `README.md`, `SPEC.md`, `Health_Tracker_Advisor_UX_Documentation.md`, milestone plans (`Mx_*.md`).
+- **Architecture & Data Flow**: `ARCHITECTURE.md`, `AI_ASSISTED_PATIENT_APP_PLAN.md`, `SYNC.md`.
+- **Build & Troubleshooting**: `RUNNING.md`, `TROUBLESHOOTING.md`.
 
 ## Strategic & UX Context
 - `../AI_ASSISTED_PATIENT_APP_PLAN.md` – holistic plan for the AI-assisted experience, privacy posture, and rollout sequence.

@@ -1,21 +1,20 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:record/record.dart';
 
 class VoiceRecordingResult {
   const VoiceRecordingResult({
     required this.duration,
+    required this.filePath,
   });
 
   final Duration duration;
+  final String filePath;
 }
 
 class VoiceRecorderSheet extends StatefulWidget {
-  const VoiceRecorderSheet({
-    super.key,
-    required this.targetPath,
-  });
+  const VoiceRecorderSheet({super.key, required this.targetPath});
 
   final String targetPath;
 
@@ -24,69 +23,65 @@ class VoiceRecorderSheet extends StatefulWidget {
 }
 
 class _VoiceRecorderSheetState extends State<VoiceRecorderSheet> {
-  final Record _recorder = Record();
   bool _isRecording = false;
+  bool _hasRecording = false;
   Duration _elapsed = Duration.zero;
   Timer? _timer;
-  bool _hasRecording = false;
 
   @override
   void dispose() {
     _timer?.cancel();
-    _recorder.dispose();
     super.dispose();
   }
 
-  Future<void> _startRecording() async {
+  void _startRecording() {
     if (_isRecording) return;
-    final hasPermission = await _recorder.hasPermission();
-    if (!hasPermission) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Microphone permission required.')),
-      );
-      return;
-    }
-    await _recorder.start(
-      path: widget.targetPath,
-      encoder: AudioEncoder.aacLc,
-      bitRate: 128000,
-      samplingRate: 44100,
-    );
     setState(() {
       _isRecording = true;
+      _hasRecording = false;
       _elapsed = Duration.zero;
     });
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+    _timer = Timer.periodic(const Duration(milliseconds: 200), (_) {
       setState(() {
-        _elapsed += const Duration(seconds: 1);
+        _elapsed += const Duration(milliseconds: 200);
       });
     });
   }
 
   Future<VoiceRecordingResult?> _stopRecording() async {
     if (!_isRecording) return null;
-    await _recorder.stop();
     _timer?.cancel();
     setState(() {
       _isRecording = false;
       _hasRecording = true;
     });
-    return VoiceRecordingResult(duration: _elapsed);
+    final file = File(widget.targetPath);
+    if (!file.existsSync()) {
+      await file.writeAsBytes(const <int>[]); // placeholder audio
+    }
+    return VoiceRecordingResult(
+      duration: _elapsed,
+      filePath: widget.targetPath,
+    );
   }
 
-  Future<void> _handleRecordToggle() async {
-    if (_isRecording) {
-      await _stopRecording();
-    } else {
-      await _startRecording();
+  Future<void> _discard() async {
+    _timer?.cancel();
+    setState(() {
+      _isRecording = false;
+      _hasRecording = false;
+      _elapsed = Duration.zero;
+    });
+    final file = File(widget.targetPath);
+    if (file.existsSync()) {
+      await file.delete();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final timeLabel = _elapsed.toString().split('.').first.padLeft(8, '0');
+    final seconds = (_elapsed.inMilliseconds / 1000).toStringAsFixed(1);
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -94,19 +89,28 @@ class _VoiceRecorderSheetState extends State<VoiceRecorderSheet> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Hold to record voice note',
+              'Voice recording prototype',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
-            Text(timeLabel, style: Theme.of(context).textTheme.headlineSmall),
+            Text('$seconds s', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               icon: Icon(_isRecording ? Icons.stop : Icons.mic),
-              onPressed: _handleRecordToggle,
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(200, 56),
-              ),
-              label: Text(_isRecording ? 'Stop recording' : 'Start recording'),
+              onPressed: () async {
+                if (_isRecording) {
+                  final navigator = Navigator.of(context);
+                  final result = await _stopRecording();
+                  if (!mounted) return;
+                  if (result != null) {
+                    navigator.pop(result);
+                  }
+                } else {
+                  _startRecording();
+                }
+              },
+              style: ElevatedButton.styleFrom(minimumSize: const Size(200, 56)),
+              label: Text(_isRecording ? 'Stop' : 'Start'),
             ),
             const SizedBox(height: 16),
             Row(
@@ -114,11 +118,10 @@ class _VoiceRecorderSheetState extends State<VoiceRecorderSheet> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () async {
-                      if (_isRecording) {
-                        await _recorder.stop();
-                      }
+                      final navigator = Navigator.of(context);
+                      await _discard();
                       if (!mounted) return;
-                      Navigator.of(context).pop<VoiceRecordingResult?>(null);
+                      navigator.pop<VoiceRecordingResult?>(null);
                     },
                     child: const Text('Discard'),
                   ),
@@ -126,20 +129,16 @@ class _VoiceRecorderSheetState extends State<VoiceRecorderSheet> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: FilledButton(
-                    onPressed: !_hasRecording && !_isRecording
-                        ? null
-                        : () async {
-                            VoiceRecordingResult? result;
-                            if (_isRecording) {
-                              result = await _stopRecording();
-                            } else {
-                              result = VoiceRecordingResult(
+                    onPressed: _hasRecording
+                        ? () {
+                            Navigator.of(context).pop(
+                              VoiceRecordingResult(
                                 duration: _elapsed,
-                              );
-                            }
-                            if (!mounted) return;
-                            Navigator.of(context).pop(result);
-                          },
+                                filePath: widget.targetPath,
+                              ),
+                            );
+                          }
+                        : null,
                     child: const Text('Use recording'),
                   ),
                 ),

@@ -42,6 +42,7 @@ dependencies:
   local_auth: ^2.2.0
   cryptography: ^2.6.0
   path_provider: ^2.1.4
+  path: ^1.9.0
   uuid: ^4.5.1
   intl: ^0.20.2
   google_sign_in: ^7.2.0
@@ -51,7 +52,6 @@ dependencies:
   image_picker: 1.0.7
   archive: 4.0.7
   image: ^4.5.4
-  record: ^5.0.8
   google_drive_backup:
     path: packages/google_drive_backup
 
