@@ -1,15 +1,18 @@
 import 'package:flutter/foundation.dart';
-import 'package:isar/isar.dart';
 
 import '../../sync/dirty_tracker.dart';
 import '../../sync/sync_state_repository.dart';
-import '../model/record.dart';
-import '../repo/records_repo.dart';
+import '../application/ports/records_repository.dart';
+import '../domain/entities/record.dart';
 
 /// Simple [ChangeNotifier] that loads recent records and exposes loading/error
 /// states. This keeps UI widgets focused on presentation.
 class RecordsHomeState extends ChangeNotifier {
-  RecordsHomeState(this._repository, this._dirtyTracker, this._syncStateRepository);
+  RecordsHomeState(
+    this._repository,
+    this._dirtyTracker,
+    this._syncStateRepository,
+  );
 
   static const int _pageSize = 20;
 
@@ -17,7 +20,7 @@ class RecordsHomeState extends ChangeNotifier {
   final AutoSyncDirtyTracker _dirtyTracker;
   final SyncStateRepository _syncStateRepository;
 
-  List<Record> _records = const [];
+  List<RecordEntity> _records = const <RecordEntity>[];
   Object? _error;
   bool _loading = false;
   bool _loadingMore = false;
@@ -25,7 +28,7 @@ class RecordsHomeState extends ChangeNotifier {
   bool _initialised = false;
   String _searchQuery = '';
 
-  List<Record> get records => _records;
+  List<RecordEntity> get records => _records;
   Object? get error => _error;
   bool get isLoading => _loading;
   bool get isLoadingMore => _loadingMore;
@@ -33,10 +36,9 @@ class RecordsHomeState extends ChangeNotifier {
   bool get hasData => _records.isNotEmpty;
   String get searchQuery => _searchQuery;
 
-  RecordsRepository get repository => _repository;
   SyncStateRepository get syncStateRepository => _syncStateRepository;
 
-  Record? recordById(Id id) {
+  RecordEntity? recordById(int id) {
     for (final record in _records) {
       if (record.id == id) return record;
     }
@@ -50,7 +52,7 @@ class RecordsHomeState extends ChangeNotifier {
 
     _searchQuery = normalized;
     _initialised = true;
-    _records = const [];
+    _records = const <RecordEntity>[];
     _hasMore = true;
     _error = null;
     _loading = true;
@@ -63,15 +65,14 @@ class RecordsHomeState extends ChangeNotifier {
     await _fetchPage(reset: false);
   }
 
-  Future<Record> saveRecord(Record record) async {
-    final savedId = await _repository.add(record);
-    record.id = savedId;
-    await _dirtyTracker.recordRecordSave(record);
+  Future<RecordEntity> saveRecord(RecordEntity record) async {
+    final saved = await _repository.save(record);
+    await _dirtyTracker.recordRecordSave(saved);
     await load(query: _searchQuery, force: true);
-    return record;
+    return saved;
   }
 
-  Future<void> deleteRecord(Id id) async {
+  Future<void> deleteRecord(int id) async {
     final existing = recordById(id) ?? await _repository.byId(id);
     await _repository.delete(id);
     await _dirtyTracker.recordRecordDelete(existing);
@@ -104,7 +105,7 @@ class RecordsHomeState extends ChangeNotifier {
     } catch (e) {
       _error = e;
       if (reset) {
-        _records = const [];
+        _records = const <RecordEntity>[];
       }
     } finally {
       _loading = false;

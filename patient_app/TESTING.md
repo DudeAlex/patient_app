@@ -1,5 +1,24 @@
 # Manual Test Log
 
+## 2025-11-05
+- **Change Scope**
+  - Phase 1 kick-off: extracted records domain entity, added Isar storage mapper, and introduced repository port/adapter integration.
+  - Added mapper + Isar repository adapter tests to lock in the new layering.
+- **Verification**
+  - `dart analyze`
+  - `flutter test`
+- **Result**
+  - Analyzer clean; Flutter tests passed (mapper + repository coverage, widget smoke test skipped due to platform channel dependency). Manual UI regression check pending once subsequent use case wiring lands.
+
+## 2025-11-04
+- **Change Scope**
+  - Documentation-only update: added `CLEAN_ARCHITECTURE_GUIDE.md` and refreshed `AI_AGENT_START_HERE.md`, `AGENTS.md`, and `ARCHITECTURE.md` references.
+- **Verification**
+  - Reviewed rendered Markdown locally to confirm headings, lists, and links.
+  - No code paths were modified; automated tests were not run.
+- **Result**
+  - Not applicable (documentation-only).
+
 ## 2025-10-29
 - **Environment**
   - Windows 11 dev box, PowerShell (elevated)

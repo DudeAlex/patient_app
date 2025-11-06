@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../model/record.dart';
 import '../model/record_types.dart';
+import '../domain/entities/record.dart';
 import 'records_home_state.dart';
 
 class AddRecordScreen extends StatefulWidget {
   const AddRecordScreen({super.key, this.existing});
 
-  final Record? existing;
+  final RecordEntity? existing;
 
   @override
   State<AddRecordScreen> createState() => _AddRecordScreenState();
@@ -24,7 +24,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
   String _type = RecordTypes.note;
   DateTime _date = DateTime.now();
   bool _submitting = false;
-  late final Record? _original;
+  late final RecordEntity? _original;
 
   @override
   void initState() {
@@ -69,25 +69,21 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
     final cleanedNotes = _notesController.text.trim();
     final tags = _parseTags(_tagsController.text);
 
-    final record = Record()
-      ..type = _type
-      ..date = _date
-      ..title = _titleController.text.trim()
-      ..text = cleanedNotes.isEmpty ? null : cleanedNotes
-      ..tags = tags
-      ..updatedAt = now;
-
     final original = _original;
-    if (original != null) {
-      record.id = original.id;
-      record.createdAt = original.createdAt;
-      record.deletedAt = original.deletedAt;
-    } else {
-      record.createdAt = now;
-    }
+    final newRecord = RecordEntity(
+      id: original?.id,
+      type: _type,
+      date: _date,
+      title: _titleController.text.trim(),
+      text: cleanedNotes.isEmpty ? null : cleanedNotes,
+      tags: tags,
+      createdAt: original?.createdAt ?? now,
+      updatedAt: now,
+      deletedAt: original?.deletedAt,
+    );
     final state = context.read<RecordsHomeState>();
     try {
-      await state.saveRecord(record);
+      await state.saveRecord(newRecord);
       if (!mounted) return;
       Navigator.of(context).pop();
     } catch (e) {

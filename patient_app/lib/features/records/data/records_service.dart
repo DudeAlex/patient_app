@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:isar/isar.dart';
 
 import '../../../core/db/isar.dart' as db_helpers;
-import '../../sync/dirty_tracker.dart';
-import '../../sync/sync_state_repository.dart';
 import '../../sync/auto_sync_coordinator.dart';
 import '../../sync/auto_sync_runner.dart';
-import '../repo/records_repo.dart';
+import '../../sync/dirty_tracker.dart';
+import '../../sync/sync_state_repository.dart';
+import '../adapters/repositories/isar_records_repository.dart';
+import '../application/ports/records_repository.dart' as port;
 
 /// Singleton wrapper that exposes a shared [RecordsRepository] backed by the
 /// Isar database. Consumers call [RecordsService.instance] to obtain the lazy
@@ -22,7 +23,7 @@ class RecordsService {
   );
 
   final Isar db;
-  final RecordsRepository records;
+  final port.RecordsRepository records;
   final SyncStateRepository syncState;
   final AutoSyncDirtyTracker dirtyTracker;
   final AutoSyncCoordinator autoSync;
@@ -48,7 +49,7 @@ class RecordsService {
       // to maintain API compatibility when encryption lands (see SPEC.md).
       encryptionKey: List<int>.filled(32, 0),
     );
-    final repo = RecordsRepository(isar);
+    final repo = IsarRecordsRepository(isar);
     final syncRepo = SyncStateRepository(isar);
     await syncRepo.ensureInitialized();
     final tracker = AutoSyncDirtyTracker(syncRepo);

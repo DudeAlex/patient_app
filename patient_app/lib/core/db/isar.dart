@@ -1,7 +1,7 @@
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../../features/records/model/record.dart';
+import '../../features/records/adapters/storage/record_isar_model.dart';
 import '../../features/records/model/attachment.dart';
 import '../../features/records/model/insight.dart';
 import '../../features/records/model/sync_state.dart';

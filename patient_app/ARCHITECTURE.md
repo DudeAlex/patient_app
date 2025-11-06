@@ -16,7 +16,7 @@ Key Modules
   - Planned: `core/ai/ai_processing_service.dart`, `core/support/support_network.dart`, `core/import/email_ingest.dart`, `core/vitals/vitals_service.dart` (cross-feature services exposed via interfaces)
 - `packages/google_drive_backup/` reusable backup/auth library (fully encapsulated module)
 - Feature modules live under `lib/features/<module>/`
-  - `features/records/` (models, repository, UI state, add/list/detail screens)
+  - `features/records/` (domain entities, application ports, adapters, UI state, add/list/detail screens)
   - `features/sync/` (SyncState repository, dirty tracking, future auto-sync runner)
   - Planned: `features/capture_core/`, `features/capture_modes/photo|scan|voice|file|email/`, `features/support_network/`, `features/vitals/`, etc. Each module owns its models/services/UI and exposes a compact API for other modules to consume.
 
@@ -40,7 +40,7 @@ We design every milestone as a collection of modules that can be composed, repla
 
 | Module | Responsibility | Public Surface | Depends On |
 | --- | --- | --- | --- |
-| `features/records` | CRUD operations, record list/detail UI | `RecordsRepository`, `RecordsService`, `RecordsHomeState`, routes for add/edit/detail screens | `core/db`, `core/storage` |
+| `features/records` | CRUD operations, record list/detail UI | `RecordEntity`, `RecordsRepository` port, `RecordsService`, `RecordsHomeState`, routes for add/edit/detail screens | `core/db`, `core/storage` via adapters |
 | `features/sync` | Dirty tracking, SyncState persistence, auto-sync orchestration (planned) | `SyncStateRepository`, `AutoSyncDirtyTracker`, future `AutoSyncCoordinator` | `features/records` (via interfaces), `google_drive_backup` |
 | `features/capture_core` (planned) | Multi-modal capture launcher, review flow orchestration | `CaptureController`, route/widget surfaces | `features/records` (to save), `core/storage` |
 | `features/capture_modes/photo` | Camera capture with clarity analysis and OCR stubs | `PhotoCaptureModule`, `PhotoCaptureService` | `core/storage`, `image_picker`, optional analyzers |
@@ -57,6 +57,18 @@ All new modules must document:
 - Events/notifications emitted
 - Storage schema owned by the module
 - Tests/manual scenarios
+
+## Clean Architecture Alignment
+
+We follow the layered dependency rule `Frameworks & Drivers -> Interface Adapters -> Application (Use Cases) -> Domain (Entities/Value Objects)`. Dependencies always point inward so domain rules stay insulated from framework churn. Each feature folder mirrors these layers (`domain/`, `application/`, `adapters/`, `ui/`), and cross-cutting helpers in `lib/core/` must respect the same direction.
+
+Key guardrails (see `CLEAN_ARCHITECTURE_GUIDE.md` for the full playbook):
+- Domain entities hold business invariants only—no UI/HTTP/ORM/serialization helpers or active-record patterns.
+- Use cases orchestrate scenarios via InputDTO/OutputDTO contracts and depend only on ports (repository/gateway interfaces).
+- Interface adapters perform all mapping between entities, DTOs, and storage/transport models; controllers never talk to persistence directly.
+- Framework-specific code (Flutter widgets, Isar implementations, OAuth flows) lives in the outermost layer and can be swapped without touching inner rules.
+
+The canonical data flow is: request -> controller -> `UseCase.InputDTO` -> entity rule enforcement + ports -> persistence/adapters -> `UseCase.OutputDTO` -> presenter/response model. Testing mirrors the layers: pure domain unit tests, mocked use-case tests, and adapter contract tests.
 
 Data Model (Isar)
 - Record: id, type, date, title, text?, tags[], createdAt, updatedAt, deletedAt?

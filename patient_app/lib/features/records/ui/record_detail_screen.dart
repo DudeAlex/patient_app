@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:isar/isar.dart';
 import 'package:provider/provider.dart';
 
-import '../model/record.dart';
 import '../model/record_types.dart';
+import '../domain/entities/record.dart';
 import 'add_record_screen.dart';
 import 'records_home_state.dart';
 
@@ -14,14 +13,14 @@ import 'records_home_state.dart';
 class RecordDetailScreen extends StatefulWidget {
   const RecordDetailScreen({super.key, required this.recordId});
 
-  final Id recordId;
+  final int recordId;
 
   @override
   State<RecordDetailScreen> createState() => _RecordDetailScreenState();
 }
 
 class _RecordDetailScreenState extends State<RecordDetailScreen> {
-  Record? _record;
+  RecordEntity? _record;
 
   @override
   void initState() {
@@ -159,7 +158,7 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     }
   }
 
-  Future<void> _editRecord(BuildContext context, Record record) async {
+  Future<void> _editRecord(BuildContext context, RecordEntity record) async {
     final state = context.read<RecordsHomeState>();
     await Navigator.of(context).push(
       MaterialPageRoute(
@@ -172,7 +171,7 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     await _refreshRecord();
   }
 
-  Future<void> _confirmDelete(BuildContext context, Record record) async {
+  Future<void> _confirmDelete(BuildContext context, RecordEntity record) async {
     final confirmed =
         await showDialog<bool>(
           context: context,
@@ -198,7 +197,7 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     if (!confirmed) return;
 
     try {
-      await context.read<RecordsHomeState>().deleteRecord(record.id);
+      await context.read<RecordsHomeState>().deleteRecord(record.id!);
       if (!context.mounted) return;
       Navigator.of(context).pop();
     } catch (e) {

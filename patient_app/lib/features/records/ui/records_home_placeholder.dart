@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../model/record.dart';
+import '../domain/entities/record.dart';
 import 'record_detail_screen.dart';
 import 'records_home_state.dart';
 
@@ -120,7 +120,7 @@ class _RecordsList extends StatelessWidget {
     required this.onLoadMore,
   });
 
-  final List<Record> records;
+  final List<RecordEntity> records;
   final bool hasMore;
   final bool isLoadingMore;
   final VoidCallback onLoadMore;
@@ -172,7 +172,7 @@ class _RecordsList extends StatelessWidget {
 class _RecordListTile extends StatelessWidget {
   const _RecordListTile({required this.record});
 
-  final Record record;
+  final RecordEntity record;
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +190,7 @@ class _RecordListTile extends StatelessWidget {
           MaterialPageRoute(
             builder: (_) => ChangeNotifierProvider.value(
               value: state,
-              child: RecordDetailScreen(recordId: record.id),
+              child: RecordDetailScreen(recordId: record.id!),
             ),
           ),
         );
