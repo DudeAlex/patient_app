@@ -12,6 +12,7 @@ import '../application/ports/records_repository.dart' as port;
 import '../application/use_cases/delete_record_use_case.dart';
 import '../application/use_cases/fetch_recent_records_use_case.dart';
 import '../application/use_cases/fetch_records_page_use_case.dart';
+import '../application/use_cases/get_record_by_id_use_case.dart';
 import '../application/use_cases/save_record_use_case.dart';
 
 /// Singleton wrapper that exposes a shared [RecordsRepository] backed by the
@@ -23,6 +24,7 @@ class RecordsService {
     this.records,
     this.fetchRecordsPage,
     this.fetchRecentRecords,
+    this.getRecordById,
     this.saveRecord,
     this.deleteRecord,
     this.syncState,
@@ -34,6 +36,7 @@ class RecordsService {
   final port.RecordsRepository records;
   final FetchRecordsPageUseCase fetchRecordsPage;
   final FetchRecentRecordsUseCase fetchRecentRecords;
+  final GetRecordByIdUseCase getRecordById;
   final SaveRecordUseCase saveRecord;
   final DeleteRecordUseCase deleteRecord;
   final SyncStateRepository syncState;
@@ -64,6 +67,7 @@ class RecordsService {
     final repo = IsarRecordsRepository(isar);
     final fetchRecordsPage = FetchRecordsPageUseCase(repo);
     final fetchRecentRecords = FetchRecentRecordsUseCase(repo);
+    final getRecordById = GetRecordByIdUseCase(repo);
     final saveRecord = SaveRecordUseCase(repo);
     final deleteRecord = DeleteRecordUseCase(repo);
     final syncRepo = SyncStateRepository(isar);
@@ -76,6 +80,7 @@ class RecordsService {
       repo,
       fetchRecordsPage,
       fetchRecentRecords,
+      getRecordById,
       saveRecord,
       deleteRecord,
       syncRepo,

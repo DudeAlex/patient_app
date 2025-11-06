@@ -4,6 +4,7 @@ import 'package:patient_app/features/records/application/ports/records_repositor
 import 'package:patient_app/features/records/application/use_cases/delete_record_use_case.dart';
 import 'package:patient_app/features/records/application/use_cases/fetch_recent_records_use_case.dart';
 import 'package:patient_app/features/records/application/use_cases/fetch_records_page_use_case.dart';
+import 'package:patient_app/features/records/application/use_cases/get_record_by_id_use_case.dart';
 import 'package:patient_app/features/records/application/use_cases/save_record_use_case.dart';
 import 'package:patient_app/features/records/domain/entities/record.dart';
 
@@ -81,6 +82,30 @@ void main() {
     });
   });
 
+  group('GetRecordByIdUseCase', () {
+    test('returns record when repository finds one', () async {
+      final repository = _RecordingRepository();
+      final record = _buildRecord(id: 99, title: 'Lookup');
+      repository.store(record);
+
+      final useCase = GetRecordByIdUseCase(repository);
+      final output =
+          await useCase.execute(const GetRecordByIdInput(id: 99));
+
+      expect(output.record, same(record));
+    });
+
+    test('returns null when record missing', () async {
+      final repository = _RecordingRepository();
+      final useCase = GetRecordByIdUseCase(repository);
+
+      final output =
+          await useCase.execute(const GetRecordByIdInput(id: 123));
+
+      expect(output.record, isNull);
+    });
+  });
+
   group('DeleteRecordUseCase', () {
     test('delegates to repository and returns deleted id', () async {
       final repository = _RecordingRepository();
@@ -143,6 +168,15 @@ class _RecordingRepository implements RecordsRepository {
   }) async {
     fetchPageArgs = _FetchPageArgs(offset: offset, limit: limit, query: query);
     return fetchPageResults;
+  }
+}
+
+extension on _RecordingRepository {
+  void store(RecordEntity record) {
+    if (record.id == null) {
+      throw ArgumentError('Record must have an id to store.');
+    }
+    _recordsById[record.id!] = record;
   }
 }
 

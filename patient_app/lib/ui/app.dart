@@ -103,6 +103,7 @@ class _HomeScaffold extends StatelessWidget {
         service.fetchRecordsPage,
         service.saveRecord,
         service.deleteRecord,
+        service.getRecordById,
         service.dirtyTracker,
         service.syncState,
       )..load(),

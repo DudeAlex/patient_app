@@ -5,7 +5,7 @@
   - `flutter analyze`
   - `flutter test test/features/records/application/use_cases/records_use_cases_test.dart`
 - **Result**
-  - Analyzer clean. Tests passed (00:04 +5) after refactoring state/service layers.
+  - Analyzer clean. Tests passed (00:04 +5) after refactoring state/service layers. *(Re-run pending for the latest get-by-id addition—local shell lacks Flutter SDK.)*
 
 # Manual Test Log
 

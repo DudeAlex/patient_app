@@ -4,6 +4,7 @@ import '../../sync/dirty_tracker.dart';
 import '../../sync/sync_state_repository.dart';
 import '../application/use_cases/delete_record_use_case.dart';
 import '../application/use_cases/fetch_records_page_use_case.dart';
+import '../application/use_cases/get_record_by_id_use_case.dart';
 import '../application/use_cases/save_record_use_case.dart';
 import '../domain/entities/record.dart';
 
@@ -14,6 +15,7 @@ class RecordsHomeState extends ChangeNotifier {
     this._fetchRecordsPage,
     this._saveRecordCase,
     this._deleteRecordCase,
+    this._getRecordByIdCase,
     this._dirtyTracker,
     this._syncStateRepository,
   );
@@ -23,6 +25,7 @@ class RecordsHomeState extends ChangeNotifier {
   final FetchRecordsPageUseCase _fetchRecordsPage;
   final SaveRecordUseCase _saveRecordCase;
   final DeleteRecordUseCase _deleteRecordCase;
+  final GetRecordByIdUseCase _getRecordByIdCase;
   final AutoSyncDirtyTracker _dirtyTracker;
   final SyncStateRepository _syncStateRepository;
 
@@ -81,7 +84,12 @@ class RecordsHomeState extends ChangeNotifier {
   }
 
   Future<void> deleteRecord(int id) async {
-    final existing = recordById(id);
+    var existing = recordById(id);
+    if (existing == null) {
+      final output =
+          await _getRecordByIdCase.execute(GetRecordByIdInput(id: id));
+      existing = output.record;
+    }
     await _deleteRecordCase.execute(DeleteRecordInput(recordId: id));
     await _dirtyTracker.recordRecordDelete(existing);
     await load(query: _searchQuery, force: true);
