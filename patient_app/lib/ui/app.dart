@@ -100,7 +100,9 @@ class _HomeScaffold extends StatelessWidget {
     ]);
     return ChangeNotifierProvider(
       create: (_) => RecordsHomeState(
-        service.records,
+        service.fetchRecordsPage,
+        service.saveRecord,
+        service.deleteRecord,
         service.dirtyTracker,
         service.syncState,
       )..load(),

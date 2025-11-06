@@ -11,11 +11,12 @@ Purpose: translate the Clean Architecture guide into actionable, bite-sized refa
 ### Progress Log
 - 2025-11-05: Completed Phase 1 tasks 1-3 (Record entity/storage split, repository port, Isar adapter wiring across UI + sync, plus mapper/adapter tests).
 - 2025-11-06: Added Phase 1 task 4 use cases (`SaveRecord`, `FetchRecentRecords`, `FetchRecordsPage`, `DeleteRecord`) with unit tests covering repository interactions.
+- 2025-11-06: Refactored `RecordsService` and `RecordsHomeState` to consume the new use cases, shifting UI state away from direct repository access.
 
 ### Next Session Starting Point
-1. Refactor `RecordsHomeState` (and related UI wiring) to depend on the new use cases rather than the repository directly.
-2. Update `RecordsService`/bootstrap to construct the use cases and expose them cleanly for presentation layers.
-3. Run targeted analyzer/tests, document outcomes in `TESTING.md`, and capture any follow-up edge cases uncovered during the refactor.
+1. Run `flutter analyze` and the records use-case test suite on a machine with the configured Flutter SDK; record outcomes in `TESTING.md`.
+2. Sweep dependent widgets/screens to ensure they only rely on the new use-case surface (e.g., detail screens pulling in refreshed state appropriately).
+3. Evaluate whether additional use cases (e.g., fetch-by-id) are needed for upcoming detail/edit refactors and capture any follow-ups in TODO.md.
 
 ---
 

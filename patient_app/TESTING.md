@@ -2,9 +2,10 @@
 - **Change Scope**
   - Implemented records application-layer use cases (`SaveRecord`, `FetchRecentRecords`, `FetchRecordsPage`, `DeleteRecord`) and added unit tests covering repository interactions.
 - **Verification**
+  - `flutter analyze`
   - `flutter test test/features/records/application/use_cases/records_use_cases_test.dart`
 - **Result**
-  - Passed (00:06 +5). Flutter toolchain restored on local machine.
+  - Analyzer clean. Tests passed (00:04 +5) after refactoring state/service layers.
 
 # Manual Test Log
 

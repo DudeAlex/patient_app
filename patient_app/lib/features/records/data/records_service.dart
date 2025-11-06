@@ -9,6 +9,10 @@ import '../../sync/dirty_tracker.dart';
 import '../../sync/sync_state_repository.dart';
 import '../adapters/repositories/isar_records_repository.dart';
 import '../application/ports/records_repository.dart' as port;
+import '../application/use_cases/delete_record_use_case.dart';
+import '../application/use_cases/fetch_recent_records_use_case.dart';
+import '../application/use_cases/fetch_records_page_use_case.dart';
+import '../application/use_cases/save_record_use_case.dart';
 
 /// Singleton wrapper that exposes a shared [RecordsRepository] backed by the
 /// Isar database. Consumers call [RecordsService.instance] to obtain the lazy
@@ -17,6 +21,10 @@ class RecordsService {
   RecordsService._(
     this.db,
     this.records,
+    this.fetchRecordsPage,
+    this.fetchRecentRecords,
+    this.saveRecord,
+    this.deleteRecord,
     this.syncState,
     this.dirtyTracker,
     this.autoSync,
@@ -24,6 +32,10 @@ class RecordsService {
 
   final Isar db;
   final port.RecordsRepository records;
+  final FetchRecordsPageUseCase fetchRecordsPage;
+  final FetchRecentRecordsUseCase fetchRecentRecords;
+  final SaveRecordUseCase saveRecord;
+  final DeleteRecordUseCase deleteRecord;
   final SyncStateRepository syncState;
   final AutoSyncDirtyTracker dirtyTracker;
   final AutoSyncCoordinator autoSync;
@@ -50,11 +62,25 @@ class RecordsService {
       encryptionKey: List<int>.filled(32, 0),
     );
     final repo = IsarRecordsRepository(isar);
+    final fetchRecordsPage = FetchRecordsPageUseCase(repo);
+    final fetchRecentRecords = FetchRecentRecordsUseCase(repo);
+    final saveRecord = SaveRecordUseCase(repo);
+    final deleteRecord = DeleteRecordUseCase(repo);
     final syncRepo = SyncStateRepository(isar);
     await syncRepo.ensureInitialized();
     final tracker = AutoSyncDirtyTracker(syncRepo);
     final autoSyncRunner = AutoSyncRunner(syncRepo);
     final autoSync = AutoSyncCoordinator(syncRepo, autoSyncRunner)..start();
-    return RecordsService._(isar, repo, syncRepo, tracker, autoSync);
+    return RecordsService._(
+      isar,
+      repo,
+      fetchRecordsPage,
+      fetchRecentRecords,
+      saveRecord,
+      deleteRecord,
+      syncRepo,
+      tracker,
+      autoSync,
+    );
   }
 }

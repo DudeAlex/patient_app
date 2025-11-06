@@ -2,21 +2,27 @@ import 'package:flutter/foundation.dart';
 
 import '../../sync/dirty_tracker.dart';
 import '../../sync/sync_state_repository.dart';
-import '../application/ports/records_repository.dart';
+import '../application/use_cases/delete_record_use_case.dart';
+import '../application/use_cases/fetch_records_page_use_case.dart';
+import '../application/use_cases/save_record_use_case.dart';
 import '../domain/entities/record.dart';
 
 /// Simple [ChangeNotifier] that loads recent records and exposes loading/error
 /// states. This keeps UI widgets focused on presentation.
 class RecordsHomeState extends ChangeNotifier {
   RecordsHomeState(
-    this._repository,
+    this._fetchRecordsPage,
+    this._saveRecordCase,
+    this._deleteRecordCase,
     this._dirtyTracker,
     this._syncStateRepository,
   );
 
   static const int _pageSize = 20;
 
-  final RecordsRepository _repository;
+  final FetchRecordsPageUseCase _fetchRecordsPage;
+  final SaveRecordUseCase _saveRecordCase;
+  final DeleteRecordUseCase _deleteRecordCase;
   final AutoSyncDirtyTracker _dirtyTracker;
   final SyncStateRepository _syncStateRepository;
 
@@ -66,15 +72,17 @@ class RecordsHomeState extends ChangeNotifier {
   }
 
   Future<RecordEntity> saveRecord(RecordEntity record) async {
-    final saved = await _repository.save(record);
-    await _dirtyTracker.recordRecordSave(saved);
+    final output = await _saveRecordCase.execute(
+      SaveRecordInput(record: record),
+    );
+    await _dirtyTracker.recordRecordSave(output.record);
     await load(query: _searchQuery, force: true);
-    return saved;
+    return output.record;
   }
 
   Future<void> deleteRecord(int id) async {
-    final existing = recordById(id) ?? await _repository.byId(id);
-    await _repository.delete(id);
+    final existing = recordById(id);
+    await _deleteRecordCase.execute(DeleteRecordInput(recordId: id));
     await _dirtyTracker.recordRecordDelete(existing);
     await load(query: _searchQuery, force: true);
   }
@@ -90,17 +98,19 @@ class RecordsHomeState extends ChangeNotifier {
 
     try {
       final offset = reset ? 0 : _records.length;
-      final results = await _repository.fetchPage(
-        offset: offset,
-        limit: _pageSize,
-        query: _searchQuery,
+      final output = await _fetchRecordsPage.execute(
+        FetchRecordsPageInput(
+          offset: offset,
+          limit: _pageSize,
+          query: _searchQuery,
+        ),
       );
       if (reset) {
-        _records = results;
+        _records = output.records;
       } else {
-        _records = [..._records, ...results];
+        _records = [..._records, ...output.records];
       }
-      _hasMore = results.length == _pageSize;
+      _hasMore = output.hasMore;
       _error = null;
     } catch (e) {
       _error = e;
