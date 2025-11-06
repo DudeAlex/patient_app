@@ -12,14 +12,15 @@ Purpose: give any AI or contributor a single launchpad to the repo’s must-read
 - **Roadmap**: Current milestone focus is M4 Auto Sync and upcoming multi-modal capture (see `TODO.md` and milestone plans).
 
 ## Immediate Must Reads (in order)
-- `AGENTS.md` – operational rules for changes (planning, validation, documentation expectations).
-- `README.md` – project overview, feature set, quickstart instructions, and current focus.
-- `RUNNING.md` – platform-specific setup, commands, and environment caveats.
-- `ARCHITECTURE.md` – module boundaries, data flow, and planned extensions.
-- `SPEC.md` – current product requirements and acceptance criteria.
-- `SYNC.md` – backup/sync behaviour and formats.
-- `TROUBLESHOOTING.md` – known issues, diagnostics, and workarounds.
-- `TODO.md` – roadmap items and follow-ups to keep in mind after each change.
+- `AGENTS.md` - operational rules for changes (planning, validation, documentation expectations).
+- `README.md` - project overview, feature set, quickstart instructions, and current focus.
+- `RUNNING.md` - platform-specific setup, commands, and environment caveats.
+- `ARCHITECTURE.md` - module boundaries, data flow, and planned extensions.
+- `CLEAN_ARCHITECTURE_GUIDE.md` - layer responsibilities, dependency rules, DTO boundaries, and clean architecture testing playbook.
+- `SPEC.md` - current product requirements and acceptance criteria.
+- `SYNC.md` - backup/sync behaviour and formats.
+- `TROUBLESHOOTING.md` - known issues, diagnostics, and workarounds.
+- `TODO.md` - roadmap items and follow-ups to keep in mind after each change.
 
 ## Reference Map
 - **Process & Quality**: `AGENTS.md`, `TESTING.md`, `TODO.md`.
