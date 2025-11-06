@@ -15,6 +15,11 @@ M3: Retrieval & Search Foundation (done)
 - Delivered: date-sorted pagination, title/notes search, shared state refresh.
 - Deferred for later phases: tag filters, attachment/OCR search, saved views, semantic retrieval.
 
+### Next Session Focus (Clean Architecture Phase 1)
+- Confirm `flutter analyze` and `flutter test test/features/records/application/use_cases/records_use_cases_test.dart` run clean on the primary dev box after the recent use-case refactor.
+- Extend Phase 1 task 7: add record-entity invariant tests plus documentation updates in `ARCHITECTURE.md`/`CLEAN_ARCHITECTURE_GUIDE.md` to reflect the new layering.
+- Audit remaining records flows (detail/edit seeds) to replace direct repository access with use cases where appropriate; capture any new tasks in this TODO.
+
 M4: Auto Sync
 - See `M4_AUTO_SYNC_PLAN.md` for the breakdown.
 - Track local dirty state (changes increment counter)
