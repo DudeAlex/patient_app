@@ -41,15 +41,29 @@ We design every milestone as a collection of modules that can be composed, repla
 | Module | Responsibility | Public Surface | Depends On |
 | --- | --- | --- | --- |
 | `features/records` | CRUD operations, record list/detail UI | `RecordEntity`, `RecordsRepository` port, `RecordsService`, `RecordsHomeState`, routes for add/edit/detail screens | `core/db`, `core/storage` via adapters |
-| `features/sync` | Dirty tracking, SyncState persistence, auto-sync orchestration (planned) | `SyncStateRepository`, `AutoSyncDirtyTracker`, future `AutoSyncCoordinator` | `features/records` (via interfaces), `google_drive_backup` |
-| `features/capture_core` (planned) | Multi-modal capture launcher, review flow orchestration | `CaptureController`, route/widget surfaces | `features/records` (to save), `core/storage` |
-| `features/capture_modes/photo` | Camera capture with clarity analysis and OCR stubs | `PhotoCaptureModule`, `PhotoCaptureService` | `core/storage`, `image_picker`, optional analyzers |
-| `features/capture_modes/document_scan` | Multi-page document scanning with baseline enhancement + clarity prompts and analysis hooks | `DocumentScanModule`, `DocumentScanService` | `core/storage`, `image_picker`, `image` |
-| `features/capture_modes/voice` (planned) | Voice dictation capture and shared audio pipeline for AI conversations | `VoiceCaptureModule` (planned), `VoiceCaptureService` (planned), `VoiceAssistantBridge` (planned) | `core/storage`, microphone permissions, optional STT/TTS providers |
+| `features/sync` | Dirty tracking, SyncState persistence, auto-sync orchestration | `AutoSyncStatus` domain entity, `SyncStateRepository` port, `IsarSyncStateRepository`, use cases (`SetAutoSyncEnabled`, `RecordAutoSyncChange`, `MarkAutoSyncSuccess`, `Read/WatchAutoSyncStatus`), `AutoSyncDirtyTracker`, `AutoSyncCoordinator`, `AutoSyncRunner` | `features/records` (via use cases), `google_drive_backup` |
+
+### Sync Module Snapshot (Phase 2)
+
+- **Domain**: `AutoSyncStatus` lives under `features/sync/domain/entities` and encodes the invariants for dirty counters/device IDs so adapters cannot persist invalid states.
+- **Application layer**: Use cases under `features/sync/application/use_cases/` provide the single entry points the UI (`SettingsScreen`), records workflow (`AutoSyncDirtyTracker`), and lifecycle hooks (`AutoSyncCoordinator`/`AutoSyncRunner`) consume. This keeps orchestration focused on intent (toggle, record change, mark success, observe status) while hiding storage concerns.
+- **Adapters**: `IsarSyncStateRepository` implements the port, maps to the generated `SyncState` collection, and caches the device id. `AutoSyncDirtyTracker`, `AutoSyncCoordinator`, and `AutoSyncRunner` now depend exclusively on the application layer so we can replace persistence without touching lifecycle code.
+- **Framework**: Settings wires the toggle by invoking `SetAutoSyncEnabledUseCase`, and Records UI records dirty events via `AutoSyncDirtyTracker`. `AutoSyncRunner` still uses `DriveBackupManager`, but persistence updates now flow through `MarkAutoSyncSuccessUseCase`.
+| `features/capture_core` | Multi-modal capture launcher, review flow orchestration | `CaptureControllerImpl`, `CaptureModeRegistry`, capture session/artifact storage ports | `features/records` (to save), `core/storage` via adapters |
+| `features/capture_modes/photo` | Camera capture with clarity analysis and OCR stubs | `PhotoCaptureModule`, `CapturePhotoUseCase`, `PhotoCaptureService` (gateway) | Capture storage ports, `image_picker`, optional analyzers |
+| `features/capture_modes/document_scan` | Multi-page document scanning with enhancement + clarity prompts and analysis hooks | `DocumentScanModule`, `CaptureDocumentUseCase`, `DocumentScanService` (gateway) | Capture storage ports, `image_picker`, `image` |
+| `features/capture_modes/voice` | Voice dictation capture and shared audio pipeline for AI conversations | `VoiceCaptureModule`, `VoiceCaptureService` | Capture storage ports, microphone permissions, optional STT/TTS providers |
 | `features/capture_modes/<mode>` (planned) | Concrete capture flows (voice, file, email) | `CaptureMode` implementations registered with `capture_core` | `core/storage`, optional platform APIs |
 | `packages/google_drive_backup` | Google auth + encrypted backup plumbing | `DriveBackupManager` class | `http`, `googleapis` |
 
-During M5 we will introduce `features/capture_core` and its sibling mode modules. Each mode provides a `CaptureMode` implementation describing how to start/complete capture, required permissions, and the payload returned to the review panel. The core module coordinates mode discovery, routing, and final commit into the records module. This approach lets us update or replace a single mode (e.g., swap camera implementation) without touching the rest of the codebase.
+### Capture Module Snapshot (Phase 3)
+
+- **Core layer**: `capture_core/application/` hosts `CaptureControllerImpl`, the in-memory registry, and the capture session/artifact storage ports. Attachments-backed adapters live under `capture_core/adapters/storage` so modes never import `AttachmentsStorage` directly.
+- **Photo mode**: `PhotoCaptureService` implements `PhotoCaptureGateway`; `CapturePhotoUseCase` encapsulates the blur-prompt flow and metadata tagging; `PhotoCaptureMode` simply invokes the use case. This keeps UI widgets free of business logic while allowing tests to mock the gateway.
+- **Document scan mode**: mirrored architecture with `DocumentScanService` (gateway) and `CaptureDocumentUseCase`, ensuring clarity prompts, page artifacts, and draft merging stay inside the use case.
+- **Voice mode**: already routes reads/writes through the capture storage ports so later use cases can plug in without filesystem references.
+
+This structure lets us iterate on capture behavior (e.g., swapping OCR/analysis) or storage strategies by swapping adapters/use cases without touching UI widgets.
 
 All new modules must document:
 - Public API (classes/functions exposed to other modules)

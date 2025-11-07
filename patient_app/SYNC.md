@@ -25,6 +25,14 @@ Operations
 - Future production UX: a minimal profile panel should expose the manual “Backup now” button plus a small set of cadence presets (6h/12h/daily/weekly/manual), alongside display preferences (light/dark/auto theme and small/medium/large text size), so patients control cadence and readability without extra screens.
 - Production blocker: implement a secure key portability flow so the AES encryption key travels with the patient when they replace or reset devices; Drive restores currently work only on the original device. Consider patient-held passphrases/mnemonics, offline QR/file exports, and optional platform key backup integration (Android Keystore/iCloud Keychain).
 
+## Implementation Layers (Phase 2 snapshot)
+
+- **Domain**: `AutoSyncStatus` (under `lib/features/sync/domain/entities`) guards counter/device-id invariants so invalid states never reach storage.
+- **Application**: Use cases in `lib/features/sync/application/use_cases`—`SetAutoSyncEnabled`, `RecordAutoSyncChange`, `MarkAutoSyncSuccess`, `PromoteRoutineChanges`, `ReadAutoSyncStatus`, `WatchAutoSyncStatus`—provide the only entry points for UI, dirty tracking, and lifecycle orchestration.
+- **Adapters**: `IsarSyncStateRepository` implements the `SyncStateRepository` port against the generated `SyncState` collection and caches device ids within Isar transactions.
+- **Framework orchestration**: `AutoSyncDirtyTracker` classifies mutations and fires `RecordAutoSyncChangeUseCase`, `AutoSyncCoordinator` subscribes to `WatchAutoSyncStatusUseCase`, promotes routine-only queues via `PromoteRoutineChangesUseCase` when needed, and reacts to lifecycle events, `AutoSyncRunner` handles uploads + `MarkAutoSyncSuccessUseCase`, and Settings toggles auto backup by invoking `SetAutoSyncEnabledUseCase` while presenting data from `ReadAutoSyncStatusUseCase`.
+- This separation keeps the Drive-specific persistence fully encapsulated so new storage engines or schedulers can be introduced by swapping adapters/use cases without touching UI code.
+
 Auth
 - Google Sign-In v7 API
   - Initialize via `GoogleSignIn.instance.initialize`

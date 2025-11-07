@@ -3,10 +3,16 @@ import 'dart:async';
 import 'package:isar/isar.dart';
 
 import '../../../core/db/isar.dart' as db_helpers;
+import '../../sync/adapters/repositories/isar_sync_state_repository.dart';
+import '../../sync/application/use_cases/mark_auto_sync_success_use_case.dart';
+import '../../sync/application/use_cases/read_auto_sync_status_use_case.dart';
+import '../../sync/application/use_cases/promote_routine_changes_use_case.dart';
+import '../../sync/application/use_cases/record_auto_sync_change_use_case.dart';
+import '../../sync/application/use_cases/set_auto_sync_enabled_use_case.dart';
+import '../../sync/application/use_cases/watch_auto_sync_status_use_case.dart';
 import '../../sync/auto_sync_coordinator.dart';
 import '../../sync/auto_sync_runner.dart';
 import '../../sync/dirty_tracker.dart';
-import '../../sync/sync_state_repository.dart';
 import '../adapters/repositories/isar_records_repository.dart';
 import '../application/ports/records_repository.dart' as port;
 import '../application/use_cases/delete_record_use_case.dart';
@@ -19,18 +25,19 @@ import '../application/use_cases/save_record_use_case.dart';
 /// Isar database. Consumers call [RecordsService.instance] to obtain the lazy
 /// loaded service rather than opening Isar manually.
 class RecordsService {
-  RecordsService._(
-    this.db,
-    this.records,
-    this.fetchRecordsPage,
-    this.fetchRecentRecords,
-    this.getRecordById,
-    this.saveRecord,
-    this.deleteRecord,
-    this.syncState,
-    this.dirtyTracker,
-    this.autoSync,
-  );
+  RecordsService._({
+    required this.db,
+    required this.records,
+    required this.fetchRecordsPage,
+    required this.fetchRecentRecords,
+    required this.getRecordById,
+    required this.saveRecord,
+    required this.deleteRecord,
+    required this.dirtyTracker,
+    required this.autoSync,
+    required this.setAutoSyncEnabled,
+    required this.readAutoSyncStatus,
+  });
 
   final Isar db;
   final port.RecordsRepository records;
@@ -39,9 +46,10 @@ class RecordsService {
   final GetRecordByIdUseCase getRecordById;
   final SaveRecordUseCase saveRecord;
   final DeleteRecordUseCase deleteRecord;
-  final SyncStateRepository syncState;
   final AutoSyncDirtyTracker dirtyTracker;
   final AutoSyncCoordinator autoSync;
+  final SetAutoSyncEnabledUseCase setAutoSyncEnabled;
+  final ReadAutoSyncStatusUseCase readAutoSyncStatus;
 
   static Future<RecordsService>? _pending;
 
@@ -70,22 +78,33 @@ class RecordsService {
     final getRecordById = GetRecordByIdUseCase(repo);
     final saveRecord = SaveRecordUseCase(repo);
     final deleteRecord = DeleteRecordUseCase(repo);
-    final syncRepo = SyncStateRepository(isar);
+    final syncRepo = IsarSyncStateRepository(isar);
     await syncRepo.ensureInitialized();
-    final tracker = AutoSyncDirtyTracker(syncRepo);
-    final autoSyncRunner = AutoSyncRunner(syncRepo);
-    final autoSync = AutoSyncCoordinator(syncRepo, autoSyncRunner)..start();
+    final recordChangeUseCase = RecordAutoSyncChangeUseCase(syncRepo);
+    final tracker = AutoSyncDirtyTracker(recordChangeUseCase);
+    final markSuccess = MarkAutoSyncSuccessUseCase(syncRepo);
+    final autoSyncRunner = AutoSyncRunner(markSuccess);
+    final watchStatus = WatchAutoSyncStatusUseCase(syncRepo);
+    final promoteRoutineChanges = PromoteRoutineChangesUseCase(syncRepo);
+    final autoSync = AutoSyncCoordinator(
+      watchStatus,
+      autoSyncRunner,
+      promoteRoutineChanges,
+    )..start();
+    final setAutoSyncEnabled = SetAutoSyncEnabledUseCase(syncRepo);
+    final readAutoSyncStatus = ReadAutoSyncStatusUseCase(syncRepo);
     return RecordsService._(
-      isar,
-      repo,
-      fetchRecordsPage,
-      fetchRecentRecords,
-      getRecordById,
-      saveRecord,
-      deleteRecord,
-      syncRepo,
-      tracker,
-      autoSync,
+      db: isar,
+      records: repo,
+      fetchRecordsPage: fetchRecordsPage,
+      fetchRecentRecords: fetchRecentRecords,
+      getRecordById: getRecordById,
+      saveRecord: saveRecord,
+      deleteRecord: deleteRecord,
+      dirtyTracker: tracker,
+      autoSync: autoSync,
+      setAutoSyncEnabled: setAutoSyncEnabled,
+      readAutoSyncStatus: readAutoSyncStatus,
     );
   }
 }

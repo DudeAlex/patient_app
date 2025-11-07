@@ -1,14 +1,13 @@
+import '../../capture_core/api/capture_draft.dart';
 import '../../capture_core/api/capture_mode.dart';
 import '../../capture_core/api/capture_result.dart';
-import '../../capture_core/api/capture_draft.dart';
 
-import 'document_scan_service.dart';
-import 'models/document_scan_outcome.dart';
+import 'application/use_cases/capture_document_use_case.dart';
 
 class DocumentScanMode implements CaptureMode {
-  DocumentScanMode(this._service);
+  DocumentScanMode(this._useCase);
 
-  final DocumentScanService _service;
+  final CaptureDocumentUseCase _useCase;
 
   @override
   String get id => 'documentScan';
@@ -20,22 +19,21 @@ class DocumentScanMode implements CaptureMode {
   String get iconName => 'document_scanner';
 
   @override
-  bool isAvailable() => _service.isAvailable;
+  bool isAvailable() => _useCase.isAvailable;
 
   @override
   Future<CaptureResult> startCapture(CaptureContext context) async {
-    final DocumentScanOutcome? outcome = await _service.captureDocument(context);
-    if (outcome == null || outcome.artifacts.isEmpty) {
+    final result = await _useCase.execute(context);
+    if (!result.completed) {
       return CaptureResult.cancelled;
     }
-
-    return CaptureResult(
-      completed: true,
-      artifacts: List.unmodifiable(outcome.artifacts),
-      draft: outcome.draft ??
-          const CaptureDraft(
-            suggestedTags: {'scan', 'document'},
-          ),
+    if (result.draft != null) {
+      return result;
+    }
+    return result.copyWith(
+      draft: const CaptureDraft(
+        suggestedTags: {'scan', 'document'},
+      ),
     );
   }
 }

@@ -1,26 +1,28 @@
 import 'package:isar/isar.dart';
 import 'package:uuid/uuid.dart';
 
-import '../records/model/sync_state.dart';
-import 'auto_sync_status.dart';
+import '../../../records/model/sync_state.dart';
+import '../../application/ports/sync_state_repository.dart';
+import '../../domain/entities/auto_sync_status.dart';
 
-/// Persists and exposes the singleton [SyncState] record that tracks pending
+/// Persists and exposes the singleton sync state record that tracks pending
 /// changes and auto sync preferences.
-class SyncStateRepository {
-  SyncStateRepository(this._db, {Uuid? uuid}) : _uuid = uuid ?? const Uuid();
+class IsarSyncStateRepository implements SyncStateRepository {
+  IsarSyncStateRepository(this._db, {Uuid? uuid}) : _uuid = uuid ?? const Uuid();
 
   final Isar _db;
   final Uuid _uuid;
 
   String? _deviceIdCache;
 
-  /// Ensures the sync state row exists and returns it.
-  Future<SyncState> ensureInitialized() async {
-    return _db.writeTxn(() async => _ensureState());
+  @override
+  Future<void> ensureInitialized() async {
+    await _db.writeTxn(() async {
+      await _ensureState();
+    });
   }
 
-  /// Reads the cached state without mutating counters.
-  Future<SyncState?> read() async {
+  Future<SyncState?> _readState() async {
     final state = await _db.syncStates.get(1);
     if (state != null && state.deviceId.isNotEmpty) {
       _deviceIdCache ??= state.deviceId;
@@ -28,18 +30,17 @@ class SyncStateRepository {
     return state;
   }
 
-  /// Returns an immutable view of the current sync state, ensuring the backing
-  /// row exists before converting it.
+  @override
   Future<AutoSyncStatus> readStatus() async {
-    final existing = await read();
+    final existing = await _readState();
     if (existing != null) {
       return _mapToStatus(existing);
     }
-    final ensured = await ensureInitialized();
+    final ensured = await _ensureState();
     return _mapToStatus(ensured);
   }
 
-  /// Emits status updates whenever the underlying sync state changes.
+  @override
   Stream<AutoSyncStatus> watchStatus({bool fireImmediately = true}) async* {
     await for (final state in _db.syncStates.watchObject(
       1,
@@ -48,13 +49,13 @@ class SyncStateRepository {
       if (state != null) {
         yield _mapToStatus(state);
       } else {
-        final ensured = await ensureInitialized();
+        final ensured = await _ensureState();
         yield _mapToStatus(ensured);
       }
     }
   }
 
-  /// Updates the auto-sync toggle persisted in Isar.
+  @override
   Future<void> setAutoSyncEnabled(bool value) async {
     await _db.writeTxn(() async {
       final state = await _ensureState();
@@ -63,7 +64,7 @@ class SyncStateRepository {
     });
   }
 
-  /// Records a new local change, splitting into critical vs routine queues.
+  @override
   Future<void> recordChange({required bool critical}) async {
     await _db.writeTxn(() async {
       final state = await _ensureState();
@@ -78,7 +79,7 @@ class SyncStateRepository {
     });
   }
 
-  /// Marks a successful sync run, clearing dirty counters and recording time.
+  @override
   Future<void> markSyncSuccess(DateTime completedAt) async {
     await _db.writeTxn(() async {
       final state = await _ensureState();
@@ -90,7 +91,7 @@ class SyncStateRepository {
     });
   }
 
-  /// Upgrades accumulated routine changes into the critical queue.
+  @override
   Future<void> promoteRoutineChanges() async {
     await _db.writeTxn(() async {
       final state = await _ensureState();
@@ -101,12 +102,12 @@ class SyncStateRepository {
     });
   }
 
-  /// Returns a stable device ID, creating one if needed.
+  @override
   Future<String> deviceId() async {
     if (_deviceIdCache != null) {
       return _deviceIdCache!;
     }
-    final state = await ensureInitialized();
+    final state = await _ensureState();
     _deviceIdCache = state.deviceId;
     return _deviceIdCache!;
   }

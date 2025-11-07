@@ -1,3 +1,4 @@
+import '../adapters/storage/attachments_capture_session_storage.dart';
 import '../api/capture_controller.dart';
 import '../api/capture_module.dart';
 import 'capture_controller_impl.dart';
@@ -8,5 +9,9 @@ CaptureController buildCaptureController(List<CaptureModule> modules) {
   for (final module in modules) {
     module.registerModes(registry);
   }
-  return CaptureControllerImpl(registry.modes);
+  final sessionStorage = const AttachmentsCaptureSessionStorage();
+  return CaptureControllerImpl(
+    registry.modes,
+    sessionStorage: sessionStorage,
+  );
 }

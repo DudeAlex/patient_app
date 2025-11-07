@@ -1,3 +1,39 @@
+# 2025-11-07 (Capture core layering)
+- **Change Scope**
+  - Moved `capture_core` controller/registry/initializer implementations into the application layer, introduced capture-session/artifact storage ports with attachments-backed adapters, and re-exported the initializer from the new location so photo/document/voice services no longer import `AttachmentsStorage` directly. Added `CapturePhotoUseCase` and a gateway interface with dedicated unit tests to cover the retake flow.
+- **Verification**
+  - `flutter analyze`
+  - `flutter test test/features/capture_modes/photo/application/capture_photo_use_case_test.dart`
+  - `flutter test test/features/capture_modes/document_scan/application/capture_document_use_case_test.dart`
+  - `flutter test test/features/sync`
+- **Result**
+  - Analyzer clean; both the new photo capture use case tests (`00:00 +3`) and the sync suite (`00:02 +12`) passed.
+
+# 2025-11-07 (Routine promotion wiring)
+- **Change Scope**
+  - Added routine-change promotion inside `AutoSyncCoordinator`, rewired `RecordsService` to inject the new use case, and introduced unit tests covering the promotion + runner handoff.
+- **Verification**
+  - `flutter analyze`
+  - `flutter test test/features/sync`
+- **Result**
+  - Analyzer clean. Sync test suite now includes the new coordinator tests (`00:03 +12`).
+
+# 2025-11-07 (Sync Phase 2 wiring)
+- **Change Scope**
+  - Rewired dirty tracking, auto-sync runner/coordinator, RecordsService, and Settings to depend on the new sync use cases instead of the concrete Isar repository.
+- **Verification**
+  - `flutter test test/features/sync`
+- **Result**
+  - Tests passed (`00:00 +10`). Confirms the refactor preserved sync behaviour before moving additional callers over.
+
+# 2025-11-07 (Sync Phase 2 groundwork)
+- **Change Scope**
+  - Introduced sync-layer clean architecture scaffolding (domain `AutoSyncStatus`, repository port, Isar adapter relocation) and added new application-layer use cases with targeted unit tests.
+- **Verification**
+  - `flutter test test/features/sync`
+- **Result**
+  - Tests passed (`00:00 +10`). Confirms the new sync use cases and existing domain invariants behave as expected before refactoring coordinators/trackers to consume them.
+
 # 2025-11-07
 - **Change Scope**
   - Phase 1 cleanup checkpoint: tightened `RecordEntity` invariants and added domain-layer tests, then revalidated the repo via analyzer + full records feature test suite per refactor plan.

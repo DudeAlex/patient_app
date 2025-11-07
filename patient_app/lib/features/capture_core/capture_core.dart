@@ -4,4 +4,4 @@ export 'api/capture_draft.dart';
 export 'api/capture_mode.dart';
 export 'api/capture_module.dart';
 export 'api/capture_result.dart';
-export 'domain/capture_core_initializer.dart' show buildCaptureController;
+export 'application/capture_core_initializer.dart' show buildCaptureController;

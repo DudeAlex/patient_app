@@ -2,8 +2,8 @@ import 'package:meta/meta.dart';
 
 /// Immutable view of the persisted sync state used by auto sync flows.
 ///
-/// This keeps higher level coordinators decoupled from the underlying Isar
-/// collection so we can evolve storage without touching every consumer.
+/// This keeps higher level coordinators decoupled from the underlying storage
+/// schema so we can evolve persistence without touching every consumer.
 @immutable
 class AutoSyncStatus {
   AutoSyncStatus({

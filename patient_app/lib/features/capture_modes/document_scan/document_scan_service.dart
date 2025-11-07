@@ -5,41 +5,49 @@ import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../core/storage/attachments.dart';
 import '../../capture_core/api/capture_artifact.dart';
 import '../../capture_core/api/capture_draft.dart';
 import '../../capture_core/api/capture_mode.dart';
+import '../../capture_core/adapters/storage/attachments_capture_artifact_storage.dart';
+import '../../capture_core/application/ports/capture_artifact_storage.dart';
+import 'application/ports/document_scan_gateway.dart';
 import 'analysis/document_analysis_pipeline.dart';
 import 'analysis/document_clarity_analyzer.dart';
 import 'analysis/document_enhancer.dart';
 import 'models/document_scan_outcome.dart';
 
-class DocumentScanService {
+class DocumentScanService implements DocumentScanGateway {
   DocumentScanService({
     ImagePicker? picker,
     DocumentEnhancer? enhancer,
     DocumentClarityAnalyzer? clarityAnalyzer,
     DocumentAnalysisPipeline? analysisPipeline,
     Uuid? uuid,
+    CaptureArtifactStorage? artifactStorage,
   })  : _picker = picker ?? ImagePicker(),
         _enhancer = enhancer ?? const DocumentEnhancer(),
         _clarityAnalyzer = clarityAnalyzer,
         _analysisPipeline = analysisPipeline,
-        _uuid = uuid ?? const Uuid();
+        _uuid = uuid ?? const Uuid(),
+        _storage =
+            artifactStorage ?? const AttachmentsCaptureArtifactStorage();
 
   final ImagePicker _picker;
   final DocumentEnhancer _enhancer;
   final DocumentClarityAnalyzer? _clarityAnalyzer;
   final DocumentAnalysisPipeline? _analysisPipeline;
   final Uuid _uuid;
+  final CaptureArtifactStorage _storage;
 
   static const int _maxPages = 10;
 
+  @override
   bool get isAvailable {
     if (kIsWeb) return false;
     return true;
   }
 
+  @override
   Future<DocumentScanOutcome?> captureDocument(CaptureContext context) async {
     if (!isAvailable) {
       throw const DocumentScanException(
@@ -82,7 +90,7 @@ class DocumentScanService {
         final onProcessing = context.onProcessing;
         onProcessing?.call(true);
         try {
-          final originalFile = await AttachmentsStorage.resolveRelativePath(
+          final originalFile = await _storage.resolveRelativePath(
             pageArtifacts.original.relativePath,
           );
           clarityResult = await analyzer.analyze(originalFile);
@@ -196,9 +204,8 @@ class DocumentScanService {
         file: file,
         pageIndex: pageIndex,
       );
-      final originalFile = await AttachmentsStorage.resolveRelativePath(
-        originalRelative,
-      );
+      final originalFile =
+          await _storage.resolveRelativePath(originalRelative);
       final originalStat = await originalFile.stat();
 
       enhancedRelative = await _storeEnhanced(
@@ -206,9 +213,8 @@ class DocumentScanService {
         originalFile: originalFile,
         pageIndex: pageIndex,
       );
-      final enhancedFile = await AttachmentsStorage.resolveRelativePath(
-        enhancedRelative,
-      );
+      final enhancedFile =
+          await _storage.resolveRelativePath(enhancedRelative);
       final enhancedStat = await enhancedFile.stat();
 
       final baseMetadata = <String, Object?>{
@@ -262,10 +268,10 @@ class DocumentScanService {
     } finally {
       if (!success) {
         if (originalRelative != null) {
-          unawaited(AttachmentsStorage.deleteRelativeFile(originalRelative));
+          unawaited(_storage.deleteRelativeFile(originalRelative));
         }
         if (enhancedRelative != null) {
-          unawaited(AttachmentsStorage.deleteRelativeFile(enhancedRelative));
+          unawaited(_storage.deleteRelativeFile(enhancedRelative));
         }
       }
     }
@@ -277,11 +283,11 @@ class DocumentScanService {
     required int pageIndex,
   }) async {
     final extension = _filenameExtension(file.name, file.mimeType);
-    final relativePath = await AttachmentsStorage.allocateRelativePath(
+    final relativePath = await _storage.allocateRelativePath(
       sessionId: sessionId,
       fileName: _buildFileName(pageIndex, 'original', extension),
     );
-    final root = await AttachmentsStorage.rootDir();
+    final root = await _storage.rootDir();
     final target = File('${root.path}/$relativePath');
     await File(file.path).copy(target.path);
     return relativePath;
@@ -295,11 +301,11 @@ class DocumentScanService {
     final bytes = await originalFile.readAsBytes();
     final enhancedBytes = await _enhancer.enhance(bytes);
 
-    final relativePath = await AttachmentsStorage.allocateRelativePath(
+    final relativePath = await _storage.allocateRelativePath(
       sessionId: sessionId,
       fileName: _buildFileName(pageIndex, 'enhanced', '.jpg'),
     );
-    final root = await AttachmentsStorage.rootDir();
+    final root = await _storage.rootDir();
     final target = File('${root.path}/$relativePath');
     await target.writeAsBytes(enhancedBytes, flush: true);
     return relativePath;
@@ -319,8 +325,8 @@ class DocumentScanService {
   }
 
   Future<void> _discardArtifacts(_PageArtifacts artifacts) async {
-    await AttachmentsStorage.deleteRelativeFile(artifacts.original.relativePath);
-    await AttachmentsStorage.deleteRelativeFile(artifacts.enhanced.relativePath);
+    await _storage.deleteRelativeFile(artifacts.original.relativePath);
+    await _storage.deleteRelativeFile(artifacts.enhanced.relativePath);
   }
 
   _PageArtifacts _applyClarityMetadata(

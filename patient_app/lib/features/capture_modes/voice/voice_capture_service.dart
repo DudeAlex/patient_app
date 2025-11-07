@@ -4,26 +4,32 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 
-import '../../../core/storage/attachments.dart';
 import '../../capture_core/api/capture_artifact.dart';
 import '../../capture_core/api/capture_draft.dart';
 import '../../capture_core/api/capture_mode.dart';
+import '../../capture_core/adapters/storage/attachments_capture_artifact_storage.dart';
+import '../../capture_core/application/ports/capture_artifact_storage.dart';
 import 'analysis/voice_transcription_pipeline.dart';
 import 'models/voice_capture_outcome.dart';
 import 'ui/voice_recorder_sheet.dart';
 
 class VoiceCaptureService {
-  VoiceCaptureService({VoiceTranscriptionPipeline? transcriptionPipeline})
-    : _transcriptionPipeline =
-          transcriptionPipeline ?? const StubVoiceTranscriptionPipeline();
+  VoiceCaptureService({
+    VoiceTranscriptionPipeline? transcriptionPipeline,
+    CaptureArtifactStorage? artifactStorage,
+  })  : _transcriptionPipeline =
+            transcriptionPipeline ?? const StubVoiceTranscriptionPipeline(),
+        _storage =
+            artifactStorage ?? const AttachmentsCaptureArtifactStorage();
 
   final VoiceTranscriptionPipeline _transcriptionPipeline;
+  final CaptureArtifactStorage _storage;
 
   Future<VoiceCaptureOutcome?> captureVoice(CaptureContext context) async {
     final sessionId = context.sessionId;
     final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final root = await AttachmentsStorage.rootDir();
-    final allocatedRelative = await AttachmentsStorage.allocateRelativePath(
+    final root = await _storage.rootDir();
+    final allocatedRelative = await _storage.allocateRelativePath(
       sessionId: sessionId,
       fileName: 'voice_$timestamp.m4a',
     );
@@ -43,7 +49,7 @@ class VoiceCaptureService {
     );
 
     if (recording == null) {
-      await AttachmentsStorage.deleteRelativeFile(allocatedRelative);
+      await _storage.deleteRelativeFile(allocatedRelative);
       return null;
     }
 

@@ -105,7 +105,6 @@ class _HomeScaffold extends StatelessWidget {
         service.deleteRecord,
         service.getRecordById,
         service.dirtyTracker,
-        service.syncState,
       )..load(),
       child: Builder(
         builder: (context) => Scaffold(

@@ -1,13 +1,13 @@
-import '../records/model/record_types.dart';
 import '../records/domain/entities/record.dart';
+import '../records/model/record_types.dart';
 
-import 'sync_state_repository.dart';
+import 'application/use_cases/record_auto_sync_change_use_case.dart';
 
 /// Classifies record mutations and forwards dirty counters to [SyncStateRepository].
 class AutoSyncDirtyTracker {
-  AutoSyncDirtyTracker(this._syncState);
+  AutoSyncDirtyTracker(this._recordChangeUseCase);
 
-  final SyncStateRepository _syncState;
+  final RecordAutoSyncChangeUseCase _recordChangeUseCase;
 
   static const Set<String> _criticalTypes = {
     RecordTypes.visit,
@@ -18,11 +18,15 @@ class AutoSyncDirtyTracker {
   bool isCriticalRecord(RecordEntity record) => _criticalTypes.contains(record.type);
 
   Future<void> recordRecordSave(RecordEntity record) {
-    return _syncState.recordChange(critical: isCriticalRecord(record));
+    return _recordChangeUseCase.execute(
+      RecordAutoSyncChangeInput(critical: isCriticalRecord(record)),
+    );
   }
 
   Future<void> recordRecordDelete(RecordEntity? record) {
     final critical = record == null ? true : isCriticalRecord(record);
-    return _syncState.recordChange(critical: critical);
+    return _recordChangeUseCase.execute(
+      RecordAutoSyncChangeInput(critical: critical),
+    );
   }
 }

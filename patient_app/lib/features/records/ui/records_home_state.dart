@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 
 import '../../sync/dirty_tracker.dart';
-import '../../sync/sync_state_repository.dart';
 import '../application/use_cases/delete_record_use_case.dart';
 import '../application/use_cases/fetch_records_page_use_case.dart';
 import '../application/use_cases/get_record_by_id_use_case.dart';
@@ -17,7 +16,6 @@ class RecordsHomeState extends ChangeNotifier {
     this._deleteRecordCase,
     this._getRecordByIdCase,
     this._dirtyTracker,
-    this._syncStateRepository,
   );
 
   static const int _pageSize = 20;
@@ -27,7 +25,6 @@ class RecordsHomeState extends ChangeNotifier {
   final DeleteRecordUseCase _deleteRecordCase;
   final GetRecordByIdUseCase _getRecordByIdCase;
   final AutoSyncDirtyTracker _dirtyTracker;
-  final SyncStateRepository _syncStateRepository;
 
   List<RecordEntity> _records = const <RecordEntity>[];
   Object? _error;
@@ -44,8 +41,6 @@ class RecordsHomeState extends ChangeNotifier {
   bool get hasMore => _hasMore;
   bool get hasData => _records.isNotEmpty;
   String get searchQuery => _searchQuery;
-
-  SyncStateRepository get syncStateRepository => _syncStateRepository;
 
   RecordEntity? recordById(int id) {
     for (final record in _records) {

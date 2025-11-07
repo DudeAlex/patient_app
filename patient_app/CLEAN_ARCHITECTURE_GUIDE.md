@@ -22,6 +22,8 @@ Closer to the center means higher stability. Never import outward across layers.
   - Orchestrate scenarios using InputDTO and OutputDTO contracts.
   - Depend only on ports such as repositories or gateways.
   - Contain no business rules; they coordinate entities and collaborate through interfaces.
+  - Example: the auto-sync stack now routes Settings toggles, dirty tracking, and lifecycle triggers through `SetAutoSyncEnabled`, `RecordAutoSyncChange`, `MarkAutoSyncSuccess`, and `WatchAutoSyncStatus` use cases so UI widgets never import the Isar repository directly.
+  - Example: capture modes now use dedicated gateways (`PhotoCaptureGateway`, `DocumentScanGateway`) plus use cases (`CapturePhotoUseCase`, `CaptureDocumentUseCase`) so prompts, artifact tagging, and draft merging live outside the Flutter widgets.
 - **Interface Adapters**
   - Map and translate: controllers/presenters convert Request <-> DTO <-> Response.
   - Repository adapters convert Entities <-> Storage models.

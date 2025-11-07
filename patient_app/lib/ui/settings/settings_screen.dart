@@ -6,7 +6,8 @@ import 'package:google_drive_backup/google_drive_backup.dart';
 import 'package:intl/intl.dart';
 
 import '../../features/records/data/records_service.dart';
-import '../../features/sync/auto_sync_status.dart';
+import '../../features/sync/application/use_cases/set_auto_sync_enabled_use_case.dart';
+import '../../features/sync/domain/entities/auto_sync_status.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -63,8 +64,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final service = await RecordsService.instance();
       if (!mounted) return;
       _recordsService = service;
-      final initialStatus =
-          service.autoSync.latestStatus ?? await service.syncState.readStatus();
+      final initialStatus = service.autoSync.latestStatus ??
+          await service.readAutoSyncStatus.execute();
       setState(() {
         _autoSyncStatus = initialStatus;
         _autoSyncInitialised = true;
@@ -87,7 +88,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (service == null) return;
     setState(() => _autoSyncBusy = true);
     try {
-      await service.syncState.setAutoSyncEnabled(value);
+      await service
+          .setAutoSyncEnabled
+          .execute(SetAutoSyncEnabledInput(enabled: value));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

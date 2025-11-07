@@ -14,6 +14,12 @@ Purpose: translate the Clean Architecture guide into actionable, bite-sized refa
 - 2025-11-06: Refactored `RecordsService` and `RecordsHomeState` to consume the new use cases, shifting UI state away from direct repository access.
 - 2025-11-06: Added `GetRecordById` use case and reintroduced delete-flow fallback via the application layer.
 - 2025-11-07: Finished Phase 1 task 7 by enforcing record-domain invariants (title/type/timestamps) and introducing sync-domain safeguards (`AutoSyncStatus` counter checks) with dedicated unit tests; refreshed `ARCHITECTURE.md`, `CLEAN_ARCHITECTURE_GUIDE.md`, and `TESTING.md` plus re-ran analyzer + targeted suites.
+- 2025-11-07: Phase 2 kickoff by moving `AutoSyncStatus` into the domain layer, introducing the `SyncStateRepository` port + Isar adapter, and adding first-wave sync use cases (toggle, record change, mark success, promote, read/watch) with dedicated tests logged in `TESTING.md`.
+- 2025-11-07: Continued Phase 2 by wiring `AutoSyncDirtyTracker`, `AutoSyncRunner`, `AutoSyncCoordinator`, `RecordsService`, and Settings UI to the new sync use cases, keeping behaviour intact while removing direct Isar repository dependencies; re-ran sync test suite and logged results in `TESTING.md`.
+- 2025-11-07: Implemented routine-change promotion inside `AutoSyncCoordinator`, added targeted unit tests plus docs describing the new layering, and re-ran analyzer + sync tests to confirm behaviour.
+- 2025-11-07: Phase 3 kick-off by relocating capture controller/registry/initializer implementations into the application layer, introducing a capture session storage port with an attachments-backed adapter, and documenting the new structure.
+- 2025-11-07: Followed up Phase 3 by abstracting capture artifact storage (photo, document scan, voice) behind `CaptureArtifactStorage` with a shared attachments adapter, keeping mode services free of direct `AttachmentsStorage` imports.
+- 2025-11-07: Added `CapturePhotoUseCase` + port-driven gateway so the photo capture mode now consumes a use case instead of inlining prompt/retake logic; added unit tests around the decision flow, and mirrored the pattern for document scan (`CaptureDocumentUseCase` + gateway).
 
 ### Next Session Starting Point
 1. Phase 2 prep: survey `SyncStateRepository`, dirty tracker, and auto-sync runner to outline the domain/application split (ports, use cases) before moving logic.

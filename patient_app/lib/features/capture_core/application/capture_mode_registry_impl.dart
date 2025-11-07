@@ -2,7 +2,7 @@ import '../api/capture_mode.dart';
 import '../api/capture_module.dart';
 
 class InMemoryCaptureModeRegistry implements CaptureModeRegistry {
-  final List<CaptureMode> _modes = [];
+  final List<CaptureMode> _modes = <CaptureMode>[];
 
   List<CaptureMode> get modes => List.unmodifiable(_modes);
 

@@ -2,17 +2,23 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 
-import 'auto_sync_status.dart';
 import 'auto_sync_runner.dart';
-import 'sync_state_repository.dart';
+import 'application/use_cases/promote_routine_changes_use_case.dart';
+import 'application/use_cases/watch_auto_sync_status_use_case.dart';
+import 'domain/entities/auto_sync_status.dart';
 
 /// Observes lifecycle changes and persisted sync state so future auto-sync
 /// orchestration can run in response to app activity.
 class AutoSyncCoordinator {
-  AutoSyncCoordinator(this._syncStateRepository, this._runner);
+  AutoSyncCoordinator(
+    this._watchStatusUseCase,
+    this._runner,
+    this._promoteRoutineChanges,
+  );
 
-  final SyncStateRepository _syncStateRepository;
+  final WatchAutoSyncStatusUseCase _watchStatusUseCase;
   final AutoSyncRunner _runner;
+  final PromoteRoutineChangesUseCase _promoteRoutineChanges;
 
   AppLifecycleListener? _lifecycleListener;
   StreamSubscription<AutoSyncStatus>? _statusSubscription;
@@ -35,7 +41,7 @@ class AutoSyncCoordinator {
   void start() {
     if (_started) return;
     _started = true;
-    _statusSubscription = _syncStateRepository.watchStatus().listen(
+    _statusSubscription = _watchStatusUseCase.execute().listen(
       (status) {
         _latestStatus = status;
         _statusController.add(status);
@@ -70,6 +76,14 @@ class AutoSyncCoordinator {
       debugPrint('[AutoSync] Resume detected but status not yet loaded.');
       return;
     }
+    unawaited(_processResume(status));
+  }
+
+  void _handleAppHidden() {
+    debugPrint('[AutoSync] App hidden; future iterations may trigger sync.');
+  }
+
+  Future<void> _processResume(AutoSyncStatus status) async {
     if (!status.autoSyncEnabled) {
       debugPrint('[AutoSync] Resume -> auto sync disabled; skipping backup.');
       return;
@@ -78,10 +92,35 @@ class AutoSyncCoordinator {
       debugPrint('[AutoSync] Resume -> no pending changes detected.');
       return;
     }
-    unawaited(_runner.handleAppResume(status));
+
+    var effectiveStatus = status;
+    if (!status.hasPendingCriticalChanges &&
+        status.hasPendingRoutineChanges) {
+      debugPrint('[AutoSync] Promoting routine changes to trigger backup.');
+      try {
+        await _promoteRoutineChanges.execute();
+        effectiveStatus = status.copyWith(
+          pendingCriticalChanges:
+              status.pendingCriticalChanges + status.pendingRoutineChanges,
+          pendingRoutineChanges: 0,
+        );
+      } catch (e, st) {
+        debugPrint('[AutoSync] Failed to promote routine changes: $e');
+        debugPrint('[AutoSync] STACK: ${st.toString().split('\n').first}');
+        return;
+      }
+    }
+
+    if (!effectiveStatus.hasPendingCriticalChanges) {
+      debugPrint('[AutoSync] Resume -> no critical changes ready for backup.');
+      return;
+    }
+
+    await _runner.handleAppResume(effectiveStatus);
   }
 
-  void _handleAppHidden() {
-    debugPrint('[AutoSync] App hidden; future iterations may trigger sync.');
+  @visibleForTesting
+  Future<void> handleResumeForTest(AutoSyncStatus status) {
+    return _processResume(status);
   }
 }

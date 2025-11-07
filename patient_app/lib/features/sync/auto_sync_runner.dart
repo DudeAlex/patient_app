@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:google_drive_backup/google_drive_backup.dart';
 
-import 'auto_sync_status.dart';
-import 'sync_state_repository.dart';
+import 'domain/entities/auto_sync_status.dart';
+import 'application/use_cases/mark_auto_sync_success_use_case.dart';
 
 /// Handles background Drive backups when auto sync decides conditions are met.
 ///
@@ -13,7 +13,7 @@ import 'sync_state_repository.dart';
 /// in a follow-up iteration.
 class AutoSyncRunner {
   AutoSyncRunner(
-    this._syncStateRepository, {
+    this._markSuccessUseCase, {
     DriveBackupManager? backupManager,
     DateTime Function()? clock,
     Duration? minInterval,
@@ -21,7 +21,7 @@ class AutoSyncRunner {
         _clock = clock ?? DateTime.now,
         _minInterval = minInterval ?? const Duration(hours: 6);
 
-  final SyncStateRepository _syncStateRepository;
+  final MarkAutoSyncSuccessUseCase _markSuccessUseCase;
   final DriveBackupManager _backupManager;
   final DateTime Function() _clock;
   /// Minimum delay between background backups to avoid re-uploading the full
@@ -77,7 +77,9 @@ class AutoSyncRunner {
     debugPrint('[AutoSync] Starting background Drive backup for $email.');
     try {
       await _backupManager.backupToDrive(promptIfNecessary: false);
-      await _syncStateRepository.markSyncSuccess(_clock());
+      await _markSuccessUseCase.execute(
+        MarkAutoSyncSuccessInput(completedAt: _clock()),
+      );
       debugPrint('[AutoSync] Backup completed successfully.');
     } on Exception catch (e, st) {
       debugPrint('[AutoSync] Backup failed: $e');

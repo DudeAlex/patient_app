@@ -3,27 +3,34 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../core/storage/attachments.dart';
 import '../../capture_core/api/capture_artifact.dart';
 import '../../capture_core/api/capture_draft.dart';
 import '../../capture_core/api/capture_mode.dart';
+import '../../capture_core/adapters/storage/attachments_capture_artifact_storage.dart';
+import '../../capture_core/application/ports/capture_artifact_storage.dart';
+import 'application/ports/photo_capture_gateway.dart';
 import 'analysis/photo_clarity_analyzer.dart';
 import 'analysis/photo_ocr_extractor.dart';
 import 'models/photo_capture_outcome.dart';
 
-class PhotoCaptureService {
+class PhotoCaptureService implements PhotoCaptureGateway {
   PhotoCaptureService({
     ImagePicker? picker,
     PhotoClarityAnalyzer? clarityAnalyzer,
     PhotoOcrExtractor? ocrExtractor,
-  }) : _picker = picker ?? ImagePicker(),
+    CaptureArtifactStorage? artifactStorage,
+  })  : _picker = picker ?? ImagePicker(),
        _clarityAnalyzer = clarityAnalyzer,
-       _ocrExtractor = ocrExtractor ?? const StubPhotoOcrExtractor();
+       _ocrExtractor = ocrExtractor ?? const StubPhotoOcrExtractor(),
+       _storage =
+           artifactStorage ?? const AttachmentsCaptureArtifactStorage();
 
   final ImagePicker _picker;
   final PhotoClarityAnalyzer? _clarityAnalyzer;
   final PhotoOcrExtractor _ocrExtractor;
+  final CaptureArtifactStorage _storage;
 
+  @override
   Future<PhotoCaptureOutcome?> capturePhoto(CaptureContext context) async {
     try {
       final xfile = await _picker.pickImage(
@@ -39,9 +46,7 @@ class PhotoCaptureService {
         sourcePath: xfile.path,
         fileNameHint: _buildFileName(xfile),
       );
-      final savedFile = await AttachmentsStorage.resolveRelativePath(
-        relativePath,
-      );
+      final savedFile = await _storage.resolveRelativePath(relativePath);
       final stat = await savedFile.stat();
 
       PhotoClarityResult? clarityResult;
@@ -95,9 +100,10 @@ class PhotoCaptureService {
     }
   }
 
+  @override
   Future<void> discardArtifacts(List<CaptureArtifact> artifacts) async {
     for (final artifact in artifacts) {
-      await AttachmentsStorage.deleteRelativeFile(artifact.relativePath);
+      await _storage.deleteRelativeFile(artifact.relativePath);
     }
   }
 
@@ -106,11 +112,11 @@ class PhotoCaptureService {
     required String sourcePath,
     required String fileNameHint,
   }) async {
-    final relativePath = await AttachmentsStorage.allocateRelativePath(
+    final relativePath = await _storage.allocateRelativePath(
       sessionId: sessionId,
       fileName: fileNameHint,
     );
-    final root = await AttachmentsStorage.rootDir();
+    final root = await _storage.rootDir();
     final target = File('${root.path}/$relativePath');
     final sourceFile = File(sourcePath);
     await sourceFile.copy(target.path);
