@@ -3,15 +3,19 @@
 class RecordEntity {
   RecordEntity({
     this.id,
-    required this.type,
+    required String type,
     required this.date,
-    required this.title,
+    required String title,
     this.text,
     List<String>? tags,
     required this.createdAt,
-    required this.updatedAt,
-    this.deletedAt,
-  }) : tags = List<String>.unmodifiable(tags ?? const []);
+    required DateTime updatedAt,
+    DateTime? deletedAt,
+  })  : type = _validateType(type),
+        title = _validateTitle(title),
+        updatedAt = _validateUpdatedAt(createdAt, updatedAt),
+        deletedAt = _validateDeletedAt(updatedAt, deletedAt),
+        tags = List<String>.unmodifiable(tags ?? const []);
 
   /// Database identifier (null before the entity is persisted).
   final int? id;
@@ -47,5 +51,43 @@ class RecordEntity {
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
     );
+  }
+
+  static String _validateType(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      throw ArgumentError.value(value, 'type', 'Record type cannot be empty.');
+    }
+    return trimmed;
+  }
+
+  static String _validateTitle(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      throw ArgumentError.value(value, 'title', 'Record title cannot be empty.');
+    }
+    return trimmed;
+  }
+
+  static DateTime _validateUpdatedAt(DateTime createdAt, DateTime updatedAt) {
+    if (updatedAt.isBefore(createdAt)) {
+      throw ArgumentError.value(
+        updatedAt,
+        'updatedAt',
+        'updatedAt cannot be before createdAt.',
+      );
+    }
+    return updatedAt;
+  }
+
+  static DateTime? _validateDeletedAt(DateTime updatedAt, DateTime? deletedAt) {
+    if (deletedAt != null && deletedAt.isBefore(updatedAt)) {
+      throw ArgumentError.value(
+        deletedAt,
+        'deletedAt',
+        'deletedAt cannot be before updatedAt.',
+      );
+    }
+    return deletedAt;
   }
 }

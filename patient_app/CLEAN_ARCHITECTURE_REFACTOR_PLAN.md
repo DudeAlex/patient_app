@@ -13,11 +13,12 @@ Purpose: translate the Clean Architecture guide into actionable, bite-sized refa
 - 2025-11-06: Added Phase 1 task 4 use cases (`SaveRecord`, `FetchRecentRecords`, `FetchRecordsPage`, `DeleteRecord`) with unit tests covering repository interactions.
 - 2025-11-06: Refactored `RecordsService` and `RecordsHomeState` to consume the new use cases, shifting UI state away from direct repository access.
 - 2025-11-06: Added `GetRecordById` use case and reintroduced delete-flow fallback via the application layer.
+- 2025-11-07: Finished Phase 1 task 7 by enforcing record-domain invariants (title/type/timestamps) and introducing sync-domain safeguards (`AutoSyncStatus` counter checks) with dedicated unit tests; refreshed `ARCHITECTURE.md`, `CLEAN_ARCHITECTURE_GUIDE.md`, and `TESTING.md` plus re-ran analyzer + targeted suites.
 
 ### Next Session Starting Point
-1. Run `flutter analyze` and the records use-case test suite on a machine with the configured Flutter SDK; record outcomes in `TESTING.md`. *(Local environment still missing SDK when attempted from this shell.)*
-2. Review other code paths (e.g., seeding helpers, detail flow) to decide whether they should shift from repository access to use-case APIs or remain infrastructure-level.
-3. Start Phase 1 task 7 by adding entity invariants/tests and refreshing architecture docs to mirror the new layering.
+1. Phase 2 prep: survey `SyncStateRepository`, dirty tracker, and auto-sync runner to outline the domain/application split (ports, use cases) before moving logic.
+2. Decide whether attachment/domain entities need similar invariants; capture any gaps in TODO.md if they exceed this iteration.
+3. Once the Phase 2 scope is confirmed, queue up contracts/tests for sync repositories and document the plan updates here.
 
 ---
 

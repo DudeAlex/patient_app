@@ -76,6 +76,7 @@ Data Model (Isar)
 - Insight: id, recordId?, kind, text, createdAt
 - SyncState (singleton): lastSyncedAt?, lastRemoteModified?, localChangeCounter, deviceId
 - Planned: SupportContact, WellnessCheckIn collections (see SPEC.md for fields)
+- Domain-level guards: `RecordEntity` enforces non-empty type/title strings and monotonic timestamps (createdAt ≤ updatedAt ≤ deletedAt), while `AutoSyncStatus` asserts non-negative dirty counters, consistent totals, and non-empty device ids before reaching adapters; unit tests lock in those invariants.
 
 ## Localization & Internationalisation
 

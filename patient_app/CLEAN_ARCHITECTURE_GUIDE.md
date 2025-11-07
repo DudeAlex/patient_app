@@ -17,6 +17,7 @@ Closer to the center means higher stability. Never import outward across layers.
   - Own business rules, invariants, and rich behaviour.
   - Remain free of UI, HTTP, persistence, annotations, or serialization helpers.
   - Change only when business rules change.
+- Example: `RecordEntity` now validates non-empty type/title fields and chronological timestamps via constructor checks with dedicated unit tests; `AutoSyncStatus` similarly guards against negative dirty counters or empty device identifiers.
 - **Application / Use Cases (Interactors)**
   - Orchestrate scenarios using InputDTO and OutputDTO contracts.
   - Depend only on ports such as repositories or gateways.
@@ -88,4 +89,3 @@ lib/features/<feature>/
   ui/            # Flutter widgets/screens (framework layer)
 ```
 Cross-cutting helpers belong in `lib/core/` only when they serve multiple features without breaking the dependency rule. Keep module APIs minimal and communicate via interfaces so features stay composable.
-

@@ -6,7 +6,7 @@ import 'package:meta/meta.dart';
 /// collection so we can evolve storage without touching every consumer.
 @immutable
 class AutoSyncStatus {
-  const AutoSyncStatus({
+  AutoSyncStatus({
     required this.autoSyncEnabled,
     required this.pendingCriticalChanges,
     required this.pendingRoutineChanges,
@@ -14,7 +14,18 @@ class AutoSyncStatus {
     required this.deviceId,
     this.lastSyncedAt,
     this.lastRemoteModified,
-  });
+  })  : assert(pendingCriticalChanges >= 0,
+            'pendingCriticalChanges cannot be negative.'),
+        assert(pendingRoutineChanges >= 0,
+            'pendingRoutineChanges cannot be negative.'),
+        assert(localChangeCounter >= 0,
+            'localChangeCounter cannot be negative.'),
+        assert(
+          localChangeCounter >=
+              pendingCriticalChanges + pendingRoutineChanges,
+          'localChangeCounter cannot be less than the sum of pending changes.',
+        ),
+        assert(deviceId.isNotEmpty, 'deviceId cannot be empty.');
 
   /// Flag persisted from Settings that allows patients to disable auto sync.
   final bool autoSyncEnabled;
