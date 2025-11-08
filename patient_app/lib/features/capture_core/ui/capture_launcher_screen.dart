@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../adapters/presenters/capture_launcher_presenter.dart';
 import '../api/capture_controller.dart';
 import '../api/capture_mode.dart';
 import '../api/capture_result.dart';
@@ -36,7 +37,7 @@ class CaptureLauncherScreen extends StatefulWidget {
 }
 
 class _CaptureLauncherScreenState extends State<CaptureLauncherScreen> {
-  final ValueNotifier<bool> _processingNotifier = ValueNotifier<bool>(false);
+  late final CaptureLauncherPresenter _presenter;
 
   Future<T?> _withUiContext<T>(
     Future<T?> Function(BuildContext context) action,
@@ -46,16 +47,22 @@ class _CaptureLauncherScreenState extends State<CaptureLauncherScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _presenter = CaptureLauncherPresenter(widget.controller);
+  }
+
+  @override
   void dispose() {
-    _processingNotifier.dispose();
+    _presenter.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final modes = widget.controller.modes.where((m) => m.isAvailable()).toList();
+    final modes = _presenter.availableModes();
     return ValueListenableBuilder<bool>(
-      valueListenable: _processingNotifier,
+      valueListenable: _presenter.processing,
       builder: (context, isProcessing, child) {
         return Stack(
           children: [
@@ -94,51 +101,41 @@ class _CaptureLauncherScreenState extends State<CaptureLauncherScreen> {
   }
 
   Future<void> _startMode(BuildContext context, CaptureMode mode) async {
-    final sessionId = widget.controller.createSession();
-    final captureContext = CaptureContext(
-      onProcessing: (processing) => _processingNotifier.value = processing,
-      withUiContext: _withUiContext,
-      sessionId: sessionId,
-      locale: widget.locale.toLanguageTag(),
-      isAccessibilityEnabled: widget.isAccessibilityEnabled,
-      promptRetake: (title, message) => _showDecisionDialog(
-        context,
-        title: title,
-        message: message,
-        confirmLabel: 'Retake',
-        cancelLabel: 'Keep',
-      ),
-      promptChoice: (title, message,
-              {String confirmLabel = 'OK', String cancelLabel = 'Cancel'}) =>
-          _showDecisionDialog(
-        context,
-        title: title,
-        message: message,
-        confirmLabel: confirmLabel,
-        cancelLabel: cancelLabel,
-      ),
-    );
     try {
-      final result = await widget.controller.startMode(
-        modeId: mode.id,
-        context: captureContext,
+      final result = await _presenter.startCapture(
+        mode: mode,
+        bindings: CaptureLauncherBindings(
+          localeTag: widget.locale.toLanguageTag(),
+          isAccessibilityEnabled: widget.isAccessibilityEnabled,
+          withUiContext: _withUiContext,
+          promptRetake: (title, message) => _showDecisionDialog(
+            context,
+            title: title,
+            message: message,
+            confirmLabel: 'Retake',
+            cancelLabel: 'Keep',
+          ),
+          promptChoice: (title, message,
+                  {String confirmLabel = 'OK', String cancelLabel = 'Cancel'}) =>
+              _showDecisionDialog(
+            context,
+            title: title,
+            message: message,
+            confirmLabel: confirmLabel,
+            cancelLabel: cancelLabel,
+          ),
+        ),
       );
       if (!mounted || !context.mounted) return;
       await widget.onResult(context, mode, result);
     } catch (e) {
       if (!mounted || !context.mounted) {
-        await widget.controller.discardSession(sessionId);
         return;
       }
       final messenger = ScaffoldMessenger.of(context);
       messenger.showSnackBar(
         SnackBar(content: Text('Unable to start ${mode.displayName}: $e')),
       );
-      await widget.controller.discardSession(sessionId);
-    } finally {
-      if (_processingNotifier.value) {
-        _processingNotifier.value = false;
-      }
     }
   }
 

@@ -1,3 +1,29 @@
+# 2025-11-08 (AppContainer bootstrap)
+- **Change Scope**
+  - Added `AppContainer` + bootstrap wiring so dependencies are registered once (records service future + capture controller) and resolved via the container inside `PatientApp`.
+- **Verification**
+  - `flutter analyze`
+- **Result**
+  - Unable to run locally in this shell: Flutter tool still fails to build because `/mnt/c/src/flutter/bin/cache/dart-sdk/bin/dart` is missing. Analyzer/test commands were run earlier on the workstation (per user log) to confirm the change; rerun locally if additional verification is needed.
+
+# 2025-11-08 (Capture launcher presenter + voice use case tests)
+- **Change Scope**
+  - Added `CaptureLauncherPresenter` + bindings, rewired the launcher UI to consume it, and created presenter unit tests. Also introduced the voice capture gateway/use case pair with dedicated tests so all active modes route through the application layer.
+- **Verification**
+  - `flutter analyze`
+  - `flutter test test/features/capture_modes/voice/application/use_cases/capture_voice_use_case_test.dart`
+  - `flutter test test/features/capture_core/adapters/presenters/capture_launcher_presenter_test.dart`
+- **Result**
+  - Unable to execute any Flutter commands in this environment: the toolchain repeatedly fails with “/mnt/c/src/flutter/bin/cache/dart-sdk/bin/dart: No such file or directory” while trying to build the Flutter tool (see CLI output). Tests will need to be rerun on a workstation with a complete Flutter SDK.
+
+# 2025-11-08 (Capture review presenter)
+- **Change Scope**
+  - Introduced `CaptureReviewPresenter` + view models and updated the review screen to render presenter data instead of deriving strings inline; added presenter unit tests covering draft fallbacks and metadata formatting.
+- **Verification**
+  - `flutter test test/features/capture_core/adapters/presenters/capture_review_presenter_test.dart`
+- **Result**
+  - Tests now pass locally (`00:00 +2`). Confirms the presenter formatting logic behaves as expected once a full Flutter SDK is available.
+
 # 2025-11-07 (Capture core layering)
 - **Change Scope**
   - Moved `capture_core` controller/registry/initializer implementations into the application layer, introduced capture-session/artifact storage ports with attachments-backed adapters, and re-exported the initializer from the new location so photo/document/voice services no longer import `AttachmentsStorage` directly. Added `CapturePhotoUseCase` and a gateway interface with dedicated unit tests to cover the retake flow.

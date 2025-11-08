@@ -1,14 +1,11 @@
 import '../../capture_core/api/capture_mode.dart';
 import '../../capture_core/api/capture_result.dart';
-import '../../capture_core/api/capture_draft.dart';
-
-import 'models/voice_capture_outcome.dart';
-import 'voice_capture_service.dart';
+import 'application/use_cases/capture_voice_use_case.dart';
 
 class VoiceCaptureMode implements CaptureMode {
-  VoiceCaptureMode(this._service);
+  VoiceCaptureMode(this._useCase);
 
-  final VoiceCaptureService _service;
+  final CaptureVoiceUseCase _useCase;
 
   @override
   String get id => 'voice';
@@ -24,19 +21,6 @@ class VoiceCaptureMode implements CaptureMode {
 
   @override
   Future<CaptureResult> startCapture(CaptureContext context) async {
-    final VoiceCaptureOutcome? outcome =
-        await _service.captureVoice(context);
-    if (outcome == null) {
-      return CaptureResult.cancelled;
-    }
-
-    return CaptureResult(
-      completed: true,
-      artifacts: [outcome.artifact],
-      draft: outcome.draft ??
-          const CaptureDraft(
-            suggestedTags: {'voice'},
-          ),
-    );
+    return _useCase.execute(context);
   }
 }

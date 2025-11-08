@@ -12,8 +12,9 @@ import '../../capture_core/application/ports/capture_artifact_storage.dart';
 import 'analysis/voice_transcription_pipeline.dart';
 import 'models/voice_capture_outcome.dart';
 import 'ui/voice_recorder_sheet.dart';
+import 'application/ports/voice_capture_gateway.dart';
 
-class VoiceCaptureService {
+class VoiceCaptureService implements VoiceCaptureGateway {
   VoiceCaptureService({
     VoiceTranscriptionPipeline? transcriptionPipeline,
     CaptureArtifactStorage? artifactStorage,
@@ -25,6 +26,7 @@ class VoiceCaptureService {
   final VoiceTranscriptionPipeline _transcriptionPipeline;
   final CaptureArtifactStorage _storage;
 
+  @override
   Future<VoiceCaptureOutcome?> captureVoice(CaptureContext context) async {
     final sessionId = context.sessionId;
     final timestamp = DateTime.now().millisecondsSinceEpoch;

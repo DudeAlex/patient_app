@@ -26,7 +26,7 @@ We design every milestone as a collection of modules that can be composed, repla
 
 - **Clear Boundaries**: Keep all code for a feature inside `lib/features/<feature>/...`. A module may expose public entry points (e.g., services, providers, routes) via `lib/features/<feature>/<feature>.dart` or a dedicated `api/` folder. Other modules import only these entry points.
 - **Interfaces over Implementations**: Define service/repository interfaces in the module and inject them where needed. When a module depends on another module, it should do so through interfaces or simple function contracts rather than concrete classes.
-- **Dependency Injection**: Pass dependencies via constructors or a thin DI container initialised in `ui/app.dart`. Avoid global singletons; modules register their services during app boot (e.g., `CaptureModule.register(container)`).
+- **Dependency Injection**: Pass dependencies via constructors or the thin `AppContainer` (`lib/core/di/app_container.dart`) initialised from `main.dart`. Avoid ad-hoc globals; modules register their services during app boot (e.g., `bootstrapAppContainer` wires the capture controller + records service).
 - **Stable Data Contracts**: Shared data structures live in `core/` only if they are truly cross-cutting. If a module needs to publish data, provide DTOs or value objects in its public API.
 - **Testable Modules**: Each module owns its tests and may substitute dependencies with mocks. Modules should not rely on global state or static singletons to remain test-friendly.
 - **Minimal Coupling**: Avoid direct imports across sibling modules. If cross-module communication is required, use events/notifiers, callbacks, or well-defined service interfaces.

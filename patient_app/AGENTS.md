@@ -17,6 +17,7 @@ Golden Rules
 Workflow Expectations
 Before Step 1, refresh context by reading `AI_AGENT_START_HERE.md` and opening each must-read document so the active guidance is top of mind. Then invest time in reviewing the relevant code, tests, and docs to confirm you fully understand current behavior. After Step 5, reopen those documents to double-check that every necessary update has been captured.
 Before initiating any refactor or architecture-impacting change, the assigned agent must survey the current implementation end-to-end (code, tests, assets) to ensure proposed edits respect existing behaviour and layering. Document the review scope in the plan.
+When drafting a new milestone/feature plan (e.g., M5 brief), duplicate `docs/templates/milestone_plan_template.md` and keep the “Must-Read References” section intact so the Clean Architecture guide + refactor plan are linked automatically.
 1) Plan: Create or update a short plan with concrete steps. When kicking off a new roadmap milestone (e.g., M3), author a dedicated breakdown document in the repository (see `M2_RECORDS_CRUD_PLAN.md`) so the detailed tasks live alongside the main TODO. Keep planned steps small enough that you can implement one at a time and verify immediately (run `dart analyze`, targeted tests, or manual checks after each increment).
 2) Implement incrementally: small patches that are easy to review and revert.
 3) Document: update info files in the same patch (what changed, why, how to run/verify).

@@ -34,8 +34,9 @@ Purpose: give any AI or contributor a single launchpad to the repo’s must-read
 
 ## Usage Notes
 1. At the start of every work session, read through this index and open each must-read document to refresh the current expectations before making changes.
-2. If you are just beginning work on this project (or a brand-new feature area), generate or refresh the core docs/specs first so everyone has an up-to-date reference frame.
-3. After reviewing the docs, study the specific code, tests, and assets you intend to modify so you fully understand current behavior-especially in large or critical areas-before drafting changes.
-4. Implement in tiny, testable increments: after each small change, run `dart analyze`, relevant tests, or manual checks before proceeding. Keep the referenced documents in sync; record updates as soon as behavior or requirements shift. Log any new manual verification steps and outcomes in `TESTING.md`.
-5. Before delivering the final summary—or whenever you wrap a session—revisit every must-read document and confirm they reflect the final state of the work, updating them before signing off.
-6. Update this index whenever a new "must read" document is introduced so agents always have a single authoritative entry point.
+2. If you are drafting a new milestone/feature plan (M5, capture mode brief, etc.), copy `docs/templates/milestone_plan_template.md` and keep the “Must-Read References” section intact so the Clean Architecture docs stay linked in every plan.
+3. If you are just beginning work on this project (or a brand-new feature area), generate or refresh the core docs/specs first so everyone has an up-to-date reference frame.
+4. After reviewing the docs, study the specific code, tests, and assets you intend to modify so you fully understand current behavior—especially in large or critical areas—before drafting changes.
+5. Implement in tiny, testable increments: after each small change, run `dart analyze`, relevant tests, or manual checks before proceeding. Keep the referenced documents in sync; record updates as soon as behavior or requirements shift. Log any new manual verification steps and outcomes in `TESTING.md`.
+6. Before delivering the final summary—or whenever you wrap a session—revisit every must-read document and confirm they reflect the final state of the work, updating them before signing off.
+7. Update this index whenever a new "must read" document is introduced so agents always have a single authoritative entry point.

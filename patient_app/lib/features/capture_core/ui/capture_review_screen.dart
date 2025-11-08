@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../adapters/presenters/capture_review_presenter.dart';
 import '../api/capture_mode.dart';
 import '../api/capture_result.dart';
 
@@ -15,16 +16,17 @@ class CaptureReviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final draft = result.draft;
-    final artifacts = result.artifacts;
+    final presenter = CaptureReviewPresenter(mode: mode, result: result);
+    final viewModel = presenter.buildViewModel();
+    final artifacts = viewModel.artifacts;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Review ${mode.displayName}'),
+        title: Text(viewModel.title),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          if (draft != null) ...[
+          if (viewModel.hasDraft) ...[
             Text(
               'Suggested Summary',
               style: Theme.of(context).textTheme.titleMedium,
@@ -32,14 +34,12 @@ class CaptureReviewScreen extends StatelessWidget {
             const SizedBox(height: 8),
             _ReadOnlyField(
               label: 'Details',
-              value: draft.suggestedDetails ?? 'No details suggested yet.',
+              value: viewModel.details,
             ),
             const SizedBox(height: 8),
             _ReadOnlyField(
               label: 'Tags',
-              value: draft.suggestedTags.isEmpty
-                  ? 'No tags suggested yet.'
-                  : draft.suggestedTags.join(', '),
+              value: viewModel.tagsDescription,
             ),
             const Divider(height: 32),
           ],
@@ -52,16 +52,16 @@ class CaptureReviewScreen extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ListTile(
                   title: Text(
-                    artifact.type.name,
+                    artifact.kindLabel,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Stored at: ${artifact.relativePath}'),
-                      if (artifact.metadata.isNotEmpty) ...[
+                      Text(artifact.pathLabel),
+                      if (artifact.hasMetadata) ...[
                         const SizedBox(height: 4),
-                        Text('Metadata: ${artifact.metadata}'),
+                        Text(artifact.metadataLabel),
                       ],
                     ],
                   ),

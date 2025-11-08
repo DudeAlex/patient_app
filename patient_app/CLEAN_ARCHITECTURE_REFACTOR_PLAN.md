@@ -20,11 +20,15 @@ Purpose: translate the Clean Architecture guide into actionable, bite-sized refa
 - 2025-11-07: Phase 3 kick-off by relocating capture controller/registry/initializer implementations into the application layer, introducing a capture session storage port with an attachments-backed adapter, and documenting the new structure.
 - 2025-11-07: Followed up Phase 3 by abstracting capture artifact storage (photo, document scan, voice) behind `CaptureArtifactStorage` with a shared attachments adapter, keeping mode services free of direct `AttachmentsStorage` imports.
 - 2025-11-07: Added `CapturePhotoUseCase` + port-driven gateway so the photo capture mode now consumes a use case instead of inlining prompt/retake logic; added unit tests around the decision flow, and mirrored the pattern for document scan (`CaptureDocumentUseCase` + gateway).
+- 2025-11-08: Extended the voice capture mode to route through `CaptureVoiceUseCase` + `VoiceCaptureGateway`, updated the module wiring, and added dedicated unit tests so voice follows the same clean-architecture contract as photo/document.
+- 2025-11-08: Introduced `CaptureLauncherPresenter` + bindings so the launcher screen no longer owns capture orchestration; added presenter unit tests and updated the UI to rely on the presenter for processing state and mode availability.
+- 2025-11-08: Added `CaptureReviewPresenter` + view models so the review screen simply renders presenter output; new presenter tests cover draft/metadata fallbacks.
+- 2025-11-08: Phase 4 kickoff with `AppContainer` + bootstrap wiring; `main.dart` now initialises the container once and `PatientApp` resolves `RecordsService` + `CaptureController` through it.
 
 ### Next Session Starting Point
-1. Phase 2 prep: survey `SyncStateRepository`, dirty tracker, and auto-sync runner to outline the domain/application split (ports, use cases) before moving logic.
-2. Decide whether attachment/domain entities need similar invariants; capture any gaps in TODO.md if they exceed this iteration.
-3. Once the Phase 2 scope is confirmed, queue up contracts/tests for sync repositories and document the plan updates here.
+1. Catalogue any remaining clean-architecture gaps surfaced after the recent records/sync/capture refactors (e.g., attachment invariants, capture-mode parity, DI wiring limits) and log new TODO entries before touching code.
+2. Choose the next tiny deliverable (likely a Phase 3 follow-up or the Phase 4 DI spike) and break it into concrete tasks with validation steps inside this plan.
+3. Double-check `README`, `ARCHITECTURE`, `TODO`, and `TESTING` still reflect the refactored state and note the verification you’ll run once the next increment lands.
 
 ---
 
@@ -43,7 +47,7 @@ Purpose: translate the Clean Architecture guide into actionable, bite-sized refa
 
 ---
 
-## Phase 1 – Records Feature Foundations
+## Phase 1 – Records Feature Foundations *(Completed 2025-11-07 — kept for reference)*
 1. **Separate Entity vs Storage Model**
    - Create `lib/features/records/domain/entities/record.dart` without Isar annotations.  
    - Introduce `lib/features/records/adapters/storage/record_isar_model.dart` to keep `@collection` annotations.  
@@ -80,7 +84,7 @@ Purpose: translate the Clean Architecture guide into actionable, bite-sized refa
 
 ---
 
-## Phase 2 – Sync Feature Alignment
+## Phase 2 – Sync Feature Alignment *(Completed 2025-11-07 — kept for reference)*
 1. **Create Sync Domain Models**
    - Introduce domain value objects/entities for auto-sync status and counters, free of Isar.  
    - Keep storage schema under `adapters/storage` with annotations.
@@ -103,28 +107,28 @@ Purpose: translate the Clean Architecture guide into actionable, bite-sized refa
 
 ---
 
-## Phase 3 - Capture Modules Cleanup *(stretch – schedule after capture UX solidifies)*
-1. **Stabilize API vs Domain Layers**
-   - Confirm `capture_core/api` surfaces only interfaces/DTOs.  
-   - Move implementation (`CaptureControllerImpl`, registries) into `application` or `adapters` depending on responsibility.
+## Phase 3 – Capture Modules Cleanup *(In progress: controllers/storage refactors done; remaining gaps tracked below)*
+1. **Stabilise API vs Domain Layers** *(delivered 2025-11-07)*  
+   - `capture_core/api` now exports interfaces only, with controller/registry implementations relocated to `application`.  
+   - Action: keep new modules aligned with this layout when adding modes or adapters.
 
-2. **Remove Direct Storage Calls**
-   - Wrap `AttachmentsStorage` interactions behind a port so capture domain logic stays storage-agnostic.
+2. **Abstract Attachments Storage** *(delivered 2025-11-07)*  
+   - `CaptureArtifactStorage`/`CaptureSessionStorage` ports plus attachments-backed adapters already replace direct `AttachmentsStorage` imports.  
+   - Action: extend the same adapters to any future capture services (file/email/vitals) to avoid regressions.
 
-3. **Define Use Cases per Mode**
-   - For each capture mode, add use cases that manage capture flow outcomes, returning DTOs for UI to render.  
-   - Provide mock-based tests verifying onProcessing/prompt callbacks.
+3. **Define Use Cases per Mode** *(partially complete)*  
+   - Photo/document scan/voice use cases exist; extend the pattern to file upload, email import, and upcoming modes so widgets never own capture logic.  
+   - Add mock-based tests validating prompt/retake flows for each new use case.
 
-4. **UI Presenter Layer**
-   - Create presenters/view models that consume use case outputs, keeping Flutter widgets simple.  
-   - Add widget tests using fake use cases where beneficial.
+4. **UI Presenter Layer** *(in progress)*  
+   - Launcher + review presenters now own orchestration/state; next step is wiring presenters into upcoming widget tests (and future review actions) so Flutter widgets stay dumb/testable.  
+   - Follow up with widget tests that rely on the new presenters once persistence flows land.
 
 ---
 
 ## Phase 4 - Cross-Cutting Infrastructure
-1. **Introduce Simple DI Container** *(defer until wiring pressure justifies it)*
-   - Replace ad-hoc singleton instantiation with a lightweight dependency provider (manual or package-free) once current factory wiring becomes brittle.  
-   - Document how to register adapters per platform (mobile vs web) when the container lands.
+1. **Introduce Simple DI Container** *(completed 2025-11-08)*  
+   - `AppContainer` + bootstrap now register the capture controller and records service future; `PatientApp` resolves dependencies through the container, keeping wiring in one place. Documented below for reference and future module hooks.
 
 2. **Audit Core Utilities**
    - Ensure `lib/core/` only holds truly cross-cutting concerns that obey inward dependencies.  
