@@ -7,7 +7,7 @@ Local-first personal health records app. Mobile stores data on-device (Isar), wi
 - Features
 - Local storage with Isar (encrypted backup archive, on-device DB not encrypted yet)
 - Attachments folder for files (mobile only at this stage)
-- Settings screen with Google sign-in, Drive backup/restore, and auto backup toggle (mobile — weekly cadence planned; currently resume-triggered after critical changes with a six-hour throttle, and patients can disable it entirely from Settings)
+- Settings screen with a profile hub (account status, manual “Backup now”, Wi-Fi/ethernet cadence presets, appearance controls, AI consent preview, backup-key portability placeholder) plus Google sign-in, Drive backup/restore, and auto backup toggle (mobile — weekly cadence planned; currently resume-triggered after critical changes, gated to Wi-Fi/ethernet connections, throttled to once per six hours with exponential backoff on failures, and patients can disable it entirely from Settings)
 - Planned minimal patient profile hub surfacing account info, a manual “Backup now” button, auto backup cadence picker, AI consent toggle, display preferences (light/dark/auto theme plus small/medium/large text), and backup-key export/import options (passphrase/QR) so patients manage essentials without extra navigation
 - Settings caches the signed-in account to avoid re-showing the Google sign-in sheet when reopening the screen
 - Shared `google_drive_backup` package provides reusable Google auth + encrypted Drive backup helpers
@@ -137,3 +137,5 @@ Contributing & Process
 - See `AGENTS.md` for the full set of repo guidelines for LLMs and contributors.
 - Write code with Clean Code principles in mind: descriptive names, single-purpose functions, and straightforward control flow.
 - Balance OOP and functional techniques: keep module APIs encapsulated, apply SOLID where it clarifies responsibilities, and prefer immutable data/pure helpers for state transformations when practical.
+- When drafting a new milestone or feature brief, copy `docs/templates/milestone_plan_template.md` so the “Must-Read References” (clean architecture guide + refactor plan) stay linked in every plan.
+- App boot now resolves dependencies via the lightweight `AppContainer` (`lib/core/di`); register new services there instead of creating ad-hoc singletons.

@@ -1,3 +1,28 @@
+# 2025-11-08 (Profile hub UI preview)
+- **Change Scope**
+  - Reworked Settings into the new profile hub card (account summary, manual backup, cadence presets preview, appearance controls, AI consent toggle, backup-key portability entry point) while sharing the new backup service with the auto-sync runner.
+- **Verification**
+  - `flutter analyze`
+  - `flutter test test/features/sync`
+- **Result**
+  - Analyzer clean; sync suite passes (`00:03 +15`). UI changes were not exercised manually in this shell.
+
+# 2025-11-08 (Auto sync Wi-Fi gating)
+- **Change Scope**
+  - Added connectivity-aware gating to `AutoSyncRunner` plus new network abstraction, updated RecordsService wiring, and refreshed README/SYNC docs.
+- **Verification**
+  - `flutter test test/features/sync`
+- **Result**
+  - Tests pass locally (`00:04 +14`). Confirms the new gating logic and unit tests behave as expected.
+
+# 2025-11-08 (Auto sync backup service + backoff)
+- **Change Scope**
+  - Introduced `AutoSyncBackupService`, wired Settings + runner to use it, added exponential backoff for failed background runs, and surfaced manual backup snackbars + doc updates.
+- **Verification**
+  - `flutter test test/features/sync`
+- **Result**
+  - Sync suite passes locally (`00:05 +15`). Demonstrates the new service/backoff behavior is covered by unit tests.
+
 # 2025-11-08 (AppContainer bootstrap)
 - **Change Scope**
   - Added `AppContainer` + bootstrap wiring so dependencies are registered once (records service future + capture controller) and resolved via the container inside `PatientApp`.

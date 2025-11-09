@@ -5,14 +5,16 @@ import 'package:isar/isar.dart';
 import '../../../core/db/isar.dart' as db_helpers;
 import '../../sync/adapters/repositories/isar_sync_state_repository.dart';
 import '../../sync/application/use_cases/mark_auto_sync_success_use_case.dart';
-import '../../sync/application/use_cases/read_auto_sync_status_use_case.dart';
 import '../../sync/application/use_cases/promote_routine_changes_use_case.dart';
+import '../../sync/application/use_cases/read_auto_sync_status_use_case.dart';
 import '../../sync/application/use_cases/record_auto_sync_change_use_case.dart';
 import '../../sync/application/use_cases/set_auto_sync_enabled_use_case.dart';
 import '../../sync/application/use_cases/watch_auto_sync_status_use_case.dart';
+import '../../sync/auto_sync_backup_service.dart';
 import '../../sync/auto_sync_coordinator.dart';
 import '../../sync/auto_sync_runner.dart';
 import '../../sync/dirty_tracker.dart';
+import '../../sync/network/auto_sync_network_info.dart';
 import '../adapters/repositories/isar_records_repository.dart';
 import '../application/ports/records_repository.dart' as port;
 import '../application/use_cases/delete_record_use_case.dart';
@@ -34,6 +36,7 @@ class RecordsService {
     required this.saveRecord,
     required this.deleteRecord,
     required this.dirtyTracker,
+    required this.backupService,
     required this.autoSync,
     required this.setAutoSyncEnabled,
     required this.readAutoSyncStatus,
@@ -47,6 +50,7 @@ class RecordsService {
   final SaveRecordUseCase saveRecord;
   final DeleteRecordUseCase deleteRecord;
   final AutoSyncDirtyTracker dirtyTracker;
+  final AutoSyncBackupService backupService;
   final AutoSyncCoordinator autoSync;
   final SetAutoSyncEnabledUseCase setAutoSyncEnabled;
   final ReadAutoSyncStatusUseCase readAutoSyncStatus;
@@ -83,7 +87,12 @@ class RecordsService {
     final recordChangeUseCase = RecordAutoSyncChangeUseCase(syncRepo);
     final tracker = AutoSyncDirtyTracker(recordChangeUseCase);
     final markSuccess = MarkAutoSyncSuccessUseCase(syncRepo);
-    final autoSyncRunner = AutoSyncRunner(markSuccess);
+    final backupService = AutoSyncBackupService();
+    final autoSyncRunner = AutoSyncRunner(
+      markSuccess,
+      backupClient: backupService,
+      networkInfo: ConnectivityAutoSyncNetworkInfo(),
+    );
     final watchStatus = WatchAutoSyncStatusUseCase(syncRepo);
     final promoteRoutineChanges = PromoteRoutineChangesUseCase(syncRepo);
     final autoSync = AutoSyncCoordinator(
@@ -102,6 +111,7 @@ class RecordsService {
       saveRecord: saveRecord,
       deleteRecord: deleteRecord,
       dirtyTracker: tracker,
+      backupService: backupService,
       autoSync: autoSync,
       setAutoSyncEnabled: setAutoSyncEnabled,
       readAutoSyncStatus: readAutoSyncStatus,

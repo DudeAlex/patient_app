@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../features/records/data/records_service.dart';
 import '../../features/sync/application/use_cases/set_auto_sync_enabled_use_case.dart';
+import '../../features/sync/auto_sync_backup_service.dart';
 import '../../features/sync/domain/entities/auto_sync_status.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -17,7 +18,9 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final _manager = DriveBackupManager();
+  AutoSyncBackupService _backupService = AutoSyncBackupService();
+  DriveBackupManager get _manager => _backupService.manager;
+
   String? _email;
   bool _busy = false;
   RecordsService? _recordsService;
@@ -25,6 +28,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   AutoSyncStatus? _autoSyncStatus;
   bool _autoSyncBusy = false;
   bool _autoSyncInitialised = false;
+
+  AutoSyncCadenceOption _selectedCadence = AutoSyncCadenceOption.weekly;
+  ThemeModePreference _themePreference = ThemeModePreference.system;
+  TextScalePreference _textPreference = TextScalePreference.medium;
+  bool _aiConsentEnabled = false;
 
   @override
   void initState() {
@@ -49,8 +57,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final email = await _manager.restoreAccount();
     if (!mounted) return;
     setState(() => _email = email ?? cached);
-    // Warm up auth headers silently to reduce latency when the user
-    // triggers backup/restore shortly after opening Settings.
     final effectiveEmail = email ?? cached;
     if (effectiveEmail != null) {
       Future.microtask(
@@ -63,18 +69,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final service = await RecordsService.instance();
       if (!mounted) return;
-      _recordsService = service;
-      final initialStatus = service.autoSync.latestStatus ??
+      final initialStatus =
+          service.autoSync.latestStatus ??
           await service.readAutoSyncStatus.execute();
       setState(() {
+        _recordsService = service;
+        _backupService = service.backupService;
         _autoSyncStatus = initialStatus;
         _autoSyncInitialised = true;
       });
-      _autoSyncSubscription =
-          service.autoSync.statusStream.listen((AutoSyncStatus status) {
+      _autoSyncSubscription = service.autoSync.statusStream.listen((
+        AutoSyncStatus status,
+      ) {
         if (!mounted) return;
         setState(() => _autoSyncStatus = status);
       });
+      // Refresh cached email with the shared Drive manager.
+      _restoreAccount();
     } catch (e, st) {
       debugPrint('[Settings] Failed to initialise auto sync: $e');
       debugPrint('[Settings] STACK: ${st.toString().split('\n').first}');
@@ -88,29 +99,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (service == null) return;
     setState(() => _autoSyncBusy = true);
     try {
-      await service
-          .setAutoSyncEnabled
-          .execute(SetAutoSyncEnabledInput(enabled: value));
+      await service.setAutoSyncEnabled.execute(
+        SetAutoSyncEnabledInput(enabled: value),
+      );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to update auto backup: $e')),
       );
     } finally {
-      if (mounted) {
-        setState(() => _autoSyncBusy = false);
-      }
+      if (mounted) setState(() => _autoSyncBusy = false);
     }
-  }
-
-  String _formatLastSynced(DateTime? timestamp) {
-    if (timestamp == null) return 'Last sync: never';
-    final formatter = DateFormat.yMMMd().add_jm();
-    return 'Last sync: ${formatter.format(timestamp)}';
-  }
-
-  String _pendingSummary(AutoSyncStatus status) {
-    return 'Pending changes — critical: ${status.pendingCriticalChanges}, routine: ${status.pendingRoutineChanges}';
   }
 
   Future<void> _signIn() async {
@@ -122,14 +121,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (email == null || acc == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Sign-in cancelled or failed. Check logs.')),
+            const SnackBar(
+              content: Text('Sign-in cancelled or failed. Check logs.'),
+            ),
           );
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Signed in as $email')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Signed in as $email')));
         }
       }
     } finally {
@@ -150,32 +151,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _backupToDrive() async {
     if (_email == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please sign in first')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Please sign in first')));
       }
       return;
     }
     setState(() => _busy = true);
     try {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uploading backup to Drive...')));
-      }
-      await _manager.backupToDrive();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Backup uploaded to Drive')));
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Uploading backup to Drive...')),
+      );
+      final result = await _backupService.runBackup(promptIfNecessary: true);
+      messenger.hideCurrentSnackBar();
+      if (result.isSuccess) {
+        final completedAt = result.completedAt ?? DateTime.now();
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Backup uploaded (${_formatTimestamp(completedAt)})'),
+          ),
+        );
+      } else {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Backup failed. Please try again.\n${result.error}'),
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Backup failed: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Backup failed unexpectedly: $e')),
+        );
       }
     } finally {
-      setState(() => _busy = false);
+      if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _restoreFromDrive() async {
     if (_email == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please sign in first')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Please sign in first')));
       }
       return;
     }
@@ -185,19 +205,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await _manager.restoreFromDrive();
       } on StateError catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(e.message)));
         }
         return;
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Restoring backup...')));
-      }
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Restore completed')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Restoring backup...')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Restore completed')));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Restore failed: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Restore failed: $e')));
       }
     } finally {
       setState(() => _busy = false);
@@ -218,7 +244,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
               child: const Text('Close'),
-            )
+            ),
           ],
         ),
       );
@@ -227,18 +253,80 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  String _formatTimestamp(DateTime timestamp) {
+    final formatter = DateFormat.yMMMd().add_jm();
+    return formatter.format(timestamp);
+  }
+
+  String _formatLastSynced(DateTime? timestamp) {
+    if (timestamp == null) return 'Last sync: never';
+    return 'Last sync: ${_formatTimestamp(timestamp)}';
+  }
+
+  String _pendingSummary(AutoSyncStatus status) {
+    return 'Pending changes - critical: ${status.pendingCriticalChanges}, routine: ${status.pendingRoutineChanges}';
+  }
+
+  void _selectCadence(AutoSyncCadenceOption option) {
+    setState(() => _selectedCadence = option);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          option.interval == null
+              ? 'Manual-only mode selected. Scheduler integration pending.'
+              : 'Cadence set to ${option.label}. Background scheduler update pending.',
+        ),
+      ),
+    );
+  }
+
+  void _toggleAiConsent(bool value) {
+    setState(() => _aiConsentEnabled = value);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          value
+              ? 'AI assistance enabled (per-request consent still required).'
+              : 'AI assistance disabled.',
+        ),
+      ),
+    );
+  }
+
+  void _showBackupKeyDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Backup key portability'),
+        content: const Text(
+          'A secure export/import experience (passphrase, QR, or platform key '
+          'backup) is in flight. Keep this device nearby when restoring until it ships.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _updateTheme(ThemeModePreference preference) {
+    setState(() => _themePreference = preference);
+  }
+
+  void _updateTextScale(TextScalePreference preference) {
+    setState(() => _textPreference = preference);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isWeb = kIsWeb;
     final status = _autoSyncStatus;
     final autoSyncEnabled = status?.autoSyncEnabled ?? false;
-    final autoSyncSubtitle = !_autoSyncInitialised
-        ? 'Checking auto backup status…'
-        : [
-            'Automatically backs up after important changes when enabled.',
-            _formatLastSynced(status?.lastSyncedAt),
-            if (status != null) _pendingSummary(status),
-          ].join('\n');
+    final showAutoSync = !isWeb;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: AbsorbPointer(
@@ -246,28 +334,147 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            _ProfileHubCard(
+              email: _email,
+              isWeb: isWeb,
+              onSignIn: _signIn,
+              onSignOut: _signOut,
+              onBackupNow: isWeb ? null : _backupToDrive,
+              lastSyncLabel: _formatLastSynced(status?.lastSyncedAt),
+              pendingSummary: status != null
+                  ? _pendingSummary(status)
+                  : 'Pending change info unavailable.',
+              autoSyncToggle: showAutoSync
+                  ? AutoSyncToggleData(
+                      enabled: autoSyncEnabled,
+                      busy: _autoSyncBusy,
+                      initialised: _autoSyncInitialised,
+                      onToggle: _toggleAutoSync,
+                    )
+                  : null,
+              cadenceOptions: _cadenceOptions,
+              selectedCadence: _selectedCadence,
+              onSelectCadence: _selectCadence,
+            ),
+            const SizedBox(height: 16),
+            if (!isWeb)
+              _DisplayPreferencesCard(
+                themePreference: _themePreference,
+                textPreference: _textPreference,
+                onThemeChanged: _updateTheme,
+                onTextChanged: _updateTextScale,
+              ),
+            if (!isWeb) const SizedBox(height: 16),
+            _AiConsentCard(
+              enabled: _aiConsentEnabled,
+              onChanged: _toggleAiConsent,
+            ),
+            const SizedBox(height: 16),
+            if (!isWeb) _BackupKeyCard(onManageKeys: _showBackupKeyDialog),
+            if (!isWeb) const SizedBox(height: 16),
+            _DiagnosticsCard(
+              isWeb: isWeb,
+              onBackup: isWeb ? null : _backupToDrive,
+              onRestore: isWeb ? null : _restoreFromDrive,
+              onAuthDiagnostics: _runAuthDiagnostics,
+            ),
+            if (_busy)
+              const Padding(
+                padding: EdgeInsets.only(top: 24),
+                child: LinearProgressIndicator(),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileHubCard extends StatelessWidget {
+  const _ProfileHubCard({
+    required this.email,
+    required this.isWeb,
+    required this.onSignIn,
+    required this.onSignOut,
+    required this.onBackupNow,
+    required this.lastSyncLabel,
+    required this.pendingSummary,
+    required this.cadenceOptions,
+    required this.selectedCadence,
+    required this.onSelectCadence,
+    this.autoSyncToggle,
+  });
+
+  final String? email;
+  final bool isWeb;
+  final VoidCallback onSignIn;
+  final VoidCallback onSignOut;
+  final VoidCallback? onBackupNow;
+  final String lastSyncLabel;
+  final String pendingSummary;
+  final AutoSyncToggleData? autoSyncToggle;
+  final List<AutoSyncCadenceOption> cadenceOptions;
+  final AutoSyncCadenceOption selectedCadence;
+  final ValueChanged<AutoSyncCadenceOption> onSelectCadence;
+
+  @override
+  Widget build(BuildContext context) {
+    final signedIn = email != null;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Profile & Backup',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
             Row(
               children: [
                 Expanded(
-                  child: Text(_email != null ? 'Signed in: $_email' : 'Not signed in'),
+                  child: Text(signedIn ? 'Signed in: $email' : 'Not signed in'),
                 ),
-                ElevatedButton(
-                  onPressed: _email == null ? _signIn : _signOut,
-                  child: Text(_email == null ? 'Sign in' : 'Sign out'),
+                OutlinedButton(
+                  onPressed: signedIn ? onSignOut : onSignIn,
+                  child: Text(signedIn ? 'Sign out' : 'Sign in'),
                 ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          if (!isWeb) ...[
-            Card(
-              child: SwitchListTile.adaptive(
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(lastSyncLabel),
+            const SizedBox(height: 4),
+            Text(pendingSummary, style: Theme.of(context).textTheme.bodySmall),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: onBackupNow,
+              icon: const Icon(Icons.backup_outlined),
+              label: const Text('Backup now'),
+            ),
+            if (isWeb)
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text(
+                  'Drive backups are disabled on the web build because browsers cannot access the local app data directory.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            if (autoSyncToggle != null) ...[
+              const Divider(height: 24),
+              SwitchListTile.adaptive(
                 title: const Text('Auto backup (beta)'),
-                subtitle: Text(autoSyncSubtitle),
-                value: autoSyncEnabled,
-                onChanged: (!_autoSyncBusy && _autoSyncInitialised && status != null)
-                    ? _toggleAutoSync
+                subtitle: Text(
+                  autoSyncToggle!.initialised
+                      ? 'Automatically backs up after important changes when enabled.'
+                      : 'Checking auto backup status.',
+                ),
+                value: autoSyncToggle!.enabled,
+                onChanged:
+                    (!autoSyncToggle!.busy && autoSyncToggle!.initialised)
+                    ? autoSyncToggle!.onToggle
                     : null,
-                secondary: _autoSyncBusy
+                secondary: autoSyncToggle!.busy
                     ? const SizedBox(
                         width: 24,
                         height: 24,
@@ -275,38 +482,298 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       )
                     : const Icon(Icons.sync),
               ),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton.icon(
-              onPressed: _runAuthDiagnostics,
-              icon: const Icon(Icons.bug_report),
-              label: const Text('Run Auth Diagnostics'),
-            ),
-              const SizedBox(height: 12),
-              ElevatedButton.icon(
-                onPressed: _backupToDrive,
-                icon: const Icon(Icons.backup),
-                label: const Text('Backup to Google Drive'),
+              const SizedBox(height: 8),
+              Text(
+                'Cadence presets',
+                style: Theme.of(context).textTheme.bodySmall,
               ),
-              const SizedBox(height: 12),
-              ElevatedButton.icon(
-                onPressed: _restoreFromDrive,
-                icon: const Icon(Icons.restore),
-                label: const Text('Restore from Google Drive'),
+              Wrap(
+                spacing: 8,
+                children: cadenceOptions
+                    .map(
+                      (option) => ChoiceChip(
+                        label: Text(option.label),
+                        selected: selectedCadence == option,
+                        onSelected: (_) => onSelectCadence(option),
+                      ),
+                    )
+                    .toList(),
               ),
-            ] else ...[
+              const SizedBox(height: 4),
               const Text(
-                'Drive backup/restore is available on mobile builds.\nThe web build cannot access app files due to browser sandbox.',
+                'Weekly cadence will be enforced automatically once the scheduler refactor lands.',
                 style: TextStyle(color: Colors.grey),
               ),
             ],
-            if (_busy) const Padding(
-              padding: EdgeInsets.only(top: 24),
-              child: Center(child: CircularProgressIndicator()),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AutoSyncToggleData {
+  const AutoSyncToggleData({
+    required this.enabled,
+    required this.busy,
+    required this.initialised,
+    required this.onToggle,
+  });
+
+  final bool enabled;
+  final bool busy;
+  final bool initialised;
+  final ValueChanged<bool> onToggle;
+}
+
+class _DisplayPreferencesCard extends StatelessWidget {
+  const _DisplayPreferencesCard({
+    required this.themePreference,
+    required this.textPreference,
+    required this.onThemeChanged,
+    required this.onTextChanged,
+  });
+
+  final ThemeModePreference themePreference;
+  final TextScalePreference textPreference;
+  final ValueChanged<ThemeModePreference> onThemeChanged;
+  final ValueChanged<TextScalePreference> onTextChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Display preferences',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 12),
+            Text('Theme', style: Theme.of(context).textTheme.bodySmall),
+            Wrap(
+              spacing: 8,
+              children: ThemeModePreference.values
+                  .map(
+                    (pref) => ChoiceChip(
+                      label: Text(pref.label),
+                      selected: themePreference == pref,
+                      onSelected: (_) => onThemeChanged(pref),
+                    ),
+                  )
+                  .toList(),
+            ),
+            const SizedBox(height: 12),
+            Text('Text size', style: Theme.of(context).textTheme.bodySmall),
+            Wrap(
+              spacing: 8,
+              children: TextScalePreference.values
+                  .map(
+                    (pref) => ChoiceChip(
+                      label: Text(pref.label),
+                      selected: textPreference == pref,
+                      onSelected: (_) => onTextChanged(pref),
+                    ),
+                  )
+                  .toList(),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Theme/text options currently apply to Patient App screens only. Global overrides will follow.',
+              style: TextStyle(color: Colors.grey),
             ),
           ],
         ),
       ),
     );
+  }
+}
+
+class _AiConsentCard extends StatelessWidget {
+  const _AiConsentCard({required this.enabled, required this.onChanged});
+
+  final bool enabled;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: SwitchListTile.adaptive(
+        title: const Text('AI companion consent'),
+        subtitle: const Text(
+          'Control whether the upcoming AI assistant may analyse your records. '
+          'Per-request consent banners will still appear.',
+        ),
+        value: enabled,
+        onChanged: onChanged,
+        secondary: const Icon(Icons.psychology_alt_outlined),
+      ),
+    );
+  }
+}
+
+class _BackupKeyCard extends StatelessWidget {
+  const _BackupKeyCard({required this.onManageKeys});
+
+  final VoidCallback onManageKeys;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTile(
+        title: const Text('Backup key portability'),
+        subtitle: const Text(
+          'Export/import encrypted backup keys (passphrase, QR, or platform key backup).',
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onManageKeys,
+      ),
+    );
+  }
+}
+
+class _DiagnosticsCard extends StatelessWidget {
+  const _DiagnosticsCard({
+    required this.isWeb,
+    required this.onBackup,
+    required this.onRestore,
+    required this.onAuthDiagnostics,
+  });
+
+  final bool isWeb;
+  final VoidCallback? onBackup;
+  final VoidCallback? onRestore;
+  final Future<void> Function() onAuthDiagnostics;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Diagnostics & tools',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: onAuthDiagnostics,
+              icon: const Icon(Icons.bug_report_outlined),
+              label: const Text('Run auth diagnostics'),
+            ),
+            const SizedBox(height: 12),
+            if (!isWeb) ...[
+              OutlinedButton.icon(
+                onPressed: onBackup,
+                icon: const Icon(Icons.backup),
+                label: const Text('Backup to Google Drive'),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: onRestore,
+                icon: const Icon(Icons.restore),
+                label: const Text('Restore from Google Drive'),
+              ),
+            ] else
+              const Text(
+                'Drive backup/restore is available on mobile builds.\n'
+                'The web build cannot access app files due to the browser sandbox.',
+                style: TextStyle(color: Colors.grey),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AutoSyncCadenceOption {
+  const AutoSyncCadenceOption._(
+    this.id,
+    this.label,
+    this.description,
+    this.interval,
+  );
+
+  final String id;
+  final String label;
+  final String description;
+  final Duration? interval;
+
+  static const AutoSyncCadenceOption sixHours = AutoSyncCadenceOption._(
+    '6h',
+    '6 hours',
+    'Good for frequent updates on Wi-Fi.',
+    Duration(hours: 6),
+  );
+
+  static const AutoSyncCadenceOption twelveHours = AutoSyncCadenceOption._(
+    '12h',
+    '12 hours',
+    'Twice per day when changes are detected.',
+    Duration(hours: 12),
+  );
+
+  static const AutoSyncCadenceOption daily = AutoSyncCadenceOption._(
+    'daily',
+    'Daily',
+    'Nightly backups while on Wi-Fi.',
+    Duration(days: 1),
+  );
+
+  static const AutoSyncCadenceOption weekly = AutoSyncCadenceOption._(
+    'weekly',
+    'Weekly',
+    'Default cadence (scheduler refactor pending).',
+    Duration(days: 7),
+  );
+
+  static const AutoSyncCadenceOption manual = AutoSyncCadenceOption._(
+    'manual',
+    'Manual',
+    'Only run backups when you tap “Backup now”.',
+    null,
+  );
+}
+
+const List<AutoSyncCadenceOption> _cadenceOptions = <AutoSyncCadenceOption>[
+  AutoSyncCadenceOption.sixHours,
+  AutoSyncCadenceOption.twelveHours,
+  AutoSyncCadenceOption.daily,
+  AutoSyncCadenceOption.weekly,
+  AutoSyncCadenceOption.manual,
+];
+
+enum ThemeModePreference { light, dark, system }
+
+extension on ThemeModePreference {
+  String get label {
+    switch (this) {
+      case ThemeModePreference.light:
+        return 'Light';
+      case ThemeModePreference.dark:
+        return 'Dark';
+      case ThemeModePreference.system:
+        return 'Auto';
+    }
+  }
+}
+
+enum TextScalePreference { small, medium, large }
+
+extension on TextScalePreference {
+  String get label {
+    switch (this) {
+      case TextScalePreference.small:
+        return 'Small';
+      case TextScalePreference.medium:
+        return 'Medium';
+      case TextScalePreference.large:
+        return 'Large';
+    }
   }
 }

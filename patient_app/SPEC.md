@@ -36,6 +36,8 @@ Out of scope (for MVP)
 - Shows current email when signed in.
 - Errors surface via SnackBar with actionable hints.
 - Minimal production UX: surface the essentials in a compact profile hub — account identity, manual “Backup now” action, auto backup cadence picker, AI consent toggle, and display preferences (light/dark/auto theme and small/medium/large text size) — avoiding dense menus.
+- Current build (Nov 2025) ships the profile hub card with account summary, manual “Backup now” (shared orchestration service), Wi‑Fi/ethernet cadence presets (preview only until the scheduler refactor lands), AI consent toggle placeholder, and display preference chips. Cadence and AI toggles currently store local intent and surface SnackBars; wiring into the scheduler and AI consent gate remains a follow-up task.
+- Backup-key portability entry point is present (dialog describing the in-progress QR/passphrase/platform export flow) so patients know where to initiate key management once the secure workflow lands.
 
 4.2 Backup to Google Drive (mobile)
 - Preconditions: user signed in; device online.

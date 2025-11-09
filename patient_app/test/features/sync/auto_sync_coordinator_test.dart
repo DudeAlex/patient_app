@@ -1,12 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:patient_app/features/sync/auto_sync_runner.dart';
+import 'package:patient_app/features/sync/auto_sync_backup_service.dart';
 import 'package:patient_app/features/sync/auto_sync_coordinator.dart';
 import 'package:patient_app/features/sync/application/ports/sync_state_repository.dart';
 import 'package:patient_app/features/sync/application/use_cases/mark_auto_sync_success_use_case.dart';
 import 'package:patient_app/features/sync/application/use_cases/promote_routine_changes_use_case.dart';
 import 'package:patient_app/features/sync/application/use_cases/watch_auto_sync_status_use_case.dart';
 import 'package:patient_app/features/sync/domain/entities/auto_sync_status.dart';
+import 'package:patient_app/features/sync/network/auto_sync_network_info.dart';
 
 void main() {
   group('AutoSyncCoordinator', () {
@@ -60,7 +62,11 @@ void main() {
 
 class _RecordingRunner extends AutoSyncRunner {
   _RecordingRunner()
-      : super(MarkAutoSyncSuccessUseCase(_NoopSyncStateRepository()));
+    : super(
+        MarkAutoSyncSuccessUseCase(_NoopSyncStateRepository()),
+        backupClient: _NoopBackupClient(),
+        networkInfo: _WifiOnlyNetworkInfo(),
+      );
 
   final List<AutoSyncStatus> handledStatuses = <AutoSyncStatus>[];
 
@@ -70,9 +76,31 @@ class _RecordingRunner extends AutoSyncRunner {
   }
 }
 
+class _NoopBackupClient implements AutoSyncBackupClient {
+  @override
+  bool get hasCachedAccount => true;
+
+  @override
+  String? get cachedEmail => 'test@example.com';
+
+  @override
+  Future<AutoSyncBackupResult> runBackup({
+    bool promptIfNecessary = true,
+  }) async {
+    return AutoSyncBackupResult.success(completedAt: DateTime.now());
+  }
+}
+
+class _WifiOnlyNetworkInfo implements AutoSyncNetworkInfo {
+  @override
+  Future<AutoSyncConnectionType> connectionType() async {
+    return AutoSyncConnectionType.wifiLike;
+  }
+}
+
 class _RecordingPromoteUseCase extends PromoteRoutineChangesUseCase {
   _RecordingPromoteUseCase({this.shouldThrow = false})
-      : super(_NoopSyncStateRepository());
+    : super(_NoopSyncStateRepository());
 
   final bool shouldThrow;
   bool called = false;
