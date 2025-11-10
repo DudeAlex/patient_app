@@ -20,9 +20,9 @@ M4: Auto Sync
 - Track local dirty state (changes increment counter)
 - On app resume/exit: export/encrypt/upload if dirty
 - Conflict: last-write-wins with banner
-- Auto backup toggle now available in Settings (resume-triggered backup for critical changes). Upcoming refactor: switch default cadence to weekly background backups with patient-configurable triggers, add Wi-Fi gating, and surface conflict banner.
-- Profile hub card now surfaces manual “Backup now,” cadence presets (preview), display preferences, AI consent toggle, and backup-key portability entry point. Follow-up: persist cadence selections and hook them into the scheduler + AI consent flows.
-- Add a minimal patient profile hub exposing account info, manual “Backup now,” auto backup cadence presets (6h/12h/daily/weekly/manual), theme mode (light/dark/auto), text size options (small/medium/large), and the AI consent toggle so patients control core settings themselves.
+- Auto backup toggle now available in Settings. Background backups run on resume when pending changes exist, Wi-Fi/ethernet is available, and the selected cadence interval (6h/12h/daily/weekly/manual) has elapsed; follow-up: surface conflict banner messaging during Drive merges.
+- Profile hub card now surfaces manual "Backup now," cadence presets (persisted + scheduler-backed), display preferences, AI consent toggle, and backup-key portability entry point. Follow-up: wire the AI consent toggle into the forthcoming companion flows and ship the backup-key export/import experience.
+- Continue polishing the profile hub (account info, manual "Backup now," cadence presets, theme/text toggles, AI consent) so patients control core settings themselves without deep navigation.
 - Deliver a secure backup-key portability solution (patient passphrase/mnemonic, offline QR/file export, or platform secure backup integration) so encrypted archives restore on replacement devices before production launch.
 
 M5: Multi-Modal Capture & Accessibility

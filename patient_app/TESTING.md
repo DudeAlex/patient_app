@@ -1,3 +1,20 @@
+# 2025-11-09 (Cadence-aware auto sync)
+- **Change Scope**
+  - Persisted auto-sync cadence in `SyncState`, wired Settings to update it, and updated the coordinator/runner to honour patient-selected intervals (manual disables background backups).
+- **Verification**
+  - `flutter analyze`
+  - `flutter test test/features/sync`
+- **Result**
+  - Analyzer clean; sync-focused suite passes (`00:05 +22`). Confirms cadence persistence, scheduler gating, and new tests behave as expected.
+
+# 2025-11-09 (Manual backup clears dirty state + tracker tests)
+- **Change Scope**
+  - Ensured manual "Backup now" resets pending auto-sync counters via `MarkAutoSyncSuccessUseCase` and added dedicated dirty-tracker unit coverage.
+- **Verification**
+  - `flutter test test/features/sync`
+- **Result**
+  - Passes locally (`00:03 +18`). Confirms manual backups now mark success and the dirty-tracker classification behaves as expected.
+
 # 2025-11-08 (Profile hub UI preview)
 - **Change Scope**
   - Reworked Settings into the new profile hub card (account summary, manual backup, cadence presets preview, appearance controls, AI consent toggle, backup-key portability entry point) while sharing the new backup service with the auto-sync runner.

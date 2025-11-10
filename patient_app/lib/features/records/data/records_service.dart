@@ -9,6 +9,7 @@ import '../../sync/application/use_cases/promote_routine_changes_use_case.dart';
 import '../../sync/application/use_cases/read_auto_sync_status_use_case.dart';
 import '../../sync/application/use_cases/record_auto_sync_change_use_case.dart';
 import '../../sync/application/use_cases/set_auto_sync_enabled_use_case.dart';
+import '../../sync/application/use_cases/set_auto_sync_cadence_use_case.dart';
 import '../../sync/application/use_cases/watch_auto_sync_status_use_case.dart';
 import '../../sync/auto_sync_backup_service.dart';
 import '../../sync/auto_sync_coordinator.dart';
@@ -39,7 +40,9 @@ class RecordsService {
     required this.backupService,
     required this.autoSync,
     required this.setAutoSyncEnabled,
+    required this.setAutoSyncCadence,
     required this.readAutoSyncStatus,
+    required this.markAutoSyncSuccess,
   });
 
   final Isar db;
@@ -53,7 +56,9 @@ class RecordsService {
   final AutoSyncBackupService backupService;
   final AutoSyncCoordinator autoSync;
   final SetAutoSyncEnabledUseCase setAutoSyncEnabled;
+  final SetAutoSyncCadenceUseCase setAutoSyncCadence;
   final ReadAutoSyncStatusUseCase readAutoSyncStatus;
+  final MarkAutoSyncSuccessUseCase markAutoSyncSuccess;
 
   static Future<RecordsService>? _pending;
 
@@ -101,6 +106,7 @@ class RecordsService {
       promoteRoutineChanges,
     )..start();
     final setAutoSyncEnabled = SetAutoSyncEnabledUseCase(syncRepo);
+    final setAutoSyncCadence = SetAutoSyncCadenceUseCase(syncRepo);
     final readAutoSyncStatus = ReadAutoSyncStatusUseCase(syncRepo);
     return RecordsService._(
       db: isar,
@@ -114,7 +120,9 @@ class RecordsService {
       backupService: backupService,
       autoSync: autoSync,
       setAutoSyncEnabled: setAutoSyncEnabled,
+      setAutoSyncCadence: setAutoSyncCadence,
       readAutoSyncStatus: readAutoSyncStatus,
+      markAutoSyncSuccess: markSuccess,
     );
   }
 }

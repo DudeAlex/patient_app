@@ -20,10 +20,10 @@ Operations
   3) Unzip to app docs dir (replace)
   - Imported assets now include scanned PDFs, uploaded documents, email attachments, and audio clips alongside photos.
 - Patients can disable auto backup entirely from Settings; when the toggle is off, only manual backups and restores run.
-- Auto sync batches critical-only edits by throttling background backups to at most once every six hours; pending changes remain queued until the next run or a manual backup.
+- Auto sync batches critical-only edits and respects the patient's selected cadence preset (6h/12h/daily/weekly/manual). Manual mode disables automatic runs entirely; other presets define the minimum interval since the last successful backup, and pending changes remain queued until the next run or a manual backup.
 - Background backups currently run only when the device is on Wi-Fi or ethernet to avoid unexpected cellular data usage; future releases will add an explicit opt-in for cellular.
 - Failed auto-sync attempts schedule exponential backoff retries (starting at five minutes and capping at two hours) while logging the next retry window so patients/devs can diagnose status.
-- Auto backup toggle lives in Settings (Android/iOS). Product target is a weekly background backup by default with patient-configurable cadence; the current implementation still uses resume-after-critical-change triggers and will be refactored to the weekly scheduler in a follow-up.
+- Auto backup toggle lives in Settings (Android/iOS). Weekly is the default cadence, but patients can switch to 6h/12h/daily or manual-only modes; resume events trigger background backups whenever the cadence interval has elapsed, pending changes exist, Wi-Fi/ethernet is available, and the patient is signed in.
 - Future production UX: a minimal profile panel should expose the manual “Backup now” button plus a small set of cadence presets (6h/12h/daily/weekly/manual), alongside display preferences (light/dark/auto theme and small/medium/large text size), so patients control cadence and readability without extra screens.
 - Production blocker: implement a secure key portability flow so the AES encryption key travels with the patient when they replace or reset devices; Drive restores currently work only on the original device. Consider patient-held passphrases/mnemonics, offline QR/file exports, and optional platform key backup integration (Android Keystore/iCloud Keychain).
 

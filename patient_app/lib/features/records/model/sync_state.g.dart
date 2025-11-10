@@ -17,38 +17,43 @@ const SyncStateSchema = CollectionSchema(
   name: r'SyncState',
   id: 8359124993045979625,
   properties: {
-    r'autoSyncEnabled': PropertySchema(
+    r'autoSyncCadenceId': PropertySchema(
       id: 0,
+      name: r'autoSyncCadenceId',
+      type: IsarType.string,
+    ),
+    r'autoSyncEnabled': PropertySchema(
+      id: 1,
       name: r'autoSyncEnabled',
       type: IsarType.bool,
     ),
     r'deviceId': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'deviceId',
       type: IsarType.string,
     ),
     r'lastRemoteModified': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'lastRemoteModified',
       type: IsarType.dateTime,
     ),
     r'lastSyncedAt': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'lastSyncedAt',
       type: IsarType.dateTime,
     ),
     r'localChangeCounter': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'localChangeCounter',
       type: IsarType.long,
     ),
     r'pendingCriticalChanges': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'pendingCriticalChanges',
       type: IsarType.long,
     ),
     r'pendingRoutineChanges': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'pendingRoutineChanges',
       type: IsarType.long,
     )
@@ -73,6 +78,7 @@ int _syncStateEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  bytesCount += 3 + object.autoSyncCadenceId.length * 3;
   bytesCount += 3 + object.deviceId.length * 3;
   return bytesCount;
 }
@@ -83,13 +89,14 @@ void _syncStateSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeBool(offsets[0], object.autoSyncEnabled);
-  writer.writeString(offsets[1], object.deviceId);
-  writer.writeDateTime(offsets[2], object.lastRemoteModified);
-  writer.writeDateTime(offsets[3], object.lastSyncedAt);
-  writer.writeLong(offsets[4], object.localChangeCounter);
-  writer.writeLong(offsets[5], object.pendingCriticalChanges);
-  writer.writeLong(offsets[6], object.pendingRoutineChanges);
+  writer.writeString(offsets[0], object.autoSyncCadenceId);
+  writer.writeBool(offsets[1], object.autoSyncEnabled);
+  writer.writeString(offsets[2], object.deviceId);
+  writer.writeDateTime(offsets[3], object.lastRemoteModified);
+  writer.writeDateTime(offsets[4], object.lastSyncedAt);
+  writer.writeLong(offsets[5], object.localChangeCounter);
+  writer.writeLong(offsets[6], object.pendingCriticalChanges);
+  writer.writeLong(offsets[7], object.pendingRoutineChanges);
 }
 
 SyncState _syncStateDeserialize(
@@ -99,14 +106,15 @@ SyncState _syncStateDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = SyncState();
-  object.autoSyncEnabled = reader.readBool(offsets[0]);
-  object.deviceId = reader.readString(offsets[1]);
+  object.autoSyncCadenceId = reader.readString(offsets[0]);
+  object.autoSyncEnabled = reader.readBool(offsets[1]);
+  object.deviceId = reader.readString(offsets[2]);
   object.id = id;
-  object.lastRemoteModified = reader.readDateTimeOrNull(offsets[2]);
-  object.lastSyncedAt = reader.readDateTimeOrNull(offsets[3]);
-  object.localChangeCounter = reader.readLong(offsets[4]);
-  object.pendingCriticalChanges = reader.readLong(offsets[5]);
-  object.pendingRoutineChanges = reader.readLong(offsets[6]);
+  object.lastRemoteModified = reader.readDateTimeOrNull(offsets[3]);
+  object.lastSyncedAt = reader.readDateTimeOrNull(offsets[4]);
+  object.localChangeCounter = reader.readLong(offsets[5]);
+  object.pendingCriticalChanges = reader.readLong(offsets[6]);
+  object.pendingRoutineChanges = reader.readLong(offsets[7]);
   return object;
 }
 
@@ -118,18 +126,20 @@ P _syncStateDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readBool(offset)) as P;
-    case 1:
       return (reader.readString(offset)) as P;
+    case 1:
+      return (reader.readBool(offset)) as P;
     case 2:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 3:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 4:
-      return (reader.readLong(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 5:
       return (reader.readLong(offset)) as P;
     case 6:
+      return (reader.readLong(offset)) as P;
+    case 7:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -227,6 +237,142 @@ extension SyncStateQueryWhere
 
 extension SyncStateQueryFilter
     on QueryBuilder<SyncState, SyncState, QFilterCondition> {
+  QueryBuilder<SyncState, SyncState, QAfterFilterCondition>
+      autoSyncCadenceIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'autoSyncCadenceId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SyncState, SyncState, QAfterFilterCondition>
+      autoSyncCadenceIdGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'autoSyncCadenceId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SyncState, SyncState, QAfterFilterCondition>
+      autoSyncCadenceIdLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'autoSyncCadenceId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SyncState, SyncState, QAfterFilterCondition>
+      autoSyncCadenceIdBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'autoSyncCadenceId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SyncState, SyncState, QAfterFilterCondition>
+      autoSyncCadenceIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'autoSyncCadenceId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SyncState, SyncState, QAfterFilterCondition>
+      autoSyncCadenceIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'autoSyncCadenceId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SyncState, SyncState, QAfterFilterCondition>
+      autoSyncCadenceIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'autoSyncCadenceId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SyncState, SyncState, QAfterFilterCondition>
+      autoSyncCadenceIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'autoSyncCadenceId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<SyncState, SyncState, QAfterFilterCondition>
+      autoSyncCadenceIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'autoSyncCadenceId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<SyncState, SyncState, QAfterFilterCondition>
+      autoSyncCadenceIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'autoSyncCadenceId',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<SyncState, SyncState, QAfterFilterCondition>
       autoSyncEnabledEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
@@ -744,6 +890,19 @@ extension SyncStateQueryLinks
     on QueryBuilder<SyncState, SyncState, QFilterCondition> {}
 
 extension SyncStateQuerySortBy on QueryBuilder<SyncState, SyncState, QSortBy> {
+  QueryBuilder<SyncState, SyncState, QAfterSortBy> sortByAutoSyncCadenceId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'autoSyncCadenceId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SyncState, SyncState, QAfterSortBy>
+      sortByAutoSyncCadenceIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'autoSyncCadenceId', Sort.desc);
+    });
+  }
+
   QueryBuilder<SyncState, SyncState, QAfterSortBy> sortByAutoSyncEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'autoSyncEnabled', Sort.asc);
@@ -837,6 +996,19 @@ extension SyncStateQuerySortBy on QueryBuilder<SyncState, SyncState, QSortBy> {
 
 extension SyncStateQuerySortThenBy
     on QueryBuilder<SyncState, SyncState, QSortThenBy> {
+  QueryBuilder<SyncState, SyncState, QAfterSortBy> thenByAutoSyncCadenceId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'autoSyncCadenceId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SyncState, SyncState, QAfterSortBy>
+      thenByAutoSyncCadenceIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'autoSyncCadenceId', Sort.desc);
+    });
+  }
+
   QueryBuilder<SyncState, SyncState, QAfterSortBy> thenByAutoSyncEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'autoSyncEnabled', Sort.asc);
@@ -942,6 +1114,14 @@ extension SyncStateQuerySortThenBy
 
 extension SyncStateQueryWhereDistinct
     on QueryBuilder<SyncState, SyncState, QDistinct> {
+  QueryBuilder<SyncState, SyncState, QDistinct> distinctByAutoSyncCadenceId(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'autoSyncCadenceId',
+          caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<SyncState, SyncState, QDistinct> distinctByAutoSyncEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'autoSyncEnabled');
@@ -993,6 +1173,13 @@ extension SyncStateQueryProperty
   QueryBuilder<SyncState, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<SyncState, String, QQueryOperations>
+      autoSyncCadenceIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'autoSyncCadenceId');
     });
   }
 

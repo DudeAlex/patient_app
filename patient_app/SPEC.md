@@ -36,7 +36,7 @@ Out of scope (for MVP)
 - Shows current email when signed in.
 - Errors surface via SnackBar with actionable hints.
 - Minimal production UX: surface the essentials in a compact profile hub — account identity, manual “Backup now” action, auto backup cadence picker, AI consent toggle, and display preferences (light/dark/auto theme and small/medium/large text size) — avoiding dense menus.
-- Current build (Nov 2025) ships the profile hub card with account summary, manual “Backup now” (shared orchestration service), Wi‑Fi/ethernet cadence presets (preview only until the scheduler refactor lands), AI consent toggle placeholder, and display preference chips. Cadence and AI toggles currently store local intent and surface SnackBars; wiring into the scheduler and AI consent gate remains a follow-up task.
+- Current build (Nov 2025) ships the profile hub card with account summary, manual "Backup now" (shared orchestration service), Wi-Fi/ethernet cadence presets (now persisted + scheduler-backed), AI consent toggle placeholder, and display preference chips. Cadence selection updates the auto-sync schedule immediately, while the AI consent toggle still surfaces intent-only messaging until the companion flow ships.
 - Backup-key portability entry point is present (dialog describing the in-progress QR/passphrase/platform export flow) so patients know where to initiate key management once the secure workflow lands.
 
 4.2 Backup to Google Drive (mobile)
@@ -47,9 +47,9 @@ Out of scope (for MVP)
 
 4.2a Auto Backup Toggle (mobile, beta)
 - Settings exposes “Auto backup” switch (default off) when Drive backup is supported.
-- Default cadence: one automatic backup per week. Patients can opt into alternative triggers (e.g., on-resume after critical changes) once the scheduling UI ships.
-- Current implementation (Nov 2025) still relies on resume-after-critical-change triggers; moving to weekly cadence requires refactoring the lifecycle coordinator and scheduler.
-- When the weekly cadence lands and the patient is signed in, the app silently attempts a Drive backup using the configured schedule; ad-hoc triggers should remain available.
+- Default cadence: one automatic backup per week, with optional presets for 6h, 12h, daily, or manual-only operation. Resume events trigger backups when pending changes exist, the cadence interval has elapsed, and Wi-Fi/ethernet connectivity plus Drive auth are available.
+- The current implementation (Nov 2025) already respects the cadence presets described above; further polish will focus on exposing clearer conflict banners and key portability.
+- Ad-hoc triggers remain available via the manual "Backup now" button, even when auto sync is disabled or set to manual-only mode.
 - Patients can turn auto backup off at any time; when disabled, only manual backups run.
 - To limit redundant uploads, background auto sync enforces a minimum six-hour interval between successful runs while still queuing pending changes for the next window.
 - Production UX requirement: keep cadence controls lightweight — offer a small set of presets (e.g., 6h/12h/daily/weekly/manual) within the profile hub alongside the manual backup button, with adjacent toggles for theme mode (light/dark/auto) and text size (small/medium/large) to preserve accessibility.

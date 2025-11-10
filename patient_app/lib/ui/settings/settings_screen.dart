@@ -6,8 +6,11 @@ import 'package:google_drive_backup/google_drive_backup.dart';
 import 'package:intl/intl.dart';
 
 import '../../features/records/data/records_service.dart';
+import '../../features/sync/application/use_cases/mark_auto_sync_success_use_case.dart';
+import '../../features/sync/application/use_cases/set_auto_sync_cadence_use_case.dart';
 import '../../features/sync/application/use_cases/set_auto_sync_enabled_use_case.dart';
 import '../../features/sync/auto_sync_backup_service.dart';
+import '../../features/sync/domain/entities/auto_sync_cadence.dart';
 import '../../features/sync/domain/entities/auto_sync_status.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -30,6 +33,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _autoSyncInitialised = false;
 
   AutoSyncCadenceOption _selectedCadence = AutoSyncCadenceOption.weekly;
+  bool _cadenceBusy = false;
   ThemeModePreference _themePreference = ThemeModePreference.system;
   TextScalePreference _textPreference = TextScalePreference.medium;
   bool _aiConsentEnabled = false;
@@ -76,13 +80,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _recordsService = service;
         _backupService = service.backupService;
         _autoSyncStatus = initialStatus;
+        _selectedCadence =
+            AutoSyncCadenceOption.fromCadence(initialStatus.cadence);
         _autoSyncInitialised = true;
       });
       _autoSyncSubscription = service.autoSync.statusStream.listen((
         AutoSyncStatus status,
       ) {
         if (!mounted) return;
-        setState(() => _autoSyncStatus = status);
+        setState(() {
+          _autoSyncStatus = status;
+          _selectedCadence =
+              AutoSyncCadenceOption.fromCadence(status.cadence);
+        });
       });
       // Refresh cached email with the shared Drive manager.
       _restoreAccount();
@@ -167,6 +177,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       messenger.hideCurrentSnackBar();
       if (result.isSuccess) {
         final completedAt = result.completedAt ?? DateTime.now();
+        final service = _recordsService;
+        if (service != null) {
+          await service.markAutoSyncSuccess.execute(
+            MarkAutoSyncSuccessInput(completedAt: completedAt),
+          );
+        }
         messenger.showSnackBar(
           SnackBar(
             content: Text('Backup uploaded (${_formatTimestamp(completedAt)})'),
@@ -267,17 +283,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return 'Pending changes - critical: ${status.pendingCriticalChanges}, routine: ${status.pendingRoutineChanges}';
   }
 
-  void _selectCadence(AutoSyncCadenceOption option) {
-    setState(() => _selectedCadence = option);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          option.interval == null
-              ? 'Manual-only mode selected. Scheduler integration pending.'
-              : 'Cadence set to ${option.label}. Background scheduler update pending.',
-        ),
-      ),
-    );
+  Future<void> _updateCadence(AutoSyncCadenceOption option) async {
+    final service = _recordsService;
+    if (service == null) return;
+    setState(() {
+      _selectedCadence = option;
+      _cadenceBusy = true;
+    });
+    try {
+      await service.setAutoSyncCadence.execute(
+        SetAutoSyncCadenceInput(cadence: option.cadence),
+      );
+      if (!mounted) return;
+      final message = option.cadence.isManual
+          ? 'Automatic backups disabled. Manual backups only.'
+          : 'Auto backup cadence set to ${option.label}.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update cadence: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _cadenceBusy = false);
+      }
+    }
   }
 
   void _toggleAiConsent(bool value) {
@@ -354,7 +387,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   : null,
               cadenceOptions: _cadenceOptions,
               selectedCadence: _selectedCadence,
-              onSelectCadence: _selectCadence,
+              onSelectCadence:
+                  _autoSyncInitialised && !_cadenceBusy ? _updateCadence : null,
             ),
             const SizedBox(height: 16),
             if (!isWeb)
@@ -415,7 +449,7 @@ class _ProfileHubCard extends StatelessWidget {
   final AutoSyncToggleData? autoSyncToggle;
   final List<AutoSyncCadenceOption> cadenceOptions;
   final AutoSyncCadenceOption selectedCadence;
-  final ValueChanged<AutoSyncCadenceOption> onSelectCadence;
+  final ValueChanged<AutoSyncCadenceOption>? onSelectCadence;
 
   @override
   Widget build(BuildContext context) {
@@ -494,14 +528,16 @@ class _ProfileHubCard extends StatelessWidget {
                       (option) => ChoiceChip(
                         label: Text(option.label),
                         selected: selectedCadence == option,
-                        onSelected: (_) => onSelectCadence(option),
+                        onSelected: onSelectCadence == null
+                            ? null
+                            : (_) => onSelectCadence!(option),
                       ),
                     )
                     .toList(),
               ),
               const SizedBox(height: 4),
               const Text(
-                'Weekly cadence will be enforced automatically once the scheduler refactor lands.',
+                'Manual disables automatic backups. Other presets define the minimum interval between background runs while on Wi-Fi.',
                 style: TextStyle(color: Colors.grey),
               ),
             ],
@@ -697,18 +733,21 @@ class AutoSyncCadenceOption {
     this.label,
     this.description,
     this.interval,
+    this.cadence,
   );
 
   final String id;
   final String label;
   final String description;
   final Duration? interval;
+  final AutoSyncCadence cadence;
 
   static const AutoSyncCadenceOption sixHours = AutoSyncCadenceOption._(
     '6h',
     '6 hours',
     'Good for frequent updates on Wi-Fi.',
     Duration(hours: 6),
+    AutoSyncCadence.sixHours,
   );
 
   static const AutoSyncCadenceOption twelveHours = AutoSyncCadenceOption._(
@@ -716,6 +755,7 @@ class AutoSyncCadenceOption {
     '12 hours',
     'Twice per day when changes are detected.',
     Duration(hours: 12),
+    AutoSyncCadence.twelveHours,
   );
 
   static const AutoSyncCadenceOption daily = AutoSyncCadenceOption._(
@@ -723,21 +763,39 @@ class AutoSyncCadenceOption {
     'Daily',
     'Nightly backups while on Wi-Fi.',
     Duration(days: 1),
+    AutoSyncCadence.daily,
   );
 
   static const AutoSyncCadenceOption weekly = AutoSyncCadenceOption._(
     'weekly',
     'Weekly',
-    'Default cadence (scheduler refactor pending).',
+    'Default cadence for worry-free coverage.',
     Duration(days: 7),
+    AutoSyncCadence.weekly,
   );
 
   static const AutoSyncCadenceOption manual = AutoSyncCadenceOption._(
     'manual',
     'Manual',
-    'Only run backups when you tap “Backup now”.',
+    'Only run backups when you tap "Backup now".',
     null,
+    AutoSyncCadence.manual,
   );
+
+  static AutoSyncCadenceOption fromCadence(AutoSyncCadence cadence) {
+    switch (cadence) {
+      case AutoSyncCadence.sixHours:
+        return sixHours;
+      case AutoSyncCadence.twelveHours:
+        return twelveHours;
+      case AutoSyncCadence.daily:
+        return daily;
+      case AutoSyncCadence.weekly:
+        return weekly;
+      case AutoSyncCadence.manual:
+        return manual;
+    }
+  }
 }
 
 const List<AutoSyncCadenceOption> _cadenceOptions = <AutoSyncCadenceOption>[

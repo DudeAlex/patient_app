@@ -7,8 +7,8 @@ Local-first personal health records app. Mobile stores data on-device (Isar), wi
 - Features
 - Local storage with Isar (encrypted backup archive, on-device DB not encrypted yet)
 - Attachments folder for files (mobile only at this stage)
-- Settings screen with a profile hub (account status, manual “Backup now”, Wi-Fi/ethernet cadence presets, appearance controls, AI consent preview, backup-key portability placeholder) plus Google sign-in, Drive backup/restore, and auto backup toggle (mobile — weekly cadence planned; currently resume-triggered after critical changes, gated to Wi-Fi/ethernet connections, throttled to once per six hours with exponential backoff on failures, and patients can disable it entirely from Settings)
-- Planned minimal patient profile hub surfacing account info, a manual “Backup now” button, auto backup cadence picker, AI consent toggle, display preferences (light/dark/auto theme plus small/medium/large text), and backup-key export/import options (passphrase/QR) so patients manage essentials without extra navigation
+- Settings screen with a profile hub (account status, manual “Backup now”, Wi-Fi/ethernet cadence presets, appearance controls, AI consent preview, backup-key portability placeholder) plus Google sign-in, Drive backup/restore, and auto backup toggle (mobile — background backups now respect the selected cadence preset: 6h/12h/daily/weekly/manual, always gated to Wi-Fi/ethernet connections, with exponential backoff on failures and the ability to disable auto sync entirely from Settings)
+- Planned refinements to the profile hub include wiring the AI consent toggle end-to-end and adding backup-key export/import options (passphrase/QR) so patients manage essentials without extra navigation
 - Settings caches the signed-in account to avoid re-showing the Google sign-in sheet when reopening the screen
 - Shared `google_drive_backup` package provides reusable Google auth + encrypted Drive backup helpers
 - In-app Auth Diagnostics (runs sign-in and header checks; logs safe details)

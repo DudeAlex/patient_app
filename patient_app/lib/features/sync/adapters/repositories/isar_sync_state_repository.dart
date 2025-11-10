@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../records/model/sync_state.dart';
 import '../../application/ports/sync_state_repository.dart';
+import '../../domain/entities/auto_sync_cadence.dart';
 import '../../domain/entities/auto_sync_status.dart';
 
 /// Persists and exposes the singleton sync state record that tracks pending
@@ -60,6 +61,15 @@ class IsarSyncStateRepository implements SyncStateRepository {
     await _db.writeTxn(() async {
       final state = await _ensureState();
       state.autoSyncEnabled = value;
+      await _db.syncStates.put(state);
+    });
+  }
+
+  @override
+  Future<void> setAutoSyncCadence(AutoSyncCadence cadence) async {
+    await _db.writeTxn(() async {
+      final state = await _ensureState();
+      state.autoSyncCadenceId = cadence.id;
       await _db.syncStates.put(state);
     });
   }
@@ -123,6 +133,10 @@ class IsarSyncStateRepository implements SyncStateRepository {
       state.deviceId = _uuid.v4();
       await _db.syncStates.put(state);
     }
+    if (state.autoSyncCadenceId.isEmpty) {
+      state.autoSyncCadenceId = AutoSyncCadence.weekly.id;
+      await _db.syncStates.put(state);
+    }
     _deviceIdCache ??= state.deviceId;
     return state;
   }
@@ -136,6 +150,7 @@ class IsarSyncStateRepository implements SyncStateRepository {
       lastSyncedAt: state.lastSyncedAt,
       lastRemoteModified: state.lastRemoteModified,
       deviceId: state.deviceId,
+      cadence: AutoSyncCadence.fromId(state.autoSyncCadenceId),
     );
   }
 }

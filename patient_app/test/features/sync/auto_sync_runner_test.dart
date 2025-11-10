@@ -6,6 +6,7 @@ import 'package:patient_app/features/sync/application/ports/sync_state_repositor
 import 'package:patient_app/features/sync/application/use_cases/mark_auto_sync_success_use_case.dart';
 import 'package:patient_app/features/sync/auto_sync_backup_service.dart';
 import 'package:patient_app/features/sync/auto_sync_runner.dart';
+import 'package:patient_app/features/sync/domain/entities/auto_sync_cadence.dart';
 import 'package:patient_app/features/sync/domain/entities/auto_sync_status.dart';
 import 'package:patient_app/features/sync/network/auto_sync_network_info.dart';
 
@@ -87,6 +88,54 @@ void main() {
       expect(backupClient.runCount, 2);
       expect(repository.lastSuccess, current);
     });
+
+    test('skips automatic backup when cadence is manual', () async {
+      final repository = _RecordingSyncStateRepository();
+      final backupClient = _StubBackupClient();
+      final runner = AutoSyncRunner(
+        MarkAutoSyncSuccessUseCase(repository),
+        backupClient: backupClient,
+        networkInfo: _StubNetworkInfo(AutoSyncConnectionType.wifiLike),
+      );
+
+      await runner.handleAppResume(
+        _statusWithCriticalChanges().copyWith(cadence: AutoSyncCadence.manual),
+      );
+
+      expect(backupClient.runCount, 0);
+      expect(repository.lastSuccess, isNull);
+    });
+
+    test('uses selected cadence interval instead of fallback', () async {
+      final repository = _RecordingSyncStateRepository();
+      final now = DateTime.utc(2025, 11, 9, 8, 0);
+      final backupClient = _StubBackupClient(
+        responses: Queue<AutoSyncBackupResult>.of([
+          AutoSyncBackupResult.success(completedAt: now),
+        ]),
+      );
+      final runner = AutoSyncRunner(
+        MarkAutoSyncSuccessUseCase(repository),
+        backupClient: backupClient,
+        networkInfo: _StubNetworkInfo(AutoSyncConnectionType.wifiLike),
+        clock: () => now,
+      );
+      final status = _statusWithCriticalChanges().copyWith(
+        cadence: AutoSyncCadence.daily,
+        lastSyncedAt: now.subtract(const Duration(hours: 10)),
+      );
+
+      await runner.handleAppResume(status);
+
+      expect(backupClient.runCount, 0);
+
+      await runner.handleAppResume(
+        status.copyWith(lastSyncedAt: now.subtract(const Duration(days: 2))),
+      );
+
+      expect(backupClient.runCount, 1);
+      expect(repository.lastSuccess, now);
+    });
   });
 }
 
@@ -97,6 +146,7 @@ AutoSyncStatus _statusWithCriticalChanges() {
     pendingRoutineChanges: 0,
     localChangeCounter: 1,
     deviceId: 'device',
+    cadence: AutoSyncCadence.weekly,
   );
 }
 
@@ -142,6 +192,7 @@ class _StubBackupClient implements AutoSyncBackupClient {
 
 class _RecordingSyncStateRepository implements SyncStateRepository {
   DateTime? lastSuccess;
+  AutoSyncCadence? lastCadence;
 
   @override
   Future<void> ensureInitialized() async => throw UnimplementedError();
@@ -156,6 +207,10 @@ class _RecordingSyncStateRepository implements SyncStateRepository {
   @override
   Future<void> setAutoSyncEnabled(bool value) async =>
       throw UnimplementedError();
+  @override
+  Future<void> setAutoSyncCadence(AutoSyncCadence cadence) async {
+    lastCadence = cadence;
+  }
 
   @override
   Future<void> recordChange({required bool critical}) async =>

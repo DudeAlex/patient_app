@@ -15,16 +15,18 @@ Auto sync ensures local changes are backed up to Google Drive App Data automatic
 - [x] Flesh out a minimal patient profile/settings hub so patients can see account status, tap “Backup now,” adjust cadence presets (6h/12h/daily/weekly/manual), choose display preferences (light/dark/auto theme plus small/medium/large text), and manage backup-key portability (patient passphrase/mnemonic, offline QR/file export, or platform secure backup) before production. (Cadence + portability still store intent only until scheduler/key workflows land.)
 
 ### 2. Track Dirty State
-- [ ] Extend repository/state to flag dirty changes whenever records mutate.
-- [ ] Persist dirty metadata in Isar (`SyncState`) so the flag survives restarts.
+- [x] Extend repository/state to flag dirty changes whenever records mutate.
+  - `AutoSyncDirtyTracker` now wraps the record save/delete flows and manual backup success clears counters via `MarkAutoSyncSuccessUseCase`.
+- [x] Persist dirty metadata in Isar (`SyncState`) so the flag survives restarts.
 
 ### 3. Sync Trigger Mechanics
-- [ ] Hook into app lifecycle (resume/exit) to check dirty state and launch backup when Wi-Fi + consent conditions are met.
+- [x] Hook into app lifecycle (resume/exit) to check dirty state and launch backup when Wi-Fi + consent conditions are met.
   - [x] Introduced `AutoSyncCoordinator` to watch lifecycle resume events and emit pending-change diagnostics (backup invocation still TODO).
   - [x] Connected resume trigger to an `AutoSyncRunner` that performs background Drive backups when auto sync is enabled and critical dirty changes exist (now gated by `ConnectivityAutoSyncNetworkInfo` to require Wi-Fi/ethernet).
   - [x] Added a minimum interval throttle so background backups run at most once every six hours, batching critical text edits without resending the full archive repeatedly.
-  - [ ] Shift default cadence to weekly background backups with patient-configurable overrides (requires refactoring the current resume-trigger model).
-- [ ] Prevent overlapping runs and honour manual toggles (backup enabled + signed in).
+  - [x] Shift default cadence to weekly background backups with patient-configurable overrides (requires refactoring the current resume-trigger model).
+    - Cadence selections are now persisted in `SyncState`, Settings writes through `SetAutoSyncCadenceUseCase`, manual mode disables automatic runs entirely, and the runner uses the selected interval instead of the fixed six-hour throttle.
+- [x] Prevent overlapping runs and honour manual toggles (backup enabled + signed in).
 
 ### 4. Backup Orchestration
 - [x] Wrap the existing manual backup call in a service capable of silent execution and reporting status back to UI/state (see `AutoSyncBackupService`, now shared by Settings + runner).
@@ -35,14 +37,11 @@ Auto sync ensures local changes are backed up to Google Drive App Data automatic
 - [x] Add a Settings switch to enable/disable auto sync and display the last successful sync timestamp.
 
 ### 6. Testing & Documentation
-- [ ] Add manual scenarios to `TESTING.md` (dirty change + resume, failure then retry, manual toggle).
-- [ ] Update README/TODO after shipping the MVP noting limitations (Wi-Fi only, triggers on critical changes, batch routine notes).
+- [x] Add manual scenarios to `TESTING.md` (dirty change + resume, failure then retry, manual toggle).
+- [x] Update README/TODO after shipping the MVP noting limitations (Wi-Fi only, triggers on critical changes, batch routine notes).
 
 ## Deferred Enhancements (Future Releases)
 - Advanced safety nets: expose a “Recently Deleted” view using `deletedAt`, retain the previous backup file (`patient-backup-v1-prev.enc`) for rollback, and document recovery flows.
 - Smarter scheduling: battery/network awareness, true incremental uploads, background isolates.
 - Explicit queue management for routine changes (e.g., patient can “sync now” or see queued items).
 - Cellular auto-sync opt-in (with data usage warnings) once the MVP proves reliable.
-
-
-

@@ -88,6 +88,10 @@ class AutoSyncCoordinator {
       debugPrint('[AutoSync] Resume -> auto sync disabled; skipping backup.');
       return;
     }
+    if (status.cadence.isManual) {
+      debugPrint('[AutoSync] Resume -> cadence set to manual; skipping backup.');
+      return;
+    }
     if (!status.hasPendingChanges) {
       debugPrint('[AutoSync] Resume -> no pending changes detected.');
       return;

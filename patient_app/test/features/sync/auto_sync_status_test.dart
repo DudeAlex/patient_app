@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:patient_app/features/sync/domain/entities/auto_sync_cadence.dart';
 import 'package:patient_app/features/sync/domain/entities/auto_sync_status.dart';
 
 void main() {
@@ -11,6 +12,7 @@ void main() {
         pendingRoutineChanges: 1,
         localChangeCounter: 3,
         deviceId: 'device-123',
+        cadence: AutoSyncCadence.weekly,
         lastSyncedAt: DateTime(2025, 1, 1),
       );
 
@@ -32,6 +34,7 @@ void main() {
           pendingRoutineChanges: 0,
           localChangeCounter: 0,
           deviceId: 'abc',
+          cadence: AutoSyncCadence.weekly,
         ),
         throwsAssertionError,
       );
@@ -43,6 +46,7 @@ void main() {
           pendingRoutineChanges: -5,
           localChangeCounter: 0,
           deviceId: 'abc',
+          cadence: AutoSyncCadence.weekly,
         ),
         throwsAssertionError,
       );
@@ -56,6 +60,7 @@ void main() {
           pendingRoutineChanges: 2,
           localChangeCounter: 3,
           deviceId: 'abc',
+          cadence: AutoSyncCadence.weekly,
         ),
         throwsAssertionError,
       );
@@ -69,6 +74,7 @@ void main() {
           pendingRoutineChanges: 0,
           localChangeCounter: 0,
           deviceId: '',
+          cadence: AutoSyncCadence.weekly,
         ),
         throwsAssertionError,
       );

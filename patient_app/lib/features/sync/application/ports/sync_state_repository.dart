@@ -1,3 +1,4 @@
+import '../../domain/entities/auto_sync_cadence.dart';
 import '../../domain/entities/auto_sync_status.dart';
 
 /// Repository port exposing sync state persistence operations to application
@@ -10,6 +11,7 @@ abstract class SyncStateRepository {
   Stream<AutoSyncStatus> watchStatus({bool fireImmediately = true});
 
   Future<void> setAutoSyncEnabled(bool value);
+  Future<void> setAutoSyncCadence(AutoSyncCadence cadence);
 
   Future<void> recordChange({required bool critical});
 

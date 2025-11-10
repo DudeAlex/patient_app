@@ -5,8 +5,10 @@ import 'package:patient_app/features/sync/application/use_cases/mark_auto_sync_s
 import 'package:patient_app/features/sync/application/use_cases/promote_routine_changes_use_case.dart';
 import 'package:patient_app/features/sync/application/use_cases/read_auto_sync_status_use_case.dart';
 import 'package:patient_app/features/sync/application/use_cases/record_auto_sync_change_use_case.dart';
+import 'package:patient_app/features/sync/application/use_cases/set_auto_sync_cadence_use_case.dart';
 import 'package:patient_app/features/sync/application/use_cases/set_auto_sync_enabled_use_case.dart';
 import 'package:patient_app/features/sync/application/use_cases/watch_auto_sync_status_use_case.dart';
+import 'package:patient_app/features/sync/domain/entities/auto_sync_cadence.dart';
 import 'package:patient_app/features/sync/domain/entities/auto_sync_status.dart';
 
 void main() {
@@ -16,6 +18,7 @@ void main() {
     pendingRoutineChanges: 0,
     localChangeCounter: 1,
     deviceId: 'device',
+    cadence: AutoSyncCadence.weekly,
     lastSyncedAt: DateTime(2025, 1, 1),
   );
 
@@ -29,6 +32,20 @@ void main() {
       expect(repository.setAutoSyncEnabledValue, isFalse);
     });
   });
+
+  group('SetAutoSyncCadenceUseCase', () {
+    test('persists cadence via repository', () async {
+      final repository = _RecordingRepository(initialStatus);
+      final useCase = SetAutoSyncCadenceUseCase(repository);
+
+      await useCase.execute(
+        const SetAutoSyncCadenceInput(cadence: AutoSyncCadence.daily),
+      );
+
+      expect(repository.setAutoSyncCadenceValue, AutoSyncCadence.daily);
+    });
+  });
+
 
   group('RecordAutoSyncChangeUseCase', () {
     test('records critical flag', () async {
@@ -97,6 +114,7 @@ class _RecordingRepository implements SyncStateRepository {
   final AutoSyncStatus readStatusResult;
 
   bool? setAutoSyncEnabledValue;
+  AutoSyncCadence? setAutoSyncCadenceValue;
   bool? lastRecordedChange;
   DateTime? lastMarkedSuccess;
   bool promoteCalled = false;
@@ -119,6 +137,11 @@ class _RecordingRepository implements SyncStateRepository {
   @override
   Future<void> setAutoSyncEnabled(bool value) async {
     setAutoSyncEnabledValue = value;
+  }
+
+  @override
+  Future<void> setAutoSyncCadence(AutoSyncCadence cadence) async {
+    setAutoSyncCadenceValue = cadence;
   }
 
   @override

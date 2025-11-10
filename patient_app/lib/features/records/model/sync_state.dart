@@ -12,6 +12,6 @@ class SyncState {
   int pendingCriticalChanges = 0;
   int pendingRoutineChanges = 0;
   late String deviceId;
+  String autoSyncCadenceId = 'weekly';
 }
-
 

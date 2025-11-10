@@ -7,6 +7,7 @@ import 'package:patient_app/features/sync/application/ports/sync_state_repositor
 import 'package:patient_app/features/sync/application/use_cases/mark_auto_sync_success_use_case.dart';
 import 'package:patient_app/features/sync/application/use_cases/promote_routine_changes_use_case.dart';
 import 'package:patient_app/features/sync/application/use_cases/watch_auto_sync_status_use_case.dart';
+import 'package:patient_app/features/sync/domain/entities/auto_sync_cadence.dart';
 import 'package:patient_app/features/sync/domain/entities/auto_sync_status.dart';
 import 'package:patient_app/features/sync/network/auto_sync_network_info.dart';
 
@@ -26,6 +27,7 @@ void main() {
         pendingRoutineChanges: 2,
         localChangeCounter: 2,
         deviceId: 'device',
+        cadence: AutoSyncCadence.weekly,
       );
 
       await coordinator.handleResumeForTest(status);
@@ -50,11 +52,34 @@ void main() {
         pendingRoutineChanges: 1,
         localChangeCounter: 1,
         deviceId: 'device',
+        cadence: AutoSyncCadence.weekly,
       );
 
       await coordinator.handleResumeForTest(status);
 
       expect(promoteUseCase.called, isTrue);
+      expect(runner.handledStatuses, isEmpty);
+    });
+    test('skips when cadence is manual', () async {
+      final runner = _RecordingRunner();
+      final promoteUseCase = _RecordingPromoteUseCase();
+      final coordinator = AutoSyncCoordinator(
+        _SilentWatchUseCase(),
+        runner,
+        promoteUseCase,
+      );
+      final status = AutoSyncStatus(
+        autoSyncEnabled: true,
+        pendingCriticalChanges: 1,
+        pendingRoutineChanges: 0,
+        localChangeCounter: 1,
+        deviceId: 'device',
+        cadence: AutoSyncCadence.manual,
+      );
+
+      await coordinator.handleResumeForTest(status);
+
+      expect(promoteUseCase.called, isFalse);
       expect(runner.handledStatuses, isEmpty);
     });
   });
@@ -137,6 +162,9 @@ class _NoopSyncStateRepository implements SyncStateRepository {
 
   @override
   Future<void> setAutoSyncEnabled(bool value) async {}
+
+  @override
+  Future<void> setAutoSyncCadence(AutoSyncCadence cadence) async {}
 
   @override
   Future<void> recordChange({required bool critical}) async {}

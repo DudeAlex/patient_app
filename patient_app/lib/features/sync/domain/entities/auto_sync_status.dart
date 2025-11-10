@@ -1,5 +1,7 @@
 import 'package:meta/meta.dart';
 
+import 'auto_sync_cadence.dart';
+
 /// Immutable view of the persisted sync state used by auto sync flows.
 ///
 /// This keeps higher level coordinators decoupled from the underlying storage
@@ -12,6 +14,7 @@ class AutoSyncStatus {
     required this.pendingRoutineChanges,
     required this.localChangeCounter,
     required this.deviceId,
+    required this.cadence,
     this.lastSyncedAt,
     this.lastRemoteModified,
   })  : assert(pendingCriticalChanges >= 0,
@@ -45,6 +48,9 @@ class AutoSyncStatus {
   /// Stable device identifier used to annotate Drive backups.
   final String deviceId;
 
+  /// Patient-selected schedule for background backups.
+  final AutoSyncCadence cadence;
+
   final DateTime? lastSyncedAt;
   final DateTime? lastRemoteModified;
 
@@ -59,6 +65,7 @@ class AutoSyncStatus {
     int? pendingRoutineChanges,
     int? localChangeCounter,
     String? deviceId,
+    AutoSyncCadence? cadence,
     DateTime? lastSyncedAt,
     DateTime? lastRemoteModified,
   }) {
@@ -70,6 +77,7 @@ class AutoSyncStatus {
           pendingRoutineChanges ?? this.pendingRoutineChanges,
       localChangeCounter: localChangeCounter ?? this.localChangeCounter,
       deviceId: deviceId ?? this.deviceId,
+      cadence: cadence ?? this.cadence,
       lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
       lastRemoteModified: lastRemoteModified ?? this.lastRemoteModified,
     );

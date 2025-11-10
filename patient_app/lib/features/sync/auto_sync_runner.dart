@@ -23,7 +23,7 @@ class AutoSyncRunner {
     Duration? maxRetryDelay,
   }) : _backupClient = backupClient,
        _clock = clock ?? DateTime.now,
-       _minInterval = minInterval ?? const Duration(hours: 6),
+       _fallbackInterval = minInterval ?? const Duration(hours: 6),
        _networkInfo = networkInfo ?? ConnectivityAutoSyncNetworkInfo(),
        _initialRetryDelay = initialRetryDelay ?? const Duration(minutes: 5),
        _maxRetryDelay = maxRetryDelay ?? const Duration(hours: 2),
@@ -38,7 +38,7 @@ class AutoSyncRunner {
 
   /// Minimum delay between background backups to avoid re-uploading the full
   /// archive multiple times within a short window.
-  final Duration _minInterval;
+  final Duration _fallbackInterval;
   Duration _currentRetryDelay;
   DateTime? _nextRetryAt;
 
@@ -64,12 +64,17 @@ class AutoSyncRunner {
       debugPrint('[AutoSync] No pending changes. Resume trigger ignored.');
       return;
     }
+    if (status.cadence.isManual) {
+      debugPrint('[AutoSync] Cadence set to manual; automatic backup disabled.');
+      return;
+    }
     if (status.pendingCriticalChanges == 0) {
       debugPrint(
         '[AutoSync] Only routine changes pending; waiting for critical trigger.',
       );
       return;
     }
+    final cadenceInterval = status.cadence.interval ?? _fallbackInterval;
     final now = _clock();
     if (_nextRetryAt != null && now.isBefore(_nextRetryAt!)) {
       final remaining = _nextRetryAt!.difference(now);
@@ -89,11 +94,11 @@ class AutoSyncRunner {
     final lastSyncedAt = status.lastSyncedAt;
     if (lastSyncedAt != null) {
       final elapsed = now.difference(lastSyncedAt);
-      if (elapsed < _minInterval) {
-        final remaining = _minInterval - elapsed;
+      if (elapsed < cadenceInterval) {
+        final remaining = cadenceInterval - elapsed;
         debugPrint(
           '[AutoSync] Last backup ${elapsed.inMinutes}m ago; deferring for '
-          '${remaining.inMinutes}m to reduce duplicate uploads.',
+          '${remaining.inMinutes}m based on the selected cadence.',
         );
         return;
       }
