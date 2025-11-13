@@ -26,13 +26,18 @@ M4: Auto Sync (Completed 2025-11-09)
 - ⏳ Follow-up: Wire the AI consent toggle into companion flows (M6)
 - ⏳ Follow-up: Ship backup-key export/import experience (production blocker, target M4.1)
 
-M5: Multi-Modal Capture & Accessibility
-- Design modal with Photo, Document Scan, Voice Dictation, Keyboard, File Upload, and Email Import options (no video capture)
-- Implement large-button, step-by-step flow tuned for older users
-- Ensure attachments folder covers photos, scanned PDFs, audio clips, and uploaded documents
-- Add on-device clarity/OCR checks that prompt for retake before advancing when photos/scans are unreadable
-- Build Gmail-based email import (read-only label via Gmail API) with clear consent copy and metadata display
-- Add contextual follow-up prompts, OCR review, and unified review panel
+M5: Multi-Modal Capture & Accessibility (In Progress - 56% complete)
+- See `M5_MULTI_MODAL_PLAN.md` for detailed breakdown
+- ✅ Photo capture with clarity checks and retake prompts
+- ✅ Document scanning with multi-page support and enhancement
+- ✅ Voice dictation with transcription pipeline
+- ✅ Editable review screen with form validation
+- ✅ Attachments saved and linked to records
+- ✅ Attachments displayed in record detail with metadata
+- ⏳ File upload capability (PDF/images)
+- ⏳ Gmail-based email import with OAuth
+- ⏳ Keyboard form enhancements
+- ⏳ Accessibility audit and localization prep
 
 M6: AI-Assisted Companion (opt-in)
 - Build `AiProcessingService` with Together AI integration + consent flow

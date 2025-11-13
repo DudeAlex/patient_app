@@ -15,6 +15,7 @@ Local-first personal health records app. Mobile stores data on-device (Isar), wi
 - Web build boots the app and hides backup/restore (browser sandbox)
 - Records list with search (title + notes) and load-more pagination (new in M3)
 - Multi-modal "Add Record" flow (photo with on-device retake checks, baseline document scanning with enhanced previews + clarity prompts, voice dictation capture, keyboard, file upload, Gmail label import)
+- Attachments saved and displayed: photos, scans, audio with metadata (file size, duration, timestamps, page counts)
 - Dual operating modes: local-only storage by default, opt-in AI-assisted companion (Together AI: Llama 70B text, Apriel image) for extraction, organization, and encouragement
 - Compassionate companion experience with contextual follow-ups, safety hints, and morale support (design underway)
 - Support network & emergency contacts for quick outreach (design underway)
