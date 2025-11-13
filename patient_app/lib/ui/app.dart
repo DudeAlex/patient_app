@@ -143,9 +143,12 @@ class _HomeScaffold extends StatelessWidget {
                       }
                       await Navigator.of(ctx).push(
                         MaterialPageRoute(
-                          builder: (_) => CaptureReviewScreen(
-                            mode: mode,
-                            result: result,
+                          builder: (_) => ChangeNotifierProvider.value(
+                            value: state,
+                            child: CaptureReviewScreen(
+                              mode: mode,
+                              result: result,
+                            ),
                           ),
                         ),
                       );

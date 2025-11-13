@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../adapters/presenters/capture_review_presenter.dart';
 import '../api/capture_mode.dart';
 import '../api/capture_result.dart';
+import '../../records/domain/entities/record.dart';
+import '../../records/model/record_types.dart';
+import '../../records/ui/records_home_state.dart';
 
-class CaptureReviewScreen extends StatelessWidget {
+class CaptureReviewScreen extends StatefulWidget {
   const CaptureReviewScreen({
     super.key,
     required this.mode,
@@ -15,40 +20,219 @@ class CaptureReviewScreen extends StatelessWidget {
   final CaptureResult result;
 
   @override
+  State<CaptureReviewScreen> createState() => _CaptureReviewScreenState();
+}
+
+class _CaptureReviewScreenState extends State<CaptureReviewScreen> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _titleController;
+  late final TextEditingController _notesController;
+  late final TextEditingController _tagsController;
+
+  String _type = RecordTypes.note;
+  DateTime _date = DateTime.now();
+  bool _submitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final presenter = CaptureReviewPresenter(
+      mode: widget.mode,
+      result: widget.result,
+    );
+    final viewModel = presenter.buildViewModel();
+
+    // Initialize controllers with suggested values from capture
+    _titleController = TextEditingController(
+      text: _inferTitle(viewModel),
+    );
+    _notesController = TextEditingController(
+      text: viewModel.details,
+    );
+    _tagsController = TextEditingController(
+      text: viewModel.tagsDescription,
+    );
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _notesController.dispose();
+    _tagsController.dispose();
+    super.dispose();
+  }
+
+  String _inferTitle(CaptureReviewViewModel viewModel) {
+    // Generate a default title based on capture mode and date
+    final modeName = widget.mode.displayName;
+    final dateStr = DateFormat.yMd().format(_date);
+    return '$modeName - $dateStr';
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _date,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null) {
+      setState(() {
+        _date = picked;
+      });
+    }
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _submitting = true);
+
+    final now = DateTime.now();
+    final cleanedNotes = _notesController.text.trim();
+    final tags = _parseTags(_tagsController.text);
+
+    final newRecord = RecordEntity(
+      id: null,
+      type: _type,
+      date: _date,
+      title: _titleController.text.trim(),
+      text: cleanedNotes.isEmpty ? null : cleanedNotes,
+      tags: tags,
+      createdAt: now,
+      updatedAt: now,
+      deletedAt: null,
+    );
+
+    final state = context.read<RecordsHomeState>();
+    try {
+      await state.saveRecord(newRecord);
+      // TODO: Save attachments - will be implemented in next increment
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Record saved successfully'),
+        ),
+      );
+      Navigator.of(context).pop();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save record: $e')),
+      );
+      setState(() => _submitting = false);
+    }
+  }
+
+  List<String> _parseTags(String input) {
+    return input
+        .split(',')
+        .map((tag) => tag.trim())
+        .where((tag) => tag.isNotEmpty)
+        .toList(growable: false);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final presenter = CaptureReviewPresenter(mode: mode, result: result);
+    final presenter = CaptureReviewPresenter(
+      mode: widget.mode,
+      result: widget.result,
+    );
     final viewModel = presenter.buildViewModel();
     final artifacts = viewModel.artifacts;
+    final dateLabel = DateFormat.yMMMMd().format(_date);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(viewModel.title),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          if (viewModel.hasDraft) ...[
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            // Record type and date
+            DropdownButtonFormField<String>(
+              value: _type,
+              decoration: const InputDecoration(labelText: 'Type'),
+              items: RecordTypes.values
+                  .map(
+                    (value) => DropdownMenuItem(
+                      value: value,
+                      child: Text(_formatType(value)),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) {
+                if (value == null) return;
+                setState(() {
+                  _type = value;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+            InputDecorator(
+              decoration: const InputDecoration(
+                labelText: 'Date',
+                border: OutlineInputBorder(),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(dateLabel),
+                  TextButton(
+                    onPressed: _pickDate,
+                    child: const Text('Change'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Editable fields
+            TextFormField(
+              controller: _titleController,
+              decoration: const InputDecoration(
+                labelText: 'Title',
+                border: OutlineInputBorder(),
+              ),
+              textInputAction: TextInputAction.next,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Enter a title';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _notesController,
+              decoration: const InputDecoration(
+                labelText: 'Notes',
+                border: OutlineInputBorder(),
+                alignLabelWithHint: true,
+                helperText: 'Edit the suggested summary or add your own notes',
+              ),
+              maxLines: 5,
+              minLines: 3,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _tagsController,
+              decoration: const InputDecoration(
+                labelText: 'Tags (comma separated)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const Divider(height: 32),
+
+            // Captured artifacts (read-only display)
             Text(
-              'Suggested Summary',
+              'Captured Artefacts (${artifacts.length})',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
-            _ReadOnlyField(
-              label: 'Details',
-              value: viewModel.details,
-            ),
-            const SizedBox(height: 8),
-            _ReadOnlyField(
-              label: 'Tags',
-              value: viewModel.tagsDescription,
-            ),
-            const Divider(height: 32),
-          ],
-          Text(
-            'Captured Artefacts (${artifacts.length})',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 8),
-          ...artifacts.map((artifact) => Card(
+            ...artifacts.map(
+              (artifact) => Card(
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ListTile(
                   title: Text(
@@ -66,46 +250,54 @@ class CaptureReviewScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-              )),
-          const SizedBox(height: 24),
-          FilledButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Saving from review coming soon.'),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Action buttons
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton(
+                    onPressed: _submitting ? null : _submit,
+                    child: _submitting
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Save'),
+                  ),
                 ),
-              );
-            },
-            child: const Text('Save (coming soon)'),
-          ),
-          const SizedBox(height: 12),
-          OutlinedButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-        ],
+                const SizedBox(width: 16),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: _submitting
+                        ? null
+                        : () => Navigator.of(context).pop(),
+                    child: const Text('Cancel'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
-class _ReadOnlyField extends StatelessWidget {
-  const _ReadOnlyField({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      initialValue: value,
-      readOnly: true,
-      maxLines: null,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-      ),
-    );
+  String _formatType(String type) {
+    switch (type) {
+      case RecordTypes.visit:
+        return 'Visit';
+      case RecordTypes.lab:
+        return 'Lab';
+      case RecordTypes.medication:
+        return 'Medication';
+      case RecordTypes.note:
+        return 'Note';
+      default:
+        return type;
+    }
   }
 }

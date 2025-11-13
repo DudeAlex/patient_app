@@ -245,3 +245,20 @@
     - `[AutoSync] Starting background Drive backup for bilimus.comet@gmail.com`
     - `[AutoSync] Backup completed successfully.`
   - Post-run status card showed `Last sync: Nov 4, 2025 12:46 PM` with `critical: 0, routine: 0`.
+
+# 2025-11-12 (M5: Review & Save Flow)
+- **Change Scope**
+  - Implemented editable review screen for capture modes (photo, scan, voice)
+  - Added form validation, record type selector, date picker
+  - Wired save functionality to create RecordEntity via RecordsHomeState
+  - Added success/error feedback via SnackBar
+- **Verification**
+  - `flutter analyze` - clean
+  - Manual tests on Android emulator (Pixel 9, API 36):
+    - Photo capture → review → edit → save → verified in records list
+    - Document scan → review → save → verified in records list
+    - Voice capture → review → save → verified in records list
+    - Form validation → empty title shows error message
+- **Result**
+  - All tests passed. Capture modes now functional end-to-end.
+  - Note: Attachments are captured but not yet linked to records (next increment).

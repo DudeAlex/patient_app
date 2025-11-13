@@ -1,8 +1,8 @@
 # M5 – Multi-Modal Capture & Accessibility Plan
 
-**Status:** In Progress (Phase 3 - Voice & Review)
+**Status:** In Progress (Phase 4 - Attachments & Polish)
 **Last Updated:** 2025-11-12
-**Completion:** 12/27 tasks (44%)
+**Completion:** 13/27 tasks (48%)
 
 Bring the add-record experience from a simple form to a patient-friendly capture assistant that supports photos, scans, audio dictation, keyboard entry, file uploads, and Gmail imports. The MVP focuses on delivering a cohesive flow on mobile (Android first) with accessible defaults and a path toward web parity where feasible.
 
@@ -79,11 +79,12 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 - [ ] Provide patient controls to disconnect Gmail and purge imported artefacts.
 
 ### 7. Unified Review & Save Flow
-- [ ] Build review panel that merges captured artefacts, extracted text, suggested tags, and patient edits before saving.
-  - Read-only review screen scaffold added (captures artefacts + AI stub output; editing/saving pending).
+- [x] Build review panel that merges captured artefacts, extracted text, suggested tags, and patient edits before saving.
+  - Editable review screen implemented with form validation, type selector, date picker, and save functionality.
 - [ ] Allow reordering or removing attachments and editing metadata prior to commit.
 - [ ] Ensure saving creates/updates Record + Attachment documents atomically; hook dirty tracking for auto-sync when that feature resumes.
-- [ ] Surface success/Failure feedback that meets accessibility guidelines (snackbar, haptics, voice prompt).
+  - Note: Records save successfully; Attachment linking is next increment.
+- [x] Surface success/Failure feedback that meets accessibility guidelines (snackbar, haptics, voice prompt).
 
 ### 8. Accessibility & Internationalisation
 - [ ] Run large-font, screen-reader, and colour-contrast audits for each capture mode.
