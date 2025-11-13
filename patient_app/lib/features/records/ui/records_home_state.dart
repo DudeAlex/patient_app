@@ -101,6 +101,11 @@ class RecordsHomeState extends ChangeNotifier {
     return _repository.saveAttachments(attachments);
   }
 
+  /// Fetches attachments for a given record.
+  Future<List<Attachment>> getAttachmentsByRecordId(int recordId) async {
+    return _repository.getAttachmentsByRecordId(recordId);
+  }
+
   Future<void> _fetchPage({required bool reset}) async {
     if (_loadingMore) return;
     if (!reset && !_hasMore) return;

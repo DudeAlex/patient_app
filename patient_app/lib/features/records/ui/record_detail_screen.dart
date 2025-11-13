@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../model/attachment.dart';
 import '../model/record_types.dart';
 import '../domain/entities/record.dart';
 import 'add_record_screen.dart';
@@ -21,12 +22,34 @@ class RecordDetailScreen extends StatefulWidget {
 
 class _RecordDetailScreenState extends State<RecordDetailScreen> {
   RecordEntity? _record;
+  List<Attachment>? _attachments;
+  bool _loadingAttachments = false;
 
   @override
   void initState() {
     super.initState();
     final state = context.read<RecordsHomeState>();
     _record = state.recordById(widget.recordId);
+    _loadAttachments();
+  }
+
+  Future<void> _loadAttachments() async {
+    setState(() => _loadingAttachments = true);
+    try {
+      final state = context.read<RecordsHomeState>();
+      final attachments =
+          await state.getAttachmentsByRecordId(widget.recordId);
+      if (mounted) {
+        setState(() {
+          _attachments = attachments;
+          _loadingAttachments = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _loadingAttachments = false);
+      }
+    }
   }
 
   String get _title => _record?.title ?? 'Record';
@@ -116,27 +139,68 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
             const SizedBox(height: 32),
             Text('Attachments', style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
-            Card(
-              color: containerColor,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Attachment support is coming soon.',
-                      style: TextStyle(color: Colors.black54),
+            if (_loadingAttachments)
+              const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              )
+            else if (_attachments == null || _attachments!.isEmpty)
+              Card(
+                color: containerColor,
+                child: const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    'No attachments for this record.',
+                    style: TextStyle(color: Colors.black54),
+                  ),
+                ),
+              )
+            else
+              ..._attachments!.map(
+                (attachment) => Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: ListTile(
+                    leading: Icon(
+                      _getIconForKind(attachment.kind),
+                      size: 32,
+                      color: theme.colorScheme.primary,
                     ),
-                    const SizedBox(height: 12),
-                    OutlinedButton.icon(
-                      onPressed: null,
-                      icon: const Icon(Icons.attach_file),
-                      label: const Text('Add attachment (coming soon)'),
+                    title: Text(_getAttachmentTitle(attachment)),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(_formatFileSize(attachment.sizeBytes)),
+                        if (attachment.capturedAt != null)
+                          Text(
+                            'Captured: ${dateTimeFormatter.format(attachment.capturedAt!)}',
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        if (attachment.durationMs != null)
+                          Text(
+                            'Duration: ${_formatDuration(attachment.durationMs!)}',
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        if (attachment.pageCount != null)
+                          Text(
+                            'Pages: ${attachment.pageCount}',
+                            style: theme.textTheme.bodySmall,
+                          ),
+                      ],
                     ),
-                  ],
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      // TODO: Open attachment viewer
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Attachment viewer coming soon'),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -156,6 +220,45 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
       default:
         return type;
     }
+  }
+
+  IconData _getIconForKind(String kind) {
+    switch (kind.toLowerCase()) {
+      case 'image':
+        return Icons.image;
+      case 'pdf':
+        return Icons.picture_as_pdf;
+      case 'audio':
+        return Icons.audiotrack;
+      case 'file':
+        return Icons.insert_drive_file;
+      case 'email':
+        return Icons.email;
+      default:
+        return Icons.attach_file;
+    }
+  }
+
+  String _getAttachmentTitle(Attachment attachment) {
+    final fileName = attachment.path.split('/').last;
+    return fileName;
+  }
+
+  String _formatFileSize(int? bytes) {
+    if (bytes == null) return 'Unknown size';
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+
+  String _formatDuration(int milliseconds) {
+    final seconds = milliseconds ~/ 1000;
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    if (minutes > 0) {
+      return '$minutes:${remainingSeconds.toString().padLeft(2, '0')}';
+    }
+    return '${seconds}s';
   }
 
   Future<void> _editRecord(BuildContext context, RecordEntity record) async {

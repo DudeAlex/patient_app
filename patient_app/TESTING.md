@@ -280,3 +280,24 @@
 - **Result**
   - All tests passed. Attachments are now properly linked to records in database.
   - Success message shows attachment count: "Record saved with X attachment(s)"
+
+# 2025-11-12 (M5: Attachment Display in Record Detail)
+- **Change Scope**
+  - Added `getAttachmentsByRecordId()` method to IsarRecordsRepository
+  - Exposed method in RecordsHomeState for UI access
+  - Updated record detail screen to load and display attachments
+  - Shows attachment list with icons, file names, sizes, timestamps
+  - Formats file sizes (B/KB/MB), durations (mm:ss), and page counts
+  - Added loading and empty states
+- **Verification**
+  - `flutter analyze` - clean
+  - Manual tests on Android emulator (Pixel 9, API 36):
+    - Opened record with attachments → verified list displays correctly
+    - Confirmed icons match attachment types (image/pdf/audio)
+    - Verified file size formatting (e.g., "1.9 MB")
+    - Confirmed capture timestamps display
+    - Tested tap handler → "Attachment viewer coming soon" message
+    - Tested empty state → "No attachments for this record"
+- **Result**
+  - All tests passed. Attachments now visible in record detail screen.
+  - Complete end-to-end flow: capture → save → view attachments.

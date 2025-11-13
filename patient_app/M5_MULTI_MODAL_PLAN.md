@@ -1,8 +1,8 @@
 # M5 – Multi-Modal Capture & Accessibility Plan
 
-**Status:** In Progress (Phase 4 - File Upload & Polish)
+**Status:** In Progress (Phase 5 - File Upload & Polish)
 **Last Updated:** 2025-11-12
-**Completion:** 14/27 tasks (52%)
+**Completion:** 15/27 tasks (56%)
 
 Bring the add-record experience from a simple form to a patient-friendly capture assistant that supports photos, scans, audio dictation, keyboard entry, file uploads, and Gmail imports. The MVP focuses on delivering a cohesive flow on mobile (Android first) with accessible defaults and a path toward web parity where feasible.
 

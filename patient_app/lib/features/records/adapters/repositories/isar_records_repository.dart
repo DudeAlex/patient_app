@@ -80,4 +80,13 @@ class IsarRecordsRepository implements RecordsRepository {
     final saved = await _db.attachments.getAll(ids);
     return saved.whereType<Attachment>().toList(growable: false);
   }
+
+  /// Fetches all attachments for a given record.
+  Future<List<Attachment>> getAttachmentsByRecordId(int recordId) async {
+    return _db.attachments
+        .filter()
+        .recordIdEqualTo(recordId)
+        .sortByCreatedAt()
+        .findAll();
+  }
 }
