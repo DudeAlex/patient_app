@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
 
 import '../../sync/dirty_tracker.dart';
+import '../adapters/repositories/isar_records_repository.dart';
 import '../application/use_cases/delete_record_use_case.dart';
 import '../application/use_cases/fetch_records_page_use_case.dart';
 import '../application/use_cases/get_record_by_id_use_case.dart';
 import '../application/use_cases/save_record_use_case.dart';
 import '../domain/entities/record.dart';
+import '../model/attachment.dart';
 
 /// Simple [ChangeNotifier] that loads recent records and exposes loading/error
 /// states. This keeps UI widgets focused on presentation.
@@ -16,6 +18,7 @@ class RecordsHomeState extends ChangeNotifier {
     this._deleteRecordCase,
     this._getRecordByIdCase,
     this._dirtyTracker,
+    this._repository,
   );
 
   static const int _pageSize = 20;
@@ -25,6 +28,7 @@ class RecordsHomeState extends ChangeNotifier {
   final DeleteRecordUseCase _deleteRecordCase;
   final GetRecordByIdUseCase _getRecordByIdCase;
   final AutoSyncDirtyTracker _dirtyTracker;
+  final IsarRecordsRepository _repository;
 
   List<RecordEntity> _records = const <RecordEntity>[];
   Object? _error;
@@ -88,6 +92,13 @@ class RecordsHomeState extends ChangeNotifier {
     await _deleteRecordCase.execute(DeleteRecordInput(recordId: id));
     await _dirtyTracker.recordRecordDelete(existing);
     await load(query: _searchQuery, force: true);
+  }
+
+  /// Saves attachments linked to a record.
+  /// This is a temporary direct repository access until we create a proper
+  /// use case for attachment management.
+  Future<List<Attachment>> saveAttachments(List<Attachment> attachments) async {
+    return _repository.saveAttachments(attachments);
   }
 
   Future<void> _fetchPage({required bool reset}) async {

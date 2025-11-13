@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../adapters/presenters/capture_review_presenter.dart';
+import '../api/capture_artifact.dart';
 import '../api/capture_mode.dart';
 import '../api/capture_result.dart';
 import '../../records/domain/entities/record.dart';
+import '../../records/model/attachment.dart';
 import '../../records/model/record_types.dart';
 import '../../records/ui/records_home_state.dart';
 
@@ -105,12 +109,20 @@ class _CaptureReviewScreenState extends State<CaptureReviewScreen> {
 
     final state = context.read<RecordsHomeState>();
     try {
-      await state.saveRecord(newRecord);
-      // TODO: Save attachments - will be implemented in next increment
+      // Save the record first to get the ID
+      final savedRecord = await state.saveRecord(newRecord);
+
+      // Save attachments linked to the record
+      if (widget.result.artifacts.isNotEmpty) {
+        await _saveAttachments(savedRecord.id!, widget.result.artifacts);
+      }
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Record saved successfully'),
+        SnackBar(
+          content: Text(
+            'Record saved with ${widget.result.artifacts.length} attachment(s)',
+          ),
         ),
       );
       Navigator.of(context).pop();
@@ -120,6 +132,45 @@ class _CaptureReviewScreenState extends State<CaptureReviewScreen> {
         SnackBar(content: Text('Failed to save record: $e')),
       );
       setState(() => _submitting = false);
+    }
+  }
+
+  Future<void> _saveAttachments(
+    int recordId,
+    List<CaptureArtifact> artifacts,
+  ) async {
+    final state = context.read<RecordsHomeState>();
+    final attachments = artifacts.map((artifact) {
+      return Attachment()
+        ..recordId = recordId
+        ..path = artifact.relativePath
+        ..kind = _mapArtifactTypeToKind(artifact.type)
+        ..mimeType = artifact.mimeType
+        ..sizeBytes = artifact.sizeBytes
+        ..durationMs = artifact.durationMs
+        ..pageCount = artifact.pageCount
+        ..capturedAt = artifact.createdAt
+        ..source = widget.mode.id
+        ..metadataJson =
+            artifact.metadata.isNotEmpty ? jsonEncode(artifact.metadata) : null
+        ..createdAt = DateTime.now();
+    }).toList();
+
+    await state.saveAttachments(attachments);
+  }
+
+  String _mapArtifactTypeToKind(CaptureArtifactType type) {
+    switch (type) {
+      case CaptureArtifactType.photo:
+        return 'image';
+      case CaptureArtifactType.documentScan:
+        return 'pdf';
+      case CaptureArtifactType.audio:
+        return 'audio';
+      case CaptureArtifactType.file:
+        return 'file';
+      case CaptureArtifactType.email:
+        return 'email';
     }
   }
 

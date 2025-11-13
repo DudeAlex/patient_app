@@ -5,6 +5,7 @@ import '../core/di/app_container.dart';
 import '../features/capture_core/capture_core.dart' as capture_core;
 import '../features/capture_core/ui/capture_launcher_screen.dart';
 import '../features/capture_core/ui/capture_review_screen.dart';
+import '../features/records/adapters/repositories/isar_records_repository.dart';
 import '../features/records/data/debug_seed.dart';
 import '../features/records/data/records_service.dart';
 import '../features/records/ui/add_record_screen.dart';
@@ -100,6 +101,7 @@ class _HomeScaffold extends StatelessWidget {
         service.deleteRecord,
         service.getRecordById,
         service.dirtyTracker,
+        service.records as IsarRecordsRepository,
       )..load(),
       child: Builder(
         builder: (context) => Scaffold(

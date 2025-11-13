@@ -2,6 +2,7 @@ import 'package:isar/isar.dart';
 
 import '../../application/ports/records_repository.dart';
 import '../../domain/entities/record.dart';
+import '../../model/attachment.dart';
 import '../mappers/record_mapper.dart';
 import '../storage/record_isar_model.dart';
 
@@ -66,5 +67,17 @@ class IsarRecordsRepository implements RecordsRepository {
             .limit(limit)
             .findAll();
     return results.map(mapRecordFromStorage).toList(growable: false);
+  }
+
+  /// Saves a list of attachments linked to a record.
+  /// Returns the list of saved attachments with assigned IDs.
+  Future<List<Attachment>> saveAttachments(
+    List<Attachment> attachments,
+  ) async {
+    final ids = await _db.writeTxn<List<int>>(
+      () => _db.attachments.putAll(attachments),
+    );
+    final saved = await _db.attachments.getAll(ids);
+    return saved.whereType<Attachment>().toList(growable: false);
   }
 }

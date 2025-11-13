@@ -1,8 +1,8 @@
 # M5 – Multi-Modal Capture & Accessibility Plan
 
-**Status:** In Progress (Phase 4 - Attachments & Polish)
+**Status:** In Progress (Phase 4 - File Upload & Polish)
 **Last Updated:** 2025-11-12
-**Completion:** 13/27 tasks (48%)
+**Completion:** 14/27 tasks (52%)
 
 Bring the add-record experience from a simple form to a patient-friendly capture assistant that supports photos, scans, audio dictation, keyboard entry, file uploads, and Gmail imports. The MVP focuses on delivering a cohesive flow on mobile (Android first) with accessible defaults and a path toward web parity where feasible.
 
@@ -82,8 +82,8 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 - [x] Build review panel that merges captured artefacts, extracted text, suggested tags, and patient edits before saving.
   - Editable review screen implemented with form validation, type selector, date picker, and save functionality.
 - [ ] Allow reordering or removing attachments and editing metadata prior to commit.
-- [ ] Ensure saving creates/updates Record + Attachment documents atomically; hook dirty tracking for auto-sync when that feature resumes.
-  - Note: Records save successfully; Attachment linking is next increment.
+- [x] Ensure saving creates/updates Record + Attachment documents atomically; hook dirty tracking for auto-sync when that feature resumes.
+  - Attachments now saved with recordId, path, metadata (kind, mimeType, sizeBytes, durationMs, pageCount, capturedAt, source, metadataJson).
 - [x] Surface success/Failure feedback that meets accessibility guidelines (snackbar, haptics, voice prompt).
 
 ### 8. Accessibility & Internationalisation

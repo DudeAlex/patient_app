@@ -262,3 +262,21 @@
 - **Result**
   - All tests passed. Capture modes now functional end-to-end.
   - Note: Attachments are captured but not yet linked to records (next increment).
+
+# 2025-11-12 (M5: Attachment Linking)
+- **Change Scope**
+  - Added `saveAttachments()` method to IsarRecordsRepository
+  - Updated review screen to save attachments linked to records
+  - Maps CaptureArtifact → Attachment model with recordId
+  - Saves all metadata: path, kind, mimeType, sizeBytes, durationMs, pageCount, capturedAt, source, metadataJson
+- **Verification**
+  - `flutter analyze` - clean
+  - Manual tests on Android emulator (Pixel 9, API 36):
+    - Photo capture → review → save → verified 8 attachments in Isar Inspector
+    - Attachment metadata confirmed: recordId=7, kind="image", mimeType="image/jpeg", sizeBytes=1992078
+    - File path preserved: sessions/AaLa7hbs-59Wa-4Yf0-322c-cfa2949f4970/meta_17a36169288b53.jpg
+    - Clarity analysis metadata stored in metadataJson
+    - Source mode tracked: "photo"
+- **Result**
+  - All tests passed. Attachments are now properly linked to records in database.
+  - Success message shows attachment count: "Record saved with X attachment(s)"
