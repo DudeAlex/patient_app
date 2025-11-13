@@ -15,15 +15,16 @@ M3: Retrieval & Search Foundation (done)
 - Delivered: date-sorted pagination, title/notes search, shared state refresh.
 - Deferred for later phases: tag filters, attachment/OCR search, saved views, semantic retrieval.
 
-M4: Auto Sync
+M4: Auto Sync (Completed 2025-11-09)
 - See `M4_AUTO_SYNC_PLAN.md` for the breakdown.
-- Track local dirty state (changes increment counter)
-- On app resume/exit: export/encrypt/upload if dirty
-- Conflict: last-write-wins with banner
-- Auto backup toggle now available in Settings. Background backups run on resume when pending changes exist, Wi-Fi/ethernet is available, and the selected cadence interval (6h/12h/daily/weekly/manual) has elapsed; follow-up: surface conflict banner messaging during Drive merges.
-- Profile hub card now surfaces manual "Backup now," cadence presets (persisted + scheduler-backed), display preferences, AI consent toggle, and backup-key portability entry point. Follow-up: wire the AI consent toggle into the forthcoming companion flows and ship the backup-key export/import experience.
-- Continue polishing the profile hub (account info, manual "Backup now," cadence presets, theme/text toggles, AI consent) so patients control core settings themselves without deep navigation.
-- Deliver a secure backup-key portability solution (patient passphrase/mnemonic, offline QR/file export, or platform secure backup integration) so encrypted archives restore on replacement devices before production launch.
+- ✅ Track local dirty state (changes increment counter)
+- ✅ On app resume/exit: export/encrypt/upload if dirty
+- ✅ Auto backup toggle available in Settings
+- ✅ Background backups run on resume when pending changes exist, Wi-Fi/ethernet is available, and the selected cadence interval (6h/12h/daily/weekly/manual) has elapsed
+- ✅ Profile hub card surfaces manual "Backup now," cadence presets (persisted + scheduler-backed), display preferences, AI consent toggle, and backup-key portability entry point
+- ⏳ Follow-up: Surface conflict banner messaging during Drive merges (deferred to M4.1)
+- ⏳ Follow-up: Wire the AI consent toggle into companion flows (M6)
+- ⏳ Follow-up: Ship backup-key export/import experience (production blocker, target M4.1)
 
 M5: Multi-Modal Capture & Accessibility
 - Design modal with Photo, Document Scan, Voice Dictation, Keyboard, File Upload, and Email Import options (no video capture)

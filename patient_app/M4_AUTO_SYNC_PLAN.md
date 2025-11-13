@@ -1,6 +1,34 @@
 # M4 - Auto Sync Plan
 
+**Status:** Completed (MVP shipped 2025-11-09)
+**Last Updated:** 2025-11-12
+
 Auto sync ensures local changes are backed up to Google Drive App Data automatically, while keeping patients in control and mindful of data usage. Work is split into a minimal MVP and future enhancements.
+
+## For AI Agents
+
+**Context needed:**
+1. `SYNC.md` - Backup format and sync architecture
+2. `SPEC.md` sections 4.2a, 6 - Auto sync requirements
+3. `CLEAN_ARCHITECTURE_GUIDE.md` - Layer responsibilities
+
+**What was delivered:**
+- Dirty change tracking (critical vs routine)
+- Wi-Fi/ethernet gating
+- Cadence presets (6h/12h/daily/weekly/manual)
+- Profile hub UI with manual backup button
+- Exponential backoff on failures
+- Clean architecture refactor (Phase 2)
+
+**What's deferred:**
+- Conflict banner UI (M4.1)
+- Backup key portability (M4.1 - production blocker)
+- Cellular opt-in (future)
+
+**Key files:**
+- `lib/features/sync/` - All sync-related code
+- `lib/ui/settings/settings_screen.dart` - Profile hub UI
+- `test/features/sync/` - Unit tests
 
 ## MVP Scope (Release Now)
 

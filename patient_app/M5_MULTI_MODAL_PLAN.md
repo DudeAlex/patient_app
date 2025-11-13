@@ -1,6 +1,38 @@
 # M5 – Multi-Modal Capture & Accessibility Plan
 
+**Status:** In Progress (Phase 3 - Voice & Review)
+**Last Updated:** 2025-11-12
+**Completion:** 12/27 tasks (44%)
+
 Bring the add-record experience from a simple form to a patient-friendly capture assistant that supports photos, scans, audio dictation, keyboard entry, file uploads, and Gmail imports. The MVP focuses on delivering a cohesive flow on mobile (Android first) with accessible defaults and a path toward web parity where feasible.
+
+## For AI Agents
+
+**Context needed before starting:**
+1. `CLEAN_ARCHITECTURE_GUIDE.md` - Layer responsibilities and dependency rules
+2. `ARCHITECTURE.md` - Module boundaries and capture architecture
+3. `SPEC.md` sections 4.6, 9 - Multi-modal requirements and accessibility
+4. `M5_MULTI_MODAL_PLAN.md` (this file) - Task breakdown
+
+**Entry points:**
+- Capture launcher: `lib/features/capture_core/ui/capture_launcher_screen.dart`
+- Photo mode: `lib/features/capture_modes/photo/`
+- Document scan: `lib/features/capture_modes/document_scan/`
+- Voice mode: `lib/features/capture_modes/voice/`
+- UI mockups: `UI Design Samples/` (reference designs for visual guidance)
+
+**Validation after each task:**
+1. Run `flutter analyze` (must be clean)
+2. Run relevant unit tests: `flutter test test/features/capture_*`
+3. Manual test on Android emulator (log in TESTING.md)
+4. Update this plan's completion count
+
+**Common pitfalls:**
+- Don't import `AttachmentsStorage` directly in modes - use capture storage ports
+- Don't put business logic in UI widgets - use use cases
+- Don't skip consent/permission checks for camera/mic
+- Don't hard-code strings - prepare for localization
+- Always preserve original artifacts before AI processing
 
 ## MVP Scope (Ship as part of M5)
 

@@ -1,6 +1,29 @@
 # M2 — Records CRUD UI Breakdown
 
+**Status:** Completed (2025-10-31)
+**Last Updated:** 2025-11-12
+
 This stage expands milestone M2 into actionable steps so implementation can progress in small, verifiable increments.
+
+## For AI Agents
+
+**Context needed:**
+1. `SPEC.md` section 4.5 - Records CRUD requirements
+2. `ARCHITECTURE.md` - Records feature module structure
+3. `CLEAN_ARCHITECTURE_GUIDE.md` - Layer responsibilities
+
+**What was delivered:**
+- Full CRUD operations (create, read, update, delete)
+- Home list with empty states
+- Detail screen with timestamps and tags
+- Add/edit forms with validation
+- Shared provider for automatic UI refresh
+- Attachment placeholders
+
+**Key files:**
+- `lib/features/records/` - All records code
+- `test/features/records/` - Unit tests
+- Manual tests logged in TESTING.md (2025-10-31)
 
 ## 1. Finalize Data Contracts
 - [x] Review existing `Record` fields and confirm required data from `SPEC.md`.

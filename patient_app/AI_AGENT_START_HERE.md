@@ -13,6 +13,7 @@ Purpose: give any AI or contributor a single launchpad to the repo’s must-read
 
 ## Immediate Must Reads (in order)
 - `AGENTS.md` - operational rules for changes (planning, validation, documentation expectations).
+- `GLOSSARY.md` - canonical terms to use consistently across code and docs.
 - `README.md` - project overview, feature set, quickstart instructions, and current focus.
 - `RUNNING.md` - platform-specific setup, commands, and environment caveats.
 - `ARCHITECTURE.md` - module boundaries, data flow, and planned extensions.
@@ -24,13 +25,14 @@ Purpose: give any AI or contributor a single launchpad to the repo’s must-read
 
 ## Reference Map
 - **Process & Quality**: `AGENTS.md`, `TESTING.md`, `TODO.md`.
-- **Product & UX Context**: `README.md`, `SPEC.md`, `Health_Tracker_Advisor_UX_Documentation.md`, milestone plans (`Mx_*.md`).
+- **Product & UX Context**: `README.md`, `SPEC.md`, `Health_Tracker_Advisor_UX_Documentation.md`, `UI Design Samples/`, milestone plans (`Mx_*.md`).
 - **Architecture & Data Flow**: `ARCHITECTURE.md`, `AI_ASSISTED_PATIENT_APP_PLAN.md`, `SYNC.md`.
 - **Build & Troubleshooting**: `RUNNING.md`, `TROUBLESHOOTING.md`.
 
 ## Strategic & UX Context
-- `../AI_ASSISTED_PATIENT_APP_PLAN.md` – holistic plan for the AI-assisted experience, privacy posture, and rollout sequence.
+- `AI_ASSISTED_PATIENT_APP_PLAN.md` – holistic plan for the AI-assisted experience, privacy posture, and rollout sequence.
 - `Health_Tracker_Advisor_UX_Documentation.md` – detailed UX vision, screen flows, and accessibility principles.
+- `UI Design Samples/` – visual mockups for dashboard, records page, and multi-modal capture launcher.
 
 ## Usage Notes
 1. At the start of every work session, read through this index and open each must-read document to refresh the current expectations before making changes.

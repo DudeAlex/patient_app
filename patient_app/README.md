@@ -35,6 +35,7 @@ Project Layout
 - Contributors and AI agents: start every session with `AI_AGENT_START_HERE.md` to review the must-read guidance before making changes.
 - Specs: see `SPEC.md` for detailed, living requirements
 - Strategy & compassionate AI roadmap: see `AI_ASSISTED_PATIENT_APP_PLAN.md`
+- Canonical terminology: see `GLOSSARY.md`
 
 Prerequisites
 - Flutter stable ≥ 3.32
@@ -122,10 +123,10 @@ Development Scripts
   `dart run build_runner build --delete-conflicting-outputs`
 
  Status & Next Steps
-- Immediate focus: Auto sync (M4) — add Wi-Fi-friendly backup triggers and patient feedback.
-- Recently delivered: Records CRUD, search, and pagination (M2/M3).
-- In discovery: multi-modal Add Record flow and opt-in AI companion (Together AI).
-- Full roadmap (support network, localisation, wellness companion): see `TODO.md` for the living milestones.
+- Current focus: Multi-modal capture (M5) — photo, scan, voice, file, email input with accessibility-first UX.
+- Recently delivered: Auto sync (M4) with Wi-Fi gating, cadence presets, and profile hub; Records CRUD, search, and pagination (M2/M3).
+- In discovery: AI companion integration (M6) with Together AI for extraction and wellness guidance.
+- Full roadmap (support network, localization, wellness companion): see `TODO.md` for the living milestones.
 
 
 Contributing & Process

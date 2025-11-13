@@ -230,4 +230,5 @@ T-06 Failure Paths
 
 References
 - Code: `lib/core/*`, `lib/ui/*`, `lib/features/records/*`
-- Docs: README.md, RUNNING.md, ARCHITECTURE.md, SYNC.md, TROUBLESHOOTING.md, TODO.md, AGENTS.md, AI_ASSISTED_PATIENT_APP_PLAN.md
+- Docs: README.md, RUNNING.md, ARCHITECTURE.md, SYNC.md, TROUBLESHOOTING.md, TODO.md, AGENTS.md, AI_ASSISTED_PATIENT_APP_PLAN.md, GLOSSARY.md
+- Design: `UI Design Samples/`, Health_Tracker_Advisor_UX_Documentation.md

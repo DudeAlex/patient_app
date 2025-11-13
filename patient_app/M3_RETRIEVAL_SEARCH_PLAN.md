@@ -1,6 +1,32 @@
 # M3 - Retrieval & Search Foundation Breakdown
 
+**Status:** Completed (2025-10-31)
+**Last Updated:** 2025-11-12
+
 This plan expands the M3 milestone into incremental slices so we can introduce structured search and retrieval with confidence.
+
+## For AI Agents
+
+**Context needed:**
+1. `SPEC.md` section 4.5 - Search requirements
+2. `lib/features/records/` - Records repository and state
+
+**What was delivered:**
+- Date-sorted pagination with load-more
+- Title/notes keyword search
+- Shared state refresh after CRUD operations
+- Empty states for search results
+
+**What's deferred:**
+- Tag filters (future)
+- Attachment/OCR search (M5+)
+- Saved views (future)
+- Semantic/AI search (M6+)
+
+**Key files:**
+- `lib/features/records/adapters/repositories/isar_records_repository.dart` - Search queries
+- `lib/features/records/ui/records_home_state.dart` - Search state management
+- Manual tests logged in TESTING.md (2025-10-31)
 
 ## 1. Clarify Retrieval Requirements
 - [x] Re-read TODO/M3 milestone notes: initial scope is structured filters (type/date/tag, keyword) with hooks for future OCR/indexing and saved views.
