@@ -43,3 +43,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Design reference (local only)
+Mobile Health App Design/
+
+# IDE specific
+.vscode/
+.obsidian/
+.kiro/
+
+# Coverage reports
+coverage/

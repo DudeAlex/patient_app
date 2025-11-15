@@ -12,6 +12,7 @@ import '../../features/sync/application/use_cases/set_auto_sync_enabled_use_case
 import '../../features/sync/auto_sync_backup_service.dart';
 import '../../features/sync/domain/entities/auto_sync_cadence.dart';
 import '../../features/sync/domain/entities/auto_sync_status.dart';
+import '../screens/design_showcase_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -700,6 +701,18 @@ class _DiagnosticsCard extends StatelessWidget {
               onPressed: onAuthDiagnostics,
               icon: const Icon(Icons.bug_report_outlined),
               label: const Text('Run auth diagnostics'),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const DesignShowcaseScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.palette_outlined),
+              label: const Text('View Design Showcase'),
             ),
             const SizedBox(height: 12),
             if (!isWeb) ...[

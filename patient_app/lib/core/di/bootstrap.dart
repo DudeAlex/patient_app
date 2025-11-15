@@ -1,5 +1,6 @@
 import '../../features/capture_core/capture_core.dart' as capture_core;
 import '../../features/capture_modes/document_scan/document_scan_module.dart';
+import '../../features/capture_modes/file/file_upload_module.dart';
 import '../../features/capture_modes/photo/photo_capture_module.dart';
 import '../../features/capture_modes/voice/voice_capture_module.dart';
 import '../../features/records/data/records_service.dart';
@@ -21,6 +22,7 @@ Future<void> bootstrapAppContainer() async {
         PhotoCaptureModule(),
         DocumentScanModule(),
         VoiceCaptureModule(),
+        FileUploadModule(),
       ],
     ),
   );

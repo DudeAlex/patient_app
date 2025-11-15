@@ -1,8 +1,8 @@
 # M5 – Multi-Modal Capture & Accessibility Plan
 
-**Status:** In Progress (Phase 5 - File Upload & Polish)
-**Last Updated:** 2025-11-12
-**Completion:** 15/27 tasks (56%)
+**Status:** In Progress (Phase 5 - File Upload Complete, Polish Remaining)
+**Last Updated:** 2025-11-13
+**Completion:** 18/27 tasks (67%)
 
 Bring the add-record experience from a simple form to a patient-friendly capture assistant that supports photos, scans, audio dictation, keyboard entry, file uploads, and Gmail imports. The MVP focuses on delivering a cohesive flow on mobile (Android first) with accessible defaults and a path toward web parity where feasible.
 
@@ -73,8 +73,16 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 - [ ] Ensure offline persistence and recovery (drafts survive app backgrounding).
 
 ### 6. File Upload & Email Import
-- [ ] Implement local file picker (PDF/images) with clear copy about storage location and size limits.
-- [ ] Store imported files as attachments with MIME metadata; generate thumbnails/previews where possible.
+- [x] Implement local file picker (PDF/images) with clear copy about storage location and size limits.
+  - File picker integrated with type filtering (PDF, JPEG, PNG)
+  - 50 MB size limit enforced with user-friendly error messages
+  - Files copied to session directory with timestamped names
+  - Original files preserved in source location
+- [x] Store imported files as attachments with MIME metadata; generate thumbnails/previews where possible.
+  - Attachments saved with complete metadata: path, MIME type, size, timestamps
+  - Artifact type inference: PDF → documentScan, images → photo
+  - Linked to records via recordId foreign key
+  - Metadata includes originalFileName for reference
 - [ ] Prototype Gmail label-based import: OAuth scopes, label selection, metadata capture (subject, sender, receivedAt); save fetched content locally without retaining credentials in plaintext.
 - [ ] Provide patient controls to disconnect Gmail and purge imported artefacts.
 
@@ -105,6 +113,24 @@ Bring the add-record experience from a simple form to a patient-friendly capture
 - Web attachment capture parity (camera, audio) leveraging browser APIs.
 - AI-assisted summarisation that drafts structured notes from multi-modal inputs.
 - Collaborative review mode for caregivers with consent management.
+
+## Platform-Specific Limitations
+
+### File Upload
+- **Android**: Fully supported with native file picker
+- **iOS**: Supported via file_picker package (requires testing)
+- **Web**: Supported via browser file input (limited to browser-accessible files)
+- **File Types**: Restricted to PDF, JPEG, PNG for MVP
+- **Size Limit**: 50 MB maximum per file
+- **Storage**: Files copied to app-private storage (attachments/sessions/{sessionId}/)
+- **Permissions**: Handled automatically by file_picker package on mobile
+
+### Known Limitations
+- No multi-file selection (single file per upload operation)
+- No file preview in review screen (shows metadata only)
+- No automatic image compression (large photos stored as-is)
+- No duplicate detection (user can upload same file multiple times)
+- Session cleanup not automatic (temporary files persist if user cancels before save)
 
 ## Open Questions / Risks
 - Package choices for document scanning and STT (licensing, size, offline capability).

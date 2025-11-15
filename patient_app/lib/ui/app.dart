@@ -12,6 +12,7 @@ import '../features/records/ui/add_record_screen.dart';
 import '../features/records/ui/records_home_placeholder.dart';
 import '../features/records/ui/records_home_state.dart';
 import 'settings/settings_screen.dart';
+import 'theme/app_theme.dart';
 
 class PatientApp extends StatelessWidget {
   const PatientApp({super.key});
@@ -20,10 +21,7 @@ class PatientApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Patient App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
       home: const _RecordsLoader(),
     );
   }

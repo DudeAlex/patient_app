@@ -5,6 +5,10 @@ import '../../features/records/adapters/storage/record_isar_model.dart';
 import '../../features/records/model/attachment.dart';
 import '../../features/records/model/insight.dart';
 import '../../features/records/model/sync_state.dart';
+import '../../features/authentication/infrastructure/models/user_isar_model.dart';
+import '../../features/authentication/infrastructure/models/session_isar_model.dart';
+import '../../features/authentication/infrastructure/models/login_attempt_isar_model.dart';
+import '../../features/authentication/infrastructure/models/mfa_pending_isar_model.dart';
 
 class IsarDatabase {
   static Isar? _instance;
@@ -21,6 +25,11 @@ class IsarDatabase {
       AttachmentSchema,
       InsightSchema,
       SyncStateSchema,
+      // Authentication schemas
+      UserIsarModelSchema,
+      SessionIsarModelSchema,
+      LoginAttemptIsarModelSchema,
+      MfaPendingIsarModelSchema,
     ],
         directory: dir.path,
         name: 'patient');
