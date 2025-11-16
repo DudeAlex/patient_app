@@ -1,5 +1,7 @@
 ## Patient App (Flutter)
 
+> **Vision**: Evolving from a health-focused app into a universal personal information system that helps any person collect, organize, and understand the important information in their life. See [VISION.md](./VISION.md) for the complete vision.
+
 Local-first personal health records app. Mobile stores data on-device (Isar), with optional encrypted backup to Google Drive App Data. Web build runs in Chrome with limited backup (disabled by default).
 
 -
@@ -23,10 +25,18 @@ Local-first personal health records app. Mobile stores data on-device (Isar), wi
 - Multilingual UX with focus on English, Russian, and Central Asian languages (localization pipeline planned)
 
 Tech Stack
-- Flutter (Material 3)
+- Flutter (Material 3) with custom gradient-based design system
 - Isar + codegen
 - Google Sign‑In (v7 API) + Google Drive v3
 - AES‑GCM backup encryption
+
+Design System
+- Modern gradient-based UI (blue → purple → pink)
+- Reusable components (gradient headers, buttons, category badges)
+- 3D card effects with touch animations
+- Category-specific color schemes for health records
+- See `docs/DESIGN_SYSTEM.md` for complete documentation
+- View in app: Settings → View Design Showcase
 
 Project Layout
 - `lib/ui/` app shell and screens

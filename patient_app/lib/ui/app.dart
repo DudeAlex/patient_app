@@ -10,6 +10,7 @@ import '../features/records/data/debug_seed.dart';
 import '../features/records/data/records_service.dart';
 import '../features/records/ui/add_record_screen.dart';
 import '../features/records/ui/records_home_placeholder.dart';
+import '../features/records/ui/records_home_modern.dart';
 import '../features/records/ui/records_home_state.dart';
 import 'settings/settings_screen.dart';
 import 'theme/app_theme.dart';
@@ -116,7 +117,7 @@ class _HomeScaffold extends StatelessWidget {
               ),
             ],
           ),
-          body: const RecordsHomePlaceholder(),
+          body: const RecordsHomeModern(), // Switch to RecordsHomePlaceholder() to see old design
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
               final state = context.read<RecordsHomeState>();

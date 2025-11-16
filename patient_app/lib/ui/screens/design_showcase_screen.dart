@@ -126,8 +126,8 @@ class DesignShowcaseScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                         _ColorSwatch(
-                          color: AppColors.gradientPink,
-                          label: 'Pink',
+                          color: AppColors.gradientTeal,
+                          label: 'Teal',
                         ),
                       ],
                     ),

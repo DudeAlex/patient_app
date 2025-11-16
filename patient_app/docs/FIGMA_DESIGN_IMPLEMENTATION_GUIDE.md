@@ -1,5 +1,7 @@
 # Figma Design Implementation Guide for Flutter
 
+> **Note**: For quick reference and practical usage, see [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md). This document provides detailed code examples and implementation patterns.
+
 ## Quick Start: Adapting the Design to Flutter
 
 This guide provides concrete code examples for implementing the Figma design patterns in our Flutter patient app.

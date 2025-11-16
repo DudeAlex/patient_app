@@ -1,5 +1,7 @@
 # Figma Design Analysis & Adaptation Plan
 
+> **Note**: For quick reference and practical usage, see [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md). This document provides detailed analysis and adaptation strategy.
+
 ## Overview
 
 The Mobile Health App Design created with Figma AI is a modern, polished React/TypeScript application with excellent UI/UX patterns that can be adapted to our Flutter patient app project.

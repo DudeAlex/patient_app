@@ -12,6 +12,7 @@ Purpose: give any AI or contributor a single launchpad to the repo’s must-read
 - **Roadmap**: Current milestone focus is M4 Auto Sync and upcoming multi-modal capture (see `TODO.md` and milestone plans).
 
 ## Immediate Must Reads (in order)
+- `VISION.md` - **Long-term vision**: Evolution from health app to universal personal information system.
 - `AGENTS.md` - operational rules for changes (planning, validation, documentation expectations).
 - `GLOSSARY.md` - canonical terms to use consistently across code and docs.
 - `README.md` - project overview, feature set, quickstart instructions, and current focus.

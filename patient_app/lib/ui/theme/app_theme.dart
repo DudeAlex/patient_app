@@ -21,7 +21,7 @@ class AppTheme {
       colorScheme: ColorScheme.light(
         primary: AppColors.gradientPurple,
         secondary: AppColors.gradientBlue,
-        tertiary: AppColors.gradientPink,
+        tertiary: AppColors.gradientTeal,
         surface: AppColors.white,
         background: AppColors.gray50,
         error: AppColors.error,

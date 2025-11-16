@@ -11,19 +11,19 @@ class AppColors {
   // Primary Gradient Colors
   static const gradientBlue = Color(0xFF3B82F6);    // blue-500
   static const gradientPurple = Color(0xFF8B5CF6);  // purple-500
-  static const gradientPink = Color(0xFFEC4899);    // pink-500
+  static const gradientTeal = Color(0xFF14B8A6);    // teal-500 (softer than pink)
   
   // Category Colors - Light backgrounds
   static const checkupLight = Color(0xFFDBEAFE);    // blue-100
   static const dentalLight = Color(0xFFF3E8FF);     // purple-100
-  static const visionLight = Color(0xFFFCE7F3);     // pink-100
+  static const visionLight = Color(0xFFCCFBF1);     // teal-100 (softer than pink)
   static const labLight = Color(0xFFD1FAE5);        // green-100
   static const medicationLight = Color(0xFFFFEDD5); // orange-100
   
   // Category Colors - Dark text
   static const checkupDark = Color(0xFF1D4ED8);     // blue-700
   static const dentalDark = Color(0xFF7C3AED);      // purple-700
-  static const visionDark = Color(0xFFDB2777);      // pink-700
+  static const visionDark = Color(0xFF0F766E);      // teal-700 (softer than pink)
   static const labDark = Color(0xFF059669);         // green-700
   static const medicationDark = Color(0xFFEA580C);  // orange-700
   
@@ -52,7 +52,7 @@ class AppColors {
   static const primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [gradientBlue, gradientPurple, gradientPink],
+    colors: [gradientBlue, gradientPurple, gradientTeal],
   );
   
   /// Button gradient for primary action buttons
