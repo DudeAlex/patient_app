@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../../../ui/theme/app_colors.dart';
 import '../../../ui/theme/app_text_styles.dart';
 import '../../../ui/widgets/common/gradient_header.dart';
+import '../../spaces/providers/space_provider.dart';
+import '../../spaces/ui/space_selector_screen.dart';
 import '../domain/entities/record.dart';
 import 'record_detail_screen.dart';
 import 'records_home_state.dart';
@@ -54,22 +56,26 @@ class _RecordsHomeBodyState extends State<_RecordsHomeBody> {
     _submitSearch('');
   }
   
-  int _countTags(List<RecordEntity> records) {
-    final allTags = <String>{};
-    for (final record in records) {
-      allTags.addAll(record.tags);
-    }
-    return allTags.length;
+  /// Count unique categories (types) used in current space
+  int _countCategories(List<RecordEntity> records) {
+    return records.map((r) => r.type).toSet().length;
   }
   
-  int _countTypes(List<RecordEntity> records) {
-    return records.map((r) => r.type).toSet().length;
+  /// Count total attachments across all records in current space
+  /// Note: This is a placeholder implementation. Attachments are stored
+  /// separately and would need to be queried from the database.
+  /// For now, returns 0 as a safe default.
+  int _countAttachments(List<RecordEntity> records) {
+    // TODO: Implement actual attachment counting by querying the database
+    // This would require accessing the repository to count attachments
+    // where recordId is in the list of record IDs
+    return 0;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<RecordsHomeState>(
-      builder: (context, state, _) {
+    return Consumer2<RecordsHomeState, SpaceProvider>(
+      builder: (context, state, spaceProvider, _) {
         if (_searchController.text != state.searchQuery) {
           _searchController.value = _searchController.value.copyWith(
             text: state.searchQuery,
@@ -99,20 +105,42 @@ class _RecordsHomeBodyState extends State<_RecordsHomeBody> {
           );
         }
 
+        // Get current space for header
+        final currentSpace = spaceProvider.currentSpace;
+        final hasMultipleSpaces = spaceProvider.activeSpaces.length > 1;
+
         return Column(
           children: [
-            // Modern gradient header with search
-            GradientHeader(
-              title: 'My Health Records',
-              subtitle: 'Manage your personal health data',
+            // Modern gradient header with space identity
+            GradientHeader.fromSpace(
+              space: currentSpace ?? spaceProvider.activeSpaces.first,
               bottomPadding: 32,
+              actions: hasMultipleSpaces
+                  ? [
+                      GradientHeaderActionButton(
+                        icon: Icons.grid_3x3,
+                        tooltip: 'Switch space',
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => SpaceSelectorScreen(
+                                spaceProvider: spaceProvider,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ]
+                  : null,
               child: TextField(
                 controller: _searchController,
                 textInputAction: TextInputAction.search,
                 onSubmitted: _submitSearch,
                 style: const TextStyle(color: AppColors.gray900),
                 decoration: InputDecoration(
-                  hintText: 'Search records...',
+                  hintText: currentSpace != null
+                      ? 'Search in ${currentSpace.name}...'
+                      : 'Search records...',
                   hintStyle: TextStyle(color: AppColors.gray400),
                   prefixIcon: const Icon(Icons.search, color: AppColors.gray400),
                   suffixIcon: _searchController.text.isEmpty
@@ -140,7 +168,7 @@ class _RecordsHomeBodyState extends State<_RecordsHomeBody> {
               ),
             ),
             
-            // Stats Cards
+            // Stats Cards - space-specific statistics
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
               child: Transform.translate(
@@ -150,22 +178,22 @@ class _RecordsHomeBodyState extends State<_RecordsHomeBody> {
                     Expanded(
                       child: _StatsCard(
                         value: '${state.records.length}',
-                        label: 'Total Records',
+                        label: 'Records',
                         color: AppColors.gradientBlue,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _StatsCard(
-                        value: '${_countTags(state.records)}',
-                        label: 'Tags',
+                        value: '${_countAttachments(state.records)}',
+                        label: 'Attachments',
                         color: AppColors.gradientPurple,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _StatsCard(
-                        value: '${_countTypes(state.records)}',
+                        value: '${_countCategories(state.records)}',
                         label: 'Categories',
                         color: AppColors.gradientTeal,
                       ),

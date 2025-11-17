@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:isar/isar.dart';
 
 import '../../../core/db/isar.dart' as db_helpers;
+import '../../../core/diagnostics/app_logger.dart';
 import '../../sync/adapters/repositories/isar_sync_state_repository.dart';
 import '../../sync/application/use_cases/mark_auto_sync_success_use_case.dart';
 import '../../sync/application/use_cases/promote_routine_changes_use_case.dart';
@@ -76,53 +77,80 @@ class RecordsService {
   }
 
   static Future<RecordsService> _create() async {
-    final isar = await db_helpers.IsarDatabase.open(
-      // Encryption-at-rest is not enabled yet; we pass a stable placeholder key
-      // to maintain API compatibility when encryption lands (see SPEC.md).
-      encryptionKey: List<int>.filled(32, 0),
-    );
-    final repo = IsarRecordsRepository(isar);
-    final fetchRecordsPage = FetchRecordsPageUseCase(repo);
-    final fetchRecentRecords = FetchRecentRecordsUseCase(repo);
-    final getRecordById = GetRecordByIdUseCase(repo);
-    final saveRecord = SaveRecordUseCase(repo);
-    final deleteRecord = DeleteRecordUseCase(repo);
-    final syncRepo = IsarSyncStateRepository(isar);
-    await syncRepo.ensureInitialized();
-    final recordChangeUseCase = RecordAutoSyncChangeUseCase(syncRepo);
-    final tracker = AutoSyncDirtyTracker(recordChangeUseCase);
-    final markSuccess = MarkAutoSyncSuccessUseCase(syncRepo);
-    final backupService = AutoSyncBackupService();
-    final autoSyncRunner = AutoSyncRunner(
-      markSuccess,
-      backupClient: backupService,
-      networkInfo: ConnectivityAutoSyncNetworkInfo(),
-    );
-    final watchStatus = WatchAutoSyncStatusUseCase(syncRepo);
-    final promoteRoutineChanges = PromoteRoutineChangesUseCase(syncRepo);
-    final autoSync = AutoSyncCoordinator(
-      watchStatus,
-      autoSyncRunner,
-      promoteRoutineChanges,
-    )..start();
-    final setAutoSyncEnabled = SetAutoSyncEnabledUseCase(syncRepo);
-    final setAutoSyncCadence = SetAutoSyncCadenceUseCase(syncRepo);
-    final readAutoSyncStatus = ReadAutoSyncStatusUseCase(syncRepo);
-    return RecordsService._(
-      db: isar,
-      records: repo,
-      fetchRecordsPage: fetchRecordsPage,
-      fetchRecentRecords: fetchRecentRecords,
-      getRecordById: getRecordById,
-      saveRecord: saveRecord,
-      deleteRecord: deleteRecord,
-      dirtyTracker: tracker,
-      backupService: backupService,
-      autoSync: autoSync,
-      setAutoSyncEnabled: setAutoSyncEnabled,
-      setAutoSyncCadence: setAutoSyncCadence,
-      readAutoSyncStatus: readAutoSyncStatus,
-      markAutoSyncSuccess: markSuccess,
-    );
+    final createOp = AppLogger.startOperation('create_records_service');
+    
+    try {
+      // Open database
+      final dbOpenOp = AppLogger.startOperation('open_isar_database', parentId: createOp);
+      final isar = await db_helpers.IsarDatabase.open(
+        // Encryption-at-rest is not enabled yet; we pass a stable placeholder key
+        // to maintain API compatibility when encryption lands (see SPEC.md).
+        encryptionKey: List<int>.filled(32, 0),
+      );
+      await AppLogger.endOperation(dbOpenOp);
+      
+      // Initialize repositories and use cases
+      final initOp = AppLogger.startOperation('initialize_repositories', parentId: createOp);
+      final repo = IsarRecordsRepository(isar);
+      final fetchRecordsPage = FetchRecordsPageUseCase(repo);
+      final fetchRecentRecords = FetchRecentRecordsUseCase(repo);
+      final getRecordById = GetRecordByIdUseCase(repo);
+      final saveRecord = SaveRecordUseCase(repo);
+      final deleteRecord = DeleteRecordUseCase(repo);
+      await AppLogger.endOperation(initOp);
+      
+      // Initialize sync system
+      final syncOp = AppLogger.startOperation('initialize_sync_system', parentId: createOp);
+      final syncRepo = IsarSyncStateRepository(isar);
+      await syncRepo.ensureInitialized();
+      final recordChangeUseCase = RecordAutoSyncChangeUseCase(syncRepo);
+      final tracker = AutoSyncDirtyTracker(recordChangeUseCase);
+      final markSuccess = MarkAutoSyncSuccessUseCase(syncRepo);
+      final backupService = AutoSyncBackupService();
+      final autoSyncRunner = AutoSyncRunner(
+        markSuccess,
+        backupClient: backupService,
+        networkInfo: ConnectivityAutoSyncNetworkInfo(),
+      );
+      final watchStatus = WatchAutoSyncStatusUseCase(syncRepo);
+      final promoteRoutineChanges = PromoteRoutineChangesUseCase(syncRepo);
+      final autoSync = AutoSyncCoordinator(
+        watchStatus,
+        autoSyncRunner,
+        promoteRoutineChanges,
+      )..start();
+      await AppLogger.endOperation(syncOp);
+      
+      final setAutoSyncEnabled = SetAutoSyncEnabledUseCase(syncRepo);
+      final setAutoSyncCadence = SetAutoSyncCadenceUseCase(syncRepo);
+      final readAutoSyncStatus = ReadAutoSyncStatusUseCase(syncRepo);
+      
+      await AppLogger.endOperation(createOp);
+      
+      return RecordsService._(
+        db: isar,
+        records: repo,
+        fetchRecordsPage: fetchRecordsPage,
+        fetchRecentRecords: fetchRecentRecords,
+        getRecordById: getRecordById,
+        saveRecord: saveRecord,
+        deleteRecord: deleteRecord,
+        dirtyTracker: tracker,
+        backupService: backupService,
+        autoSync: autoSync,
+        setAutoSyncEnabled: setAutoSyncEnabled,
+        setAutoSyncCadence: setAutoSyncCadence,
+        readAutoSyncStatus: readAutoSyncStatus,
+        markAutoSyncSuccess: markSuccess,
+      );
+    } catch (e, stackTrace) {
+      await AppLogger.error(
+        'Failed to create RecordsService',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      await AppLogger.endOperation(createOp);
+      rethrow;
+    }
   }
 }

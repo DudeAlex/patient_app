@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/domain/entities/space.dart';
+import '../../../features/spaces/ui/widgets/space_icon.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 
@@ -7,11 +9,13 @@ import '../../theme/app_text_styles.dart';
 /// This component provides a consistent header design across the app with
 /// a gradient background and rounded bottom corners.
 /// 
-/// Example:
+/// Can be used with a Space object to automatically apply space-specific styling,
+/// or with manual title/subtitle for custom headers.
+/// 
+/// Example with Space:
 /// ```dart
-/// GradientHeader(
-///   title: 'My Health Records',
-///   subtitle: 'Manage your personal health data',
+/// GradientHeader.fromSpace(
+///   space: healthSpace,
 ///   onBackPressed: () => Navigator.pop(context),
 ///   actions: [
 ///     IconButton(
@@ -22,12 +26,25 @@ import '../../theme/app_text_styles.dart';
 ///   child: SearchBar(...),
 /// )
 /// ```
+/// 
+/// Example with manual title:
+/// ```dart
+/// GradientHeader(
+///   title: 'My Health Records',
+///   subtitle: 'Manage your personal health data',
+///   onBackPressed: () => Navigator.pop(context),
+///   child: SearchBar(...),
+/// )
+/// ```
 class GradientHeader extends StatelessWidget {
   /// The main title text displayed in the header
   final String title;
   
   /// Optional subtitle text displayed below the title
   final String? subtitle;
+  
+  /// Optional space to use for gradient and icon
+  final Space? space;
   
   /// Callback when the back button is pressed (if null, no back button shown)
   final VoidCallback? onBackPressed;
@@ -48,6 +65,7 @@ class GradientHeader extends StatelessWidget {
     Key? key,
     required this.title,
     this.subtitle,
+    this.space,
     this.onBackPressed,
     this.actions,
     this.child,
@@ -55,19 +73,57 @@ class GradientHeader extends StatelessWidget {
     this.useSafeArea = true,
   }) : super(key: key);
 
+  /// Creates a GradientHeader from a Space object
+  /// 
+  /// Automatically uses the space's name, description, icon, and gradient.
+  factory GradientHeader.fromSpace({
+    Key? key,
+    required Space space,
+    VoidCallback? onBackPressed,
+    List<Widget>? actions,
+    Widget? child,
+    double bottomPadding = 32,
+    bool useSafeArea = true,
+  }) {
+    return GradientHeader(
+      key: key,
+      title: space.name,
+      subtitle: space.description,
+      space: space,
+      onBackPressed: onBackPressed,
+      actions: actions,
+      child: child,
+      bottomPadding: bottomPadding,
+      useSafeArea: useSafeArea,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Use space gradient if available, otherwise use default primary gradient
+    final gradient = space?.gradient.toLinearGradient() ?? AppColors.primaryGradient;
+
     final content = Padding(
       padding: EdgeInsets.fromLTRB(24, 16, 24, bottomPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Header Row with back button, title, and actions
+          // Header Row with back button, space icon, title, and actions
           Row(
             children: [
               if (onBackPressed != null) ...[
                 _BackButton(onPressed: onBackPressed!),
+                const SizedBox(width: 12),
+              ],
+              // Show space icon if space is provided
+              if (space != null) ...[
+                SpaceIcon(
+                  iconName: space!.icon,
+                  gradient: space!.gradient,
+                  size: 40,
+                  isSelected: true,
+                ),
                 const SizedBox(width: 12),
               ],
               Expanded(
@@ -106,9 +162,9 @@ class GradientHeader extends StatelessWidget {
     );
 
     return Container(
-      decoration: const BoxDecoration(
-        gradient: AppColors.primaryGradient,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        gradient: gradient,
+        borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(24),
         ),

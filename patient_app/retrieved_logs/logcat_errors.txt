@@ -1,0 +1,3 @@
+--------- beginning of main
+11-16 21:28:15.441   910   910 F ot-daemon: [C] P-SpinelDrive-: Software reset co-processor successfully
+11-16 21:28:15.565   910   910 F ot-daemon: [C] P-Resolver----: No domain name servers found in /etc/resolv.conf, default to 127.0.0.1

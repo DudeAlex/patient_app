@@ -2,11 +2,12 @@
 
 > **Vision**: Evolving from a health-focused app into a universal personal information system that helps any person collect, organize, and understand the important information in their life. See [VISION.md](./VISION.md) for the complete vision.
 
-Local-first personal health records app. Mobile stores data on-device (Isar), with optional encrypted backup to Google Drive App Data. Web build runs in Chrome with limited backup (disabled by default).
+Local-first personal information system. Mobile stores data on-device (Isar), with optional encrypted backup to Google Drive App Data. Web build runs in Chrome with limited backup (disabled by default).
 
 -
 
 - Features
+- **Universal Spaces System**: Organize different life areas (Health, Education, Home & Life, Business, Finance, Travel, Family, Creative) in separate spaces with distinct visual identities, categories, and records. Create custom spaces for unique needs. Switch between spaces seamlessly with space-specific filtering, search, and statistics.
 - Local storage with Isar (encrypted backup archive, on-device DB not encrypted yet)
 - Attachments folder for files (mobile only at this stage)
 - Settings screen with a profile hub (account status, manual “Backup now”, Wi-Fi/ethernet cadence presets, appearance controls, AI consent preview, backup-key portability placeholder) plus Google sign-in, Drive backup/restore, and auto backup toggle (mobile — background backups now respect the selected cadence preset: 6h/12h/daily/weekly/manual, always gated to Wi-Fi/ethernet connections, with exponential backoff on failures and the ability to disable auto sync entirely from Settings)
@@ -15,14 +16,26 @@ Local-first personal health records app. Mobile stores data on-device (Isar), wi
 - Shared `google_drive_backup` package provides reusable Google auth + encrypted Drive backup helpers
 - In-app Auth Diagnostics (runs sign-in and header checks; logs safe details)
 - Web build boots the app and hides backup/restore (browser sandbox)
-- Records list with search (title + notes) and load-more pagination (new in M3)
-- Multi-modal "Add Record" flow (photo with on-device retake checks, baseline document scanning with enhanced previews + clarity prompts, voice dictation capture, keyboard entry, file upload from device storage, Gmail label import)
+- Records list with search (title + notes) and load-more pagination, filtered by current space
+- Multi-modal "Add Record" flow (photo with on-device retake checks, baseline document scanning with enhanced previews + clarity prompts, voice dictation capture, keyboard entry, file upload from device storage, Gmail label import) with space-specific categories
 - Attachments saved and displayed: photos, scans, audio, uploaded files (PDF/images) with metadata (file size, duration, timestamps, page counts, MIME types)
 - Dual operating modes: local-only storage by default, opt-in AI-assisted companion (Together AI: Llama 70B text, Apriel image) for extraction, organization, and encouragement
 - Compassionate companion experience with contextual follow-ups, safety hints, and morale support (design underway)
 - Support network & emergency contacts for quick outreach (design underway)
 - Planned phone-based vitals capture (camera-based pulse and connected-cuff blood pressure) with patient consent
 - Multilingual UX with focus on English, Russian, and Central Asian languages (localization pipeline planned)
+
+### Universal Information Concept
+
+The app has evolved from a health-focused tool into a flexible personal information system. Instead of being limited to health records, you can now organize any area of your life:
+
+- **Spaces**: Each space represents a distinct life area (e.g., Health, Education, Business) with its own icon, color gradient, and categories
+- **Default Spaces**: Choose from 8 pre-configured spaces covering common life areas, each with relevant categories
+- **Custom Spaces**: Create your own spaces for unique needs with personalized icons, colors, and categories
+- **Space Switching**: Easily switch between active spaces to view different areas of your life
+- **Space-Specific Data**: Records, categories, search, and statistics are all scoped to the current space
+- **Onboarding**: First-time users select their initial spaces through a guided 3-step onboarding flow
+- **Backward Compatibility**: All existing health records continue to work seamlessly in the Health space
 
 Tech Stack
 - Flutter (Material 3) with custom gradient-based design system

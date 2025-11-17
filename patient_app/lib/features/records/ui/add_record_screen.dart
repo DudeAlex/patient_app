@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../model/record_types.dart';
 import '../domain/entities/record.dart';
 import 'records_home_state.dart';
+import '../../spaces/providers/space_provider.dart';
+import '../../../core/domain/entities/space.dart';
 
 class AddRecordScreen extends StatefulWidget {
   const AddRecordScreen({super.key, this.existing});
@@ -21,10 +22,11 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
   final _notesController = TextEditingController();
   final _tagsController = TextEditingController();
 
-  String _type = RecordTypes.note;
+  String? _type; // Will be initialized from space categories
   DateTime _date = DateTime.now();
   bool _submitting = false;
   late final RecordEntity? _original;
+  Space? _currentSpace;
 
   @override
   void initState() {
@@ -37,6 +39,19 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
       _titleController.text = original.title;
       _notesController.text = original.text ?? '';
       _tagsController.text = original.tags.join(', ');
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Get current space from provider
+    final spaceProvider = context.watch<SpaceProvider>();
+    _currentSpace = spaceProvider.currentSpace;
+    
+    // Initialize type from space categories if not set
+    if (_type == null && _currentSpace != null) {
+      _type = _currentSpace!.categories.first;
     }
   }
 
@@ -70,9 +85,13 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
     final tags = _parseTags(_tagsController.text);
 
     final original = _original;
+    // Use current space ID for new records
+    final spaceId = _currentSpace?.id ?? 'health';
+    
     final newRecord = RecordEntity(
       id: original?.id,
-      type: _type,
+      spaceId: spaceId,
+      type: _type ?? 'Other',
       date: _date,
       title: _titleController.text.trim(),
       text: cleanedNotes.isEmpty ? null : cleanedNotes,
@@ -107,8 +126,14 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
   Widget build(BuildContext context) {
     final isEdit = _original != null;
     final dateLabel = DateFormat.yMMMMd().format(_date);
+    
+    // Get space-specific title and categories
+    final spaceName = _currentSpace?.name ?? 'Record';
+    final title = isEdit ? 'Edit $spaceName Record' : 'Add $spaceName Record';
+    final categories = _currentSpace?.categories ?? ['Other'];
+    
     return Scaffold(
-      appBar: AppBar(title: Text(isEdit ? 'Edit Record' : 'Add Record')),
+      appBar: AppBar(title: Text(title)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -116,12 +141,15 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
           children: [
             DropdownButtonFormField<String>(
               value: _type,
-              decoration: const InputDecoration(labelText: 'Type'),
-              items: RecordTypes.values
+              decoration: InputDecoration(
+                labelText: 'Category',
+                hintText: 'Select a category for this ${spaceName.toLowerCase()} record',
+              ),
+              items: categories
                   .map(
                     (value) => DropdownMenuItem(
                       value: value,
-                      child: Text(_formatType(value)),
+                      child: Text(value),
                     ),
                   )
                   .toList(),
@@ -130,6 +158,12 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                 setState(() {
                   _type = value;
                 });
+              },
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Please select a category';
+                }
+                return null;
               },
             ),
             const SizedBox(height: 16),
@@ -149,9 +183,10 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _titleController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Title',
-                border: OutlineInputBorder(),
+                hintText: 'Enter a descriptive title for this ${spaceName.toLowerCase()} record',
+                border: const OutlineInputBorder(),
               ),
               textInputAction: TextInputAction.next,
               validator: (value) {
@@ -236,18 +271,4 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
     );
   }
 
-  String _formatType(String type) {
-    switch (type) {
-      case RecordTypes.visit:
-        return 'Visit';
-      case RecordTypes.lab:
-        return 'Lab';
-      case RecordTypes.medication:
-        return 'Medication';
-      case RecordTypes.note:
-        return 'Note';
-      default:
-        return type;
-    }
-  }
 }

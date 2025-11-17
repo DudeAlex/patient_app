@@ -10,6 +10,11 @@ class Record {
 
   Id id = Isar.autoIncrement;
 
+  /// Space identifier - associates record with a specific life area/domain
+  /// Defaults to 'health' for backward compatibility with existing records
+  @Index()
+  late String spaceId;
+
   @Index()
   late String type; // note, lab, visit, med
 
@@ -30,6 +35,12 @@ class Record {
 
   DateTime? deletedAt;
 
+  /// Composite index for efficient space-based queries
+  /// Enables fast filtering by space, then category (type), then date
+  @Index(composite: [CompositeIndex('type'), CompositeIndex('date')])
+  String get spaceTypeDateIndex => '$spaceId-$type-${date.toIso8601String()}';
+
+  /// Legacy index maintained for backward compatibility
   @Index()
   String get typeDateIndex => '$type-${date.toIso8601String()}';
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../spaces/providers/space_provider.dart';
 import '../../sync/dirty_tracker.dart';
 import '../adapters/repositories/isar_records_repository.dart';
 import '../application/use_cases/delete_record_use_case.dart';
@@ -19,7 +20,11 @@ class RecordsHomeState extends ChangeNotifier {
     this._getRecordByIdCase,
     this._dirtyTracker,
     this._repository,
-  );
+    this._spaceProvider,
+  ) {
+    // Listen to space changes and reload records
+    _spaceProvider.addListener(_onSpaceChanged);
+  }
 
   static const int _pageSize = 20;
 
@@ -29,6 +34,7 @@ class RecordsHomeState extends ChangeNotifier {
   final GetRecordByIdUseCase _getRecordByIdCase;
   final AutoSyncDirtyTracker _dirtyTracker;
   final IsarRecordsRepository _repository;
+  final SpaceProvider _spaceProvider;
 
   List<RecordEntity> _records = const <RecordEntity>[];
   Object? _error;
@@ -45,6 +51,19 @@ class RecordsHomeState extends ChangeNotifier {
   bool get hasMore => _hasMore;
   bool get hasData => _records.isNotEmpty;
   String get searchQuery => _searchQuery;
+
+  /// Callback when space changes - reload records for new space
+  void _onSpaceChanged() {
+    // Clear search when switching spaces
+    _searchQuery = '';
+    load(force: true);
+  }
+
+  @override
+  void dispose() {
+    _spaceProvider.removeListener(_onSpaceChanged);
+    super.dispose();
+  }
 
   RecordEntity? recordById(int id) {
     for (final record in _records) {
@@ -117,11 +136,15 @@ class RecordsHomeState extends ChangeNotifier {
 
     try {
       final offset = reset ? 0 : _records.length;
+      // Get current space ID for filtering
+      final currentSpaceId = _spaceProvider.currentSpace?.id;
+      
       final output = await _fetchRecordsPage.execute(
         FetchRecordsPageInput(
           offset: offset,
           limit: _pageSize,
           query: _searchQuery,
+          spaceId: currentSpaceId,
         ),
       );
       if (reset) {

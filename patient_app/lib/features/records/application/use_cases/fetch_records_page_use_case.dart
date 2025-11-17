@@ -7,11 +7,13 @@ class FetchRecordsPageInput {
     required this.offset,
     required this.limit,
     this.query,
+    this.spaceId,
   });
 
   final int offset;
   final int limit;
   final String? query;
+  final String? spaceId;
 }
 
 /// Output DTO for [FetchRecordsPageUseCase].
@@ -39,6 +41,7 @@ class FetchRecordsPageUseCase {
       offset: input.offset,
       limit: input.limit,
       query: trimmedQuery?.isEmpty == true ? null : trimmedQuery,
+      spaceId: input.spaceId,
     );
     final hasMore = results.length == input.limit;
     return FetchRecordsPageOutput(records: results, hasMore: hasMore);

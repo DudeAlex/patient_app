@@ -45,27 +45,52 @@ class IsarRecordsRepository implements RecordsRepository {
     required int offset,
     required int limit,
     String? query,
+    String? spaceId,
   }) async {
     final trimmed = query?.trim();
-    final results = trimmed == null || trimmed.isEmpty
-        ? await _db.records
-            .where()
+    final hasQuery = trimmed != null && trimmed.isNotEmpty;
+    final hasSpace = spaceId != null && spaceId.isNotEmpty;
+
+    // Build query based on filters
+    QueryBuilder<Record, Record, QAfterFilterCondition>? queryBuilder;
+
+    if (hasSpace) {
+      // Filter by space
+      queryBuilder = _db.records.filter().spaceIdEqualTo(spaceId);
+
+      if (hasQuery) {
+        // Add text search within space
+        queryBuilder = queryBuilder.group(
+          (q) => q
+              .titleContains(trimmed, caseSensitive: false)
+              .or()
+              .textContains(trimmed, caseSensitive: false),
+        );
+      }
+    } else if (hasQuery) {
+      // Text search without space filter
+      queryBuilder = _db.records.filter().group(
+            (q) => q
+                .titleContains(trimmed, caseSensitive: false)
+                .or()
+                .textContains(trimmed, caseSensitive: false),
+          );
+    }
+
+    // Execute query
+    final results = queryBuilder != null
+        ? await queryBuilder
             .sortByDateDesc()
             .offset(offset)
             .limit(limit)
             .findAll()
         : await _db.records
-            .filter()
-            .group(
-              (q) => q
-                  .titleContains(trimmed, caseSensitive: false)
-                  .or()
-                  .textContains(trimmed, caseSensitive: false),
-            )
+            .where()
             .sortByDateDesc()
             .offset(offset)
             .limit(limit)
             .findAll();
+
     return results.map(mapRecordFromStorage).toList(growable: false);
   }
 

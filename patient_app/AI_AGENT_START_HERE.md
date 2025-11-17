@@ -10,6 +10,8 @@ Purpose: give any AI or contributor a single launchpad to the repo’s must-read
 - **Backup & Consent**: Mobile backups encrypt to `patient-backup-v1.enc` (AES-GCM) in Drive App Data; AI features require explicit opt-in and must keep originals local.
 - **Troubleshooting Triggers**: Symlink issues on Windows, emulator GPU/Play Services quirks, and Google auth scopes are documented in `TROUBLESHOOTING.md`.
 - **Roadmap**: Current milestone focus is M4 Auto Sync and upcoming multi-modal capture (see `TODO.md` and milestone plans).
+- **Diagnostic System**: Comprehensive logging, crash detection, and memory monitoring are active. Logs are stored in app documents directory. Use `get_crash_logs.ps1` to retrieve logs from emulator. See `CRASH_DETECTION_SUMMARY.md` and `DIAGNOSTIC_SYSTEM_INTEGRATION.md` for details.
+- **Logging Requirements**: All code must use `AppLogger` for significant operations, errors, and state changes. See `.kiro/steering/logging-guidelines.md` for mandatory practices.
 
 ## Immediate Must Reads (in order)
 - `VISION.md` - **Long-term vision**: Evolution from health app to universal personal information system.
@@ -23,12 +25,15 @@ Purpose: give any AI or contributor a single launchpad to the repo’s must-read
 - `SYNC.md` - backup/sync behaviour and formats.
 - `TROUBLESHOOTING.md` - known issues, diagnostics, and workarounds.
 - `TODO.md` - roadmap items and follow-ups to keep in mind after each change.
+- `CRASH_DETECTION_SUMMARY.md` - crash detection system, log preservation, and debugging workflow.
+- `DIAGNOSTIC_SYSTEM_INTEGRATION.md` - logging infrastructure, privacy filtering, and performance tracking.
 
 ## Reference Map
 - **Process & Quality**: `AGENTS.md`, `TESTING.md`, `TODO.md`.
 - **Product & UX Context**: `README.md`, `SPEC.md`, `Health_Tracker_Advisor_UX_Documentation.md`, `UI Design Samples/`, milestone plans (`Mx_*.md`).
 - **Architecture & Data Flow**: `ARCHITECTURE.md`, `AI_ASSISTED_PATIENT_APP_PLAN.md`, `SYNC.md`.
-- **Build & Troubleshooting**: `RUNNING.md`, `TROUBLESHOOTING.md`.
+- **Build & Troubleshooting**: `RUNNING.md`, `TROUBLESHOOTING.md`, `KNOWN_ISSUES_AND_FIXES.md`.
+- **Diagnostics & Debugging**: `CRASH_DETECTION_SUMMARY.md`, `DIAGNOSTIC_SYSTEM_INTEGRATION.md`, `KNOWN_ISSUES_AND_FIXES.md`, `get_crash_logs.ps1`, `.kiro/steering/logging-guidelines.md`.
 
 ## Strategic & UX Context
 - `AI_ASSISTED_PATIENT_APP_PLAN.md` – holistic plan for the AI-assisted experience, privacy posture, and rollout sequence.

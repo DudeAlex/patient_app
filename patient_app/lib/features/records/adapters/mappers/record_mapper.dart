@@ -5,6 +5,7 @@ import '../storage/record_isar_model.dart' as storage;
 RecordEntity mapRecordFromStorage(storage.Record record) {
   return RecordEntity(
     id: record.id,
+    spaceId: record.spaceId,
     type: record.type,
     date: record.date,
     title: record.title,
@@ -19,6 +20,7 @@ RecordEntity mapRecordFromStorage(storage.Record record) {
 /// Converts a domain [RecordEntity] into an Isar [storage.Record].
 storage.Record mapRecordToStorage(RecordEntity entity) {
   final model = storage.Record()
+    ..spaceId = entity.spaceId
     ..type = entity.type
     ..date = entity.date
     ..title = entity.title

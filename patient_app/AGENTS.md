@@ -41,6 +41,14 @@ Coding Style
 - Apply Clean Code practices: clear intent-revealing names, small focused functions, and minimal side effects so the code stays easy to read and maintain.
 - Respect core OOP principles (SOLID, encapsulation) when shaping module interfaces, and lean on functional patterns (immutability, pure helpers) where they simplify state or side-effect handling.
 
+Logging Requirements
+- Use `AppLogger` for all significant operations, state changes, and errors (see `.kiro/steering/logging-guidelines.md` for details).
+- Always log errors with context: `await AppLogger.error('Message', error: e, stackTrace: stackTrace, context: {...})`.
+- Use `AppLogger.startOperation()` / `endOperation()` for performance-critical code.
+- Include rich context with all log messages: `context: {'key': 'value'}`.
+- Avoid logging sensitive data (privacy filter will redact, but be mindful).
+- Check logs after changes to ensure no infinite logging loops or excessive noise.
+
 When in Doubt
 - Ask for confirmation before large changes.
 - Split work into multiple small patches instead of one big patch.

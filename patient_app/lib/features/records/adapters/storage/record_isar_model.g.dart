@@ -32,33 +32,43 @@ const RecordSchema = CollectionSchema(
       name: r'deletedAt',
       type: IsarType.dateTime,
     ),
-    r'tags': PropertySchema(
+    r'spaceId': PropertySchema(
       id: 3,
+      name: r'spaceId',
+      type: IsarType.string,
+    ),
+    r'spaceTypeDateIndex': PropertySchema(
+      id: 4,
+      name: r'spaceTypeDateIndex',
+      type: IsarType.string,
+    ),
+    r'tags': PropertySchema(
+      id: 5,
       name: r'tags',
       type: IsarType.stringList,
     ),
     r'text': PropertySchema(
-      id: 4,
+      id: 6,
       name: r'text',
       type: IsarType.string,
     ),
     r'title': PropertySchema(
-      id: 5,
+      id: 7,
       name: r'title',
       type: IsarType.string,
     ),
     r'type': PropertySchema(
-      id: 6,
+      id: 8,
       name: r'type',
       type: IsarType.string,
     ),
     r'typeDateIndex': PropertySchema(
-      id: 7,
+      id: 9,
       name: r'typeDateIndex',
       type: IsarType.string,
     ),
     r'updatedAt': PropertySchema(
-      id: 8,
+      id: 10,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -69,6 +79,19 @@ const RecordSchema = CollectionSchema(
   deserializeProp: _recordDeserializeProp,
   idName: r'id',
   indexes: {
+    r'spaceId': IndexSchema(
+      id: -1779888219436521473,
+      name: r'spaceId',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'spaceId',
+          type: IndexType.hash,
+          caseSensitive: true,
+        )
+      ],
+    ),
     r'type': IndexSchema(
       id: 5117122708147080838,
       name: r'type',
@@ -121,6 +144,29 @@ const RecordSchema = CollectionSchema(
         )
       ],
     ),
+    r'spaceTypeDateIndex_type_date': IndexSchema(
+      id: -4297736848588247556,
+      name: r'spaceTypeDateIndex_type_date',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'spaceTypeDateIndex',
+          type: IndexType.hash,
+          caseSensitive: true,
+        ),
+        IndexPropertySchema(
+          name: r'type',
+          type: IndexType.hash,
+          caseSensitive: true,
+        ),
+        IndexPropertySchema(
+          name: r'date',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    ),
     r'typeDateIndex': IndexSchema(
       id: 4090986116092533020,
       name: r'typeDateIndex',
@@ -149,6 +195,8 @@ int _recordEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  bytesCount += 3 + object.spaceId.length * 3;
+  bytesCount += 3 + object.spaceTypeDateIndex.length * 3;
   bytesCount += 3 + object.tags.length * 3;
   {
     for (var i = 0; i < object.tags.length; i++) {
@@ -177,12 +225,14 @@ void _recordSerialize(
   writer.writeDateTime(offsets[0], object.createdAt);
   writer.writeDateTime(offsets[1], object.date);
   writer.writeDateTime(offsets[2], object.deletedAt);
-  writer.writeStringList(offsets[3], object.tags);
-  writer.writeString(offsets[4], object.text);
-  writer.writeString(offsets[5], object.title);
-  writer.writeString(offsets[6], object.type);
-  writer.writeString(offsets[7], object.typeDateIndex);
-  writer.writeDateTime(offsets[8], object.updatedAt);
+  writer.writeString(offsets[3], object.spaceId);
+  writer.writeString(offsets[4], object.spaceTypeDateIndex);
+  writer.writeStringList(offsets[5], object.tags);
+  writer.writeString(offsets[6], object.text);
+  writer.writeString(offsets[7], object.title);
+  writer.writeString(offsets[8], object.type);
+  writer.writeString(offsets[9], object.typeDateIndex);
+  writer.writeDateTime(offsets[10], object.updatedAt);
 }
 
 Record _recordDeserialize(
@@ -196,11 +246,12 @@ Record _recordDeserialize(
   object.date = reader.readDateTime(offsets[1]);
   object.deletedAt = reader.readDateTimeOrNull(offsets[2]);
   object.id = id;
-  object.tags = reader.readStringList(offsets[3]) ?? [];
-  object.text = reader.readStringOrNull(offsets[4]);
-  object.title = reader.readString(offsets[5]);
-  object.type = reader.readString(offsets[6]);
-  object.updatedAt = reader.readDateTime(offsets[8]);
+  object.spaceId = reader.readString(offsets[3]);
+  object.tags = reader.readStringList(offsets[5]) ?? [];
+  object.text = reader.readStringOrNull(offsets[6]);
+  object.title = reader.readString(offsets[7]);
+  object.type = reader.readString(offsets[8]);
+  object.updatedAt = reader.readDateTime(offsets[10]);
   return object;
 }
 
@@ -218,16 +269,20 @@ P _recordDeserializeProp<P>(
     case 2:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 3:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readString(offset)) as P;
     case 4:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 6:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 7:
       return (reader.readString(offset)) as P;
     case 8:
+      return (reader.readString(offset)) as P;
+    case 9:
+      return (reader.readString(offset)) as P;
+    case 10:
       return (reader.readDateTime(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -333,6 +388,51 @@ extension RecordQueryWhere on QueryBuilder<Record, Record, QWhereClause> {
         upper: upperId,
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause> spaceIdEqualTo(
+      String spaceId) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'spaceId',
+        value: [spaceId],
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause> spaceIdNotEqualTo(
+      String spaceId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceId',
+              lower: [],
+              upper: [spaceId],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceId',
+              lower: [spaceId],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceId',
+              lower: [spaceId],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceId',
+              lower: [],
+              upper: [spaceId],
+              includeUpper: false,
+            ));
+      }
     });
   }
 
@@ -666,6 +766,199 @@ extension RecordQueryWhere on QueryBuilder<Record, Record, QWhereClause> {
     });
   }
 
+  QueryBuilder<Record, Record, QAfterWhereClause>
+      spaceTypeDateIndexEqualToAnyTypeDate(String spaceTypeDateIndex) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'spaceTypeDateIndex_type_date',
+        value: [spaceTypeDateIndex],
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause>
+      spaceTypeDateIndexNotEqualToAnyTypeDate(String spaceTypeDateIndex) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceTypeDateIndex_type_date',
+              lower: [],
+              upper: [spaceTypeDateIndex],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceTypeDateIndex_type_date',
+              lower: [spaceTypeDateIndex],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceTypeDateIndex_type_date',
+              lower: [spaceTypeDateIndex],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceTypeDateIndex_type_date',
+              lower: [],
+              upper: [spaceTypeDateIndex],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause>
+      spaceTypeDateIndexTypeEqualToAnyDate(
+          String spaceTypeDateIndex, String type) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'spaceTypeDateIndex_type_date',
+        value: [spaceTypeDateIndex, type],
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause>
+      spaceTypeDateIndexEqualToTypeNotEqualToAnyDate(
+          String spaceTypeDateIndex, String type) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceTypeDateIndex_type_date',
+              lower: [spaceTypeDateIndex],
+              upper: [spaceTypeDateIndex, type],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceTypeDateIndex_type_date',
+              lower: [spaceTypeDateIndex, type],
+              includeLower: false,
+              upper: [spaceTypeDateIndex],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceTypeDateIndex_type_date',
+              lower: [spaceTypeDateIndex, type],
+              includeLower: false,
+              upper: [spaceTypeDateIndex],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceTypeDateIndex_type_date',
+              lower: [spaceTypeDateIndex],
+              upper: [spaceTypeDateIndex, type],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause>
+      spaceTypeDateIndexTypeDateEqualTo(
+          String spaceTypeDateIndex, String type, DateTime date) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'spaceTypeDateIndex_type_date',
+        value: [spaceTypeDateIndex, type, date],
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause>
+      spaceTypeDateIndexTypeEqualToDateNotEqualTo(
+          String spaceTypeDateIndex, String type, DateTime date) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceTypeDateIndex_type_date',
+              lower: [spaceTypeDateIndex, type],
+              upper: [spaceTypeDateIndex, type, date],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceTypeDateIndex_type_date',
+              lower: [spaceTypeDateIndex, type, date],
+              includeLower: false,
+              upper: [spaceTypeDateIndex, type],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceTypeDateIndex_type_date',
+              lower: [spaceTypeDateIndex, type, date],
+              includeLower: false,
+              upper: [spaceTypeDateIndex, type],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'spaceTypeDateIndex_type_date',
+              lower: [spaceTypeDateIndex, type],
+              upper: [spaceTypeDateIndex, type, date],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause>
+      spaceTypeDateIndexTypeEqualToDateGreaterThan(
+    String spaceTypeDateIndex,
+    String type,
+    DateTime date, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'spaceTypeDateIndex_type_date',
+        lower: [spaceTypeDateIndex, type, date],
+        includeLower: include,
+        upper: [spaceTypeDateIndex, type],
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause>
+      spaceTypeDateIndexTypeEqualToDateLessThan(
+    String spaceTypeDateIndex,
+    String type,
+    DateTime date, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'spaceTypeDateIndex_type_date',
+        lower: [spaceTypeDateIndex, type],
+        upper: [spaceTypeDateIndex, type, date],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause>
+      spaceTypeDateIndexTypeEqualToDateBetween(
+    String spaceTypeDateIndex,
+    String type,
+    DateTime lowerDate,
+    DateTime upperDate, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'spaceTypeDateIndex_type_date',
+        lower: [spaceTypeDateIndex, type, lowerDate],
+        includeLower: includeLower,
+        upper: [spaceTypeDateIndex, type, upperDate],
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Record, Record, QAfterWhereClause> typeDateIndexEqualTo(
       String typeDateIndex) {
     return QueryBuilder.apply(this, (query) {
@@ -936,6 +1229,271 @@ extension RecordQueryFilter on QueryBuilder<Record, Record, QFilterCondition> {
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> spaceIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'spaceId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> spaceIdGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'spaceId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> spaceIdLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'spaceId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> spaceIdBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'spaceId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> spaceIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'spaceId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> spaceIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'spaceId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> spaceIdContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'spaceId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> spaceIdMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'spaceId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> spaceIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'spaceId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> spaceIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'spaceId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> spaceTypeDateIndexEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'spaceTypeDateIndex',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition>
+      spaceTypeDateIndexGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'spaceTypeDateIndex',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition>
+      spaceTypeDateIndexLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'spaceTypeDateIndex',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> spaceTypeDateIndexBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'spaceTypeDateIndex',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition>
+      spaceTypeDateIndexStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'spaceTypeDateIndex',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition>
+      spaceTypeDateIndexEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'spaceTypeDateIndex',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition>
+      spaceTypeDateIndexContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'spaceTypeDateIndex',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> spaceTypeDateIndexMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'spaceTypeDateIndex',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition>
+      spaceTypeDateIndexIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'spaceTypeDateIndex',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition>
+      spaceTypeDateIndexIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'spaceTypeDateIndex',
+        value: '',
       ));
     });
   }
@@ -1784,6 +2342,30 @@ extension RecordQuerySortBy on QueryBuilder<Record, Record, QSortBy> {
     });
   }
 
+  QueryBuilder<Record, Record, QAfterSortBy> sortBySpaceId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'spaceId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterSortBy> sortBySpaceIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'spaceId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterSortBy> sortBySpaceTypeDateIndex() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'spaceTypeDateIndex', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterSortBy> sortBySpaceTypeDateIndexDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'spaceTypeDateIndex', Sort.desc);
+    });
+  }
+
   QueryBuilder<Record, Record, QAfterSortBy> sortByText() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'text', Sort.asc);
@@ -1894,6 +2476,30 @@ extension RecordQuerySortThenBy on QueryBuilder<Record, Record, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Record, Record, QAfterSortBy> thenBySpaceId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'spaceId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterSortBy> thenBySpaceIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'spaceId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterSortBy> thenBySpaceTypeDateIndex() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'spaceTypeDateIndex', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterSortBy> thenBySpaceTypeDateIndexDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'spaceTypeDateIndex', Sort.desc);
+    });
+  }
+
   QueryBuilder<Record, Record, QAfterSortBy> thenByText() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'text', Sort.asc);
@@ -1974,6 +2580,21 @@ extension RecordQueryWhereDistinct on QueryBuilder<Record, Record, QDistinct> {
     });
   }
 
+  QueryBuilder<Record, Record, QDistinct> distinctBySpaceId(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'spaceId', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Record, Record, QDistinct> distinctBySpaceTypeDateIndex(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'spaceTypeDateIndex',
+          caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Record, Record, QDistinct> distinctByTags() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'tags');
@@ -2038,6 +2659,18 @@ extension RecordQueryProperty on QueryBuilder<Record, Record, QQueryProperty> {
   QueryBuilder<Record, DateTime?, QQueryOperations> deletedAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'deletedAt');
+    });
+  }
+
+  QueryBuilder<Record, String, QQueryOperations> spaceIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'spaceId');
+    });
+  }
+
+  QueryBuilder<Record, String, QQueryOperations> spaceTypeDateIndexProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'spaceTypeDateIndex');
     });
   }
 

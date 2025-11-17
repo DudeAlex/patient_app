@@ -3,6 +3,7 @@
 class RecordEntity {
   RecordEntity({
     this.id,
+    String? spaceId,
     required String type,
     required this.date,
     required String title,
@@ -11,7 +12,8 @@ class RecordEntity {
     required this.createdAt,
     required DateTime updatedAt,
     DateTime? deletedAt,
-  })  : type = _validateType(type),
+  })  : spaceId = _validateSpaceId(spaceId),
+        type = _validateType(type),
         title = _validateTitle(title),
         updatedAt = _validateUpdatedAt(createdAt, updatedAt),
         deletedAt = _validateDeletedAt(updatedAt, deletedAt),
@@ -19,6 +21,11 @@ class RecordEntity {
 
   /// Database identifier (null before the entity is persisted).
   final int? id;
+  
+  /// Space identifier - associates record with a specific life area/domain
+  /// Defaults to 'health' for backward compatibility
+  final String spaceId;
+  
   final String type;
   final DateTime date;
   final String title;
@@ -31,6 +38,7 @@ class RecordEntity {
   /// Convenience helper to clone the entity with updated fields.
   RecordEntity copyWith({
     int? id,
+    String? spaceId,
     String? type,
     DateTime? date,
     String? title,
@@ -42,6 +50,7 @@ class RecordEntity {
   }) {
     return RecordEntity(
       id: id ?? this.id,
+      spaceId: spaceId ?? this.spaceId,
       type: type ?? this.type,
       date: date ?? this.date,
       title: title ?? this.title,
@@ -51,6 +60,14 @@ class RecordEntity {
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
     );
+  }
+
+  static String _validateSpaceId(String? value) {
+    // Default to 'health' for backward compatibility
+    if (value == null || value.trim().isEmpty) {
+      return 'health';
+    }
+    return value.trim();
   }
 
   static String _validateType(String value) {

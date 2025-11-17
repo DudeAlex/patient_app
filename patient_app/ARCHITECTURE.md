@@ -13,9 +13,16 @@ Key Modules
 - `lib/core/` shared infrastructure (no feature-specific logic)
   - `core/db/isar.dart` open Isar with schemas
   - `core/storage/attachments.dart` manage attachments root directory
+  - `core/domain/entities/space.dart` Space entity with validation
+  - `core/domain/value_objects/space_gradient.dart` Space gradient value object
+  - `core/application/services/space_manager.dart` Space management service
+  - `core/application/ports/space_repository.dart` Space repository interface
+  - `core/infrastructure/storage/space_preferences.dart` SharedPreferences-based space storage
+  - `core/infrastructure/storage/migration_service.dart` Database migration orchestration
   - Planned: `core/ai/ai_processing_service.dart`, `core/support/support_network.dart`, `core/import/email_ingest.dart`, `core/vitals/vitals_service.dart` (cross-feature services exposed via interfaces)
 - `packages/google_drive_backup/` reusable backup/auth library (fully encapsulated module)
 - Feature modules live under `lib/features/<module>/`
+  - `features/spaces/` (Space registry, UI screens for onboarding/selector/creation, space provider, space widgets)
   - `features/records/` (domain entities, application ports, adapters, UI state, add/list/detail screens)
   - `features/sync/` (SyncState repository, dirty tracking, future auto-sync runner)
   - Planned: `features/capture_core/`, `features/capture_modes/photo|scan|voice|file|email/`, `features/support_network/`, `features/vitals/`, etc. Each module owns its models/services/UI and exposes a compact API for other modules to consume.
@@ -40,7 +47,8 @@ We design every milestone as a collection of modules that can be composed, repla
 
 | Module | Responsibility | Public Surface | Depends On |
 | --- | --- | --- | --- |
-| `features/records` | CRUD operations, record list/detail UI | `RecordEntity`, `RecordsRepository` port, `RecordsService`, `RecordsHomeState`, routes for add/edit/detail screens | `core/db`, `core/storage` via adapters |
+| `features/spaces` | Space management, onboarding, space selection UI | `Space` entity, `SpaceRegistry`, `SpaceManager` service, `SpaceProvider`, onboarding/selector/creation screens, space widgets | `core/domain`, `core/application`, `core/infrastructure` |
+| `features/records` | CRUD operations, record list/detail UI | `RecordEntity`, `RecordsRepository` port, `RecordsService`, `RecordsHomeState`, routes for add/edit/detail screens | `core/db`, `core/storage` via adapters, `features/spaces` for current space |
 | `features/sync` | Dirty tracking, SyncState persistence, auto-sync orchestration | `AutoSyncStatus` domain entity, `SyncStateRepository` port, `IsarSyncStateRepository`, use cases (`SetAutoSyncEnabled`, `RecordAutoSyncChange`, `MarkAutoSyncSuccess`, `Read/WatchAutoSyncStatus`), `AutoSyncDirtyTracker`, `AutoSyncCoordinator`, `AutoSyncRunner` | `features/records` (via use cases), `google_drive_backup` |
 
 ### Sync Module Snapshot (Phase 2)
@@ -85,12 +93,53 @@ Key guardrails (see `CLEAN_ARCHITECTURE_GUIDE.md` for the full playbook):
 The canonical data flow is: request -> controller -> `UseCase.InputDTO` -> entity rule enforcement + ports -> persistence/adapters -> `UseCase.OutputDTO` -> presenter/response model. Testing mirrors the layers: pure domain unit tests, mocked use-case tests, and adapter contract tests.
 
 Data Model (Isar)
-- Record: id, type, date, title, text?, tags[], createdAt, updatedAt, deletedAt?
+- Record: id, **spaceId**, type, date, title, text?, tags[], createdAt, updatedAt, deletedAt?
+  - **spaceId** associates each record with a space (e.g., 'health', 'education')
+  - Composite index on (spaceId, type, date) for efficient space-based queries
+  - Existing records without spaceId default to 'health' for backward compatibility
 - Attachment: id, recordId, path, kind, ocrText?, createdAt
 - Insight: id, recordId?, kind, text, createdAt
 - SyncState (singleton): lastSyncedAt?, lastRemoteModified?, localChangeCounter, deviceId
 - Planned: SupportContact, WellnessCheckIn collections (see SPEC.md for fields)
 - Domain-level guards: `RecordEntity` enforces non-empty type/title strings and monotonic timestamps (createdAt ≤ updatedAt ≤ deletedAt), while `AutoSyncStatus` asserts non-negative dirty counters, consistent totals, and non-empty device ids before reaching adapters; unit tests lock in those invariants.
+
+### Spaces System Data Model
+
+The Spaces System introduces a flexible organization layer that allows users to manage different life areas independently:
+
+**Space Entity** (`lib/core/domain/entities/space.dart`):
+- `id`: Unique identifier (e.g., 'health', 'education', 'custom_fitness')
+- `name`: Display name (e.g., 'Health', 'Education')
+- `icon`: Lucide icon name (e.g., 'Heart', 'GraduationCap')
+- `gradient`: SpaceGradient value object with start/end colors
+- `description`: Brief description of the space
+- `categories`: List of space-specific categories
+- `isDefault`: True for pre-configured spaces
+- `isCustom`: True for user-created spaces
+- `createdAt`: Creation timestamp
+
+**Space Storage** (SharedPreferences):
+- Active space IDs: List of space IDs the user has enabled
+- Current space ID: The space currently being viewed
+- Custom spaces: JSON-serialized list of user-created Space objects
+- Onboarding completion flag: Tracks whether user has completed initial setup
+
+**Default Spaces** (`lib/features/spaces/domain/space_registry.dart`):
+The system provides 8 pre-configured spaces:
+1. Health (red-pink gradient): Medical records, appointments, medications
+2. Education (blue-cyan gradient): Courses, assignments, research, notes
+3. Home & Life (green-emerald gradient): Recipes, DIY, maintenance, hobbies
+4. Business (purple-violet gradient): Meetings, contacts, contracts, projects
+5. Finance (yellow-amber gradient): Expenses, income, investments, receipts
+6. Travel (indigo-blue gradient): Trips, bookings, itineraries, memories
+7. Family (rose-pink gradient): Events, milestones, photos, genealogy
+8. Creative (orange-red gradient): Art, writing, music, photography
+
+**Migration Strategy**:
+- Existing records without spaceId are automatically assigned 'health' during first launch after update
+- Migration is tracked via version number in SharedPreferences
+- Existing users are automatically set up with Health space active and onboarding marked complete
+- New users go through onboarding to select initial spaces
 
 ## Localization & Internationalisation
 

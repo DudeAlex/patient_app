@@ -15,5 +15,6 @@ abstract class RecordsRepository {
     required int offset,
     required int limit,
     String? query,
+    String? spaceId,
   });
 }
