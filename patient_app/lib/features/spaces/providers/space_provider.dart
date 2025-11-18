@@ -19,6 +19,7 @@ class SpaceProvider extends ChangeNotifier {
   List<Space> _activeSpaces = [];
   bool _isLoading = false;
   String? _error;
+  bool? _onboardingComplete; // Cached onboarding status (null = not loaded)
 
   SpaceProvider(this._spaceManager);
 
@@ -41,23 +42,35 @@ class SpaceProvider extends ChangeNotifier {
   /// Whether the provider has been initialized with data.
   bool get isInitialized => _currentSpace != null && _activeSpaces.isNotEmpty;
 
+  /// Whether the user has completed onboarding.
+  /// Returns null if onboarding status hasn't been loaded yet.
+  /// This value is cached during initialization to avoid additional async calls.
+  bool? get onboardingComplete => _onboardingComplete;
+
   // Initialization
 
-  /// Initializes the provider by loading active spaces and current space.
+  /// Initializes the provider by loading active spaces, current space, and onboarding status.
   /// 
   /// This method should be called once when the provider is created,
   /// typically in the app initialization flow.
   /// 
+  /// Optimized to batch all data loading before notifying listeners, reducing
+  /// UI rebuilds from multiple notifications to a single notification.
+  /// 
   /// Handles errors gracefully by setting the error state and logging.
   /// If initialization fails, the provider will have empty state but won't crash.
+  /// 
+  /// Performance metrics are logged, with warnings if initialization exceeds 500ms.
   Future<void> initialize() async {
+    // Start operation tracking and record start time for performance metrics
     final initOp = AppLogger.startOperation('initialize_space_provider');
+    final startTime = DateTime.now();
     
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-
+    await AppLogger.info('Starting SpaceProvider initialization');
+    
     try {
+      // Load all data without notifying listeners (batch operation)
+      
       // Load active spaces first
       final loadSpacesOp = AppLogger.startOperation('load_active_spaces', parentId: initOp);
       _activeSpaces = await _spaceManager.getActiveSpaces();
@@ -68,22 +81,67 @@ class SpaceProvider extends ChangeNotifier {
       _currentSpace = await _spaceManager.getCurrentSpace();
       await AppLogger.endOperation(loadCurrentOp);
 
+      // Load onboarding status
+      final loadOnboardingOp = AppLogger.startOperation('load_onboarding_status', parentId: initOp);
+      _onboardingComplete = await _spaceManager.hasCompletedOnboarding();
+      await AppLogger.endOperation(loadOnboardingOp);
+
+      // Clear any previous errors
       _error = null;
+      
+      // Calculate duration and log completion with performance metrics
+      final endTime = DateTime.now();
+      final durationMs = endTime.difference(startTime).inMilliseconds;
+      
       await AppLogger.endOperation(initOp);
+      
+      // Log completion with performance context
+      final performanceContext = {
+        'durationMs': durationMs,
+        'activeSpacesCount': _activeSpaces.length,
+        'currentSpaceId': _currentSpace?.id,
+        'onboardingComplete': _onboardingComplete,
+      };
+      
+      // Warn if initialization took longer than 500ms (performance threshold)
+      if (durationMs > 500) {
+        await AppLogger.warning(
+          'SpaceProvider initialization completed but exceeded performance threshold',
+          context: {
+            ...performanceContext,
+            'thresholdMs': 500,
+            'exceededBy': durationMs - 500,
+          },
+        );
+      } else {
+        await AppLogger.info(
+          'SpaceProvider initialization completed successfully',
+          context: performanceContext,
+        );
+      }
     } catch (e, stackTrace) {
-      // Handle errors gracefully - log but don't crash
+      // Calculate duration even on error for performance tracking
+      final endTime = DateTime.now();
+      final durationMs = endTime.difference(startTime).inMilliseconds;
+      
+      // Handle errors gracefully - set all fields before notifying
       _error = 'Failed to load spaces: ${e.toString()}';
       _activeSpaces = [];
       _currentSpace = null;
+      _onboardingComplete = false;
       
-      // Log error for debugging
+      // Log error with performance context
       await AppLogger.error(
         'SpaceProvider initialization failed',
         error: e,
         stackTrace: stackTrace,
+        context: {
+          'durationMs': durationMs,
+        },
       );
       await AppLogger.endOperation(initOp);
     } finally {
+      // Set loading to false and notify listeners once with all data loaded
       _isLoading = false;
       notifyListeners();
     }

@@ -35,10 +35,54 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   
   // Track selected spaces (initially empty, user must select at least one)
   final Set<String> _selectedSpaceIds = {};
+  
+  // Performance tracking
+  String? _buildOperationId;
+  DateTime? _buildStartTime;
 
   @override
   void initState() {
     super.initState();
+    
+    // Start performance tracking for onboarding screen build
+    _buildStartTime = DateTime.now();
+    _buildOperationId = AppLogger.startOperation('onboarding_screen_build');
+    
+    // Use addPostFrameCallback to log completion after first frame renders
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_buildOperationId != null && _buildStartTime != null) {
+        final duration = DateTime.now().difference(_buildStartTime!);
+        final durationMs = duration.inMilliseconds;
+        
+        // End the operation tracking
+        AppLogger.endOperation(_buildOperationId!);
+        
+        // Log warning if initial build exceeds 100ms threshold
+        if (durationMs > 100) {
+          AppLogger.warning(
+            'OnboardingScreen initial build exceeded threshold',
+            context: {
+              'durationMs': durationMs,
+              'threshold': 100,
+              'exceeded_by': durationMs - 100,
+            },
+          );
+        } else {
+          AppLogger.info(
+            'OnboardingScreen initial build completed',
+            context: {
+              'durationMs': durationMs,
+              'threshold': 100,
+            },
+          );
+        }
+        
+        // Clear tracking variables
+        _buildOperationId = null;
+        _buildStartTime = null;
+      }
+    });
+    
     AppLogger.info('OnboardingScreen initialized');
   }
 
@@ -120,22 +164,39 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             // Progress indicators (dots)
             _buildProgressIndicator(),
             
-            // PageView for 3 steps
+            // PageView for 3 steps with lazy loading
             Expanded(
-              child: PageView(
+              child: PageView.builder(
                 controller: _pageController,
                 onPageChanged: _onPageChanged,
-                children: [
-                  _buildWelcomeStep(),
-                  _buildSpaceSelectionStep(),
-                  _buildFeaturesOverviewStep(),
-                ],
+                itemCount: 3,
+                itemBuilder: (context, index) {
+                  // Wrap each page in RepaintBoundary to isolate repaints
+                  return RepaintBoundary(
+                    child: _buildPage(index),
+                  );
+                },
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  /// Builds the page at the given index (lazy loading)
+  /// Requirements: 1.1, 1.2, 1.4, 4.2
+  Widget _buildPage(int index) {
+    switch (index) {
+      case 0:
+        return _buildWelcomeStep();
+      case 1:
+        return _buildSpaceSelectionStep();
+      case 2:
+        return _buildFeaturesOverviewStep();
+      default:
+        return const SizedBox.shrink();
+    }
   }
 
   /// Progress dots indicator at the top
@@ -261,59 +322,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Icon
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-              borderRadius: BorderRadius.circular(60),
-            ),
-            child: const Icon(
-              Icons.grid_view_rounded,
-              size: 64,
-              color: AppColors.white,
-            ),
-          ),
+          const _WelcomeIcon(),
           const SizedBox(height: 32),
           
           // Title
-          Text(
-            'Welcome to Your Personal Space',
-            style: AppTextStyles.h1.copyWith(
-              color: AppColors.gray900,
-              fontWeight: FontWeight.w600,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          const _WelcomeTitle(),
           const SizedBox(height: 16),
           
           // Description
-          Text(
-            'Organize every area of your life in one secure place. From health to education, business to creative projects.',
-            style: AppTextStyles.bodyLarge.copyWith(
-              color: AppColors.gray600,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          const _WelcomeDescription(),
           const SizedBox(height: 32),
 
           // Value propositions
-          _buildValueProposition(
-            Icons.tune,
-            'Flexible',
-            'Choose the spaces that matter to you',
+          const _ValueProposition(
+            icon: Icons.tune,
+            title: 'Flexible',
+            description: 'Choose the spaces that matter to you',
           ),
           const SizedBox(height: 16),
-          _buildValueProposition(
-            Icons.auto_awesome,
-            'AI-Powered',
-            'Smart assistance for capturing and organizing',
+          const _ValueProposition(
+            icon: Icons.auto_awesome,
+            title: 'AI-Powered',
+            description: 'Smart assistance for capturing and organizing',
           ),
           const SizedBox(height: 16),
-          _buildValueProposition(
-            Icons.lock,
-            'Secure',
-            'Your data stays private and encrypted',
+          const _ValueProposition(
+            icon: Icons.lock,
+            title: 'Secure',
+            description: 'Your data stays private and encrypted',
           ),
           const SizedBox(height: 48),
           
@@ -353,46 +389,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildValueProposition(IconData icon, String title, String description) {
-    return Row(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: AppColors.gray100,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            icon,
-            color: AppColors.gradientPurple,
-            size: 24,
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: AppTextStyles.h4.copyWith(
-                  color: AppColors.gray900,
-                ),
-              ),
-              Text(
-                description,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.gray600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   /// Step 2: Space Selection
   /// Requirements: 2.1-2.9, 10.3
   Widget _buildSpaceSelectionStep() {
@@ -405,24 +401,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         child: Column(
           children: [
             // Title
-            Text(
-              'Choose Your Spaces',
-              style: AppTextStyles.h1.copyWith(
-                color: AppColors.gray900,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
+            const _SpaceSelectionTitle(),
             const SizedBox(height: 8),
             
             // Description
-            Text(
-              'Select the areas of life you want to organize. You can always add more later.',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.gray600,
-              ),
-              textAlign: TextAlign.center,
-            ),
+            const _SpaceSelectionDescription(),
             const SizedBox(height: 16),
             
             // Selection count display
@@ -533,59 +516,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Icon
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-              borderRadius: BorderRadius.circular(60),
-            ),
-            child: const Icon(
-              Icons.rocket_launch,
-              size: 64,
-              color: AppColors.white,
-            ),
-          ),
+          const _FeaturesIcon(),
           const SizedBox(height: 32),
           
           // Title
-          Text(
-            'Everything You Need',
-            style: AppTextStyles.h1.copyWith(
-              color: AppColors.gray900,
-              fontWeight: FontWeight.w600,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          const _FeaturesTitle(),
           const SizedBox(height: 16),
           
           // Description
-          Text(
-            'Powerful features to help you capture, organize, and find your information.',
-            style: AppTextStyles.bodyLarge.copyWith(
-              color: AppColors.gray600,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          const _FeaturesDescription(),
           const SizedBox(height: 32),
           
           // Features
-          _buildFeature(
-            Icons.mic,
-            'Multi-Modal Input',
-            'Capture information through voice, camera, or keyboard',
+          const _Feature(
+            icon: Icons.mic,
+            title: 'Multi-Modal Input',
+            description: 'Capture information through voice, camera, or keyboard',
           ),
           const SizedBox(height: 20),
-          _buildFeature(
-            Icons.auto_awesome,
-            'AI Assistance',
-            'Smart suggestions and automatic organization',
+          const _Feature(
+            icon: Icons.auto_awesome,
+            title: 'AI Assistance',
+            description: 'Smart suggestions and automatic organization',
           ),
           const SizedBox(height: 20),
-          _buildFeature(
-            Icons.shield,
-            'Privacy & Security',
-            'Your data is encrypted and stays on your device',
+          const _Feature(
+            icon: Icons.shield,
+            title: 'Privacy & Security',
+            description: 'Your data is encrypted and stays on your device',
           ),
           const SizedBox(height: 48),
           
@@ -612,8 +570,225 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
     );
   }
+}
 
-  Widget _buildFeature(IconData icon, String title, String description) {
+
+// ============================================================================
+// Const Widget Components for Performance Optimization
+// Requirements: 4.3 - Use const constructors for immutable widgets
+// ============================================================================
+
+/// Welcome step icon with gradient background
+class _WelcomeIcon extends StatelessWidget {
+  const _WelcomeIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 120,
+      height: 120,
+      decoration: BoxDecoration(
+        gradient: AppColors.primaryGradient,
+        borderRadius: BorderRadius.circular(60),
+      ),
+      child: const Icon(
+        Icons.grid_view_rounded,
+        size: 64,
+        color: AppColors.white,
+      ),
+    );
+  }
+}
+
+/// Welcome step title
+class _WelcomeTitle extends StatelessWidget {
+  const _WelcomeTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'Welcome to Your Personal Space',
+      style: AppTextStyles.h1.copyWith(
+        color: AppColors.gray900,
+        fontWeight: FontWeight.w600,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+}
+
+/// Welcome step description
+class _WelcomeDescription extends StatelessWidget {
+  const _WelcomeDescription();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'Organize every area of your life in one secure place. From health to education, business to creative projects.',
+      style: AppTextStyles.bodyLarge.copyWith(
+        color: AppColors.gray600,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+}
+
+/// Value proposition row with icon and text
+class _ValueProposition extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String description;
+
+  const _ValueProposition({
+    required this.icon,
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: AppColors.gray100,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            icon,
+            color: AppColors.gradientPurple,
+            size: 24,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: AppTextStyles.h4.copyWith(
+                  color: AppColors.gray900,
+                ),
+              ),
+              Text(
+                description,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.gray600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Space selection step title
+class _SpaceSelectionTitle extends StatelessWidget {
+  const _SpaceSelectionTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'Choose Your Spaces',
+      style: AppTextStyles.h1.copyWith(
+        color: AppColors.gray900,
+        fontWeight: FontWeight.w600,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+}
+
+/// Space selection step description
+class _SpaceSelectionDescription extends StatelessWidget {
+  const _SpaceSelectionDescription();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'Select the areas of life you want to organize. You can always add more later.',
+      style: AppTextStyles.bodyMedium.copyWith(
+        color: AppColors.gray600,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+}
+
+/// Features overview step icon
+class _FeaturesIcon extends StatelessWidget {
+  const _FeaturesIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 120,
+      height: 120,
+      decoration: BoxDecoration(
+        gradient: AppColors.primaryGradient,
+        borderRadius: BorderRadius.circular(60),
+      ),
+      child: const Icon(
+        Icons.rocket_launch,
+        size: 64,
+        color: AppColors.white,
+      ),
+    );
+  }
+}
+
+/// Features overview step title
+class _FeaturesTitle extends StatelessWidget {
+  const _FeaturesTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'Everything You Need',
+      style: AppTextStyles.h1.copyWith(
+        color: AppColors.gray900,
+        fontWeight: FontWeight.w600,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+}
+
+/// Features overview step description
+class _FeaturesDescription extends StatelessWidget {
+  const _FeaturesDescription();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'Powerful features to help you capture, organize, and find your information.',
+      style: AppTextStyles.bodyLarge.copyWith(
+        color: AppColors.gray600,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+}
+
+/// Feature row with icon and text
+class _Feature extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String description;
+
+  const _Feature({
+    required this.icon,
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -655,3 +830,4 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
+

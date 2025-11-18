@@ -45,43 +45,43 @@ class _CreateSpaceScreenState extends State<CreateSpaceScreen> {
   
   // Available gradient options for selection
   static final List<SpaceGradient> _availableGradients = [
-    const SpaceGradient(
+    SpaceGradient(
       startColor: Color(0xFFEF4444), // red-500
       endColor: Color(0xFFEC4899),   // pink-500
     ),
-    const SpaceGradient(
+    SpaceGradient(
       startColor: Color(0xFF3B82F6), // blue-500
       endColor: Color(0xFF06B6D4),   // cyan-500
     ),
-    const SpaceGradient(
+    SpaceGradient(
       startColor: Color(0xFF10B981), // green-500
       endColor: Color(0xFF14B8A6),   // teal-500
     ),
-    const SpaceGradient(
+    SpaceGradient(
       startColor: Color(0xFF8B5CF6), // violet-500
       endColor: Color(0xFFA855F7),   // purple-500
     ),
-    const SpaceGradient(
+    SpaceGradient(
       startColor: Color(0xFFF59E0B), // amber-500
       endColor: Color(0xFFEAB308),   // yellow-500
     ),
-    const SpaceGradient(
+    SpaceGradient(
       startColor: Color(0xFF06B6D4), // cyan-500
       endColor: Color(0xFF0EA5E9),   // sky-500
     ),
-    const SpaceGradient(
+    SpaceGradient(
       startColor: Color(0xFFF43F5E), // rose-500
       endColor: Color(0xFFEC4899),   // pink-500
     ),
-    const SpaceGradient(
+    SpaceGradient(
       startColor: Color(0xFFEC4899), // pink-500
       endColor: Color(0xFFA855F7),   // purple-500
     ),
-    const SpaceGradient(
+    SpaceGradient(
       startColor: Color(0xFF6366F1), // indigo-500
       endColor: Color(0xFF8B5CF6),   // violet-500
     ),
-    const SpaceGradient(
+    SpaceGradient(
       startColor: Color(0xFF14B8A6), // teal-500
       endColor: Color(0xFF10B981),   // green-500
     ),

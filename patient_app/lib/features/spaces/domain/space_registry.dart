@@ -13,7 +13,7 @@ class SpaceRegistry {
       id: 'health',
       name: 'Health',
       icon: 'Heart',
-      gradient: const SpaceGradient(
+      gradient: SpaceGradient(
         startColor: Color(0xFFEF4444), // red-500
         endColor: Color(0xFFEC4899),   // pink-500
       ),
@@ -34,7 +34,7 @@ class SpaceRegistry {
       id: 'education',
       name: 'Education',
       icon: 'GraduationCap',
-      gradient: const SpaceGradient(
+      gradient: SpaceGradient(
         startColor: Color(0xFF3B82F6), // blue-500
         endColor: Color(0xFF06B6D4),   // cyan-500
       ),
@@ -55,7 +55,7 @@ class SpaceRegistry {
       id: 'home',
       name: 'Home & Life',
       icon: 'Home',
-      gradient: const SpaceGradient(
+      gradient: SpaceGradient(
         startColor: Color(0xFF10B981), // green-500
         endColor: Color(0xFF14B8A6),   // teal-500
       ),
@@ -76,7 +76,7 @@ class SpaceRegistry {
       id: 'business',
       name: 'Business',
       icon: 'Briefcase',
-      gradient: const SpaceGradient(
+      gradient: SpaceGradient(
         startColor: Color(0xFF8B5CF6), // violet-500
         endColor: Color(0xFFA855F7),   // purple-500
       ),
@@ -97,7 +97,7 @@ class SpaceRegistry {
       id: 'finance',
       name: 'Finance',
       icon: 'DollarSign',
-      gradient: const SpaceGradient(
+      gradient: SpaceGradient(
         startColor: Color(0xFFF59E0B), // amber-500
         endColor: Color(0xFFEAB308),   // yellow-500
       ),
@@ -118,7 +118,7 @@ class SpaceRegistry {
       id: 'travel',
       name: 'Travel',
       icon: 'Plane',
-      gradient: const SpaceGradient(
+      gradient: SpaceGradient(
         startColor: Color(0xFF06B6D4), // cyan-500
         endColor: Color(0xFF0EA5E9),   // sky-500
       ),
@@ -139,7 +139,7 @@ class SpaceRegistry {
       id: 'family',
       name: 'Family',
       icon: 'Users',
-      gradient: const SpaceGradient(
+      gradient: SpaceGradient(
         startColor: Color(0xFFF43F5E), // rose-500
         endColor: Color(0xFFEC4899),   // pink-500
       ),
@@ -160,7 +160,7 @@ class SpaceRegistry {
       id: 'creative',
       name: 'Creative',
       icon: 'Palette',
-      gradient: const SpaceGradient(
+      gradient: SpaceGradient(
         startColor: Color(0xFFEC4899), // pink-500
         endColor: Color(0xFFA855F7),   // purple-500
       ),
@@ -179,12 +179,17 @@ class SpaceRegistry {
     ),
   };
 
+  /// Cached list of default spaces for performance optimization
+  /// Initialized lazily on first access to avoid recreating the list on every call
+  late final List<Space> _cachedDefaultSpaces = _defaultSpaces.values.toList();
+
   /// Gets a default space by ID
   /// Returns null if space ID doesn't exist
   Space? getDefaultSpace(String id) => _defaultSpaces[id];
 
-  /// Gets all default spaces as a list
-  List<Space> getAllDefaultSpaces() => _defaultSpaces.values.toList();
+  /// Gets all default spaces as a cached list
+  /// Returns a cached immutable list to avoid recreating on every call
+  List<Space> getAllDefaultSpaces() => _cachedDefaultSpaces;
 
   /// Checks if a space ID corresponds to a default space
   bool isDefaultSpace(String id) => _defaultSpaces.containsKey(id);

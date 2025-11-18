@@ -11,6 +11,11 @@ import 'space_icon.dart';
 /// - Selected: Space gradient background with shadow
 /// - Current: Shows "Current" badge
 /// 
+/// Performance optimizations:
+/// - Uses RepaintBoundary to isolate repaints
+/// - Caches gradient object to avoid recreating on every build
+/// - Uses regular Container instead of AnimatedContainer for better performance
+/// 
 /// Example:
 /// ```dart
 /// SpaceCard(
@@ -33,7 +38,7 @@ class SpaceCard extends StatelessWidget {
   /// Callback when the card is tapped
   final VoidCallback onTap;
 
-  const SpaceCard({
+  SpaceCard({
     Key? key,
     required this.space,
     required this.isSelected,
@@ -44,102 +49,18 @@ class SpaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     try {
-      return GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: isSelected ? space.gradient.toLinearGradient() : null,
-            color: isSelected ? null : AppColors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isSelected ? Colors.transparent : AppColors.gray300,
-              width: 2,
-            ),
-            boxShadow: [
-              if (isSelected)
-                BoxShadow(
-                  color: space.gradient.startColor.withOpacity(0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-            ],
+      // Wrap entire card in RepaintBoundary to isolate repaints
+      return RepaintBoundary(
+        child: GestureDetector(
+          onTap: onTap,
+          // Use regular Container instead of AnimatedContainer for better performance
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: _buildDecoration(),
+            child: _buildContent(),
           ),
-        child: Row(
-          children: [
-            // Space icon
-            SpaceIcon(
-              iconName: space.icon,
-              gradient: space.gradient,
-              size: 48,
-              isSelected: isSelected,
-            ),
-            const SizedBox(width: 16),
-            // Space name and description
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          space.name,
-                          style: AppTextStyles.h3.copyWith(
-                            color: isSelected ? AppColors.white : AppColors.gray900,
-                          ),
-                        ),
-                      ),
-                      if (isCurrent) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? AppColors.white.withOpacity(0.3)
-                                : AppColors.gradientPurple,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            'Current',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    space.description,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: isSelected
-                          ? AppColors.white.withOpacity(0.9)
-                          : AppColors.gray600,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            // Checkmark for selected state
-            if (isSelected)
-              const Icon(
-                Icons.check_circle,
-                color: AppColors.white,
-                size: 24,
-              ),
-          ],
         ),
-      ),
-    );
+      );
     } catch (e, stackTrace) {
       // Fallback UI if card fails to render
       debugPrint('Error building SpaceCard for ${space.id}: $e');
@@ -156,5 +77,103 @@ class SpaceCard extends StatelessWidget {
         ),
       );
     }
+  }
+
+  /// Builds the card decoration with gradient or solid color
+  BoxDecoration _buildDecoration() {
+    return BoxDecoration(
+      // Use cached gradient from SpaceGradient (cached internally)
+      gradient: isSelected ? space.gradient.toLinearGradient() : null,
+      color: isSelected ? null : AppColors.white,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(
+        color: isSelected ? Colors.transparent : AppColors.gray300,
+        width: 2,
+      ),
+      boxShadow: [
+        if (isSelected)
+          BoxShadow(
+            color: space.gradient.startColor.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+      ],
+    );
+  }
+
+  /// Builds the card content with icon, name, description, and badges
+  Widget _buildContent() {
+    return Row(
+      children: [
+        // Space icon
+        SpaceIcon(
+          iconName: space.icon,
+          gradient: space.gradient,
+          size: 48,
+          isSelected: isSelected,
+        ),
+        const SizedBox(width: 16),
+        // Space name and description
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      space.name,
+                      style: AppTextStyles.h3.copyWith(
+                        color: isSelected ? AppColors.white : AppColors.gray900,
+                      ),
+                    ),
+                  ),
+                  if (isCurrent) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.white.withOpacity(0.3)
+                            : AppColors.gradientPurple,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        'Current',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                space.description,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: isSelected
+                      ? AppColors.white.withOpacity(0.9)
+                      : AppColors.gray600,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+        // Checkmark for selected state
+        if (isSelected)
+          const Icon(
+            Icons.check_circle,
+            color: AppColors.white,
+            size: 24,
+          ),
+      ],
+    );
   }
 }

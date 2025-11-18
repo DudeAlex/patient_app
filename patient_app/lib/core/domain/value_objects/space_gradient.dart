@@ -17,7 +17,11 @@ class SpaceGradient {
   /// Gradient end alignment (default: bottom-right)
   final AlignmentGeometry end;
 
-  const SpaceGradient({
+  /// Cached LinearGradient to avoid recreating on every call
+  /// Initialized lazily on first access to toLinearGradient()
+  LinearGradient? _cachedLinearGradient;
+
+  SpaceGradient({
     required this.startColor,
     required this.endColor,
     this.begin = Alignment.topLeft,
@@ -26,8 +30,10 @@ class SpaceGradient {
 
   /// Converts this gradient to a Flutter LinearGradient
   /// Used for rendering in UI components
+  /// Returns cached gradient if available, otherwise creates and caches it
   LinearGradient toLinearGradient() {
-    return LinearGradient(
+    // Return cached gradient or create and cache it
+    return _cachedLinearGradient ??= LinearGradient(
       begin: begin,
       end: end,
       colors: [startColor, endColor],

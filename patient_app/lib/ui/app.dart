@@ -81,9 +81,6 @@ class _RecordsLoaderState extends State<_RecordsLoader> {
   
   // Cache the space provider initialization to avoid recreating on every build
   Future<SpaceProvider>? _spaceProviderFuture;
-  
-  // Cache the onboarding check to avoid recreating on every build
-  Future<bool>? _onboardingCheckFuture;
 
   /// Initialize space system components (cached)
   Future<SpaceProvider> _initializeSpaceProvider() {
@@ -170,67 +167,54 @@ class _RecordsLoaderState extends State<_RecordsLoader> {
             final spaceProvider = spaceSnapshot.data!;
             AppLogger.info('SpaceProvider initialized successfully');
             
-            // Check onboarding completion (Requirements: 10.7, 10.8, 12.1)
-            // Cache the future to avoid recreating on every build
-            _onboardingCheckFuture ??= spaceProvider.hasCompletedOnboarding();
+            // Access onboarding status synchronously from cached value
+            // (Requirements: 1.1, 1.3, 3.2, 3.3)
+            final hasCompletedOnboarding = spaceProvider.onboardingComplete ?? false;
             
-            return FutureBuilder<bool>(
-              future: _onboardingCheckFuture,
-              builder: (context, onboardingSnapshot) {
-                if (onboardingSnapshot.connectionState != ConnectionState.done) {
+            // Show onboarding if first time and not yet completed in this session
+            // Requirements: 10.8
+            if (!hasCompletedOnboarding && !_onboardingCompleted) {
+              AppLogger.logScreenLoad('OnboardingScreen');
+              // Don't wrap in Provider - OnboardingScreen doesn't need to listen to changes
+              return OnboardingScreen(
+                spaceProvider: spaceProvider,
+                onComplete: _handleOnboardingComplete,
+              );
+            }
+            
+            AppLogger.info('Onboarding completed, loading main app');
+            
+            // Load spaces if onboarding complete
+            return FutureBuilder<void>(
+              future: seedDebugRecordsIfEmpty(service.records),
+              builder: (context, seedSnapshot) {
+                if (seedSnapshot.connectionState != ConnectionState.done) {
                   return const Scaffold(
                     body: Center(child: CircularProgressIndicator()),
                   );
                 }
-                
-                final hasCompletedOnboarding = onboardingSnapshot.data ?? false;
-                
-                // Show onboarding if first time and not yet completed in this session
-                // Requirements: 10.8
-                if (!hasCompletedOnboarding && !_onboardingCompleted) {
-                  AppLogger.logScreenLoad('OnboardingScreen');
-                  // Don't wrap in Provider - OnboardingScreen doesn't need to listen to changes
-                  return OnboardingScreen(
-                    spaceProvider: spaceProvider,
-                    onComplete: _handleOnboardingComplete,
+                if (seedSnapshot.hasError) {
+                  AppLogger.error(
+                    'Failed to seed debug records',
+                    error: seedSnapshot.error,
+                    stackTrace: seedSnapshot.stackTrace,
+                  );
+                  return Scaffold(
+                    body: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(
+                          'Failed to seed debug records.\n${seedSnapshot.error}',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
                   );
                 }
-                
-                AppLogger.info('Onboarding completed, loading main app');
-                
-                // Load spaces if onboarding complete
-                return FutureBuilder<void>(
-                  future: seedDebugRecordsIfEmpty(service.records),
-                  builder: (context, seedSnapshot) {
-                    if (seedSnapshot.connectionState != ConnectionState.done) {
-                      return const Scaffold(
-                        body: Center(child: CircularProgressIndicator()),
-                      );
-                    }
-                    if (seedSnapshot.hasError) {
-                      AppLogger.error(
-                        'Failed to seed debug records',
-                        error: seedSnapshot.error,
-                        stackTrace: seedSnapshot.stackTrace,
-                      );
-                      return Scaffold(
-                        body: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Text(
-                              'Failed to seed debug records.\n${seedSnapshot.error}',
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-                    AppLogger.logScreenLoad('RecordsHome');
-                    return ChangeNotifierProvider.value(
-                      value: spaceProvider,
-                      child: _HomeScaffold(service: service),
-                    );
-                  },
+                AppLogger.logScreenLoad('RecordsHome');
+                return ChangeNotifierProvider.value(
+                  value: spaceProvider,
+                  child: _HomeScaffold(service: service),
                 );
               },
             );

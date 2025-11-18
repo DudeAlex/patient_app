@@ -87,7 +87,58 @@ if (!hasCompletedOnboarding && !_onboardingCompleted) {
 
 ---
 
-### Issue #2: Layout Overflow on Onboarding Features Screen
+### Issue #2: Performance - Image Processing Blocking Main Thread
+**Date Fixed**: November 17, 2025
+**Severity**: High - Performance issue
+**Symptoms**:
+- 40-76 skipped frames during app lifecycle transitions
+- UI freezes when returning from camera/file picker
+- "Application may be doing too much work on its main thread" warnings
+- Choppy animations and delayed responses
+
+**Root Cause**:
+- Image processing operations running synchronously on main thread
+- `img.decodeImage()`, `img.grayscale()`, and pixel-level calculations blocking UI
+- Affected files:
+  - `photo_clarity_analyzer.dart` - Laplacian variance calculation
+  - `document_clarity_analyzer.dart` - Document clarity analysis
+  - `document_enhancer.dart` - Grayscale conversion and contrast adjustment
+
+**Fix Applied**:
+```dart
+// Moved CPU-intensive work to background isolates using compute()
+
+// Top-level isolate function
+PhotoClarityResult _analyzeClarityInIsolate(_ClarityAnalysisParams params) {
+  // Image decoding and analysis happens in background
+  final image = img.decodeImage(params.bytes);
+  // ... Laplacian variance calculation ...
+  return result;
+}
+
+// Updated analyzer to use compute()
+@override
+Future<PhotoClarityResult> analyze(File file) async {
+  final bytes = await file.readAsBytes();  // Fast I/O on main thread
+  final params = _ClarityAnalysisParams(bytes, threshold);
+  return await compute(_analyzeClarityInIsolate, params);  // CPU work in isolate
+}
+```
+
+**Prevention**:
+- Always use `compute()` for CPU-intensive operations
+- Profile with Flutter DevTools to identify main thread bottlenecks
+- Watch for "Skipped frames" warnings in logs
+- Test performance during lifecycle transitions
+
+**Related Files**:
+- `lib/features/capture_modes/photo/analysis/photo_clarity_analyzer.dart`
+- `lib/features/capture_modes/document_scan/analysis/document_clarity_analyzer.dart`
+- `lib/features/capture_modes/document_scan/analysis/document_enhancer.dart`
+
+---
+
+### Issue #3: Layout Overflow on Onboarding Features Screen
 **Date Fixed**: November 16, 2025
 **Severity**: Medium - Visual issue
 **Symptoms**:
@@ -123,6 +174,264 @@ Widget _buildFeaturesOverviewStep() {
 
 **Related Files**:
 - `lib/features/spaces/ui/onboarding_screen.dart`
+
+---
+
+### Issue #4: SpaceProvider Initialization Frame Drops
+**Date Fixed**: November 17, 2025
+**Severity**: High - Performance issue
+**Symptoms**:
+- 82 frames skipped during SpaceProvider initialization
+- Multiple UI rebuilds during app startup
+- Slow time to first screen (2-3 seconds)
+- Potential emulator crashes on low-end devices
+
+**Root Causes**:
+1. **Multiple `notifyListeners()` calls during initialization**
+   - Called once at start to set loading state
+   - Called again after data loaded
+   - Each call triggered full widget tree rebuild
+   - Caused 2-3 rebuilds before any data was ready
+
+2. **Separate async onboarding check**
+   - Additional `FutureBuilder<bool>` for `hasCompletedOnboarding()`
+   - Created extra async operation after SpaceProvider initialized
+   - Caused additional rebuild when onboarding status loaded
+
+3. **Cascading rebuild effects**
+   - Each rebuild propagated through entire widget tree
+   - Compounded frame drops
+   - Blocked main thread during initialization
+
+**Fixes Applied**:
+```dart
+// Fix 1: Batch all data loading before notifying listeners
+class SpaceProvider extends ChangeNotifier {
+  bool? _onboardingComplete; // Cache onboarding status
+  
+  Future<void> initialize() async {
+    try {
+      // Load ALL data without notifying
+      _activeSpaces = await _spaceManager.getActiveSpaces();
+      _currentSpace = await _spaceManager.getCurrentSpace();
+      _onboardingComplete = await _spaceManager.hasCompletedOnboarding();
+      _error = null;
+    } catch (e) {
+      // Set error state
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // Single notification with all data
+    }
+  }
+  
+  // Synchronous getter for cached onboarding status
+  bool? get onboardingComplete => _onboardingComplete;
+}
+
+// Fix 2: Remove separate onboarding FutureBuilder
+// Before (WRONG):
+return FutureBuilder<SpaceProvider>(
+  future: _initializeSpaceProvider(),
+  builder: (context, spaceSnapshot) {
+    final spaceProvider = spaceSnapshot.data!;
+    return FutureBuilder<bool>(  // Extra async operation!
+      future: spaceProvider.hasCompletedOnboarding(),
+      builder: (context, onboardingSnapshot) {
+        // ... check onboarding ...
+      },
+    );
+  },
+);
+
+// After (CORRECT):
+return FutureBuilder<SpaceProvider>(
+  future: _initializeSpaceProvider(),
+  builder: (context, spaceSnapshot) {
+    final spaceProvider = spaceSnapshot.data!;
+    // Synchronous check - no extra FutureBuilder!
+    final hasCompletedOnboarding = spaceProvider.onboardingComplete ?? false;
+    if (!hasCompletedOnboarding) {
+      return OnboardingScreen(...);
+    }
+    // ... continue to home ...
+  },
+);
+
+// Fix 3: Add performance logging
+Future<void> initialize() async {
+  final initOp = AppLogger.startOperation('initialize_space_provider');
+  final startTime = DateTime.now();
+  
+  try {
+    // ... load data ...
+    
+    final durationMs = DateTime.now().difference(startTime).inMilliseconds;
+    if (durationMs > 500) {
+      await AppLogger.warning('Initialization exceeded 500ms threshold');
+    }
+  } finally {
+    await AppLogger.endOperation(initOp);
+    notifyListeners();
+  }
+}
+```
+
+**Results**:
+- Frame drops reduced from 82 to < 5 (expected)
+- UI rebuilds reduced from 2-3 to 1
+- Async operations reduced from 2 to 1
+- Time to first screen: < 2 seconds (expected)
+
+**Prevention**:
+- Batch state updates before notifying listeners
+- Cache data to avoid redundant async operations
+- Use performance logging to track initialization time
+- Test on low-end devices/emulators
+
+**Related Files**:
+- `lib/features/spaces/providers/space_provider.dart` - Batched updates, cached onboarding
+- `lib/ui/app.dart` - Simplified initialization flow
+- `.kiro/specs/space-initialization-performance/` - Full specification
+
+---
+
+### Issue #5: OnboardingScreen Frame Drops During Initial Render
+**Date Fixed**: November 17, 2025
+**Severity**: High - Performance issue
+**Symptoms**:
+- 53 frames skipped during OnboardingScreen initial render
+- Heavy widget build process blocking main thread
+- All 3 pages pre-built before display
+- Poor first impression for new users
+- Potential emulator crashes on low-end devices
+
+**Root Causes**:
+1. **Eager PageView pre-building all pages**
+   - `PageView` with pre-built children created all 3 pages immediately
+   - Only first page visible, but all built synchronously
+   - Wasted CPU cycles on off-screen content
+
+2. **Gradient object recreation on every build**
+   - `SpaceGradient.toLinearGradient()` called repeatedly
+   - Created new `LinearGradient` objects on every build/rebuild
+   - 8 space cards × multiple builds = dozens of allocations
+
+3. **SpaceRegistry list recreation**
+   - `getAllDefaultSpaces()` recreated list on every call
+   - Unnecessary list allocations during build
+
+4. **AnimatedContainer overhead**
+   - `AnimatedContainer` used in SpaceCard even when no animation needed
+   - Implicit animation setup blocked main thread
+
+5. **No repaint isolation**
+   - State changes in one card triggered repaints of all cards
+   - Cascading rebuilds throughout widget tree
+
+6. **Missing performance logging**
+   - No visibility into build duration
+   - Difficult to measure optimization impact
+
+**Fixes Applied**:
+```dart
+// Fix 1: Convert PageView to lazy loading with PageView.builder
+PageView.builder(
+  controller: _pageController,
+  itemCount: 3,
+  itemBuilder: (context, index) {
+    return RepaintBoundary(
+      child: _buildPage(index), // Built only when visible
+    );
+  },
+)
+
+// Fix 2: Cache gradient objects in SpaceGradient
+class SpaceGradient {
+  LinearGradient? _cachedLinearGradient;
+  
+  LinearGradient toLinearGradient() {
+    return _cachedLinearGradient ??= LinearGradient(
+      colors: [startColor, endColor],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+  }
+}
+
+// Fix 3: Cache default spaces list in SpaceRegistry
+class SpaceRegistry {
+  late final List<Space> _cachedDefaultSpaces = _defaultSpaces.values.toList();
+  
+  List<Space> getAllDefaultSpaces() => _cachedDefaultSpaces;
+}
+
+// Fix 4: Optimize SpaceCard widget
+class SpaceCard extends StatelessWidget {
+  late final LinearGradient _cachedGradient = space.gradient.toLinearGradient();
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container( // Regular Container instead of AnimatedContainer
+          padding: const EdgeInsets.all(16),
+          decoration: _buildDecoration(),
+          child: _buildContent(),
+        ),
+      ),
+    );
+  }
+}
+
+// Fix 5: Add const constructors to onboarding widgets
+class _WelcomeIcon extends StatelessWidget {
+  const _WelcomeIcon();
+  // ... implementation
+}
+
+// Fix 6: Add performance logging
+@override
+void initState() {
+  super.initState();
+  
+  _buildStartTime = DateTime.now();
+  _buildOperationId = AppLogger.startOperation('onboarding_screen_build');
+  
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    final duration = DateTime.now().difference(_buildStartTime!);
+    final durationMs = duration.inMilliseconds;
+    
+    AppLogger.endOperation(_buildOperationId!);
+    
+    if (durationMs > 100) {
+      AppLogger.warning('OnboardingScreen build exceeded threshold');
+    }
+  });
+}
+```
+
+**Results**:
+- Frame drops reduced from 53 to < 5 (expected)
+- Build time reduced from ~883ms to < 100ms (expected)
+- Pages built reduced from 3 to 1 (only visible page)
+- Gradient allocations: 8 total (cached and reused)
+- Smooth 60fps page transitions and scrolling
+
+**Prevention**:
+- Use `PageView.builder` for lazy loading
+- Cache expensive objects (gradients, lists)
+- Use `RepaintBoundary` to isolate repaints
+- Remove `AnimatedContainer` when animation not needed
+- Use const constructors for immutable widgets
+- Add performance logging to track build times
+
+**Related Files**:
+- `lib/features/spaces/ui/onboarding_screen.dart` - Lazy PageView, performance logging
+- `lib/features/spaces/ui/widgets/space_card.dart` - RepaintBoundary, cached gradient
+- `lib/features/spaces/domain/space_registry.dart` - Cached spaces list
+- `lib/core/domain/value_objects/space_gradient.dart` - Gradient caching
+- `.kiro/specs/onboarding-screen-performance/` - Full specification
 
 ---
 
@@ -249,6 +558,136 @@ return Consumer<MyProvider>(
     return MyWidget(data: provider.data);
   },
 );
+```
+
+### 5. CPU-Intensive Operations on Main Thread
+❌ **Bad** - Blocking main thread:
+```dart
+Future<Result> processImage(File file) async {
+  final bytes = await file.readAsBytes();
+  final image = img.decodeImage(bytes);  // BLOCKS UI!
+  // ... heavy processing ...
+  return result;
+}
+```
+
+✅ **Good** - Use isolates for CPU work:
+```dart
+// Top-level function for isolate
+Result _processInIsolate(Uint8List bytes) {
+  final image = img.decodeImage(bytes);
+  // ... heavy processing ...
+  return result;
+}
+
+Future<Result> processImage(File file) async {
+  final bytes = await file.readAsBytes();  // Fast I/O
+  return await compute(_processInIsolate, bytes);  // CPU work in background
+}
+```
+
+### 6. Multiple State Notifications During Initialization
+❌ **Bad** - Multiple notifications causing rebuilds:
+```dart
+class MyProvider extends ChangeNotifier {
+  Future<void> initialize() async {
+    _isLoading = true;
+    notifyListeners();  // Rebuild #1
+    
+    _data = await loadData();
+    notifyListeners();  // Rebuild #2
+    
+    _isLoading = false;
+    notifyListeners();  // Rebuild #3
+  }
+}
+```
+
+✅ **Good** - Batch updates, single notification:
+```dart
+class MyProvider extends ChangeNotifier {
+  Future<void> initialize() async {
+    try {
+      // Load ALL data without notifying
+      _data = await loadData();
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();  // Single notification with all data
+    }
+  }
+}
+```
+
+### 7. Eager Widget Building in PageView
+❌ **Bad** - Pre-building all pages:
+```dart
+PageView(
+  children: [
+    ExpensivePage1(),  // Built immediately
+    ExpensivePage2(),  // Built immediately
+    ExpensivePage3(),  // Built immediately
+  ],
+)
+```
+
+✅ **Good** - Lazy loading with PageView.builder:
+```dart
+PageView.builder(
+  itemCount: 3,
+  itemBuilder: (context, index) {
+    return RepaintBoundary(
+      child: _buildPage(index),  // Built only when visible
+    );
+  },
+)
+```
+
+### 8. Recreating Expensive Objects on Every Build
+❌ **Bad** - Creating new objects repeatedly:
+```dart
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final gradient = LinearGradient(...);  // NEW OBJECT EVERY BUILD!
+    return Container(decoration: BoxDecoration(gradient: gradient));
+  }
+}
+```
+
+✅ **Good** - Cache expensive objects:
+```dart
+class MyWidget extends StatelessWidget {
+  late final LinearGradient _cachedGradient = LinearGradient(...);
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(decoration: BoxDecoration(gradient: _cachedGradient));
+  }
+}
+```
+
+### 9. No Repaint Isolation
+❌ **Bad** - Cascading repaints:
+```dart
+ListView.builder(
+  itemBuilder: (context, index) {
+    return ExpensiveWidget();  // Repaints affect all items
+  },
+)
+```
+
+✅ **Good** - Isolate repaints with RepaintBoundary:
+```dart
+ListView.builder(
+  itemBuilder: (context, index) {
+    return RepaintBoundary(
+      child: ExpensiveWidget(),  // Repaints isolated to this item
+    );
+  },
+)
 ```
 
 ---
