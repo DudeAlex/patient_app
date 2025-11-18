@@ -51,6 +51,9 @@ class RecordsHomeState extends ChangeNotifier {
   bool get hasMore => _hasMore;
   bool get hasData => _records.isNotEmpty;
   String get searchQuery => _searchQuery;
+  
+  /// Get current space ID for creating new records
+  String get currentSpaceId => _spaceProvider.currentSpace?.id ?? 'health';
 
   /// Callback when space changes - reload records for new space
   void _onSpaceChanged() {

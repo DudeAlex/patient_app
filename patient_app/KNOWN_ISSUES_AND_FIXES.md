@@ -435,6 +435,153 @@ void initState() {
 
 ---
 
+### Issue #6: FileLogWriter Concurrent Flush Error
+**Date Fixed**: November 17, 2025
+**Severity**: Medium - Logging issue
+**Symptoms**:
+- `[FileLogWriter] Error flushing logs: Bad state: StreamSink is bound to a stream`
+- Error appears during app lifecycle transitions
+- Logs may be lost during concurrent flush operations
+- No app crash, but logging reliability affected
+
+**Root Cause**:
+Concurrent flush operations on the same IOSink:
+- `_flushTimer` calls `flush()` every 1 second
+- `write()` can trigger `_rotate()` which calls `flush()`
+- `close()` also calls `flush()`
+- Multiple overlapping `flush()` calls cause StreamSink state error
+- Dart's StreamSink doesn't allow concurrent operations
+
+**Fix Applied**:
+```dart
+class FileLogWriter implements LogWriter {
+  // Added flush lock flag
+  bool _isFlushing = false;
+  
+  @override
+  Future<void> flush() async {
+    // Prevent concurrent flush operations
+    if (_isFlushing || _buffer.isEmpty || _sink == null) return;
+
+    _isFlushing = true;
+    try {
+      // Copy buffer to avoid modification during flush
+      final entriesToFlush = List<String>.from(_buffer);
+      _buffer.clear();
+      
+      // Write all entries
+      for (final entry in entriesToFlush) {
+        _sink!.writeln(entry);
+      }
+      
+      // Flush the sink
+      await _sink!.flush();
+    } catch (e) {
+      print('[FileLogWriter] Error flushing logs: $e');
+    } finally {
+      _isFlushing = false;
+    }
+  }
+}
+```
+
+**Key Changes**:
+1. Added `_isFlushing` flag to prevent concurrent flush operations
+2. Copy buffer before clearing to avoid race conditions
+3. Always reset flag in `finally` block for reliability
+4. Early return if flush already in progress
+
+**Results**:
+- No more "StreamSink is bound to a stream" errors
+- Flush operations properly serialized
+- Buffer safely copied before clearing
+- Logging reliability improved
+
+**Prevention**:
+- Always use locks/flags for concurrent async operations
+- Never allow multiple operations on same StreamSink
+- Copy data structures before async operations if they can be modified
+- Use `finally` blocks to ensure cleanup
+
+**Related Files**:
+- `lib/core/diagnostics/writers/file_log_writer.dart` - Added flush lock
+
+---
+
+### Issue #7: Records Created in Wrong Space
+**Date Fixed**: November 17, 2025
+**Severity**: High - Data integrity issue
+**Symptoms**:
+- Records captured via photo/camera appear in Health space
+- Records created in different spaces all show up in Health section
+- Space filtering not working for newly created records
+- User confusion about where records are stored
+
+**Root Cause**:
+Records created from capture (photo, document scan, etc.) were not setting the `spaceId` field:
+
+1. **Missing spaceId in CaptureReviewScreen**
+   - `RecordEntity` created without `spaceId` parameter
+   - Defaults to 'health' in `RecordEntity._validateSpaceId()`
+   - All captured records assigned to health space
+
+2. **Default fallback behavior**
+   - `RecordEntity` constructor defaults `spaceId` to 'health' for backward compatibility
+   - This was intended for migration but affected new records too
+
+**Fix Applied**:
+```dart
+// In CaptureReviewScreen._submit()
+Future<void> _submit() async {
+  // ... validation ...
+  
+  final state = context.read<RecordsHomeState>();
+  
+  // ✅ FIX: Get current space ID from SpaceProvider
+  final currentSpaceId = state.currentSpaceId;
+
+  final newRecord = RecordEntity(
+    id: null,
+    spaceId: currentSpaceId, // ✅ Set spaceId from current space
+    type: _type,
+    date: _date,
+    title: _titleController.text.trim(),
+    // ... other fields ...
+  );
+  
+  await state.saveRecord(newRecord);
+}
+
+// In RecordsHomeState - added getter
+String get currentSpaceId => _spaceProvider.currentSpace?.id ?? 'health';
+```
+
+**Key Changes**:
+1. Added `currentSpaceId` getter to `RecordsHomeState`
+2. Modified `CaptureReviewScreen` to get and use current space ID
+3. Records now saved to the currently active space
+4. `AddRecordScreen` already had correct implementation
+
+**Results**:
+- ✅ Records created via capture now go to correct space
+- ✅ Space filtering works correctly
+- ✅ Records appear in the space they were created in
+- ✅ User experience matches expectations
+
+**Prevention**:
+- Always pass `spaceId` when creating `RecordEntity`
+- Use `SpaceProvider.currentSpace.id` for new records
+- Test record creation in different spaces
+- Verify space filtering after creating records
+
+**Related Files**:
+- `lib/features/capture_core/ui/capture_review_screen.dart` - Added spaceId from current space
+- `lib/features/records/ui/records_home_state.dart` - Added currentSpaceId getter
+- `lib/features/records/domain/entities/record.dart` - Has default fallback to 'health'
+- `lib/features/records/ui/add_record_screen.dart` - Already correct (no changes needed)
+
+---
+
 ## Debugging Tools Added
 
 ### Memory Monitor

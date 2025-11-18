@@ -23,6 +23,7 @@ class FileLogWriter implements LogWriter {
   final List<String> _buffer = [];
   Timer? _flushTimer;
   String? _absoluteLogPath;
+  bool _isFlushing = false;
 
   FileLogWriter({
     required this.logDirectory,
@@ -61,16 +62,26 @@ class FileLogWriter implements LogWriter {
 
   @override
   Future<void> flush() async {
-    if (_buffer.isEmpty || _sink == null) return;
+    // Prevent concurrent flush operations
+    if (_isFlushing || _buffer.isEmpty || _sink == null) return;
 
+    _isFlushing = true;
     try {
-      for (final entry in _buffer) {
+      // Copy buffer to avoid modification during flush
+      final entriesToFlush = List<String>.from(_buffer);
+      _buffer.clear();
+      
+      // Write all entries
+      for (final entry in entriesToFlush) {
         _sink!.writeln(entry);
       }
+      
+      // Flush the sink
       await _sink!.flush();
-      _buffer.clear();
     } catch (e) {
       print('[FileLogWriter] Error flushing logs: $e');
+    } finally {
+      _isFlushing = false;
     }
   }
 

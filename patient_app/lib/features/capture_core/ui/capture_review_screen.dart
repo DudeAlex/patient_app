@@ -95,8 +95,15 @@ class _CaptureReviewScreenState extends State<CaptureReviewScreen> {
     final cleanedNotes = _notesController.text.trim();
     final tags = _parseTags(_tagsController.text);
 
+    final state = context.read<RecordsHomeState>();
+    
+    // Get current space ID from SpaceProvider
+    // This ensures the record is saved to the currently active space
+    final currentSpaceId = state.currentSpaceId;
+
     final newRecord = RecordEntity(
       id: null,
+      spaceId: currentSpaceId, // ✅ FIX: Set spaceId from current space
       type: _type,
       date: _date,
       title: _titleController.text.trim(),
@@ -106,8 +113,6 @@ class _CaptureReviewScreenState extends State<CaptureReviewScreen> {
       updatedAt: now,
       deletedAt: null,
     );
-
-    final state = context.read<RecordsHomeState>();
     try {
       // Save the record first to get the ID
       final savedRecord = await state.saveRecord(newRecord);
