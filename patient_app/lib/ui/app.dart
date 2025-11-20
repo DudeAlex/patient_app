@@ -171,11 +171,9 @@ class _RecordsLoaderState extends State<_RecordsLoader> {
             // (Requirements: 1.1, 1.3, 3.2, 3.3)
             final hasCompletedOnboarding = spaceProvider.onboardingComplete ?? false;
             
-            // TEMPORARY: Skip onboarding for testing photo capture fix
-            // TODO: Remove this bypass after fixing onboarding performance
             // Show onboarding if first time and not yet completed in this session
             // Requirements: 10.8
-            if (false && !hasCompletedOnboarding && !_onboardingCompleted) {
+            if (!hasCompletedOnboarding && !_onboardingCompleted) {
               AppLogger.logScreenLoad('OnboardingScreen');
               // Don't wrap in Provider - OnboardingScreen doesn't need to listen to changes
               return OnboardingScreen(
