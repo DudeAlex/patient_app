@@ -39,6 +39,22 @@ class SpaceIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // NULL SAFETY: Validate inputs before rendering
+    if (iconName == null || iconName.isEmpty) {
+      debugPrint('SpaceIcon: iconName is null or empty');
+      return _buildErrorIcon();
+    }
+    
+    if (gradient == null) {
+      debugPrint('SpaceIcon: gradient is null');
+      return _buildErrorIcon();
+    }
+    
+    if (gradient.startColor == null) {
+      debugPrint('SpaceIcon: gradient.startColor is null');
+      return _buildErrorIcon();
+    }
+    
     final iconData = _getIconData(iconName);
     final iconSize = size * 0.5; // Icon is 50% of container size
 
@@ -57,6 +73,23 @@ class SpaceIcon extends StatelessWidget {
         iconData,
         size: iconSize,
         color: AppColors.white,
+      ),
+    );
+  }
+  
+  /// Builds an error icon when data is invalid
+  Widget _buildErrorIcon() {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: Colors.red.shade100,
+        borderRadius: BorderRadius.circular(size / 4),
+      ),
+      child: Icon(
+        Icons.error_outline,
+        size: size * 0.5,
+        color: Colors.red.shade400,
       ),
     );
   }

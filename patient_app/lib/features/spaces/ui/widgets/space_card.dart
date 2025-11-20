@@ -49,6 +49,27 @@ class SpaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     try {
+      // NULL SAFETY: Validate space has required fields before rendering
+      if (space.name == null || space.name.isEmpty) {
+        debugPrint('SpaceCard: space.name is null or empty for id: ${space.id}');
+        return _buildErrorCard('Space name missing');
+      }
+      
+      if (space.description == null) {
+        debugPrint('SpaceCard: space.description is null for id: ${space.id}');
+        return _buildErrorCard('Space description missing');
+      }
+      
+      if (space.icon == null || space.icon.isEmpty) {
+        debugPrint('SpaceCard: space.icon is null or empty for id: ${space.id}');
+        return _buildErrorCard('Space icon missing');
+      }
+      
+      if (space.gradient == null) {
+        debugPrint('SpaceCard: space.gradient is null for id: ${space.id}');
+        return _buildErrorCard('Space gradient missing');
+      }
+      
       // Wrap entire card in RepaintBoundary to isolate repaints
       return RepaintBoundary(
         child: GestureDetector(
@@ -65,18 +86,32 @@ class SpaceCard extends StatelessWidget {
       // Fallback UI if card fails to render
       debugPrint('Error building SpaceCard for ${space.id}: $e');
       debugPrint('Stack trace: $stackTrace');
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.gray100,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Text(
-          'Error loading ${space.name}',
-          style: TextStyle(color: AppColors.gray600),
-        ),
-      );
+      return _buildErrorCard('Error loading ${space.name ?? "space"}');
     }
+  }
+  
+  /// Builds an error card when space data is invalid
+  Widget _buildErrorCard(String message) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.gray100,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.red.shade200, width: 2),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.error_outline, color: Colors.red.shade400, size: 24),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(color: AppColors.gray600),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   /// Builds the card decoration with gradient or solid color
