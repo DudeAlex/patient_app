@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../capture_core/api/capture_artifact.dart';
+import '../../capture_core/api/capture_context_extensions.dart';
 import '../../capture_core/api/capture_draft.dart';
 import '../../capture_core/api/capture_mode.dart';
 import '../../capture_core/adapters/storage/attachments_capture_artifact_storage.dart';
@@ -41,6 +44,15 @@ class PhotoCaptureService implements PhotoCaptureGateway {
         return null;
       }
 
+      // Step 1: Show processing overlay IMMEDIATELY after camera closes
+      // This is the first thing we do after getting the photo, before any
+      // file operations. This gives the UI the maximum time to update and
+      // show the overlay while we're doing file storage work.
+      context.showProcessingOverlay();
+
+      // Step 2: Store the captured photo to device storage
+      // These file operations take ~50-200ms, which gives the overlay time
+      // to render on screen while we're working.
       final relativePath = await _storeOnDevice(
         sessionId: context.sessionId,
         sourcePath: xfile.path,
@@ -49,14 +61,19 @@ class PhotoCaptureService implements PhotoCaptureGateway {
       final savedFile = await _storage.resolveRelativePath(relativePath);
       final stat = await savedFile.stat();
 
+      // Step 3: Analyze photo clarity (check if blurry)
+      // This can take 500ms-2s depending on image size
       PhotoClarityResult? clarityResult;
       final analyzer = _clarityAnalyzer;
       if (analyzer != null) {
         clarityResult = await analyzer.analyze(savedFile);
       }
 
+      // Step 4: Extract text from photo using OCR
+      // This can take 500ms-3s depending on text complexity
       final ocrText = await _ocrExtractor.extract(savedFile);
 
+      // Step 5: Build metadata with analysis results
       final clarityScore = clarityResult?.score;
       final clarityIsSharp = clarityResult?.isSharp;
       final clarityReason = clarityResult?.reason;
@@ -69,6 +86,7 @@ class PhotoCaptureService implements PhotoCaptureGateway {
         if (ocrText != null && ocrText.isNotEmpty) 'ocrText': ocrText,
       };
 
+      // Step 6: Create artifact with all metadata
       final artifact = CaptureArtifact(
         id: xfile.name,
         type: CaptureArtifactType.photo,
@@ -79,6 +97,7 @@ class PhotoCaptureService implements PhotoCaptureGateway {
         metadata: Map.unmodifiable(metadata),
       );
 
+      // Step 7: Create draft with OCR text if available
       CaptureDraft? draft;
       if (ocrText != null && ocrText.isNotEmpty) {
         draft = CaptureDraft(
@@ -89,6 +108,9 @@ class PhotoCaptureService implements PhotoCaptureGateway {
         draft = const CaptureDraft(suggestedTags: {'photo'});
       }
 
+      // Step 8: Return outcome WITHOUT hiding processing overlay
+      // The CapturePhotoUseCase will handle hiding the overlay after deciding
+      // whether to show a quality dialog or proceed to review
       return PhotoCaptureOutcome(
         artifact: artifact,
         draft: draft,
@@ -143,6 +165,8 @@ class PhotoCaptureService implements PhotoCaptureGateway {
         return '.jpg';
     }
   }
+
+
 }
 
 class PhotoCaptureException implements Exception {

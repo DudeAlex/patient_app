@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../capture_core/api/capture_artifact.dart';
+import '../../capture_core/api/capture_context_extensions.dart';
 import '../../capture_core/api/capture_draft.dart';
 import '../../capture_core/api/capture_mode.dart';
 import '../../capture_core/adapters/storage/attachments_capture_artifact_storage.dart';
@@ -77,6 +78,10 @@ class DocumentScanService implements DocumentScanGateway {
         break;
       }
 
+      // Show processing overlay IMMEDIATELY after camera closes
+      // This prevents users from seeing the "Add Record" page while we process
+      context.showProcessingOverlay();
+
       final pageArtifacts = await _processPage(
         sessionId: context.sessionId,
         file: xfile,
@@ -87,17 +92,19 @@ class DocumentScanService implements DocumentScanGateway {
       DocumentClarityResult? clarityResult;
       final analyzer = _clarityAnalyzer;
       if (analyzer != null) {
-        final onProcessing = context.onProcessing;
-        onProcessing?.call(true);
-        try {
-          final originalFile = await _storage.resolveRelativePath(
-            pageArtifacts.original.relativePath,
-          );
-          clarityResult = await analyzer.analyze(originalFile);
-        } finally {
-          onProcessing?.call(false);
-        }
-        if (clarityResult.isSharp == false) {
+        // Processing overlay is already showing from above
+        final originalFile = await _storage.resolveRelativePath(
+          pageArtifacts.original.relativePath,
+        );
+        clarityResult = await analyzer.analyze(originalFile);
+        // Check if we need to show quality dialog
+        final needsQualityDialog = clarityResult.isSharp == false &&
+            (context.promptChoice != null || context.promptRetake != null);
+        
+        if (needsQualityDialog) {
+          // Hide processing overlay before showing dialog
+          context.onProcessing?.call(false);
+          
           final prompt = context.promptChoice ?? (
               context.promptRetake == null
                   ? null
@@ -119,12 +126,19 @@ class DocumentScanService implements DocumentScanGateway {
             }
             userAcceptedBlurry = true;
           }
+        } else {
+          // No dialog needed, hide processing overlay immediately
+          context.onProcessing?.call(false);
         }
+        
         augmented = _applyClarityMetadata(
           pageArtifacts,
           clarityResult: clarityResult,
           userAcceptedBlurry: userAcceptedBlurry,
         );
+      } else {
+        // No analyzer, hide processing overlay immediately
+        context.onProcessing?.call(false);
       }
 
       pages.add(augmented);

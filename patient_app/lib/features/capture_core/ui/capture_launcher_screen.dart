@@ -236,19 +236,25 @@ class _ProcessingOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get the theme background color for a clean, opaque overlay
+    final backgroundColor = Theme.of(context).scaffoldBackgroundColor;
+    
     return Positioned.fill(
       child: AbsorbPointer(
         child: DecoratedBox(
-          decoration: const BoxDecoration(color: Colors.black45),
+          // Use solid background color instead of semi-transparent
+          // This completely hides the "Add Record" page underneath
+          // so users only see the processing indicator
+          decoration: BoxDecoration(color: backgroundColor),
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: const [
-                CircularProgressIndicator(),
-                SizedBox(height: 12),
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
                 Text(
                   'Checking clarity…',
-                  style: TextStyle(color: Colors.white),
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ],
             ),
