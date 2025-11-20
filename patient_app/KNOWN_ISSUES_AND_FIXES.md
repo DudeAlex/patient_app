@@ -4,6 +4,67 @@ This document tracks resolved issues and their fixes to help future debugging an
 
 ## Critical Fixes (November 2025)
 
+### Issue #0: Onboarding Screen Crash When Scrolling Space List
+**Date Fixed**: November 20, 2025
+**Severity**: Critical - Crashes app and kills emulator
+**Symptoms**:
+- App crashes when scrolling down the space selection list on onboarding page 2
+- Crash is so severe it kills the emulator
+- ManageSpacesScreen uses same ListView and SpaceCard widgets but never crashes
+
+**Root Cause**:
+- **Nested scrolling conflict** between PageView (horizontal scroll) and ListView (vertical scroll)
+- When user scrolls the list, gesture detector cannot decide which widget should handle the gesture
+- PageView tries to interpret vertical scrolls as potential horizontal swipes
+- Gesture conflict causes crash, especially on low-end devices/emulators
+
+**Architecture Analysis**:
+```
+OnboardingScreen (CRASHES):
+  PageView (horizontal scroll)
+    └─ Page 2: ListView (vertical scroll)  ⚠️ NESTED SCROLLING CONFLICT
+
+ManageSpacesScreen (NO CRASH):
+  Scaffold
+    └─ ListView (vertical scroll)  ✅ NO NESTING
+```
+
+**Fix Applied**:
+```dart
+// lib/features/spaces/ui/onboarding_screen.dart (line ~347)
+PageView.builder(
+  controller: _pageController,
+  physics: const NeverScrollableScrollPhysics(),  // Disable PageView scrolling
+  onPageChanged: _onPageChanged,
+  itemCount: 3,
+  itemBuilder: (context, index) {
+    return RepaintBoundary(
+      child: _buildPage(index),
+    );
+  },
+)
+```
+
+**Why This Works**:
+- Completely eliminates gesture conflicts by disabling PageView scrolling
+- ListView can scroll freely without interference
+- Users navigate via "Continue" and "Skip" buttons (already present)
+- Simple, clean solution with no conditional logic
+
+**Trade-off**:
+- Users cannot swipe horizontally between pages
+- Must use buttons for navigation
+- Acceptable because buttons are clear and users need to interact with content anyway
+
+**Related Documentation**:
+- `ONBOARDING_CRASH_FIX.md` - Detailed analysis
+- `.kiro/specs/onboarding-screen-performance/` - Spec with Requirement 5
+- Tasks 8-10 in spec tasks.md
+
+---
+
+## Critical Fixes (November 2025)
+
 ### Issue #1: App Crash on Onboarding - Infinite Rebuild Loop
 **Date Fixed**: November 16, 2025
 **Severity**: Critical - App crashed emulator

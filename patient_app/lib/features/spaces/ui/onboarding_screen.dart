@@ -344,6 +344,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: PageView.builder(
                 controller: _pageController,
                 onPageChanged: _onPageChanged,
+                // CRASH FIX: Disable PageView scrolling completely
+                // Use buttons for navigation to avoid nested scrolling conflicts
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: 3,
                 itemBuilder: (context, index) {
                   // Wrap each page in RepaintBoundary to isolate repaints
