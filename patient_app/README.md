@@ -48,6 +48,11 @@ Design System
 - Reusable components (gradient headers, buttons, category badges)
 - 3D card effects with touch animations
 - Category-specific color schemes for health records
+- Optimized RecordsHomeModern with performance-first design:
+  - Removed expensive animations for smooth 60fps scrolling
+  - 3-line compact card layout with reduced spacing
+  - RepaintBoundary optimization for list rendering
+  - Comprehensive performance monitoring (render time, scroll, memory)
 - See `docs/DESIGN_SYSTEM.md` for complete documentation
 - View in app: Settings → View Design Showcase
 
@@ -92,7 +97,7 @@ First Run (Android Emulator)
 
 One‑command helper (PowerShell)
 - From `patient_app/` you can use the helper script:
-  - `./run_pixel.ps1 -EmulatorId "Pixel 6 Play" -ServerClientId YOUR_WEB_CLIENT_ID`
+  - `./tool/run_pixel.ps1 -EmulatorId "Pixel 6 Play" -ServerClientId YOUR_WEB_CLIENT_ID`
   - Re‑runs after first build: add `-SkipBuildRunner` for faster startup
 
 Android Build Notes

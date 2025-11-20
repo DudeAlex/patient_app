@@ -42,12 +42,15 @@ class SpaceIcon extends StatelessWidget {
     final iconData = _getIconData(iconName);
     final iconSize = size * 0.5; // Icon is 50% of container size
 
+    // PERFORMANCE: Use solid color instead of gradient for better performance on low-end devices
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        gradient: isSelected ? null : gradient.toLinearGradient(),
-        color: isSelected ? AppColors.white.withOpacity(0.2) : null,
+        // Use solid color from gradient start instead of full gradient
+        color: isSelected 
+            ? AppColors.white.withOpacity(0.2) 
+            : gradient.startColor,
         borderRadius: BorderRadius.circular(size / 4),
       ),
       child: Icon(

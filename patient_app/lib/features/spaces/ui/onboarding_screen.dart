@@ -36,54 +36,100 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // Track selected spaces (initially empty, user must select at least one)
   final Set<String> _selectedSpaceIds = {};
   
-  // Performance tracking
-  String? _buildOperationId;
-  DateTime? _buildStartTime;
+  // PERFORMANCE: Cache default spaces to avoid repeated registry lookups in build
+  // This prevents heavy work in build method (Rule #1)
+  late final List<dynamic> _cachedDefaultSpaces;
+  
+  // Performance tracking for initial build
+  String? _initialBuildOperationId;
+  DateTime? _initialBuildStartTime;
+  bool _isFirstBuild = true;
+  
+  // Performance tracking for rebuilds
+  DateTime? _rebuildStartTime;
 
   @override
   void initState() {
     super.initState();
     
-    // Start performance tracking for onboarding screen build
-    _buildStartTime = DateTime.now();
-    _buildOperationId = AppLogger.startOperation('onboarding_screen_build');
+    AppLogger.info('OnboardingScreen initialized', context: {
+      'category': 'onboarding',
+      'event': 'screen_init',
+    });
+    
+    // PERFORMANCE: Load and cache default spaces once in initState
+    // instead of calling getAllDefaultSpaces() on every build
+    final cacheOpId = AppLogger.startOperation('onboarding_cache_spaces');
+    _cachedDefaultSpaces = _spaceRegistry.getAllDefaultSpaces();
+    AppLogger.endOperation(cacheOpId);
+    
+    AppLogger.info('OnboardingScreen spaces cached', context: {
+      'category': 'onboarding',
+      'event': 'spaces_cached',
+      'spaceCount': _cachedDefaultSpaces.length,
+    });
+    
+    // Start performance tracking for initial build
+    _initialBuildStartTime = DateTime.now();
+    _initialBuildOperationId = AppLogger.startOperation('onboarding_initial_build');
     
     // Use addPostFrameCallback to log completion after first frame renders
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_buildOperationId != null && _buildStartTime != null) {
-        final duration = DateTime.now().difference(_buildStartTime!);
+      if (_initialBuildOperationId != null && _initialBuildStartTime != null) {
+        final duration = DateTime.now().difference(_initialBuildStartTime!);
         final durationMs = duration.inMilliseconds;
         
         // End the operation tracking
-        AppLogger.endOperation(_buildOperationId!);
+        AppLogger.endOperation(_initialBuildOperationId!);
         
-        // Log warning if initial build exceeds 100ms threshold
-        if (durationMs > 100) {
+        // Log with appropriate level based on threshold
+        if (durationMs > 150) {
           AppLogger.warning(
-            'OnboardingScreen initial build exceeded threshold',
+            'OnboardingScreen initial build slow',
             context: {
+              'category': 'onboarding',
+              'event': 'screen_build_end',
               'durationMs': durationMs,
               'threshold': 100,
               'exceeded_by': durationMs - 100,
+              'isInitialBuild': true,
+              'pageIndex': _currentPage,
+            },
+          );
+        } else if (durationMs > 50) {
+          AppLogger.info(
+            'OnboardingScreen initial build completed',
+            context: {
+              'category': 'onboarding',
+              'event': 'screen_build_end',
+              'durationMs': durationMs,
+              'threshold': 100,
+              'status': 'watch',
+              'isInitialBuild': true,
+              'pageIndex': _currentPage,
             },
           );
         } else {
           AppLogger.info(
             'OnboardingScreen initial build completed',
             context: {
+              'category': 'onboarding',
+              'event': 'screen_build_end',
               'durationMs': durationMs,
               'threshold': 100,
+              'status': 'good',
+              'isInitialBuild': true,
+              'pageIndex': _currentPage,
             },
           );
         }
         
         // Clear tracking variables
-        _buildOperationId = null;
-        _buildStartTime = null;
+        _initialBuildOperationId = null;
+        _initialBuildStartTime = null;
+        _isFirstBuild = false;
       }
     });
-    
-    AppLogger.info('OnboardingScreen initialized');
   }
 
   @override
@@ -94,7 +140,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _onPageChanged(int page) {
-    AppLogger.info('Onboarding page changed', context: {'page': page});
+    final fromPage = _currentPage;
+    final toPage = page;
+    
+    AppLogger.info('Onboarding page changed', context: {
+      'category': 'onboarding',
+      'event': 'page_change',
+      'fromPage': fromPage,
+      'toPage': toPage,
+      'pageIndex': toPage,
+    });
+    
     setState(() {
       _currentPage = page;
     });
@@ -129,12 +185,51 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _completeOnboarding() async {
+    final completeStartTime = DateTime.now();
+    final completeOpId = AppLogger.startOperation('onboarding_complete');
+    
     try {
-      AppLogger.info('Completing onboarding', context: {'selectedSpaces': _selectedSpaceIds.length});
+      AppLogger.info('Onboarding completion started', context: {
+        'category': 'onboarding',
+        'event': 'complete_start',
+        'selectedSpacesCount': _selectedSpaceIds.length,
+        'selectedSpaceIds': _selectedSpaceIds.toList(),
+      });
       
       // Save selected spaces to storage
+      // Sequential is safe here - ensures proper ordering and avoids DB contention
       for (final spaceId in _selectedSpaceIds) {
-        await widget.spaceProvider.addSpace(spaceId);
+        final addSpaceStartTime = DateTime.now();
+        final addSpaceOpId = AppLogger.startOperation('onboarding_add_space');
+        
+        try {
+          await widget.spaceProvider.addSpace(spaceId);
+          
+          final addSpaceDuration = DateTime.now().difference(addSpaceStartTime);
+          AppLogger.endOperation(addSpaceOpId);
+          
+          AppLogger.info('Space added during onboarding', context: {
+            'category': 'onboarding',
+            'event': 'add_space_end',
+            'spaceId': spaceId,
+            'durationMs': addSpaceDuration.inMilliseconds,
+          });
+        } catch (e, stackTrace) {
+          final addSpaceDuration = DateTime.now().difference(addSpaceStartTime);
+          AppLogger.endOperation(addSpaceOpId);
+          
+          AppLogger.error('Failed to add space during onboarding', 
+            error: e, 
+            stackTrace: stackTrace,
+            context: {
+              'category': 'onboarding',
+              'event': 'add_space_error',
+              'spaceId': spaceId,
+              'durationMs': addSpaceDuration.inMilliseconds,
+            },
+          );
+          rethrow;
+        }
       }
 
       // Set first space as current
@@ -143,20 +238,100 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       }
 
       // Mark onboarding complete (Requirements: 10.7)
-      await widget.spaceProvider.setOnboardingComplete();
+      final markCompleteStartTime = DateTime.now();
+      final markCompleteOpId = AppLogger.startOperation('onboarding_mark_complete');
+      
+      try {
+        await widget.spaceProvider.setOnboardingComplete();
+        
+        final markCompleteDuration = DateTime.now().difference(markCompleteStartTime);
+        AppLogger.endOperation(markCompleteOpId);
+        
+        AppLogger.info('Onboarding marked complete', context: {
+          'category': 'onboarding',
+          'event': 'mark_complete_end',
+          'durationMs': markCompleteDuration.inMilliseconds,
+        });
+      } catch (e, stackTrace) {
+        final markCompleteDuration = DateTime.now().difference(markCompleteStartTime);
+        AppLogger.endOperation(markCompleteOpId);
+        
+        AppLogger.error('Failed to mark onboarding complete', 
+          error: e, 
+          stackTrace: stackTrace,
+          context: {
+            'category': 'onboarding',
+            'event': 'mark_complete_error',
+            'durationMs': markCompleteDuration.inMilliseconds,
+          },
+        );
+        rethrow;
+      }
 
-      AppLogger.info('Onboarding completed successfully');
+      final completeDuration = DateTime.now().difference(completeStartTime);
+      AppLogger.endOperation(completeOpId);
+      
+      AppLogger.info('Onboarding completed successfully', context: {
+        'category': 'onboarding',
+        'event': 'complete_end',
+        'durationMs': completeDuration.inMilliseconds,
+        'spacesAdded': _selectedSpaceIds.length,
+        'selectedSpaceIds': _selectedSpaceIds.toList(),
+      });
       
       // Navigate to main app
       widget.onComplete();
     } catch (e, stackTrace) {
-      AppLogger.error('Error completing onboarding', error: e, stackTrace: stackTrace);
+      final completeDuration = DateTime.now().difference(completeStartTime);
+      AppLogger.endOperation(completeOpId);
+      
+      AppLogger.error('Error completing onboarding', 
+        error: e, 
+        stackTrace: stackTrace,
+        context: {
+          'category': 'onboarding',
+          'event': 'complete_error',
+          'durationMs': completeDuration.inMilliseconds,
+          'spacesAttempted': _selectedSpaceIds.length,
+          'errorType': e.runtimeType.toString(),
+        },
+      );
       rethrow;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Track rebuild performance (only after initial build)
+    if (!_isFirstBuild) {
+      _rebuildStartTime = DateTime.now();
+      
+      // Use addPostFrameCallback to measure rebuild time
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_rebuildStartTime != null) {
+          final rebuildDuration = DateTime.now().difference(_rebuildStartTime!);
+          final durationMs = rebuildDuration.inMilliseconds;
+          
+          // Only log if rebuild takes significant time
+          if (durationMs > 50) {
+            final level = durationMs > 150 ? 'warning' : 'info';
+            
+            AppLogger.info('OnboardingScreen rebuild', context: {
+              'category': 'onboarding',
+              'event': 'screen_rebuild',
+              'durationMs': durationMs,
+              'pageIndex': _currentPage,
+              'isInitialBuild': false,
+              'level': level,
+              'trigger': 'state_change', // Could be enhanced to track actual trigger
+            });
+          }
+          
+          _rebuildStartTime = null;
+        }
+      });
+    }
+    
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -393,8 +568,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   /// Requirements: 2.1-2.9, 10.3
   Widget _buildSpaceSelectionStep() {
     try {
-      // Don't log in build methods - too noisy and causes performance issues
-      final allSpaces = _spaceRegistry.getAllDefaultSpaces();
+      // PERFORMANCE: Use cached spaces instead of calling registry in build
+      // This prevents heavy work on every rebuild (Rule #1)
+      final allSpaces = _cachedDefaultSpaces;
       
       return Padding(
         padding: const EdgeInsets.all(24),

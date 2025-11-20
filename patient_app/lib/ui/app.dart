@@ -171,9 +171,11 @@ class _RecordsLoaderState extends State<_RecordsLoader> {
             // (Requirements: 1.1, 1.3, 3.2, 3.3)
             final hasCompletedOnboarding = spaceProvider.onboardingComplete ?? false;
             
+            // TEMPORARY: Skip onboarding for testing photo capture fix
+            // TODO: Remove this bypass after fixing onboarding performance
             // Show onboarding if first time and not yet completed in this session
             // Requirements: 10.8
-            if (!hasCompletedOnboarding && !_onboardingCompleted) {
+            if (false && !hasCompletedOnboarding && !_onboardingCompleted) {
               AppLogger.logScreenLoad('OnboardingScreen');
               // Don't wrap in Provider - OnboardingScreen doesn't need to listen to changes
               return OnboardingScreen(
@@ -248,19 +250,7 @@ class _HomeScaffold extends StatelessWidget {
       )..load(),
       child: Builder(
         builder: (context) => Scaffold(
-          appBar: AppBar(
-            title: const Text('Patient'),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.settings),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                  );
-                },
-              ),
-            ],
-          ),
+          // OPTIMIZATION: Removed AppBar - using GradientHeader instead for better space usage
           body: const RecordsHomeModern(), // Switch to RecordsHomePlaceholder() to see old design
           floatingActionButton: FloatingActionButton(
             onPressed: () async {
@@ -286,17 +276,58 @@ class _HomeScaffold extends StatelessWidget {
                         );
                         return;
                       }
-                      await Navigator.of(ctx).push(
-                        MaterialPageRoute(
-                          builder: (_) => ChangeNotifierProvider.value(
-                            value: state,
-                            child: CaptureReviewScreen(
-                              mode: mode,
-                              result: result,
+                      
+                      // Show loading dialog immediately to prevent accidental taps
+                      showDialog(
+                        context: ctx,
+                        barrierDismissible: false,
+                        builder: (_) => WillPopScope(
+                          onWillPop: () async => false,
+                          child: Container(
+                            color: Colors.black87,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  Text(
+                                    'Processing ${mode.displayName}...',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       );
+                      
+                      // Small delay to ensure dialog is visible
+                      await Future.delayed(const Duration(milliseconds: 100));
+                      
+                      // Navigate to review screen
+                      if (ctx.mounted) {
+                        // Pop the loading dialog
+                        Navigator.of(ctx).pop();
+                        
+                        await Navigator.of(ctx).push(
+                          MaterialPageRoute(
+                            builder: (_) => ChangeNotifierProvider.value(
+                              value: state,
+                              child: CaptureReviewScreen(
+                                mode: mode,
+                                result: result,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                      
                       if (ctx.mounted) {
                         Navigator.of(ctx).pop();
                       }

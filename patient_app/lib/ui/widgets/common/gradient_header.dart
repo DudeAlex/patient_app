@@ -103,8 +103,9 @@ class GradientHeader extends StatelessWidget {
     // Use space gradient if available, otherwise use default primary gradient
     final gradient = space?.gradient.toLinearGradient() ?? AppColors.primaryGradient;
 
+    // OPTIMIZATION: Compact header - reduced padding and single-line layout
     final content = Padding(
-      padding: EdgeInsets.fromLTRB(24, 16, 24, bottomPadding),
+      padding: EdgeInsets.fromLTRB(16, 12, 16, bottomPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -121,7 +122,7 @@ class GradientHeader extends StatelessWidget {
                 SpaceIcon(
                   iconName: space!.icon,
                   gradient: space!.gradient,
-                  size: 40,
+                  size: 32, // OPTIMIZATION: Reduced from 40 to 32
                   isSelected: true,
                 ),
                 const SizedBox(width: 12),
@@ -133,19 +134,13 @@ class GradientHeader extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: AppTextStyles.h1.copyWith(
+                      style: AppTextStyles.h2.copyWith( // OPTIMIZATION: h2 instead of h1 for smaller text
                         color: AppColors.white,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    if (subtitle != null) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        subtitle!,
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.white.withOpacity(0.8),
-                        ),
-                      ),
-                    ],
+                    // OPTIMIZATION: Remove subtitle to save vertical space
+                    // Description is not essential for navigation
                   ],
                 ),
               ),
@@ -154,7 +149,7 @@ class GradientHeader extends StatelessWidget {
           ),
           // Optional child content
           if (child != null) ...[
-            const SizedBox(height: 24),
+            const SizedBox(height: 16), // OPTIMIZATION: Reduced from 24 to 16
             child!,
           ],
         ],

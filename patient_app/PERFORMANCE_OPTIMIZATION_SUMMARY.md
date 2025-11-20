@@ -793,3 +793,373 @@ The optimizations have been successfully implemented, but the performance target
 
 **Conclusion:**
 The optimizations are correctly implemented and working as designed (lazy loading, gradient caching, repaint isolation). The performance targets may need adjustment for debug mode, or additional optimizations may be needed for the welcome page specifically. Testing in release mode is recommended to get accurate performance metrics.
+
+---
+
+## Issue #5: RecordsHomeModern UI Performance Optimization
+
+**Date Implemented**: November 18, 2025
+**Severity**: High - Performance issue
+
+### Problem
+The RecordsHomeModern screen was experiencing performance issues on low-end devices:
+- Heavy UI elements causing frame drops during scrolling
+- Expensive animations and decorations blocking main thread
+- Large padding and margins increasing render area
+- Multiple shadows and complex gradients on every card
+- All search UI rendered even when not visible
+
+### Root Causes
+
+1. **Always-Visible Search Field**
+   - Search TextField rendered even when not in use
+   - Took permanent screen space
+   - Added to initial render cost
+
+2. **Heavy Stats Cards**
+   - 3 separate StatsCard widgets with shadows and gradients
+   - Each card had complex decoration
+   - Unnecessary visual weight
+
+3. **Expensive Card Animations**
+   - AnimatedContainer on every card
+   - ScaleTransition for tap feedback
+   - Animation controllers added overhead even when not animating
+
+4. **Multiple Shadows Per Card**
+   - Each card had multiple BoxShadow layers
+   - Expensive to render and composite
+   - Compounded effect with many cards
+
+5. **Large Padding and Margins**
+   - Card padding: 20px (increased render area)
+   - Card margin: 16px (more spacing than needed)
+   - Header padding: 24px (larger than necessary)
+
+6. **No Repaint Isolation**
+   - State changes triggered repaints of all cards
+   - Cascading rebuilds throughout list
+
+### Solution
+
+#### 1. Collapsible Search Field
+Implemented progressive disclosure for search:
+
+```dart
+// Search field hidden by default, shown on demand
+bool _searchVisible = false;
+
+void _toggleSearch() {
+  setState(() {
+    _searchVisible = !_searchVisible;
+    if (!_searchVisible) {
+      _searchController.clear();
+      _submitSearch('');
+    }
+  });
+}
+
+// Wrapped in AnimatedSize for smooth transitions
+AnimatedSize(
+  duration: const Duration(milliseconds: 200),
+  curve: Curves.easeInOut,
+  child: _searchVisible
+      ? TextField(...)
+      : const SizedBox.shrink(), // Zero space when hidden
+)
+```
+
+**Benefits:**
+- Reduced initial render cost
+- Search available when needed
+- Smooth 200ms animation
+- Zero space when hidden
+
+#### 2. Simplified Stats Display
+Replaced 3 heavy cards with single lightweight row:
+
+```dart
+// Single row with minimal decoration
+Container(
+  padding: const EdgeInsets.symmetric(vertical: 16),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      _StatChip(label: 'Records', value: recordCount),
+      Text('·'), // Dot separator
+      _StatChip(label: 'Attachments', value: attachmentCount),
+      Text('·'),
+      _StatChip(label: 'Categories', value: categoryCount),
+    ],
+  ),
+)
+
+// Lightweight chip widget
+class _StatChip extends StatelessWidget {
+  const _StatChip({required this.label, required this.value});
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Text('$label: $value', style: AppTextStyles.bodySmall),
+    );
+  }
+}
+```
+
+**Benefits:**
+- Single row instead of 3 cards
+- No shadows or gradients
+- Const constructor for reuse
+- Minimal padding
+
+#### 3. Removed Card Animations
+Replaced AnimatedContainer and ScaleTransition with simple Container:
+
+```dart
+// Before (EXPENSIVE):
+AnimatedContainer(
+  duration: Duration(milliseconds: 200),
+  transform: Matrix4.identity()..scale(_scale),
+  child: ScaleTransition(...),
+)
+
+// After (OPTIMIZED):
+Container(
+  margin: EdgeInsets.only(bottom: 8), // Reduced from 16
+  decoration: BoxDecoration(...),
+  child: Material(
+    color: Colors.transparent,
+    child: InkWell( // Simple tap feedback
+      onTap: onTap,
+      child: Padding(...),
+    ),
+  ),
+)
+```
+
+**Benefits:**
+- No animation controller overhead
+- No implicit animation setup
+- Simple InkWell for tap feedback
+- Faster rendering
+
+#### 4. Simplified Card Decoration
+Reduced shadows and padding:
+
+```dart
+// Single subtle shadow instead of multiple
+boxShadow: [
+  BoxShadow(
+    color: AppColors.black.withOpacity(0.04),
+    blurRadius: 4,
+    offset: Offset(0, 2),
+  ),
+]
+
+// Reduced padding and margins
+static const double _cardMargin = 8.0;  // Was 16px
+static const double _cardPadding = 12.0; // Was 20px
+static const double _borderRadius = 12.0; // Maintained
+static const double _lineSpacing = 6.0;  // Between lines
+```
+
+**Benefits:**
+- Single shadow reduces compositing cost
+- Smaller padding reduces render area
+- Subtle border adds definition
+- Maintains visual appeal
+
+#### 5. Compact 3-Line Layout
+Implemented dense card layout:
+
+```dart
+Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    // Line 1: Category tag + Title (truncated)
+    Row(
+      children: [
+        Container(...), // Category tag
+        Expanded(
+          child: Text(
+            record.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    ),
+    SizedBox(height: 6),
+    
+    // Line 2: Date + Description (truncated to ~50 chars)
+    Row(
+      children: [
+        Icon(Icons.calendar_today, size: 14),
+        Text(_formatDate(record.date)),
+        Text('·'),
+        Expanded(
+          child: Text(
+            record.text!.length > 50 
+                ? '${record.text!.substring(0, 50)}...'
+                : record.text!,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    ),
+    
+    // Line 3: Tags (first 3, "+X more" for additional)
+    if (record.tags.isNotEmpty) ...[
+      SizedBox(height: 6),
+      Row(
+        children: [
+          ...record.tags.take(3).map((tag) => Container(...)),
+          if (record.tags.length > 3)
+            Text('+${record.tags.length - 3} more'),
+        ],
+      ),
+    ],
+  ],
+)
+```
+
+**Benefits:**
+- More records visible on screen
+- Reduced vertical space per card
+- Truncated text prevents overflow
+- Tag limit prevents excessive height
+
+#### 6. Added Repaint Boundaries
+Isolated card repaints:
+
+```dart
+ListView.builder(
+  itemBuilder: (context, index) {
+    return RepaintBoundary(
+      child: _ModernRecordCard(record: record),
+    );
+  },
+)
+```
+
+**Benefits:**
+- Repaints isolated to individual cards
+- Prevents cascading rebuilds
+- Better scroll performance
+
+#### 7. Performance Logging
+Added comprehensive performance tracking:
+
+```dart
+// Initial render tracking
+_renderOperationId = AppLogger.startOperation('records_home_initial_render');
+
+WidgetsBinding.instance.addPostFrameCallback((_) {
+  AppLogger.endOperation(_renderOperationId!);
+});
+
+// Scroll performance tracking
+_scrollController.addListener(() {
+  if (_scrollOperationId == null && isScrolling) {
+    _scrollOperationId = AppLogger.startOperation('records_list_scroll');
+  }
+  if (_scrollOperationId != null && !isScrolling) {
+    AppLogger.endOperation(_scrollOperationId!);
+  }
+});
+
+// Memory monitoring
+void _logMemoryUsage(String phase) {
+  developer.Timeline.startSync('memory_check');
+  AppLogger.info('Memory usage check', context: {
+    'phase': phase,
+    'screen': 'RecordsHomeModern',
+  });
+  developer.Timeline.finishSync();
+}
+```
+
+### Files Modified
+- `lib/features/records/ui/records_home_modern.dart` - Complete UI optimization
+
+### Impact
+
+**Before Optimization:**
+- Card padding: 20px
+- Card margin: 16px
+- Shadows per card: Multiple
+- Animations: AnimatedContainer + ScaleTransition
+- Search: Always visible
+- Stats: 3 separate cards
+- Repaint isolation: None
+
+**After Optimization:**
+- Card padding: 12px (40% reduction)
+- Card margin: 8px (50% reduction)
+- Shadows per card: 1 (single subtle shadow)
+- Animations: None (simple InkWell)
+- Search: Collapsible (hidden by default)
+- Stats: Single row with chips
+- Repaint isolation: RepaintBoundary on each card
+
+**Expected Performance Gains:**
+- Initial render: < 500ms (target)
+- Frame drops during scroll: < 5 frames (target)
+- Memory increase: < 10MB (target)
+- More records visible on screen
+- Smoother scrolling experience
+- Maintained visual appeal
+
+### Testing Instructions
+
+To verify the optimization:
+
+1. **Launch app on Small_Phone emulator:**
+   ```powershell
+   flutter emulators --launch Small_Phone
+   flutter run -d emulator-5554 --profile
+   ```
+
+2. **Monitor performance logs:**
+   - Look for `Operation completed: records_home_initial_render`
+   - Look for `Operation completed: records_list_scroll`
+   - Check memory usage logs
+
+3. **Visual verification:**
+   - Verify compact layout
+   - Test search toggle
+   - Verify colors and typography
+   - Check spacing and alignment
+
+4. **Scroll test:**
+   - Scroll through records list
+   - Monitor frame drops in console
+   - Should maintain 60fps
+
+### Architecture Compliance
+
+Per Clean Architecture guidelines:
+- RecordsHomeModern remains in presentation layer
+- No business logic in UI widgets
+- Proper separation of concerns maintained
+- Performance optimizations don't affect architecture
+
+### References
+- `.kiro/specs/ui-performance-optimization/` - Full spec with requirements and design
+- `PERFORMANCE_TEST_GUIDE.md` - Manual testing guide
+- `TASK_7_PERFORMANCE_TESTING_SUMMARY.md` - Testing implementation
+- `.kiro/steering/logging-guidelines.md` - Logging standards followed
+- `AGENTS.md` - Development workflow followed
+
+---
+
+**Date**: November 18, 2025
+**Optimization**: RecordsHomeModern UI Performance
+**Status**: Implemented and Ready for Testing

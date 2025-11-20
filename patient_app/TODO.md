@@ -34,6 +34,12 @@ M5: Multi-Modal Capture & Accessibility (In Progress - 56% complete)
 - ✅ Editable review screen with form validation
 - ✅ Attachments saved and linked to records
 - ✅ Attachments displayed in record detail with metadata
+- ✅ UI Performance Optimization (RecordsHomeModern) - See `.kiro/specs/ui-performance-optimization/`
+  - Removed expensive animations and simplified card decorations
+  - Implemented 3-line compact layout with reduced spacing
+  - Added RepaintBoundary for scroll optimization
+  - Comprehensive performance logging (render time, scroll, memory)
+  - Target metrics: <500ms render, <5 frame drops, <10MB memory increase
 - ⏳ File upload capability (PDF/images)
 - ⏳ Gmail-based email import with OAuth
 - ⏳ Keyboard form enhancements

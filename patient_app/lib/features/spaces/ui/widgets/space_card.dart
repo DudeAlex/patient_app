@@ -80,24 +80,17 @@ class SpaceCard extends StatelessWidget {
   }
 
   /// Builds the card decoration with gradient or solid color
+  /// PERFORMANCE: Simplified for low-end devices - no gradients or shadows
   BoxDecoration _buildDecoration() {
     return BoxDecoration(
-      // Use cached gradient from SpaceGradient (cached internally)
-      gradient: isSelected ? space.gradient.toLinearGradient() : null,
-      color: isSelected ? null : AppColors.white,
+      // Use solid color instead of gradient for better performance
+      color: isSelected ? space.gradient.startColor : AppColors.white,
       borderRadius: BorderRadius.circular(16),
       border: Border.all(
-        color: isSelected ? Colors.transparent : AppColors.gray300,
-        width: 2,
+        color: isSelected ? space.gradient.startColor : AppColors.gray300,
+        width: isSelected ? 3 : 2,
       ),
-      boxShadow: [
-        if (isSelected)
-          BoxShadow(
-            color: space.gradient.startColor.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-      ],
+      // Removed boxShadow for performance - shadows are expensive on low-end devices
     );
   }
 

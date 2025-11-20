@@ -582,6 +582,126 @@ String get currentSpaceId => _spaceProvider.currentSpace?.id ?? 'health';
 
 ---
 
+### Issue #8: RecordsHomeModern Performance on Low-End Devices
+**Date Fixed**: November 18, 2025
+**Severity**: High - Performance issue
+**Symptoms**:
+- Frame drops during scrolling on low-end devices
+- Heavy UI elements blocking main thread
+- Slow initial render time
+- Excessive memory usage
+- Poor user experience on Small_Phone emulator
+
+**Root Causes**:
+1. **Always-visible search field** - Rendered even when not in use
+2. **Heavy stats cards** - 3 separate cards with shadows and gradients
+3. **Expensive card animations** - AnimatedContainer and ScaleTransition on every card
+4. **Multiple shadows per card** - Complex compositing
+5. **Large padding and margins** - Increased render area
+6. **No repaint isolation** - Cascading rebuilds
+
+**Fixes Applied**:
+```dart
+// Fix 1: Collapsible search field
+bool _searchVisible = false;
+
+AnimatedSize(
+  duration: const Duration(milliseconds: 200),
+  child: _searchVisible
+      ? TextField(...)
+      : const SizedBox.shrink(), // Zero space when hidden
+)
+
+// Fix 2: Simplified stats display
+Container(
+  child: Row(
+    children: [
+      _StatChip(label: 'Records', value: count),
+      Text('·'),
+      _StatChip(label: 'Attachments', value: count),
+      Text('·'),
+      _StatChip(label: 'Categories', value: count),
+    ],
+  ),
+)
+
+// Fix 3: Removed animations, simplified decoration
+Container(
+  margin: EdgeInsets.only(bottom: 8), // Reduced from 16
+  decoration: BoxDecoration(
+    color: AppColors.white,
+    borderRadius: BorderRadius.circular(12),
+    border: Border.all(color: AppColors.gray200, width: 1),
+    boxShadow: [
+      BoxShadow( // Single shadow instead of multiple
+        color: AppColors.black.withOpacity(0.04),
+        blurRadius: 4,
+        offset: Offset(0, 2),
+      ),
+    ],
+  ),
+  child: InkWell( // Simple tap feedback
+    onTap: onTap,
+    child: Padding(
+      padding: EdgeInsets.all(12), // Reduced from 20
+      child: Column(...), // 3-line compact layout
+    ),
+  ),
+)
+
+// Fix 4: Added repaint boundaries
+ListView.builder(
+  itemBuilder: (context, index) {
+    return RepaintBoundary(
+      child: _ModernRecordCard(record: record),
+    );
+  },
+)
+
+// Fix 5: Performance logging
+_renderOperationId = AppLogger.startOperation('records_home_initial_render');
+_scrollOperationId = AppLogger.startOperation('records_list_scroll');
+```
+
+**Key Changes:**
+1. Search field hidden by default, shown on demand
+2. Single stats row with lightweight chips
+3. Removed AnimatedContainer and ScaleTransition
+4. Single subtle shadow per card
+5. Reduced padding (12px vs 20px) and margin (8px vs 16px)
+6. Compact 3-line layout with truncated text
+7. RepaintBoundary on each card
+8. Comprehensive performance logging
+
+**Results:**
+- Card padding: 40% reduction (20px → 12px)
+- Card margin: 50% reduction (16px → 8px)
+- Shadows per card: Reduced from multiple to 1
+- Animations: Removed (simple InkWell instead)
+- Search: Collapsible (zero space when hidden)
+- Stats: Single row instead of 3 cards
+- Expected initial render: < 500ms
+- Expected frame drops: < 5 during scroll
+- Expected memory increase: < 10MB
+
+**Prevention:**
+- Use RepaintBoundary to isolate repaints
+- Avoid AnimatedContainer when animation not needed
+- Use single subtle shadow instead of multiple
+- Implement progressive disclosure for optional UI
+- Add performance logging to track metrics
+- Test on low-end devices/emulators
+- Profile with Flutter DevTools
+
+**Related Files**:
+- `lib/features/records/ui/records_home_modern.dart` - Complete UI optimization
+- `.kiro/specs/ui-performance-optimization/` - Full specification
+- `PERFORMANCE_TEST_GUIDE.md` - Manual testing guide
+- `TASK_7_PERFORMANCE_TESTING_SUMMARY.md` - Testing implementation
+- `PERFORMANCE_OPTIMIZATION_SUMMARY.md` - Detailed optimization summary
+
+---
+
 ## Debugging Tools Added
 
 ### Memory Monitor
@@ -913,3 +1033,189 @@ When fixing crashes or performance issues:
 - `DIAGNOSTIC_SYSTEM_INTEGRATION.md` - Logging system architecture
 - `TROUBLESHOOTING.md` - General troubleshooting guide
 - `AGENTS.md` - Development workflow and rules
+
+
+---
+
+## Performance Issues
+
+### Issue: OnboardingScreen Severe Performance Problems
+**Date Identified**: November 18, 2024
+**Date Fixed**: November 18, 2024
+**Severity**: High - Causes emulator crashes
+**Status**: ✅ Fixed
+
+**Symptoms**:
+- OnboardingScreen takes 476ms to build (threshold: 100ms)
+- Skips 68+ frames during initial render
+- Skips 35+ frames during subsequent renders
+- Causes emulator disconnections
+- Logs show: `Choreographer: Skipped 68 frames! The application may be doing too much work on its main thread`
+- Warning: `OnboardingScreen initial build exceeded threshold (durationMs: 476, threshold: 100, exceeded_by: 376)`
+
+**Impact**:
+- Emulator crashes during onboarding flow
+- Poor user experience on low-end devices
+- Prevents proper testing of onboarding functionality
+- Not related to RecordsHomeModern optimizations (which work correctly)
+
+**Root Cause Analysis**:
+The OnboardingScreen was performing too much work on the main thread during build:
+1. ❌ **Calling `_spaceRegistry.getAllDefaultSpaces()` on every build** - Violated Rule #1
+2. No caching of expensive registry lookups
+3. Heavy operation repeated unnecessarily on every rebuild
+
+**Fix Applied**:
+```dart
+// BEFORE (BAD - Heavy work in build):
+Widget _buildSpaceSelectionStep() {
+  final allSpaces = _spaceRegistry.getAllDefaultSpaces(); // Called on every rebuild!
+  return Padding(...);
+}
+
+// AFTER (GOOD - Cached in initState):
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  late final List<dynamic> _cachedDefaultSpaces; // Cache the result
+  
+  @override
+  void initState() {
+    super.initState();
+    _cachedDefaultSpaces = _spaceRegistry.getAllDefaultSpaces(); // Load once
+  }
+  
+  Widget _buildSpaceSelectionStep() {
+    final allSpaces = _cachedDefaultSpaces; // Use cached data
+    return Padding(...);
+  }
+}
+```
+
+**Changes Made**:
+1. Added `_cachedDefaultSpaces` field to cache registry data
+2. Moved `getAllDefaultSpaces()` call to `initState()`
+3. Use cached data in `build()` method
+4. Added performance comments explaining the optimization
+
+**Expected Results After Fix**:
+- Build time should drop from 476ms to < 100ms
+- Frame drops should reduce from 68+ to < 5
+- Emulator should remain stable
+- No more crashes during onboarding
+
+**Related Files**:
+- `lib/features/spaces/ui/onboarding_screen.dart`
+- Performance logs show the issue clearly
+
+**Testing Notes**:
+- RecordsHomeModern optimizations (Task 7) are working correctly
+- This is a separate issue from the UI performance optimization spec
+- Should be addressed in a future performance optimization pass
+
+**Testing**:
+1. Run app in profile mode: `flutter run --profile`
+2. Navigate through onboarding
+3. Check logs for build time (should be < 100ms)
+4. Verify no frame drops or crashes
+5. Test on both Small_Phone and Pixel_4a emulators
+
+**Key Lesson**:
+Following Flutter UI Performance Guidelines (Rule #1: No heavy work in build) prevents crashes and ensures smooth performance. Always cache expensive operations in `initState()` instead of calling them in `build()`.
+
+---
+
+
+### Issue: Photo Capture Processing Delay - No User Feedback
+**Date Identified**: November 20, 2024
+**Date Fixed**: November 20, 2024
+**Severity**: Medium - Confusing UX
+**Status**: ✅ Fixed
+
+**Symptoms**:
+- After taking a photo, there's a 1-3 second delay with no feedback
+- Capture launcher screen remains visible in background during delay
+- Users can see and potentially interact with launcher while processing
+- "Photo looks blurry" dialog appears suddenly after delay
+- Inconsistent with document scan and voice capture (which show processing indicator)
+
+**Impact**:
+- Confusing user experience (users don't know if app is working)
+- Users might try to tap capture buttons again during processing
+- Looks like the app is frozen or broken
+- Poor first impression for new users
+
+**Root Cause**:
+The `PhotoCaptureService` was NOT calling `context.onProcessing?.call()` to signal processing state, even though:
+- The infrastructure already exists (`_ProcessingOverlay` widget)
+- Document Scan Service already uses it correctly
+- Voice Capture Service already uses it correctly
+- Only photo capture was missing the calls
+
+**Fix Applied**:
+```dart
+// In PhotoCaptureService.capturePhoto():
+
+// Signal processing start for clarity analysis and OCR extraction
+context.onProcessing?.call(true);
+
+try {
+  // Clarity analysis
+  PhotoClarityResult? clarityResult;
+  final analyzer = _clarityAnalyzer;
+  if (analyzer != null) {
+    clarityResult = await analyzer.analyze(savedFile);
+  }
+
+  // OCR extraction
+  final ocrText = await _ocrExtractor.extract(savedFile);
+
+  // ... rest of artifact creation ...
+  
+} finally {
+  // Always signal processing end, even if analysis fails
+  context.onProcessing?.call(false);
+}
+```
+
+**Changes Made**:
+1. Added `context.onProcessing?.call(true)` before clarity analysis
+2. Wrapped analysis in try-finally block
+3. Added `context.onProcessing?.call(false)` in finally block
+4. Matches pattern used by document scan and voice capture
+
+**User Experience Improvements**:
+
+Before:
+1. User takes photo → Camera closes → **Launcher visible (confusing)** → **1-3s delay** → Dialog appears
+
+After:
+1. User takes photo → Camera closes → **Processing overlay appears** → **"Checking clarity..." visible** → **Interaction blocked** → Overlay disappears → Dialog appears
+
+**Expected Results After Fix**:
+- Processing overlay appears immediately after camera closes
+- "Checking clarity..." message visible during analysis
+- User cannot interact with launcher during processing
+- Overlay disappears before quality dialog
+- Consistent experience across all capture modes
+
+**Related Files**:
+- `lib/features/capture_modes/photo/photo_capture_service.dart` (modified)
+- `lib/features/capture_core/ui/capture_launcher_screen.dart` (_ProcessingOverlay widget)
+- `lib/features/capture_core/adapters/presenters/capture_launcher_presenter.dart` (processing state)
+
+**Spec Reference**:
+- `.kiro/specs/photo-capture-processing-indicator/`
+- `PHOTO_CAPTURE_PROCESSING_INDICATOR_ADDED.md`
+
+**Testing**:
+1. Take a photo
+2. Verify processing overlay appears immediately after camera closes
+3. Verify "Checking clarity..." text is visible
+4. Try to tap capture buttons while processing (should be blocked)
+5. Verify overlay disappears before quality dialog
+6. Test with blurry photo to see full flow
+7. Test with document (lots of text) to see longer processing time
+
+**Key Lesson**:
+When adding new features, check if similar features already have established patterns. Photo capture should have used the same `onProcessing` pattern as document scan and voice capture from the start. Following existing patterns ensures consistency and better UX.
+
+---

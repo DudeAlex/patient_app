@@ -104,3 +104,69 @@ This file tracks all documentation cleanup activities to maintain a clean, organ
 3. Use GLOSSARY.md for consistent terminology
 4. Keep docs/README.md index up to date
 5. Document major changes in this history file
+
+
+---
+
+## November 18, 2024 - Post-Spec Documentation Cleanup
+
+### Changes Made
+
+**Files Moved:**
+1. Task summaries moved to `.kiro/specs/ui-performance-optimization/summaries/`:
+   - `TASK_7_PERFORMANCE_TESTING_SUMMARY.md`
+   - `TASK_8_DOCUMENTATION_CLEANUP_SUMMARY.md`
+   - `TASK_9_IMPLEMENTATION_SUMMARY.md`
+   - `TASK_11_VERIFICATION_SUMMARY.md`
+   - `TASK_12_IMPLEMENTATION_SUMMARY.md`
+   - `TASK_13_IMPLEMENTATION_SUMMARY.md`
+   - `TASK_15_DOCUMENTATION_SUMMARY.md`
+2. Scripts moved to `tool/`:
+   - `run_pixel.ps1`
+   - `get_crash_logs.ps1`
+3. Historical docs moved to `docs/archive/`:
+   - `FINAL_PERFORMANCE_FIXES.md`
+
+**Files Deleted:**
+1. `PERFORMANCE_METRICS_REFERENCE.md` - Empty duplicate file
+2. `PERFORMANCE_METRICS_QUICK_REF.md` - Merged into PERFORMANCE_TEST_GUIDE.md
+3. `flutter_01.log` - Temporary log file
+4. `flutter_input.txt` - Temporary file
+
+**Files Updated:**
+1. `TODO.md` - Added UI Performance Optimization completion under M5
+2. `README.md` - Added performance optimization info to Design System section
+3. `AI_AGENT_START_HERE.md` - Updated script paths (tool/ directory)
+4. `PERFORMANCE_TEST_GUIDE.md` - Merged quick reference content
+
+**New Files Created:**
+1. `.kiro/specs/ui-performance-optimization/summaries/README.md` - Index for task summaries
+2. `DOCUMENTATION_AUDIT_2024-11-18.md` - Audit report and cleanup plan
+3. `docs/archive/` - Directory for historical documentation
+
+**Impact:**
+- Organized spec-related documentation into proper directory structure
+- Consolidated redundant performance documentation
+- Cleaned root directory of temporary files and moved scripts to tool/
+- Updated all cross-references to reflect new file locations
+- Improved discoverability with index files
+- Preserved historical documentation in archive
+
+### Rationale
+
+After completing the UI Performance Optimization spec, multiple task summary files and performance docs were scattered in the root directory. This cleanup:
+- Follows the principle of keeping spec-related docs within the spec directory
+- Reduces root directory clutter
+- Consolidates redundant documentation
+- Maintains proper separation between active and historical docs
+- Improves navigation with clear directory structure
+
+### Files Affected by Path Changes
+
+Scripts moved to `tool/`:
+- Update any documentation referencing `run_pixel.ps1` → `tool/run_pixel.ps1`
+- Update any documentation referencing `get_crash_logs.ps1` → `tool/get_crash_logs.ps1`
+
+Task summaries moved to spec directory:
+- All task summaries now accessible via `.kiro/specs/ui-performance-optimization/summaries/README.md`
+
