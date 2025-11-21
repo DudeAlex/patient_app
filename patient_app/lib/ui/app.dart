@@ -313,10 +313,15 @@ class _HomeScaffold extends StatelessWidget {
                         // Pop the loading dialog
                         Navigator.of(ctx).pop();
                         
+                        AppLogger.logNavigation('CaptureLauncherScreen', 'CaptureReviewScreen');
+                        
                         await Navigator.of(ctx).push(
                           MaterialPageRoute(
-                            builder: (_) => ChangeNotifierProvider.value(
-                              value: state,
+                            builder: (_) => MultiProvider(
+                              providers: [
+                                ChangeNotifierProvider.value(value: state),
+                                ChangeNotifierProvider.value(value: spaceProvider),
+                              ],
                               child: CaptureReviewScreen(
                                 mode: mode,
                                 result: result,
@@ -331,10 +336,17 @@ class _HomeScaffold extends StatelessWidget {
                       }
                     },
                     onKeyboardEntry: (ctx) async {
+                      AppLogger.logNavigation('CaptureLauncherScreen', 'AddRecordScreen', context: {
+                        'source': 'keyboard_entry',
+                      });
+                      
                       await Navigator.of(ctx).push(
                         MaterialPageRoute(
-                          builder: (_) => ChangeNotifierProvider.value(
-                            value: state,
+                          builder: (_) => MultiProvider(
+                            providers: [
+                              ChangeNotifierProvider.value(value: state),
+                              ChangeNotifierProvider.value(value: spaceProvider),
+                            ],
                             child: const AddRecordScreen(),
                           ),
                         ),

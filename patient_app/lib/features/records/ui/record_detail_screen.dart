@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/diagnostics/app_logger.dart';
 import '../model/attachment.dart';
 import '../model/record_types.dart';
 import '../domain/entities/record.dart';
 import 'add_record_screen.dart';
 import 'records_home_state.dart';
+import '../../spaces/providers/space_provider.dart';
 
 /// Temporary detail screen that shows the core fields for the selected record.
 /// This keeps navigation wiring incremental while the full detail design is
@@ -28,12 +30,16 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
   @override
   void initState() {
     super.initState();
+    AppLogger.info('RecordDetailScreen initialized', context: {
+      'recordId': widget.recordId,
+    });
     final state = context.read<RecordsHomeState>();
     _record = state.recordById(widget.recordId);
     _loadAttachments();
   }
 
   Future<void> _loadAttachments() async {
+    final opId = AppLogger.startOperation('load_attachments');
     setState(() => _loadingAttachments = true);
     try {
       final state = context.read<RecordsHomeState>();
@@ -45,7 +51,18 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
           _loadingAttachments = false;
         });
       }
-    } catch (e) {
+      AppLogger.info('Attachments loaded', context: {
+        'recordId': widget.recordId,
+        'count': attachments.length,
+      });
+      AppLogger.endOperation(opId);
+    } catch (e, stackTrace) {
+      AppLogger.error('Failed to load attachments', 
+        error: e, 
+        stackTrace: stackTrace,
+        context: {'recordId': widget.recordId}
+      );
+      AppLogger.endOperation(opId);
       if (mounted) {
         setState(() => _loadingAttachments = false);
       }
@@ -262,19 +279,35 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
   }
 
   Future<void> _editRecord(BuildContext context, RecordEntity record) async {
+    AppLogger.logNavigation('RecordDetailScreen', 'AddRecordScreen', context: {
+      'action': 'edit',
+      'recordId': record.id,
+    });
+    
+    final spaceProvider = context.read<SpaceProvider>();
     final state = context.read<RecordsHomeState>();
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => ChangeNotifierProvider.value(
-          value: state,
+        builder: (_) => MultiProvider(
+          providers: [
+            ChangeNotifierProvider.value(value: state),
+            ChangeNotifierProvider.value(value: spaceProvider),
+          ],
           child: AddRecordScreen(existing: record),
         ),
       ),
     );
     await _refreshRecord();
+    AppLogger.info('Returned from edit screen', context: {
+      'recordId': record.id,
+    });
   }
 
   Future<void> _confirmDelete(BuildContext context, RecordEntity record) async {
+    AppLogger.info('Delete confirmation dialog opened', context: {
+      'recordId': record.id,
+    });
+    
     final confirmed =
         await showDialog<bool>(
           context: context,
@@ -297,13 +330,32 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
         ) ??
         false;
     if (!context.mounted) return;
-    if (!confirmed) return;
+    
+    if (!confirmed) {
+      AppLogger.info('Delete cancelled by user', context: {
+        'recordId': record.id,
+      });
+      return;
+    }
 
+    final opId = AppLogger.startOperation('delete_record');
     try {
       await context.read<RecordsHomeState>().deleteRecord(record.id!);
+      AppLogger.info('Record deleted successfully', context: {
+        'recordId': record.id,
+      });
+      AppLogger.endOperation(opId);
+      
       if (!context.mounted) return;
       Navigator.of(context).pop();
-    } catch (e) {
+    } catch (e, stackTrace) {
+      AppLogger.error('Failed to delete record', 
+        error: e, 
+        stackTrace: stackTrace,
+        context: {'recordId': record.id}
+      );
+      AppLogger.endOperation(opId);
+      
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,

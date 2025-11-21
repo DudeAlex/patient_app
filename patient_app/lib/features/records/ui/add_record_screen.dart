@@ -130,7 +130,14 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
     // Get space-specific title and categories
     final spaceName = _currentSpace?.name ?? 'Record';
     final title = isEdit ? 'Edit $spaceName Record' : 'Add $spaceName Record';
-    final categories = _currentSpace?.categories ?? ['Other'];
+    
+    // Build categories list, ensuring existing type is included
+    final baseCategories = _currentSpace?.categories ?? ['Other'];
+    final categories = <String>[
+      ...baseCategories,
+      // Add existing type if not already in categories (for backward compatibility)
+      if (_type != null && !baseCategories.contains(_type)) _type!,
+    ];
     
     return Scaffold(
       appBar: AppBar(title: Text(title)),
@@ -141,6 +148,7 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
           children: [
             DropdownButtonFormField<String>(
               value: _type,
+              isExpanded: true,  // Fix: Prevent overflow by expanding to fill width
               decoration: InputDecoration(
                 labelText: 'Category',
                 hintText: 'Select a category for this ${spaceName.toLowerCase()} record',
@@ -149,7 +157,10 @@ class _AddRecordScreenState extends State<AddRecordScreen> {
                   .map(
                     (value) => DropdownMenuItem(
                       value: value,
-                      child: Text(value),
+                      child: Text(
+                        value,
+                        overflow: TextOverflow.ellipsis,  // Fix: Truncate long text
+                      ),
                     ),
                   )
                   .toList(),

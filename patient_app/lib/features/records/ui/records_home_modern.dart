@@ -510,11 +510,19 @@ class _ModernRecordCard extends StatelessWidget {
           // OPTIMIZATION: Simple tap handling with InkWell ripple effect
           // Removed complex gesture handling (onTapDown, onTapUp, onTapCancel)
           onTap: () {
+            AppLogger.logNavigation('RecordsHomeModern', 'RecordDetailScreen', context: {
+              'recordId': record.id,
+            });
+            
             final state = context.read<RecordsHomeState>();
+            final spaceProvider = context.read<SpaceProvider>();
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => ChangeNotifierProvider.value(
-                  value: state,
+                builder: (_) => MultiProvider(
+                  providers: [
+                    ChangeNotifierProvider.value(value: state),
+                    ChangeNotifierProvider.value(value: spaceProvider),
+                  ],
                   child: RecordDetailScreen(recordId: record.id!),
                 ),
               ),
