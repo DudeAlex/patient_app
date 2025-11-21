@@ -380,7 +380,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   /// Progress dots indicator at the top
   Widget _buildProgressIndicator() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
+      padding: const EdgeInsets.symmetric(vertical: 12), // Reduced from 24
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: List.generate(3, (index) {
@@ -581,27 +581,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           children: [
             // Title
             const _SpaceSelectionTitle(),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4), // Reduced from 8
             
             // Description
             const _SpaceSelectionDescription(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12), // Reduced from 16
             
             // Selection count display
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), // Reduced padding
               decoration: BoxDecoration(
                 color: AppColors.gray100,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16), // Reduced radius
               ),
               child: Text(
                 '${_selectedSpaceIds.length} ${_selectedSpaceIds.length == 1 ? 'space' : 'spaces'} selected',
-                style: AppTextStyles.labelMedium.copyWith(
+                style: AppTextStyles.labelSmall.copyWith( // Reduced font size
                   color: AppColors.gray700,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16), // Reduced from 24
             
             // Space cards list
             Expanded(
@@ -874,7 +875,7 @@ class _SpaceSelectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       'Choose Your Spaces',
-      style: AppTextStyles.h1.copyWith(
+      style: AppTextStyles.h2.copyWith( // Reduced from h1
         color: AppColors.gray900,
         fontWeight: FontWeight.w600,
       ),
@@ -891,7 +892,7 @@ class _SpaceSelectionDescription extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       'Select the areas of life you want to organize. You can always add more later.',
-      style: AppTextStyles.bodyMedium.copyWith(
+      style: AppTextStyles.bodySmall.copyWith( // Reduced from bodyMedium
         color: AppColors.gray600,
       ),
       textAlign: TextAlign.center,
