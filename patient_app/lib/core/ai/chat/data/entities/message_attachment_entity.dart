@@ -8,8 +8,8 @@ part 'message_attachment_entity.g.dart';
 @embedded
 class MessageAttachmentEntity {
   MessageAttachmentEntity({
-    required this.id,
-    required this.type,
+    this.id = '',
+    this.type = AttachmentType.photo,
     this.localPath,
     this.fileName,
     this.fileSizeBytes,

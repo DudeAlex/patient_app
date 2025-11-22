@@ -9,13 +9,13 @@ part 'chat_message_entity.g.dart';
 @embedded
 class ChatMessageEntity {
   ChatMessageEntity({
-    required this.id,
-    required this.sender,
-    required this.timestamp,
+    this.id = '',
+    this.sender = MessageSender.user,
+    this.timestamp,
     this.content = '',
-    List<MessageAttachmentEntity>? attachments,
+    this.attachments = const [],
     this.status = MessageStatus.sending,
-    List<String>? actionHints,
+    this.actionHints = const [],
     this.tokensUsed,
     this.latencyMs,
     this.provider,
@@ -23,8 +23,7 @@ class ChatMessageEntity {
     this.errorMessage,
     this.errorCode,
     this.errorRetryable,
-  })  : attachments = attachments ?? [],
-        actionHints = actionHints ?? [];
+  });
 
   /// Stable message id (matches domain model).
   String id;
@@ -37,7 +36,7 @@ class ChatMessageEntity {
   String content;
 
   /// UTC timestamp for ordering.
-  DateTime timestamp;
+  DateTime? timestamp;
 
   /// Metadata-only attachments.
   List<MessageAttachmentEntity> attachments;

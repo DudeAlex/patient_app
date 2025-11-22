@@ -56,7 +56,7 @@ enum SpacePersona { health, education, finance, travel, general }
 /// Minimal summary of a record used for context grounding.
 @immutable
 class RecordSummary {
-  const RecordSummary({
+  RecordSummary({
     required this.title,
     required this.category,
     List<String> tags = const [],

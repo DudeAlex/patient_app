@@ -21,14 +21,14 @@
   - Add indexes for threadId and spaceId for efficient querying
   - _Requirements: 10.3, 10.4_
 
-- [ ] 3. Implement ChatThreadRepository
+- [x] 3. Implement ChatThreadRepository *(done — interface and implementation with Isar created and tested)*
   - Create `lib/core/ai/chat/repositories/chat_thread_repository.dart` interface
   - Create `lib/core/ai/chat/repositories/chat_thread_repository_impl.dart` using Isar
   - Implement CRUD operations: create, getById, getBySpaceId, addMessage, updateMessageStatus, delete
   - Implement message querying and filtering
   - _Requirements: 10.3, 10.4, 10.5_
 
-- [ ] 4. Implement MessageAttachmentHandler
+- [x] 4. Implement MessageAttachmentHandler *(done — implemented with local storage management and validation)*
   - Create `lib/core/ai/chat/services/message_attachment_handler.dart` interface
   - Create `lib/core/ai/chat/services/message_attachment_handler_impl.dart`
   - Implement attachment processing: save to local storage, generate metadata
@@ -36,7 +36,7 @@
   - Handle file size validation and limits
   - _Requirements: 4.2, 4.3, 5.4, 6.2, 6.5_
 
-- [ ] 5. Extend AiService for chat operations
+- [x] 5. Extend AiService for chat operations *(done — created AiChatService interface)*
   - Create `lib/core/ai/chat/ai_chat_service.dart` interface extending AiService
   - Define sendMessage() method with ChatRequest parameter
   - Define sendMessageStream() method for streaming responses

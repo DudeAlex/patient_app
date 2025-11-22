@@ -1,6 +1,7 @@
 import 'package:isar/isar.dart';
 
 import 'chat_message_entity.dart';
+import 'message_attachment_entity.dart';
 
 part 'chat_thread_entity.g.dart';
 
@@ -12,12 +13,10 @@ class ChatThreadEntity {
     required this.threadId,
     required this.spaceId,
     this.recordId,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    List<ChatMessageEntity>? messages,
-  })  : createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now(),
-        messages = messages ?? [];
+    required this.createdAt,
+    required this.updatedAt,
+    this.messages = const [],
+  });
 
   Id id;
 

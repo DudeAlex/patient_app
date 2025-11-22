@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 /// [toMetadataJson] when building network payloads to strip local-only fields.
 @immutable
 class MessageAttachment {
-  const MessageAttachment({
+  MessageAttachment({
     required this.id,
     required this.type,
     this.localPath,

@@ -29,7 +29,7 @@ class ChatResponse {
   factory ChatResponse.success({
     required String messageContent,
     List<String> actionHints = const [],
-    AiMessageMetadata metadata = const AiMessageMetadata(),
+    AiMessageMetadata metadata = AiMessageMetadata.empty,
   }) {
     return ChatResponse(
       messageContent: messageContent,
@@ -42,7 +42,7 @@ class ChatResponse {
     required AiError error,
     String messageContent = '',
     List<String> actionHints = const [],
-    AiMessageMetadata metadata = const AiMessageMetadata(),
+    AiMessageMetadata metadata = AiMessageMetadata.empty,
   }) {
     return ChatResponse(
       messageContent: messageContent,
@@ -56,12 +56,12 @@ class ChatResponse {
 /// Provider metadata attached to AI messages.
 @immutable
 class AiMessageMetadata {
-  const AiMessageMetadata({
+  const AiMessageMetadata._raw({
     this.tokensUsed = 0,
     this.latencyMs = 0,
     this.provider = 'unknown',
-    double confidence = 0.0,
-  }) : confidence = _clampConfidence(confidence);
+    this.confidence = 0.0,
+  });
 
   /// Token usage reported by the provider.
   final int tokensUsed;
@@ -88,6 +88,22 @@ class AiMessageMetadata {
       confidence: confidence ?? this.confidence,
     );
   }
+
+  factory AiMessageMetadata({
+    int tokensUsed = 0,
+    int latencyMs = 0,
+    String provider = 'unknown',
+    double confidence = 0.0,
+  }) {
+    return AiMessageMetadata._raw(
+      tokensUsed: tokensUsed,
+      latencyMs: latencyMs,
+      provider: provider,
+      confidence: _clampConfidence(confidence),
+    );
+  }
+
+  static const empty = AiMessageMetadata._raw();
 
   static double _clampConfidence(double value) {
     if (value.isNaN) return 0.0;
