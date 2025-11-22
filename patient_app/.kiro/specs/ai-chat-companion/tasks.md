@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [ ] 1. Create domain models for chat entities
+- [x] 1. Create domain models for chat entities *(done — domain/value objects added in lib/core/ai/chat/models)*
 
 
 
@@ -14,7 +14,7 @@
   - Ensure all models are immutable and follow clean architecture principles
   - _Requirements: 1.1, 1.2, 1.3, 3.5, 4.3, 5.4, 6.3_
 
-- [ ] 2. Create Isar schemas for chat persistence
+- [x] 2. Create Isar schemas for chat persistence *(done — thread collection + embedded message/attachment entities with indexes)*
   - Create `lib/core/ai/chat/data/entities/chat_thread_entity.dart` Isar collection
   - Create `lib/core/ai/chat/data/entities/chat_message_entity.dart` embedded object
   - Create `lib/core/ai/chat/data/entities/message_attachment_entity.dart` embedded object
