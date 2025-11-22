@@ -1,3 +1,13 @@
+# 2025-11-21 (AI Summary manual check)
+- **Change Scope**
+  - Manual QA of AI summary UI using the Cardiology follow-up fixture (Health space).
+- **Verification**
+  - Enabled AI features and consent in Settings.
+  - Fake mode: opened record detail and generated summary; observed loading → success state with summary and hints.
+  - Remote mode: repeated on same record; received `AiServiceException` (network failure contacting AI provider; retryable=true) because the remote backend is not configured yet.
+- **Result**
+  - Fake mode UI flow works; Remote mode currently blocked by missing backend. No automated tests run in this environment.
+
 # 2025-11-09 (Cadence-aware auto sync)
 - **Change Scope**
   - Persisted auto-sync cadence in `SyncState`, wired Settings to update it, and updated the coordinator/runner to honour patient-selected intervals (manual disables background backups).
@@ -409,7 +419,62 @@
     - Known limitations and future enhancements
     - Requirements coverage table
 - **Result**
-  - All documentation updated ✓
-  - File upload feature fully documented ✓
-  - Requirements 1.1-6.4 all marked complete ✓
-  - Task 11 complete
+- All documentation updated ✓
+- File upload feature fully documented ✓
+- Requirements 1.1-6.4 all marked complete ✓
+- Task 11 complete
+
+# 2025-11-19 (AI Consent + Summary UI Smoke Test)
+- **Change Scope**
+  - Added AI consent dialog, SharedPreferences-backed consent persistence, `FakeAiService`, Riverpod wiring, and AI summary sheet on `RecordDetailScreen`.
+- **Manual Test Scenarios**
+  - **Test 1: AI Consent Toggle**
+    - Launch app via `flutter run -d emulator-5554`.
+    - Open Settings → toggle “AI companion consent” on.
+    - Verify dialog explains data usage; tap “Enable AI”.
+    - Observe snackbar confirmation and persistent toggle state; toggle off to confirm disable flow.
+  - **Test 2: Summary Sheet Success**
+    - From Records home, open any record detail.
+    - Tap AI icon → bottom sheet displays loading spinner, then fake summary + action hints within ~1s.
+    - Tap refresh icon to regenerate; summaries update without errors.
+  - **Test 3: Consent Persistence**
+    - Return to Settings; ensure toggle reflects last choice after navigating away/back.
+    - Disable consent; attempt AI summary again and verify dialog reappears before enabling.
+- **Result**
+  - All manual scenarios passed; fake AI summaries render correctly and consent state persists across sessions.
+  - Pending: automated/widget tests and HttpAiService implementation per AI plan.
+
+# 2025-11-19 (AI Settings Toggle + Mode Selector)
+- **Change Scope**
+  - Added AI configuration repository, Settings toggle for enabling/disabling AI features, and Fake/Remote mode selector wired to the config repo.
+- **Manual Test Scenarios**
+  - **Test 1: Enable/Disable AI Features**
+    - Open Settings → toggle “AI features” on/off.
+    - Observe snackbar feedback and ability to open summaries only when enabled.
+  - **Test 2: Mode Selector**
+    - While enabled, switch between “Fake (offline demo)” and “Remote (backend)”.
+    - Navigate away/back; verify selection persists.
+  - **Test 3: Consent Availability**
+    - With AI disabled, note consent toggle is disabled; enabling features re-enables consent flow.
+- **Result**
+  - All scenarios passed on emulator-5554; UI state persists via SharedPreferences.
+
+# 2025-11-19 (AI Service Unit Tests)
+- **Command**: `flutter test test/core/ai`
+- **Scope**: AiSummaryResult, FakeAiService, LoggingAiService, ConfigurableAiService.
+- **Result**: ✅ All six tests passed after fixing SDK path; see console log.
+
+# 2025-11-19 (SummarizeInformationItemUseCase Tests)
+- **Command**: `flutter test test/features/information_items/application/use_cases/summarize_information_item_use_case_test.dart`
+- **Scope**: Consent enforcement + success path for SummarizeInformationItemUseCase.
+- **Result**: ✅ Passed on Windows (emulator-5554 environment); confirms use case gates AI calls on consent.
+
+# 2025-11-19 (AI Widget Tests)
+- **Command**: `flutter test test/features/information_items/ui/widgets`
+- **Scope**: Summary sheet success/error states and AI consent dialog.
+- **Result**: ✅ All three widget tests pass on Windows; overflow + text lookup issues resolved.
+
+# 2025-11-19 (AI Property Tests)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Summary length/hints constraints, consent enforcement, HTTP retry behavior.
+- **Result**: ✅ All property-based checks pass; constraints verified across randomized inputs.

@@ -166,6 +166,7 @@ Security
 - Backup encryption: AES-GCM with random nonce; key stored in platform secure storage
 - No data leaves device unencrypted for backups
 - AI-assisted mode: outbound requests gated by consent, API key stored securely, responses include confidence + disclaimers, logs redact PHI
+- AI summaries v1: AiService abstraction (Fake default, HTTP placeholder) behind consent + feature flag; payload limited to space/category/title/tags/notes/attachment descriptors (no IDs/binaries).
 
 Platform Behavior
 - Android/iOS: full backup/restore via Drive appData (`patient-backup-v1.enc`)

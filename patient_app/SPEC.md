@@ -86,6 +86,13 @@ Out of scope (for MVP)
 - Save step confirms merged data, tags, attachments, and shows accessible success feedback.
 - No video capture is planned for this milestone.
 
+4.8a AI Summaries (v1)
+- Optional, consent-gated summary generation for Information Items via AiService.
+- Inputs: space, category/type, title, tags, body/notes, attachment descriptors (no IDs/binaries sent).
+- Outputs: summary text ≤120 words; up to 3 action hints ≤12 words each; metadata (provider, latency, confidence, tokens).
+- Feature flags: `ai_enabled` (default false), `ai_mode` (`fake` default, `remote` placeholder until backend available). UI hides when disabled.
+- Consent: first use prompts consent; consent stored locally and required before any request. Logging via AppLogger with redaction.
+
 4.7 Phone-Based Vitals Capture (planned M3+)
 - Patients can measure pulse and blood pressure directly on supported phones (camera-based PPG or connected peripherals).
 - Flow guides placement (finger over camera/flash or cuff pairing), validates signal quality, and shares safety disclaimers.
@@ -173,6 +180,7 @@ Source of truth: definitions in `lib/features/records/model/*.dart`.
 - AI opt-out: "AI assistance is disabled. You can enable it in Settings."
 - AI pending: "Processing with AI; we'll notify you soon."
 - AI failure: "AI review failed: <reason>. Your original record is saved."
+- AI offline/unavailable (summaries): "Unable to generate a summary right now" with retry guidance when retryable.
 
 ## 11. Manual Test Plan (MVP + Planned Extensions)
 T-01 Sign-In/Out
@@ -230,5 +238,5 @@ T-06 Failure Paths
 
 References
 - Code: `lib/core/*`, `lib/ui/*`, `lib/features/records/*`
-- Docs: README.md, RUNNING.md, ARCHITECTURE.md, SYNC.md, TROUBLESHOOTING.md, TODO.md, AGENTS.md, AI_ASSISTED_PATIENT_APP_PLAN.md, GLOSSARY.md
+- Docs: README.md, RUNNING.md, ARCHITECTURE.md, SYNC.md, TROUBLESHOOTING.md, TODO.md, AGENTS.md, AI_ASSISTED_LIFE_COMPANION_PLAN.md, GLOSSARY.md
 - Design: `UI Design Samples/`, Health_Tracker_Advisor_UX_Documentation.md

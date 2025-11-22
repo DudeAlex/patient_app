@@ -1,6 +1,6 @@
-## Patient App (Flutter)
+## Universal Life Companion (formerly Patient App)
 
-> **Vision**: Evolving from a health-focused app into a universal personal information system that helps any person collect, organize, and understand the important information in their life. See [VISION.md](./VISION.md) for the complete vision.
+> **Vision**: A universal personal information system that helps you collect, organize, and understand the important information in your life—from health and finance to education and creative projects. See [VISION.md](./VISION.md) for the complete vision.
 
 Local-first personal information system. Mobile stores data on-device (Isar), with optional encrypted backup to Google Drive App Data. Web build runs in Chrome with limited backup (disabled by default).
 
@@ -21,6 +21,7 @@ Local-first personal information system. Mobile stores data on-device (Isar), wi
 - Attachments saved and displayed: photos, scans, audio, uploaded files (PDF/images) with metadata (file size, duration, timestamps, page counts, MIME types)
 - Dual operating modes: local-only storage by default, opt-in AI-assisted companion (Together AI: Llama 70B text, Apriel image) for extraction, organization, and encouragement
 - Compassionate companion experience with contextual follow-ups, safety hints, and morale support (design underway)
+- AI summaries (v1): optional, consent-gated summaries for Information Items. Fake provider enabled by default; remote provider placeholder present but requires backend wiring. Summaries are short (≤120 words) with up to 3 action hints.
 - Support network & emergency contacts for quick outreach (design underway)
 - Planned phone-based vitals capture (camera-based pulse and connected-cuff blood pressure) with patient consent
 - Multilingual UX with focus on English, Russian, and Central Asian languages (localization pipeline planned)
@@ -63,7 +64,7 @@ Project Layout
 - `packages/google_drive_backup/` reusable Google Drive backup + auth library (consumed by the app)
 - Contributors and AI agents: start every session with `AI_AGENT_START_HERE.md` to review the must-read guidance before making changes.
 - Specs: see `SPEC.md` for detailed, living requirements
-- Strategy & compassionate AI roadmap: see `AI_ASSISTED_PATIENT_APP_PLAN.md`
+- Strategy & compassionate AI roadmap: see `AI_ASSISTED_LIFE_COMPANION_PLAN.md`
 - Canonical terminology: see `GLOSSARY.md`
 
 Prerequisites
