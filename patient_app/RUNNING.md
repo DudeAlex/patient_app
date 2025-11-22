@@ -64,5 +64,5 @@ AI-Assisted Companion (Preview)
 - Keep the app in local-only mode unless the user provides informed consent.
 - When integration lands, expect to supply a secret (e.g., `TOGETHER_API_KEY`) via secure storage or a proxy service; never commit keys to the repo.
 - Offline behavior should fall back to manual entry; queued AI jobs will retry once connectivity returns.
-- See `AI_ASSISTED_PATIENT_APP_PLAN.md` for the current integration roadmap.
+- See `AI_ASSISTED_LIFE_COMPANION_PLAN.md` for the current integration roadmap.
 - See `GLOSSARY.md` for canonical terminology.

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/diagnostics/app_logger.dart';
+import '../../information_items/ui/widgets/information_item_summary_sheet.dart';
 import '../model/attachment.dart';
 import '../model/record_types.dart';
 import '../domain/entities/record.dart';
@@ -107,6 +109,11 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
       appBar: AppBar(
         title: Text(_title),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.psychology_alt_outlined),
+            tooltip: 'AI summary',
+            onPressed: () => _showSummary(context, record),
+          ),
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             tooltip: 'Edit record',
@@ -220,6 +227,16 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  Future<void> _showSummary(BuildContext context, RecordEntity record) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => riverpod.ProviderScope(
+        child: InformationItemSummarySheet(record: record),
       ),
     );
   }

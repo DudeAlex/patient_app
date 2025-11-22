@@ -2,9 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:google_drive_backup/google_drive_backup.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/ai/ai_config.dart';
+import '../../core/ai/repositories/ai_config_repository.dart';
+import '../../core/ai/repositories/ai_consent_repository.dart';
+import '../../core/di/app_container.dart';
+import '../../features/information_items/ui/widgets/ai_consent_dialog.dart';
 import '../../features/records/data/records_service.dart';
 import '../../features/sync/application/use_cases/mark_auto_sync_success_use_case.dart';
 import '../../features/sync/application/use_cases/set_auto_sync_cadence_use_case.dart';
@@ -12,6 +18,7 @@ import '../../features/sync/application/use_cases/set_auto_sync_enabled_use_case
 import '../../features/sync/auto_sync_backup_service.dart';
 import '../../features/sync/domain/entities/auto_sync_cadence.dart';
 import '../../features/sync/domain/entities/auto_sync_status.dart';
+import '../screens/ai_diagnostics_screen.dart';
 import '../screens/design_showcase_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -24,6 +31,10 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   AutoSyncBackupService _backupService = AutoSyncBackupService();
   DriveBackupManager get _manager => _backupService.manager;
+  late final AiConfigRepository _aiConfigRepository =
+      AppContainer.instance.resolve<AiConfigRepository>();
+  late final AiConsentRepository _aiConsentRepository =
+      AppContainer.instance.resolve<AiConsentRepository>();
 
   String? _email;
   bool _busy = false;
@@ -37,7 +48,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _cadenceBusy = false;
   ThemeModePreference _themePreference = ThemeModePreference.system;
   TextScalePreference _textPreference = TextScalePreference.medium;
+  bool _aiFeaturesEnabled = false;
+  AiMode _aiMode = AiMode.fake;
+  bool _aiConfigBusy = false;
   bool _aiConsentEnabled = false;
+  bool _aiConsentBusy = false;
 
   @override
   void initState() {
@@ -46,6 +61,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (!kIsWeb) {
       _initAutoSync();
     }
+    _loadAiConfig();
+    _loadAiConsent();
   }
 
   @override
@@ -67,6 +84,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
       Future.microtask(
         () => _manager.auth.getAuthHeaders(promptIfNecessary: false),
       );
+    }
+  }
+
+  Future<void> _loadAiConfig() async {
+    try {
+      final config = await _aiConfigRepository.loadConfig();
+      if (!mounted) return;
+      setState(() {
+        _aiFeaturesEnabled = config.enabled;
+        _aiMode = config.mode;
+      });
+    } catch (e) {
+      debugPrint('[Settings] Failed to load AI config: $e');
+    }
+  }
+
+  Future<void> _loadAiConsent() async {
+    try {
+      final granted = await _aiConsentRepository.hasConsent();
+      if (!mounted) return;
+      setState(() => _aiConsentEnabled = granted);
+    } catch (e) {
+      debugPrint('[Settings] Failed to load AI consent: $e');
     }
   }
 
@@ -314,17 +354,99 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  void _toggleAiConsent(bool value) {
-    setState(() => _aiConsentEnabled = value);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          value
-              ? 'AI assistance enabled (per-request consent still required).'
-              : 'AI assistance disabled.',
+  Future<void> _toggleAiConsent(bool value) async {
+    if (!_aiFeaturesEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enable AI assistance before giving consent.')),
+      );
+      return;
+    }
+    if (value) {
+      final accepted = await showAiConsentDialog(context);
+      if (!mounted || !accepted) return;
+      await _updateAiConsent(() => _aiConsentRepository.grantConsent(), true);
+      return;
+    }
+    await _updateAiConsent(() => _aiConsentRepository.revokeConsent(), false);
+  }
+
+  void _viewAiDiagnostics() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const riverpod.ProviderScope(
+          child: AiDiagnosticsScreen(),
         ),
       ),
     );
+  }
+
+  Future<void> _updateAiFeatures(bool value) async {
+    setState(() => _aiConfigBusy = true);
+    try {
+      await _aiConfigRepository.setEnabled(value);
+      if (!mounted) return;
+      setState(() => _aiFeaturesEnabled = value);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            value
+                ? 'AI features enabled. Summaries appear on detail screens.'
+                : 'AI features disabled.',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update AI settings: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _aiConfigBusy = false);
+    }
+  }
+
+  Future<void> _updateAiMode(AiMode mode) async {
+    if (!_aiFeaturesEnabled || mode == _aiMode) return;
+    setState(() => _aiConfigBusy = true);
+    try {
+      await _aiConfigRepository.setMode(mode);
+      if (!mounted) return;
+      setState(() => _aiMode = mode);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update AI mode: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _aiConfigBusy = false);
+    }
+  }
+
+  Future<void> _updateAiConsent(
+    Future<void> Function() action,
+    bool enabled,
+  ) async {
+    setState(() => _aiConsentBusy = true);
+    try {
+      await action();
+      if (!mounted) return;
+      setState(() => _aiConsentEnabled = enabled);
+      final message = enabled
+          ? 'AI assistance enabled. You can disable it anytime.'
+          : 'AI assistance disabled.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update AI consent: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _aiConsentBusy = false);
+      }
+    }
   }
 
   void _showBackupKeyDialog() {
@@ -400,8 +522,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTextChanged: _updateTextScale,
               ),
             if (!isWeb) const SizedBox(height: 16),
+            _AiSettingsCard(
+              enabled: _aiFeaturesEnabled,
+              mode: _aiMode,
+              busy: _aiConfigBusy,
+              onEnabledChanged: _updateAiFeatures,
+              onModeChanged: _updateAiMode,
+            ),
+            const SizedBox(height: 16),
             _AiConsentCard(
               enabled: _aiConsentEnabled,
+               available: _aiFeaturesEnabled,
+              busy: _aiConsentBusy,
               onChanged: _toggleAiConsent,
             ),
             const SizedBox(height: 16),
@@ -412,6 +544,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onBackup: isWeb ? null : _backupToDrive,
               onRestore: isWeb ? null : _restoreFromDrive,
               onAuthDiagnostics: _runAuthDiagnostics,
+              onViewAiCalls: _viewAiDiagnostics,
             ),
             if (_busy)
               const Padding(
@@ -628,24 +761,111 @@ class _DisplayPreferencesCard extends StatelessWidget {
   }
 }
 
-class _AiConsentCard extends StatelessWidget {
-  const _AiConsentCard({required this.enabled, required this.onChanged});
+class _AiSettingsCard extends StatelessWidget {
+  const _AiSettingsCard({
+    required this.enabled,
+    required this.mode,
+    required this.onEnabledChanged,
+    required this.onModeChanged,
+    this.busy = false,
+  });
 
   final bool enabled;
-  final ValueChanged<bool> onChanged;
+  final AiMode mode;
+  final bool busy;
+  final ValueChanged<bool> onEnabledChanged;
+  final ValueChanged<AiMode> onModeChanged;
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: SwitchListTile.adaptive(
-        title: const Text('AI companion consent'),
-        subtitle: const Text(
-          'Control whether the upcoming AI assistant may analyse your records. '
-          'Per-request consent banners will still appear.',
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('AI features'),
+              subtitle: const Text(
+                'Controls whether summaries appear throughout the app.',
+              ),
+              value: enabled,
+              onChanged: busy ? null : onEnabledChanged,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Mode',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: AiMode.values.map((option) {
+                final selected = option == mode;
+                return ChoiceChip(
+                  label: Text(option.label),
+                  selected: selected,
+                  onSelected: (!enabled || busy)
+                      ? null
+                      : (_) => onModeChanged(option),
+                );
+              }).toList(),
+            ),
+            if (!enabled)
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text(
+                  'Enable AI to pick between Fake (offline demo) or Remote (backend).',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            if (busy)
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: LinearProgressIndicator(),
+              ),
+          ],
         ),
-        value: enabled,
-        onChanged: onChanged,
-        secondary: const Icon(Icons.psychology_alt_outlined),
+      ),
+    );
+  }
+}
+
+class _AiConsentCard extends StatelessWidget {
+  const _AiConsentCard({
+    required this.enabled,
+    required this.available,
+    required this.onChanged,
+    this.busy = false,
+  });
+
+  final bool enabled;
+  final bool available;
+  final bool busy;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final subtitle = available
+        ? 'Allow summaries across Spaces. Per-request banners explain each AI call.'
+        : 'Enable AI features to grant consent.';
+    return Card(
+      child: Column(
+        children: [
+          SwitchListTile.adaptive(
+            title: const Text('AI companion consent'),
+            subtitle: Text(subtitle),
+            value: enabled && available,
+            onChanged: (!available || busy) ? null : onChanged,
+            secondary: const Icon(Icons.psychology_alt_outlined),
+          ),
+          if (busy)
+            const Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: LinearProgressIndicator(),
+            ),
+        ],
       ),
     );
   }
@@ -677,12 +897,14 @@ class _DiagnosticsCard extends StatelessWidget {
     required this.onBackup,
     required this.onRestore,
     required this.onAuthDiagnostics,
+    required this.onViewAiCalls,
   });
 
   final bool isWeb;
   final VoidCallback? onBackup;
   final VoidCallback? onRestore;
   final Future<void> Function() onAuthDiagnostics;
+  final VoidCallback onViewAiCalls;
 
   @override
   Widget build(BuildContext context) {
@@ -701,6 +923,12 @@ class _DiagnosticsCard extends StatelessWidget {
               onPressed: onAuthDiagnostics,
               icon: const Icon(Icons.bug_report_outlined),
               label: const Text('Run auth diagnostics'),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: onViewAiCalls,
+              icon: const Icon(Icons.psychology_alt_outlined),
+              label: const Text('View AI calls'),
             ),
             const SizedBox(height: 8),
             OutlinedButton.icon(
@@ -845,6 +1073,17 @@ extension on TextScalePreference {
         return 'Medium';
       case TextScalePreference.large:
         return 'Large';
+    }
+  }
+}
+
+extension _AiModeLabel on AiMode {
+  String get label {
+    switch (this) {
+      case AiMode.fake:
+        return 'Fake (offline demo)';
+      case AiMode.remote:
+        return 'Remote (backend)';
     }
   }
 }

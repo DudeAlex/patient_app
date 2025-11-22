@@ -32,12 +32,12 @@ Purpose: give any AI or contributor a single launchpad to the repo’s must-read
 ## Reference Map
 - **Process & Quality**: `AGENTS.md`, `TESTING.md`, `TODO.md`.
 - **Product & UX Context**: `README.md`, `SPEC.md`, `Health_Tracker_Advisor_UX_Documentation.md`, `UI Design Samples/`, milestone plans (`Mx_*.md`).
-- **Architecture & Data Flow**: `ARCHITECTURE.md`, `AI_ASSISTED_PATIENT_APP_PLAN.md`, `SYNC.md`.
+- **Architecture & Data Flow**: `ARCHITECTURE.md`, `AI_ASSISTED_LIFE_COMPANION_PLAN.md`, `SYNC.md`.
 - **Build & Troubleshooting**: `RUNNING.md`, `TROUBLESHOOTING.md`, `KNOWN_ISSUES_AND_FIXES.md`.
 - **Diagnostics & Debugging**: `CRASH_DETECTION_SUMMARY.md`, `DIAGNOSTIC_SYSTEM_INTEGRATION.md`, `KNOWN_ISSUES_AND_FIXES.md`, `tool/get_crash_logs.ps1`, `.kiro/steering/logging-guidelines.md`.
 
 ## Strategic & UX Context
-- `AI_ASSISTED_PATIENT_APP_PLAN.md` – holistic plan for the AI-assisted experience, privacy posture, and rollout sequence.
+- `AI_ASSISTED_LIFE_COMPANION_PLAN.md` – holistic plan for the AI-assisted experience, privacy posture, and rollout sequence.
 - `Health_Tracker_Advisor_UX_Documentation.md` – detailed UX vision, screen flows, and accessibility principles.
 - `UI Design Samples/` – visual mockups for dashboard, records page, and multi-modal capture launcher.
 

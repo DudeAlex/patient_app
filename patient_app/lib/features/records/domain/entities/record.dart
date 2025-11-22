@@ -1,39 +1,76 @@
+import '../../../../core/domain/entities/information_item.dart';
+
 /// Domain representation of a patient record.
-/// Free of persistence annotations so it can move across layers.
+/// 
+/// Refactored to use the Adapter Pattern, wrapping the universal [InformationItem].
+/// This ensures backward compatibility while migrating to the universal system.
 class RecordEntity {
-  RecordEntity({
-    this.id,
+  /// The underlying universal item
+  final InformationItem _item;
+
+  RecordEntity._(this._item);
+
+  /// Creates a RecordEntity from an existing InformationItem
+  factory RecordEntity.fromItem(InformationItem item) {
+    return RecordEntity._(item);
+  }
+
+  /// Creates a new RecordEntity (and underlying InformationItem)
+  factory RecordEntity({
+    int? id,
     String? spaceId,
     required String type,
-    required this.date,
+    required DateTime date,
     required String title,
-    this.text,
+    String? text,
     List<String>? tags,
-    required this.createdAt,
+    required DateTime createdAt,
     required DateTime updatedAt,
     DateTime? deletedAt,
-  })  : spaceId = _validateSpaceId(spaceId),
-        type = _validateType(type),
-        title = _validateTitle(title),
-        updatedAt = _validateUpdatedAt(createdAt, updatedAt),
-        deletedAt = _validateDeletedAt(updatedAt, deletedAt),
-        tags = List<String>.unmodifiable(tags ?? const []);
+  }) {
+    final validatedSpaceId = _validateSpaceId(spaceId);
+    final validatedType = _validateType(type);
+    final validatedTitle = _validateTitle(title);
+    final validatedUpdatedAt = _validateUpdatedAt(createdAt, updatedAt);
+    final validatedDeletedAt = _validateDeletedAt(validatedUpdatedAt, deletedAt);
+    
+    final data = {
+      'type': validatedType,
+      'date': date.toIso8601String(),
+      'title': validatedTitle,
+      'text': text,
+      'tags': tags ?? [],
+    };
 
-  /// Database identifier (null before the entity is persisted).
-  final int? id;
-  
-  /// Space identifier - associates record with a specific life area/domain
-  /// Defaults to 'health' for backward compatibility
-  final String spaceId;
-  
-  final String type;
-  final DateTime date;
-  final String title;
-  final String? text;
-  final List<String> tags;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final DateTime? deletedAt;
+    final item = InformationItem(
+      id: id,
+      spaceId: validatedSpaceId,
+      domainId: 'health', // Default domain for legacy records
+      data: data,
+      createdAt: createdAt,
+      updatedAt: validatedUpdatedAt,
+      deletedAt: validatedDeletedAt,
+    );
+
+    return RecordEntity._(item);
+  }
+
+  /// Access to the underlying item
+  InformationItem get toItem => _item;
+
+  // Forwarding properties to _item
+  int? get id => _item.id;
+  String get spaceId => _item.spaceId;
+  DateTime get createdAt => _item.createdAt;
+  DateTime get updatedAt => _item.updatedAt;
+  DateTime? get deletedAt => _item.deletedAt;
+
+  // Domain-specific properties mapped from _item.data
+  String get type => _item.data['type'] as String;
+  DateTime get date => DateTime.parse(_item.data['date'] as String);
+  String get title => _item.data['title'] as String;
+  String? get text => _item.data['text'] as String?;
+  List<String> get tags => List<String>.unmodifiable(_item.data['tags'] as List? ?? []);
 
   /// Convenience helper to clone the entity with updated fields.
   RecordEntity copyWith({
@@ -48,6 +85,7 @@ class RecordEntity {
     DateTime? updatedAt,
     DateTime? deletedAt,
   }) {
+    // We create a new RecordEntity which constructs a new InformationItem
     return RecordEntity(
       id: id ?? this.id,
       spaceId: spaceId ?? this.spaceId,

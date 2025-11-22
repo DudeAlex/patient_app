@@ -1,9 +1,21 @@
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../features/capture_core/capture_core.dart' as capture_core;
 import '../../features/capture_modes/document_scan/document_scan_module.dart';
 import '../../features/capture_modes/file/file_upload_module.dart';
 import '../../features/capture_modes/photo/photo_capture_module.dart';
 import '../../features/capture_modes/voice/voice_capture_module.dart';
 import '../../features/records/data/records_service.dart';
+import '../ai/configurable_ai_service.dart';
+import '../ai/ai_service.dart';
+import '../ai/fake_ai_service.dart';
+import '../ai/logging_ai_service.dart';
+import '../ai/repositories/ai_call_log_repository.dart';
+import '../ai/repositories/ai_config_repository.dart';
+import '../ai/repositories/ai_config_repository_impl.dart';
+import '../ai/repositories/ai_consent_repository.dart';
+import '../ai/repositories/ai_consent_repository_impl.dart';
 import '../diagnostics/app_logger.dart';
 import '../infrastructure/storage/migration_service.dart';
 import '../infrastructure/storage/space_preferences.dart';
@@ -17,6 +29,12 @@ Future<void> bootstrapAppContainer() async {
   try {
     final container = AppContainer.instance;
     container.reset();
+
+    // SharedPreferences / lightweight storage
+    final prefsOp = AppLogger.startOperation('load_shared_preferences', parentId: bootstrapOp);
+    final sharedPreferences = await SharedPreferences.getInstance();
+    container.registerSingleton<SharedPreferences>(sharedPreferences);
+    await AppLogger.endOperation(prefsOp);
 
     // Initialize RecordsService (which opens the database)
     final dbInitOp = AppLogger.startOperation('initialize_database', parentId: bootstrapOp);
@@ -44,6 +62,26 @@ Future<void> bootstrapAppContainer() async {
       await AppLogger.info('Migrations completed successfully');
     }
     await AppLogger.endOperation(migrationOp);
+
+    // Register AI dependencies
+    final aiConfigRepository = AiConfigRepositoryImpl(sharedPreferences);
+    await aiConfigRepository.loadConfig();
+    container.registerSingleton<AiConfigRepository>(aiConfigRepository);
+    final aiCallLogRepository = AiCallLogRepository();
+    container.registerSingleton<AiCallLogRepository>(aiCallLogRepository);
+    container.registerLazySingleton<AiConsentRepository>(
+      (c) => AiConsentRepositoryImpl(c.resolve<SharedPreferences>()),
+    );
+    container.registerLazySingleton<AiService>(
+      (_) => LoggingAiService(
+        ConfigurableAiService(
+          configRepository: aiConfigRepository,
+          fakeService: FakeAiService(),
+          client: http.Client(),
+        ),
+        callLogRepository: aiCallLogRepository,
+      ),
+    );
 
     // Register capture controller
     final captureOp = AppLogger.startOperation('register_capture_controller', parentId: bootstrapOp);

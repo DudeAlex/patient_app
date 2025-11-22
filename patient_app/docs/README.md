@@ -3,7 +3,7 @@
 ## Vision & Strategy
 - **[Vision](../VISION.md)** - Long-term vision: Universal personal information system
 - **[Universalization Roadmap](./UNIVERSALIZATION_ROADMAP.md)** - Detailed roadmap for evolution to universal system
-- [AI Assisted Plan](../AI_ASSISTED_PATIENT_APP_PLAN.md) - AI strategy and compassionate roadmap
+- [AI Assisted Plan](../AI_ASSISTED_LIFE_COMPANION_PLAN.md) - AI strategy and compassionate roadmap
 
 ## Quick Start
 - [Main README](../README.md) - Project overview, setup, and running instructions

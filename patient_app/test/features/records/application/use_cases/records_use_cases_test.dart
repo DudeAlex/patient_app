@@ -165,8 +165,9 @@ class _RecordingRepository implements RecordsRepository {
     required int offset,
     required int limit,
     String? query,
+    String? spaceId,
   }) async {
-    fetchPageArgs = _FetchPageArgs(offset: offset, limit: limit, query: query);
+    fetchPageArgs = _FetchPageArgs(offset: offset, limit: limit, query: query, spaceId: spaceId);
     return fetchPageResults;
   }
 }
@@ -181,11 +182,12 @@ extension on _RecordingRepository {
 }
 
 class _FetchPageArgs {
-  _FetchPageArgs({required this.offset, required this.limit, this.query});
+  _FetchPageArgs({required this.offset, required this.limit, this.query, this.spaceId});
 
   final int offset;
   final int limit;
   final String? query;
+  final String? spaceId;
 }
 
 RecordEntity _buildRecord({int? id, required String title}) {

@@ -1,12 +1,6 @@
 name: patient_app
-description: "A new Flutter project."
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+description: A new Flutter project.
 
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # In Android, build-name is used as versionName while build-number used as versionCode.
@@ -62,6 +56,7 @@ dependencies:
   mailer: ^6.1.2
   google_drive_backup:
     path: packages/google_drive_backup
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:

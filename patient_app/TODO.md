@@ -45,33 +45,33 @@ M5: Multi-Modal Capture & Accessibility (In Progress - 56% complete)
 - ⏳ Keyboard form enhancements
 - ⏳ Accessibility audit and localization prep
 
-M6: AI-Assisted Companion (opt-in)
-- Build `AiProcessingService` with Together AI integration + consent flow
-- Queue AI tasks offline, merge suggestions with patient confirmation
+M6: Universal AI Companion (opt-in)
+- Build `AiProcessingService` with flexible provider integration + consent flow
+- Queue AI tasks offline, merge suggestions with user confirmation
 - Surface empathetic summaries, safety hints, and highlight uncertainty/confidence
-- Define advisor personas (Resident Medic, Attending Physician, Consulting Specialist) and surface current persona in UI
+- Define advisor personas (Life Coach, Financial Advisor, Academic Tutor, etc.) and surface current persona in UI
 - Ship on-device lightweight LLM fallback for offline interactions with shared prompt schema
-- Integrate retrieval service (RAG) to ground answers in local records, vitals, and attachments
+- Integrate retrieval service (RAG) to ground answers in local records and attachments
 - Add voice-first co-pilot that narrates screens, announces persona shifts, and responds to context-sensitive help requests
 
-M7: Support Network & Emergency Assist
-- Add SupportContact model + management UI
-- Emergency screen with large call/message/share actions and optional countdown
+M7: Smart Sharing & Collaboration
+- Add Contact model + management UI
+- Sharing screen with granular permissions (view/edit) per space
 - Audit log for shared summaries + consent guardrails
 
-M8: Security, Backup & Wellness UX
+M8: Security, Backup & Life Companion UX
 - Passcode/biometric lock
 - Backup/restore progress + error handling improvements
-- Wellness check-ins, compassionate notifications, and caregiver sharing (with consent)
-- Medication & adherence hub: schedules, reminders, refill tracking, interaction warnings
-- Condition-specific plans with weekly goals and explainable insights tied to advisor output
+- Daily briefings, compassionate notifications, and goal tracking
+- Domain-specific hubs: Budget tracking, Study schedules, Travel itineraries
+- Personalized plans with weekly goals and explainable insights tied to advisor output
 - Build capability-aware feature toggles (install/uninstall heavy modules, explain requirements in text + voice)
 
-M9: Phone-Based Vitals Capture
-- Prototype camera-based pulse measurement (PPG) with signal quality checks and safety messaging
-- Integrate optional blood pressure capture (camera-assisted or connected cuff), persisting readings as structured records
-- Link vitals to records, backups, and AI insights; document calibration and device compatibility
-- Extend tracking dashboards with symptom journals, activity adherence, and escalation triggers when readings drift
+M9: Intelligent Data Capture
+- Prototype camera-based capture for domain specific data (Receipts, Whiteboards, Vitals)
+- Integrate optional specialized capture flows (e.g. blood pressure or receipt scanning), persisting readings as structured records
+- Link captured data to records, backups, and AI insights
+- Extend tracking dashboards with domain-specific metrics and escalation triggers when trends drift
 
 M10: Privacy-Conscious Analytics
 - Opt-in telemetry toggle with plain-language consent and data catalog

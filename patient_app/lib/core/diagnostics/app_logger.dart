@@ -152,13 +152,18 @@ class AppLogger {
   }
 
   /// Log navigation between screens
-  static Future<void> logNavigation(String from, String to) async {
+  static Future<void> logNavigation(
+    String from,
+    String to, {
+    Map<String, dynamic>? context,
+  }) async {
     await info(
       'Navigation: $from → $to',
       context: {
         'from': from,
         'to': to,
         'type': 'navigation',
+        ...?context, // Merge additional context if provided
       },
     );
   }

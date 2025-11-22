@@ -2,22 +2,6 @@
 
 Canonical terms for the Patient App project. Use these consistently across all documentation and code.
 
-Last Updated: 2025-11-12
-
----
-
-## Core Concepts
-
-### Patient
-The person using the app to manage their health records.
-- ✅ Use: "patient", "the patient"
-- ❌ Avoid: "user", "customer", "client", "end-user"
-- **Why:** Emphasizes healthcare context and compassionate approach
-
-### Record
-A single health-related entry (lab result, visit note, medication, etc.)
-- ✅ Use: "record", "health record"
-- ❌ Avoid: "entry", "document", "item", "note" (unless specifically referring to note-type records)
 - **Code:** `Record` (Isar model), `RecordEntity` (domain)
 
 ### Attachment
@@ -57,10 +41,10 @@ The multi-modal process of adding data to a record (photo, scan, voice, etc.)
 - **Code:** `CaptureController`, `CaptureMode`
 
 ### AI Companion
-The optional AI-powered assistant using Together AI
-- ✅ Use: "AI companion", "AI assistant", "wellness companion"
-- ❌ Avoid: "AI", "bot", "chatbot", "advisor" (unless referring to specific advisor personas)
-- **Why:** "Companion" emphasizes supportive, non-clinical relationship
+The optional AI-powered assistant for all life areas
+- ✅ Use: "AI companion", "AI assistant", "life companion"
+- ❌ Avoid: "bot", "chatbot"
+- **Why:** "Companion" emphasizes supportive, non-intrusive relationship across all spaces
 - **Code:** `AiProcessingService`, `AiProcessingMode`
 
 ---

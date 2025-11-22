@@ -564,7 +564,7 @@ patient_app/
 ├── TROUBLESHOOTING.md              # Issue resolution
 ├── SYNC.md                          # Backup/sync docs
 ├── CODING_PRINCIPLES.md            # Development standards
-├── AI_ASSISTED_PATIENT_APP_PLAN.md # AI strategy
+├── AI_ASSISTED_LIFE_COMPANION_PLAN.md # AI strategy
 ├── CLEAN_ARCHITECTURE_REFACTOR_PLAN.md # Refactoring roadmap
 ├── DOCUMENTATION_CLEANUP_SUMMARY.md # Meta-documentation
 ├── Health_Tracker_Advisor_UX_Documentation.md # UX vision

@@ -10,6 +10,7 @@ void main() {
     test('maps storage model to domain entity with defensive copies', () {
       final model = storage.Record()
         ..id = 42
+        ..spaceId = 'health'
         ..type = 'visit'
         ..date = DateTime(2025, 10, 1)
         ..title = 'Follow-up'

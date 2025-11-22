@@ -1,0 +1,134 @@
+[
+  {
+    "id": 1,
+    "spaceId": "health",
+    "domainId": "medical_visit",
+    "title": "Cardiology follow-up",
+    "category": "Visit",
+    "tags": ["cardiology", "bp"],
+    "notes": "Discussed palpitations over the last month. Doctor increased beta blocker dosage and asked for a blood pressure diary. Next visit in 3 months.",
+    "attachments": [
+      {"type": "pdf", "name": "echo_results.pdf"}
+    ],
+    "expectedSummary": "Short highlight of medication change and request for BP diary.",
+    "expectedTone": "Reassuring and factual."
+  },
+  {
+    "id": 2,
+    "spaceId": "finance",
+    "domainId": "expense_entry",
+    "title": "Quarterly tuition payment",
+    "category": "Education",
+    "tags": ["school", "budget"],
+    "notes": "Paid spring semester tuition for Nova Academy via bank transfer. Reminder: submit reimbursement request to employer before end of month.",
+    "attachments": [
+      {"type": "image", "name": "transfer_receipt.jpg"}
+    ],
+    "expectedSummary": "Capture payment details and reminder about reimbursement.",
+    "expectedTone": "Practical and action-oriented."
+  },
+  {
+    "id": 3,
+    "spaceId": "education",
+    "domainId": "study_note",
+    "title": "Neurobiology lecture notes",
+    "category": "Notes",
+    "tags": ["midterm", "lecture3"],
+    "notes": "Covered synaptic plasticity, LTP/LTD mechanisms. Need to review the case study on hippocampal circuits before Friday quiz.",
+    "attachments": [],
+    "expectedSummary": "Highlight key topics and mention quiz prep.",
+    "expectedTone": "Encouraging, study-focused."
+  },
+  {
+    "id": 4,
+    "spaceId": "travel",
+    "domainId": "trip_plan",
+    "title": "Istanbul layover checklist",
+    "category": "Planning",
+    "tags": ["vacation", "carry-on"],
+    "notes": "7-hour layover. Plan to store luggage, visit Hagia Sophia, grab lunch near Sultanahmet. Need to book lounge access for showers before next flight.",
+    "attachments": [],
+    "expectedSummary": "Summarize layover plan with key tasks.",
+    "expectedTone": "Helpful and time-aware."
+  },
+  {
+    "id": 5,
+    "spaceId": "family",
+    "domainId": "milestone",
+    "title": "Mara kindergarten orientation",
+    "category": "Event",
+    "tags": ["school", "kids"],
+    "notes": "Orientation confirmed for August 12th at 9am. Bring immunization record and signed health form. Schedule call with pediatrician to get updated form.",
+    "attachments": [
+      {"type": "pdf", "name": "school_forms.pdf"}
+    ],
+    "expectedSummary": "Outline event details and prep steps.",
+    "expectedTone": "Supportive and positive."
+  },
+  {
+    "id": 6,
+    "spaceId": "business",
+    "domainId": "meeting_note",
+    "title": "Investor sync with BlueWave",
+    "category": "Meeting",
+    "tags": ["fundraising"],
+    "notes": "Discussed product traction + target metrics. Investor requested cohort retention dashboard before next meeting. Need to send follow-up deck by Friday.",
+    "attachments": [
+      {"type": "pdf", "name": "pitchdeck.pdf"}
+    ],
+    "expectedSummary": "Summarize ask + next deliverable.",
+    "expectedTone": "Professional and focused."
+  },
+  {
+    "id": 7,
+    "spaceId": "creative",
+    "domainId": "project_note",
+    "title": "Photo essay concept",
+    "category": "Idea",
+    "tags": ["photography", "winter"],
+    "notes": "Concept: document the thaw on Lake Merritt over four weeks. Need to scout sunrise angles and rent telephoto lens. Consider adding short narrative captions.",
+    "attachments": [],
+    "expectedSummary": "Capture concept + next creative steps.",
+    "expectedTone": "Inspirational yet concise."
+  },
+  {
+    "id": 8,
+    "spaceId": "home",
+    "domainId": "project",
+    "title": "Kitchen cabinet refresh",
+    "category": "DIY",
+    "tags": ["home", "maintenance"],
+    "notes": "Goal: repaint cabinets and replace handles. Need sanding materials list, confirm paint order, schedule weekend work session with Alex.",
+    "attachments": [
+      {"type": "image", "name": "cabinet_before.jpg"}
+    ],
+    "expectedSummary": "Summarize scope + actionable checklist.",
+    "expectedTone": "Motivating and practical."
+  },
+  {
+    "id": 9,
+    "spaceId": "health",
+    "domainId": "lab_result",
+    "title": "Lab: Vitamin D follow-up",
+    "category": "Lab",
+    "tags": ["labs", "supplements"],
+    "notes": "Vitamin D is back to 32 ng/mL (was 18). Continue current supplement dose for another 6 weeks, then re-test. Add notes about sunlight exposure.",
+    "attachments": [
+      {"type": "pdf", "name": "vitamin_d_result.pdf"}
+    ],
+    "expectedSummary": "Highlight progress + follow-up plan.",
+    "expectedTone": "Encouraging and health-conscious."
+  },
+  {
+    "id": 10,
+    "spaceId": "finance",
+    "domainId": "budget",
+    "title": "Monthly budget retro",
+    "category": "Review",
+    "tags": ["budget", "review"],
+    "notes": "Groceries up 12% because of weekend guests. Ride-share costs dropped after switching to transit pass. Plan: adjust grocery envelope + keep pass active.",
+    "attachments": [],
+    "expectedSummary": "Note key deviations and plan adjustments.",
+    "expectedTone": "Balanced and constructive."
+  }
+]
