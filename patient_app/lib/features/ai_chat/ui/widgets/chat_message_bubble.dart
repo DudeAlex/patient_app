@@ -3,6 +3,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
 import 'package:patient_app/core/ai/chat/models/chat_message.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
+import 'package:patient_app/features/ai_chat/ui/widgets/attachment_preview.dart';
 
 /// Displays a chat message bubble with optional attachments and status UI.
 class ChatMessageBubble extends StatelessWidget {
@@ -73,7 +74,17 @@ class ChatMessageBubble extends StatelessWidget {
                         ),
                       if (message.attachments.isNotEmpty) ...[
                         const SizedBox(height: 8),
-                        _AttachmentList(attachments: message.attachments),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: message.attachments
+                              .map(
+                                (att) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 4),
+                                  child: AttachmentPreview(attachment: att),
+                                ),
+                              )
+                              .toList(),
+                        ),
                       ],
                       if (message.actionHints.isNotEmpty) ...[
                         const SizedBox(height: 8),
