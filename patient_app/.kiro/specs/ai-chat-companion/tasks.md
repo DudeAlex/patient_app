@@ -60,7 +60,7 @@
   - Handle network errors, timeouts, 4xx, 5xx responses
   - _Requirements: 9.2, 9.3, 9.4, 9.5, 11.3, 16.1, 16.2, 16.3, 16.5_
 
-- [ ] 8. Implement LoggingAiChatService decorator
+- [x] 8. Implement LoggingAiChatService decorator *(done — wrapper logs send/stream start/complete/errors without content)*
   - Create `lib/core/ai/chat/logging_ai_chat_service.dart`
   - Wrap any AiChatService implementation with diagnostic logging
   - Log message send with threadId, spaceId, attachment types (not content)
@@ -70,7 +70,7 @@
   - Redact message content from logs
   - _Requirements: 18.1, 18.2, 18.3, 18.4, 18.5_
 
-- [ ] 9. Implement SendChatMessageUseCase
+- [x] 9. Implement SendChatMessageUseCase *(done — consent check, attachment processing, persistence, AI call + response storage, tests)*
   - Create `lib/core/ai/chat/application/use_cases/send_chat_message_use_case.dart`
   - Inject AiChatService, ChatThreadRepository, AiConsentRepository, MessageAttachmentHandler
   - Implement consent checking before sending messages
@@ -81,14 +81,14 @@
   - Handle all error cases with appropriate exceptions
   - _Requirements: 1.5, 3.2, 3.3, 3.4, 3.5, 7.1, 7.2, 7.3, 14.1, 14.2, 14.3, 14.4, 14.5_
 
-- [ ] 10. Implement LoadChatHistoryUseCase
+- [x] 10. Implement LoadChatHistoryUseCase *(done — creates thread if missing, sorts messages)*
   - Create `lib/core/ai/chat/application/use_cases/load_chat_history_use_case.dart`
   - Load chat thread by Space ID
   - Create new thread if none exists
   - Return messages in chronological order
   - _Requirements: 10.3, 10.4_
 
-- [ ] 11. Implement ClearChatThreadUseCase
+- [x] 11. Implement ClearChatThreadUseCase *(done — deletes thread and attachment files)*
   - Create `lib/core/ai/chat/application/use_cases/clear_chat_thread_use_case.dart`
   - Delete all messages from a thread
   - Clean up associated attachments
