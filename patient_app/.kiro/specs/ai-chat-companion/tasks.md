@@ -42,7 +42,7 @@
   - Define sendMessageStream() method for streaming responses
   - _Requirements: 3.3, 3.4, 11.2, 11.3_
 
-- [ ] 6. Implement FakeAiChatService
+- [x] 6. Implement FakeAiChatService *(done — persona-aware deterministic responses with streaming and configurable latency)*
   - Create `lib/core/ai/chat/fake_ai_chat_service.dart`
   - Implement deterministic responses based on Space persona (Health, Education, Finance, Travel)
   - Implement contextual action hints generation

@@ -71,21 +71,15 @@ void main() {
 
   test('validateAttachment throws on large file', () async {
     final largeFile = File(path.join(tempDir.path, 'large.txt'));
-    // Create a sparse file or just write enough bytes? 
-    // Writing 10MB might be slow. Let's mock the length check or just write a slightly larger file if efficient.
-    // Actually, let's just trust the logic or write a small file and check if we can lower the limit for testing?
-    // We can't easily lower the limit since it's a static const private.
-    // So we'll skip the actual large file creation to avoid slowing down tests, 
-    // or we could use a mock file if we abstracted File system.
-    // For now, I'll skip this specific test case to avoid I/O overhead, or I can write a 10MB+1 byte file.
-    // 10MB is not that huge.
-    
-    // await largeFile.writeAsBytes(List.filled(10 * 1024 * 1024 + 1, 0));
-    // expect(
-    //   () => handler.validateAttachment(largeFile, AttachmentType.file),
-    //   throwsException,
-    // );
-    
-    // Commented out to avoid performance hit in CI/local dev for now.
+    // Create a sparse file just over the 10MB limit to verify validation.
+    final raf = await largeFile.open(mode: FileMode.write);
+    await raf.setPosition(10 * 1024 * 1024 + 1);
+    await raf.writeByte(0);
+    await raf.close();
+
+    expect(
+      () => handler.validateAttachment(largeFile, AttachmentType.file),
+      throwsException,
+    );
   });
 }

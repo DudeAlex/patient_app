@@ -1,3 +1,10 @@
+# Testing Principles
+- Cover happy paths, failure paths, and edge cases (empty/invalid input, timeouts, offline, retries); don’t stop at “works once”.
+- Assert side effects and context, not just returns: status updates, `updatedAt`, file cleanup, logging hooks, and no leaked local paths or PHI.
+- Keep tests deterministic: fixed clocks/seeds, fakes over brittle mocks, and explicit configuration for latency/failure modes.
+- Prefer small, focused cases over large integration dumps; isolate layers with ports and verify mapping/validation at boundaries.
+- Log manual verification in this file with scope, commands, and outcomes; note missing tooling when tests can’t run.
+
 # 2025-11-21 (AI Summary manual check)
 - **Change Scope**
   - Manual QA of AI summary UI using the Cardiology follow-up fixture (Health space).

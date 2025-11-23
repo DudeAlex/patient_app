@@ -8,6 +8,7 @@ import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/models/ai_error.dart';
+import 'package:patient_app/core/diagnostics/app_logger.dart';
 import 'chat_thread_repository.dart';
 
 class ChatThreadRepositoryImpl implements ChatThreadRepository {
@@ -44,6 +45,10 @@ class ChatThreadRepositoryImpl implements ChatThreadRepository {
     await _isar.writeTxn(() async {
       await _isar.chatThreadEntitys.putByThreadId(entity);
     });
+    await AppLogger.info(
+      'Saved chat thread',
+      context: {'threadId': thread.id, 'spaceId': thread.spaceId},
+    );
   }
 
   @override
@@ -51,6 +56,10 @@ class ChatThreadRepositoryImpl implements ChatThreadRepository {
     await _isar.writeTxn(() async {
       await _isar.chatThreadEntitys.deleteByThreadId(threadId);
     });
+    await AppLogger.info(
+      'Deleted chat thread',
+      context: {'threadId': threadId},
+    );
   }
 
   @override
@@ -65,6 +74,19 @@ class ChatThreadRepositoryImpl implements ChatThreadRepository {
         thread.updatedAt = DateTime.now();
         
         await _isar.chatThreadEntitys.putByThreadId(thread);
+        await AppLogger.info(
+          'Added chat message',
+          context: {
+            'threadId': threadId,
+            'messageId': message.id,
+            'sender': message.sender.name,
+          },
+        );
+      } else {
+        await AppLogger.error(
+          'Chat thread not found when adding message',
+          context: {'threadId': threadId, 'messageId': message.id},
+        );
       }
     });
   }
@@ -95,6 +117,21 @@ class ChatThreadRepositoryImpl implements ChatThreadRepository {
         thread.updatedAt = DateTime.now();
         
         await _isar.chatThreadEntitys.putByThreadId(thread);
+        await AppLogger.info(
+          'Updated chat message status',
+          context: {
+            'threadId': threadId,
+            'messageId': messageId,
+            'status': status.name,
+            if (errorCode != null) 'errorCode': errorCode,
+            if (errorRetryable != null) 'retryable': errorRetryable,
+          },
+        );
+      } else {
+        await AppLogger.error(
+          'Chat thread not found when updating message status',
+          context: {'threadId': threadId, 'messageId': messageId},
+        );
       }
     });
   }
@@ -119,6 +156,15 @@ class ChatThreadRepositoryImpl implements ChatThreadRepository {
         thread.updatedAt = DateTime.now();
         
         await _isar.chatThreadEntitys.putByThreadId(thread);
+        await AppLogger.debug(
+          'Updated chat message content',
+          context: {'threadId': threadId, 'messageId': messageId},
+        );
+      } else {
+        await AppLogger.error(
+          'Chat thread not found when updating message content',
+          context: {'threadId': threadId, 'messageId': messageId},
+        );
       }
     });
   }
@@ -142,8 +188,23 @@ class ChatThreadRepositoryImpl implements ChatThreadRepository {
         }).toList();
 
         thread.messages = updatedMessages;
+        thread.updatedAt = DateTime.now();
         
         await _isar.chatThreadEntitys.putByThreadId(thread);
+        await AppLogger.debug(
+          'Updated chat message metrics',
+          context: {
+            'threadId': threadId,
+            'messageId': messageId,
+            if (tokensUsed != null) 'tokensUsed': tokensUsed,
+            if (latencyMs != null) 'latencyMs': latencyMs,
+          },
+        );
+      } else {
+        await AppLogger.error(
+          'Chat thread not found when updating message metrics',
+          context: {'threadId': threadId, 'messageId': messageId},
+        );
       }
     });
   }

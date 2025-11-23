@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
+import 'package:patient_app/core/diagnostics/app_logger.dart';
 import 'package:uuid/uuid.dart';
 
 import 'message_attachment_handler.dart';
@@ -16,11 +17,13 @@ class MessageAttachmentHandlerImpl implements MessageAttachmentHandler {
   MessageAttachmentHandlerImpl({Future<Directory> Function()? directoryProvider})
       : _directoryProvider = directoryProvider;
 
-  Future<Directory> get _attachmentsDir async {
+  Future<Directory> _attachmentsDirFor(String threadId) async {
     final appDir = _directoryProvider != null
         ? await _directoryProvider()
         : await getApplicationDocumentsDirectory();
-    final attachmentsDir = Directory(path.join(appDir.path, 'chat_attachments'));
+    final attachmentsDir = Directory(
+      path.join(appDir.path, 'chat_attachments', threadId),
+    );
     if (!await attachmentsDir.exists()) {
       await attachmentsDir.create(recursive: true);
     }
@@ -35,7 +38,7 @@ class MessageAttachmentHandlerImpl implements MessageAttachmentHandler {
   }) async {
     await validateAttachment(sourceFile, type);
 
-    final dir = await _attachmentsDir;
+    final dir = await _attachmentsDirFor(targetThreadId);
     final extension = path.extension(sourceFile.path);
     final uniqueId = _uuid.v4();
     final fileName = '$uniqueId$extension';
@@ -46,7 +49,7 @@ class MessageAttachmentHandlerImpl implements MessageAttachmentHandler {
     final fileSize = await sourceFile.length();
     final mimeType = _getMimeType(sourceFile.path);
 
-    return MessageAttachment(
+    final attachment = MessageAttachment(
       id: uniqueId,
       type: type,
       localPath: targetPath,
@@ -54,15 +57,34 @@ class MessageAttachmentHandlerImpl implements MessageAttachmentHandler {
       fileSizeBytes: fileSize,
       mimeType: mimeType,
     );
+
+    await AppLogger.info(
+      'Processed chat attachment',
+      context: {
+        'threadId': targetThreadId,
+        'attachmentId': uniqueId,
+        'type': type.name,
+        'sizeBytes': fileSize,
+      },
+    );
+
+    return attachment;
   }
 
   @override
   Future<void> deleteAttachment(MessageAttachment attachment) async {
-    if (attachment.localPath != null) {
-      final file = File(attachment.localPath!);
-      if (await file.exists()) {
-        await file.delete();
-      }
+    if (attachment.localPath == null) return;
+
+    final file = File(attachment.localPath!);
+    if (await file.exists()) {
+      await file.delete();
+      await AppLogger.debug(
+        'Deleted chat attachment file',
+        context: {
+          'attachmentId': attachment.id,
+          'path': attachment.localPath,
+        },
+      );
     }
   }
 
@@ -78,6 +100,11 @@ class MessageAttachmentHandlerImpl implements MessageAttachmentHandler {
     }
 
     // Add more validation logic here if needed (e.g., mime type check)
+
+    await AppLogger.debug(
+      'Validated chat attachment',
+      context: {'sizeBytes': size, 'type': type.name},
+    );
   }
 
   String _getMimeType(String filePath) {
