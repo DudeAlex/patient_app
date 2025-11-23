@@ -58,7 +58,7 @@ class DefaultSpaceContextBuilder implements SpaceContextBuilder {
             title: record.title,
             category: record.type,
             tags: record.tags,
-            summaryText: record.text,
+            summaryText: _truncate(record.text),
             createdAt: record.date,
           ),
         )
@@ -102,5 +102,11 @@ class DefaultSpaceContextBuilder implements SpaceContextBuilder {
       default:
         return spaceId[0].toUpperCase() + spaceId.substring(1);
     }
+  }
+
+  String? _truncate(String? text, {int maxLength = 200}) {
+    if (text == null) return null;
+    if (text.length <= maxLength) return text;
+    return '${text.substring(0, maxLength)}...';
   }
 }

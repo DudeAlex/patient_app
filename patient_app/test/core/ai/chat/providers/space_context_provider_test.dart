@@ -79,16 +79,16 @@ void main() {
               _StubRecordsService([
                 RecordEntity(
                   id: 1,
-                  spaceId: 'health',
-                  type: 'visit',
-                  date: DateTime(2025, 1, 2),
-                  title: 'Checkup',
-                  text: 'Notes about visit',
-                  tags: ['tag1'],
-                  createdAt: DateTime(2025, 1, 2),
-                  updatedAt: DateTime(2025, 1, 2),
-                ),
-                RecordEntity(
+              spaceId: 'health',
+              type: 'visit',
+              date: DateTime(2025, 1, 2),
+              title: 'Checkup',
+              text: 'Notes about visit ' + 'x' * 500,
+              tags: ['tag1'],
+              createdAt: DateTime(2025, 1, 2),
+              updatedAt: DateTime(2025, 1, 2),
+            ),
+            RecordEntity(
                   id: 2,
                   spaceId: 'health',
                   type: 'lab',
@@ -113,6 +113,7 @@ void main() {
     expect(context.persona, SpacePersona.health);
     expect(context.limitedRecords.length, 1);
     expect(context.limitedRecords.first.title, 'Checkup');
+    expect(context.limitedRecords.first.summaryText!.length, lessThanOrEqualTo(204));
   });
 
   test('defaults to general persona for unknown spaces', () async {
