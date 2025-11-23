@@ -94,7 +94,7 @@
   - Clean up associated attachments
   - _Requirements: 10.1, 10.2_
 
-- [ ] 12. Implement SwitchSpaceContextUseCase
+- [x] 12. Implement SwitchSpaceContextUseCase *(done — clears current thread when requested and loads new space context)*
   - Create `lib/core/ai/chat/application/use_cases/switch_space_context_use_case.dart`
   - Load new Space context
   - Clear current chat thread with user confirmation
