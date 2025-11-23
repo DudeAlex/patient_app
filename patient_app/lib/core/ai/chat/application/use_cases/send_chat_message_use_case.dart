@@ -6,6 +6,7 @@ import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
 import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
@@ -93,7 +94,7 @@ class SendChatMessageUseCase {
       await _chatThreadRepository.addMessage(threadId, userMessage);
 
       // Build request with limited history including the new message.
-      final history = [
+      final history = <ChatMessage>[
         ...thread.messages,
         userMessage,
       ];

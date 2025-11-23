@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patient_app/core/ai/chat/application/use_cases/send_chat_message_use_case.dart';
 import 'package:patient_app/core/ai/chat/models/chat_message.dart';
+import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
@@ -88,6 +89,16 @@ class _StubConsentRepo implements AiConsentRepository {
   @override
   Future<void> setConsent(bool consent) async {
     _hasConsent = consent;
+  }
+
+  @override
+  Future<void> grantConsent() async {
+    _hasConsent = true;
+  }
+
+  @override
+  Future<void> revokeConsent() async {
+    _hasConsent = false;
   }
 }
 
