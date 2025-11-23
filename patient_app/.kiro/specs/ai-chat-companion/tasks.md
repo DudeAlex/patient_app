@@ -144,7 +144,7 @@
   - Wrap in RepaintBoundary for performance
   - _Requirements: 8.1, 8.2, 8.3, 9.1, 9.2, 17.1, 17.2, 17.3, 17.4, 17.5, 20.4_
 
-- [ ] 18. Implement long-press context menu for messages
+- [x] 18. Implement long-press context menu for messages *(done — long-press copy in ChatMessageBubble with tests)*
   - Add GestureDetector to ChatMessageBubble
   - Show context menu on long-press
   - Implement "Copy" option
