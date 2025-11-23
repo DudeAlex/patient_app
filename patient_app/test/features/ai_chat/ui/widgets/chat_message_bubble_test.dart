@@ -63,6 +63,23 @@ void main() {
     expect(retried, isTrue);
   });
 
+  testWidgets('long press copies content when handler provided', (tester) async {
+    var copied = '';
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ChatMessageBubble(
+            message: baseMessage(),
+            onCopy: (text) => copied = text,
+          ),
+        ),
+      ),
+    );
+
+    await tester.longPress(find.textContaining('Hello'));
+    expect(copied, contains('Hello'));
+  });
+
   testWidgets('shows attachments with icons', (tester) async {
     await tester.pumpWidget(
       MaterialApp(

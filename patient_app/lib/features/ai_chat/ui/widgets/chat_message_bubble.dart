@@ -10,10 +10,12 @@ class ChatMessageBubble extends StatelessWidget {
     super.key,
     required this.message,
     this.onRetry,
+    this.onCopy,
   });
 
   final ChatMessage message;
   final VoidCallback? onRetry;
+  final ValueChanged<String>? onCopy;
 
   bool get _isUser => message.sender == MessageSender.user;
 
@@ -49,66 +51,73 @@ class ChatMessageBubble extends StatelessWidget {
                   color: bubbleColor,
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (message.content.isNotEmpty)
-                      MarkdownBody(
-                        data: message.content,
-                        styleSheet: MarkdownStyleSheet(
-                          p: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(color: textColor),
-                        ),
-                        shrinkWrap: true,
-                      ),
-                    if (message.attachments.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      _AttachmentList(attachments: message.attachments),
-                    ],
-                    if (message.actionHints.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 4,
-                        children: message.actionHints
-                            .map(
-                              (hint) => Chip(
-                                label: Text(hint),
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ],
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          DateFormat('HH:mm').format(message.timestamp),
-                          style: Theme.of(context).textTheme.labelSmall,
-                        ),
-                        const SizedBox(width: 8),
-                        if (message.status == MessageStatus.sending)
-                          const SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                child: GestureDetector(
+                  onLongPress: () {
+                    if (message.content.isNotEmpty && onCopy != null) {
+                      onCopy!(message.content);
+                    }
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (message.content.isNotEmpty)
+                        MarkdownBody(
+                          data: message.content,
+                          styleSheet: MarkdownStyleSheet(
+                            p: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(color: textColor),
                           ),
-                        if (message.status == MessageStatus.failed) ...[
-                          const Icon(Icons.error, size: 16, color: Colors.red),
-                          const SizedBox(width: 4),
-                          TextButton(
-                            onPressed: onRetry,
-                            child: const Text('Retry'),
-                          ),
-                        ],
+                          shrinkWrap: true,
+                        ),
+                      if (message.attachments.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        _AttachmentList(attachments: message.attachments),
                       ],
-                    ),
-                  ],
+                      if (message.actionHints.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: message.actionHints
+                              .map(
+                                (hint) => Chip(
+                                  label: Text(hint),
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ],
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            DateFormat('HH:mm').format(message.timestamp),
+                            style: Theme.of(context).textTheme.labelSmall,
+                          ),
+                          const SizedBox(width: 8),
+                          if (message.status == MessageStatus.sending)
+                            const SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          if (message.status == MessageStatus.failed) ...[
+                            const Icon(Icons.error, size: 16, color: Colors.red),
+                            const SizedBox(width: 4),
+                            TextButton(
+                              onPressed: onRetry,
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
