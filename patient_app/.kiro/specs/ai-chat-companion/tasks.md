@@ -152,7 +152,7 @@
   - Show visual feedback when copied
   - _Requirements: 19.1, 19.2, 19.3, 19.4, 19.5_
 
-- [ ] 19. Create AttachmentPreview widget
+- [x] 19. Create AttachmentPreview widget *(done — previews photo/voice/file inline, size formatting, tests)*
   - Create `lib/features/ai_chat/ui/widgets/attachment_preview.dart`
   - Display photo thumbnails inline
   - Display voice note waveform with duration
