@@ -124,7 +124,7 @@
   - Implement overflow menu with "Clear Chat" and "Change Context" options
   - _Requirements: 1.4, 11.1, 15.1_
 
-- [ ] 16. Create DataUsageBanner widget
+- [x] 16. Create DataUsageBanner widget *(done — explains data access, shows space/record context, dismissible, tests)*
   - Create `lib/features/ai_chat/ui/widgets/data_usage_banner.dart`
   - Display banner explaining what data is accessible
   - Show which Space records are available to AI
