@@ -132,7 +132,7 @@
   - Make banner dismissible
   - _Requirements: 7.1, 7.2, 7.3_
 
-- [ ] 17. Create ChatMessageBubble widget
+- [x] 17. Create ChatMessageBubble widget *(done — alignment, markdown, attachments, status/retry, RepaintBoundary, tests)*
   - Create `lib/features/ai_chat/ui/widgets/chat_message_bubble.dart`
   - Display user messages right-aligned, AI messages left-aligned
   - Show timestamps for each message
