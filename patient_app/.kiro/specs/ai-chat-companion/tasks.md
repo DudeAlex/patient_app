@@ -101,7 +101,7 @@
   - Update AI persona based on new Space
   - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.5_
 
-- [ ] 13. Set up dependency injection for chat services
+- [x] 13. Set up dependency injection for chat services *(done — DI registers chat repo/handler and configurable Fake/HTTP chat service wrapped with logging, plus Riverpod providers)*
   - Update `lib/core/di/app_container.dart` to register chat services
   - Create Riverpod providers for AiChatService, ChatThreadRepository, MessageAttachmentHandler
   - Wire FakeAiChatService as default implementation
