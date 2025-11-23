@@ -170,7 +170,7 @@ void main() {
       response: ChatResponse.success(
         messageContent: 'AI reply',
         actionHints: const ['Hint'],
-        metadata: const AiMessageMetadata(tokensUsed: 5, latencyMs: 10, provider: 'fake'),
+        metadata: AiMessageMetadata(tokensUsed: 5, latencyMs: 10, provider: 'fake'),
       ),
     );
 

@@ -107,7 +107,29 @@ class SendChatMessageUseCase {
         maxHistoryMessages: maxHistoryMessages,
       );
 
-      final response = await _aiChatService.sendMessage(request);
+      final ChatResponse response;
+      try {
+        response = await _aiChatService.sendMessage(request);
+      } on AiServiceException catch (e) {
+        await _chatThreadRepository.updateMessageStatus(
+          threadId,
+          userMessage.id,
+          MessageStatus.failed,
+          errorMessage: e.error?.message ?? e.message,
+          errorCode: e.error?.code,
+          errorRetryable: e.error?.isRetryable,
+        );
+        rethrow;
+      } catch (e) {
+        await _chatThreadRepository.updateMessageStatus(
+          threadId,
+          userMessage.id,
+          MessageStatus.failed,
+          errorMessage: e.toString(),
+          errorRetryable: false,
+        );
+        rethrow;
+      }
       if (!response.isSuccess) {
         await _chatThreadRepository.updateMessageStatus(
           threadId,
