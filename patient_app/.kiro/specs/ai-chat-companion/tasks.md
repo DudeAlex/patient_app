@@ -109,7 +109,7 @@
   - Switch between Fake and HTTP based on ai_mode configuration
   - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
 
-- [ ] 14. Create SpaceContext provider
+- [x] 14. Create SpaceContext provider *(done — persona mapping + recent record summaries with truncation)*
   - Create `lib/core/ai/chat/providers/space_context_provider.dart`
   - Build SpaceContext from Space ID
   - Load recent records from the Space (limit to 5)
