@@ -86,7 +86,7 @@ void main() {
     final delegate = _StubChatService(
       response: ChatResponse.success(
         messageContent: 'Hi back',
-        metadata: const AiMessageMetadata(
+        metadata: AiMessageMetadata(
           tokensUsed: 10,
           latencyMs: 20,
           provider: 'fake',
