@@ -50,7 +50,7 @@
   - Add streaming response support with word-by-word chunks
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 11.2, 12.1, 12.2, 12.3, 12.4, 12.5, 13.1, 13.2, 13.3, 13.4, 13.5_
 
-- [ ] 7. Implement HttpAiChatService
+- [x] 7. Implement HttpAiChatService *(done — JSON payloads, timeout + retry/backoff, and parsing)*
   - Create `lib/core/ai/chat/http_ai_chat_service.dart`
   - Implement request payload construction with Space context and message history
   - Implement HTTP POST to backend endpoint with JSON payload
