@@ -117,7 +117,7 @@
   - Map Space to appropriate persona (Health → health, Education → education, etc.)
   - _Requirements: 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 2.5, 14.1, 14.2, 14.3, 14.4, 14.5_
 
-- [ ] 15. Create ChatHeader widget
+- [x] 15. Create ChatHeader widget *(done — context chip, status pill, overflow actions, tests)*
   - Create `lib/features/ai_chat/ui/widgets/chat_header.dart`
   - Display Space name and icon in context chip
   - Display status pill showing AI mode (Fake/Remote/Offline)
