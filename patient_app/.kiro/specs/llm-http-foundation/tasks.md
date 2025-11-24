@@ -288,7 +288,7 @@
   - Test Retry-After header
   - _Requirements: 10.2_
 
-- [ ] 34. Write integration test for LLM flow
+- [x] 34. Write integration test for LLM flow
   - Start with chat thread containing 2 messages
   - Send new message via HttpAiChatService
   - Verify backend receives request with history

@@ -147,6 +147,10 @@ app.use((req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Echo server listening on http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(port, () => {
+    console.log(`Echo server listening on http://localhost:${port}`);
+  });
+}
+
+export { app };

@@ -731,4 +731,9 @@
 - **Scope**: Node test suites for prompt template placeholders, history formatting, model resolver, token counter, and rate limiter behavior.
 - **Result**: Pass.
 
+# 2025-11-24 (LLM chat endpoint integration test)
+- **Command**: `cd server && npm test`
+- **Scope**: Added integration test that stubs TogetherClient, hits `/api/v1/chat/message`, and asserts response/message/metadata fields.
+- **Result**: Pass.
+
 
