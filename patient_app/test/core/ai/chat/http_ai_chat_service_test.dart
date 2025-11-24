@@ -99,6 +99,7 @@ void main() {
       baseUrl: 'https://api.example.com',
       maxRetries: 3,
       connectivityCheck: () async => [ConnectivityResult.wifi],
+      backoffCalculator: (_) => Duration.zero,
     );
 
     final response = await service.sendMessage(_request());
@@ -116,8 +117,8 @@ void main() {
       connectivityCheck: () async => [ConnectivityResult.wifi],
     );
 
-    expect(
-      () => service.sendMessage(_request()),
+    await expectLater(
+      service.sendMessage(_request()),
       throwsA(isA<ValidationException>()),
     );
   });
@@ -133,11 +134,35 @@ void main() {
       timeout: const Duration(milliseconds: 50),
       maxRetries: 1,
       connectivityCheck: () async => [ConnectivityResult.wifi],
+      backoffCalculator: (_) => Duration.zero,
     );
 
-    expect(
-      () => service.sendMessage(_request()),
+    await expectLater(
+      service.sendMessage(_request()),
       throwsA(isA<ChatTimeoutException>()),
     );
+  });
+
+  test('backoff calculator is used for retry delays', () async {
+    final observed = <Duration>[];
+    final client = MockClient((_) async {
+      return http.Response('error', 500);
+    });
+
+    final service = HttpAiChatService(
+      client: client,
+      baseUrl: 'https://api.example.com',
+      maxRetries: 2,
+      connectivityCheck: () async => [ConnectivityResult.wifi],
+      backoffCalculator: (attempt) => Duration(milliseconds: attempt * 10),
+      backoffObserver: observed.add,
+    );
+
+    await expectLater(
+      service.sendMessage(_request()),
+      throwsA(isA<ServerException>()),
+    );
+
+    expect(observed, [const Duration(milliseconds: 10)]);
   });
 }

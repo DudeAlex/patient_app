@@ -28,6 +28,8 @@ class HttpAiChatService implements AiChatService {
     this.maxRetries = 3,
     Connectivity? connectivity,
     Future<List<ConnectivityResult>> Function()? connectivityCheck,
+    this.backoffCalculator,
+    this.backoffObserver,
   })  : _connectivityCheck =
             connectivityCheck ?? (() => (connectivity ?? Connectivity()).checkConnectivity());
 
@@ -38,6 +40,8 @@ class HttpAiChatService implements AiChatService {
   final Future<List<ConnectivityResult>> Function() _connectivityCheck;
   final Uuid _uuid = const Uuid();
   final Random _random = Random();
+  final Duration Function(int attempt)? backoffCalculator;
+  final void Function(Duration delay)? backoffObserver;
 
   @override
   Future<ChatResponse> sendMessage(ChatRequest request) async {
@@ -363,9 +367,13 @@ class HttpAiChatService implements AiChatService {
   }) async {
     final baseDelays = <int>[1, 2, 4];
     final base = baseDelays[min(attempt - 1, baseDelays.length - 1)];
-    final delaySeconds = override?.inSeconds ??
-        (base * (1 + (_random.nextDouble() * 0.4 - 0.2)));
-    final delay = Duration(milliseconds: (delaySeconds * 1000).round());
+    final delay = override ??
+        backoffCalculator?.call(attempt) ??
+        Duration(
+          milliseconds:
+              (base * (1 + (_random.nextDouble() * 0.4 - 0.2)) * 1000).round(),
+        );
+    backoffObserver?.call(delay);
     await AppLogger.info(
       'Backing off before retry',
       context: {
