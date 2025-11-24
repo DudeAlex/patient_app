@@ -3,7 +3,7 @@ export const MODEL_CATALOG = {
   chatReasoning: 'ServiceNow-AI/Apriel-1.5-15b-Thinker',
   // Together no longer supports the old Meta-Llama-3-70B-Instruct-Turbo id; use supported chat fallback.
   chatFallback: 'meta-llama/Llama-3-70b-chat-hf',
-  image: 'black-forest-labs/FLUX-1-schnell',
+  image: 'ServiceNow-AI/Apriel-1.5-15b-Thinker',
 };
 
 export function resolveChatModel(envModel) {
