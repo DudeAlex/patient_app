@@ -14,6 +14,7 @@ import 'package:patient_app/core/ai/repositories/ai_consent_repository.dart';
 import 'package:patient_app/core/domain/entities/information_item.dart';
 import 'package:patient_app/features/information_items/application/use_cases/summarize_information_item_use_case.dart';
 import 'package:patient_app/core/ai/chat/application/use_cases/send_chat_message_use_case.dart';
+import 'package:patient_app/core/ai/chat/fake_ai_chat_service.dart';
 import 'package:patient_app/core/ai/chat/models/chat_message.dart';
 import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
@@ -320,6 +321,33 @@ void main() {
         final aiStored = stored.messages.firstWhere((m) => m.sender == MessageSender.ai);
         expect(userStored.content, content);
         expect(aiStored.content, 'ai response $i');
+      }
+    });
+  });
+
+  group('Property tests - health persona tone', () {
+    test('Fake AI health persona avoids prescriptive language', () async {
+      final service = FakeAiChatService(simulatedLatency: Duration.zero);
+      final rand = Random(77);
+      for (var i = 0; i < 10; i++) {
+        final request = ChatRequest(
+          threadId: 't-health-$i',
+          messageContent: 'Need advice ${rand.nextInt(1000)}',
+          spaceContext: SpaceContext(
+            spaceId: 'health',
+            spaceName: 'Health',
+            persona: SpacePersona.health,
+          ),
+          messageHistory: const [],
+        );
+
+        final response = await service.sendMessage(request);
+        final content = response.messageContent.toLowerCase();
+
+        expect(content.contains('should'), isFalse, reason: 'avoid prescriptive language');
+        expect(content.contains('must'), isFalse, reason: 'avoid prescriptive language');
+        expect(content.contains('medical advice'), isTrue,
+            reason: 'include safety-first reminder');
       }
     });
   });

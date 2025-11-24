@@ -575,3 +575,8 @@
 - **Command**: `flutter test test/core/ai/property_tests.dart`
 - **Scope**: Property loop verifying SendChatMessageUseCase persists user + AI messages into repository.
 - **Result**: Pass on Windows.
+
+# 2025-11-23 (Health persona tone property test)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Property loop verifying Fake AI health persona avoids prescriptive language and includes safety reminders.
+- **Result**: Pass on Windows.
