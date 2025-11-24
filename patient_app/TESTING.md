@@ -505,3 +505,8 @@
 - **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
 - **Scope**: Regression check after adding file picker attach flow with size/consent dialog.
 - **Result**: Pass on Windows; chat UI still builds with file attach hooks present.
+
+# 2025-11-23 (AI Chat offline queue wiring)
+- **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
+- **Scope**: Regression check after introducing MessageQueueService dependency in AiChatController.
+- **Result**: Pass on Windows; chat widget still builds with queue wiring present.

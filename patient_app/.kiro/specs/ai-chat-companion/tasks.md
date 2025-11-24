@@ -241,7 +241,7 @@
   - Hide icon when ai_enabled is false
   - _Requirements: 1.1, 1.2, 1.3_
 
-- [ ] 29. Implement offline message queuing
+- [x] 29. Implement offline message queuing
   - Create `lib/core/ai/chat/services/message_queue_service.dart`
   - Queue messages locally when offline
   - Monitor connectivity changes
