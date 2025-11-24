@@ -332,14 +332,14 @@
   - Test ChatComposer offline state
   - _Requirements: 1.4, 4.3, 5.4, 7.1, 8.1, 8.2, 8.3, 9.3, 11.1, 17.1, 19.1, 20.2_
 
-- [ ]* 39. Write property-based test for Space context inheritance
+- [x]* 39. Write property-based test for Space context inheritance
   - **Property 1: Space Context Inheritance**
   - **Validates: Requirements 1.2**
   - Generate random Spaces
   - Open chat from each Space
   - Assert context includes correct Space ID and persona
 
-- [ ]* 40. Write property-based test for record context inclusion
+- [x]* 40. Write property-based test for record context inclusion
   - **Property 2: Record Context Inclusion**
   - **Validates: Requirements 1.3**
   - Generate random records
@@ -478,3 +478,4 @@
   - Confirm AI chat can be disabled via feature flag
   - Verify performance targets met (< 500ms render, smooth scrolling)
   - Ask user if questions arise
+

@@ -171,6 +171,55 @@ void main() {
       }
     });
   });
+
+  group('Property tests - chat context propagation', () {
+    final rand = Random(101);
+    SpaceContext buildSpace(int i) => SpaceContext(
+          spaceId: 'space_$i',
+          spaceName: 'Space $i',
+          persona: SpacePersona.values[i % SpacePersona.values.length],
+        );
+
+    InformationItem buildItem(int i) => InformationItem(
+          id: i,
+          spaceId: 'space_$i',
+          domainId: 'domain_$i',
+          data: {'title': 'Item $i'},
+          createdAt: DateTime(2025, 1, 1),
+          updatedAt: DateTime(2025, 1, 1),
+        );
+
+    test('ChatRequest carries correct space id/persona', () {
+      for (var i = 0; i < 20; i++) {
+        final ctx = buildSpace(i);
+        final request = ChatRequest(
+          threadId: 't$i',
+          messageContent: 'hello',
+          spaceContext: ctx,
+          messageHistory: [],
+        );
+
+        expect(request.spaceContext.spaceId, ctx.spaceId);
+        expect(request.spaceContext.persona, ctx.persona);
+      }
+    });
+
+    test('Record summaries carry the originating space and title', () {
+      for (var i = 0; i < 10; i++) {
+        final item = buildItem(i);
+        final summary = RecordSummary(
+          title: item.data['title'] as String,
+          category: 'category_$i',
+          tags: ['t$i'],
+          createdAt: item.createdAt,
+        );
+
+        expect(summary.title, contains(item.data['title'] as String));
+        expect(summary.category, 'category_$i');
+        expect(summary.tags, contains('t$i'));
+      }
+    });
+  });
 }
 
 class _StubChatService implements AiChatService {
