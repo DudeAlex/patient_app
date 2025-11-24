@@ -565,3 +565,8 @@
 - **Command**: `flutter test test/core/ai/property_tests.dart`
 - **Scope**: Property checks for ChatRequest carrying space id/persona and record summaries retaining origin info.
 - **Result**: Pass on Windows.
+
+# 2025-11-23 (Chat payload safety property tests)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Ensures attachments strip local paths and message history trims to configured max.
+- **Result**: Pass on Windows.

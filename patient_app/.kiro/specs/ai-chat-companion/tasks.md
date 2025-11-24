@@ -360,7 +360,7 @@
   - Send messages and reload thread
   - Assert all messages appear in history
 
-- [ ]* 43. Write property-based test for attachment privacy
+- [x]* 43. Write property-based test for attachment privacy
   - **Property 5: Attachment Privacy**
   - **Validates: Requirements 4.5, 7.4**
   - Generate random attachments
@@ -374,20 +374,20 @@
   - Get AI responses
   - Assert responses don't contain prescriptive phrases
 
-- [ ]* 45. Write property-based test for context scope limitation
+- [x]* 45. Write property-based test for context scope limitation
   - **Property 7: Context Scope Limitation**
   - **Validates: Requirements 14.2**
   - Generate random Spaces with records
   - Build chat requests
   - Assert context only includes records from active Space
 
-- [ ]* 46. Write property-based test for sensitive data redaction
+- [x]* 46. Write property-based test for sensitive data redaction
   - **Property 8: Sensitive Data Redaction**
   - **Validates: Requirements 14.3**
   - Generate random chat requests
   - Assert payloads don't contain IDs or encryption keys
 
-- [ ]* 47. Write property-based test for message history limit
+- [x]* 47. Write property-based test for message history limit
   - **Property 9: Message History Limit**
   - **Validates: Requirements 14.5**
   - Generate chat threads with varying message counts
@@ -478,4 +478,5 @@
   - Confirm AI chat can be disabled via feature flag
   - Verify performance targets met (< 500ms render, smooth scrolling)
   - Ask user if questions arise
+
 

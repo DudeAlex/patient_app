@@ -220,6 +220,61 @@ void main() {
       }
     });
   });
+
+  group('Property tests - chat payload safety', () {
+    test('attachments exclude local paths when building ChatRequest', () {
+      final request = ChatRequest(
+        threadId: 't-safety',
+        messageContent: 'hello',
+        spaceContext: SpaceContext(
+          spaceId: 'space_safety',
+          spaceName: 'Space Safety',
+          persona: SpacePersona.general,
+        ),
+        attachments: [
+          MessageAttachment(
+            id: 'a1',
+            type: AttachmentType.file,
+            localPath: '/secret/path',
+            fileName: 'doc.pdf',
+          ),
+        ],
+        messageHistory: const [],
+      );
+
+      final json = request.toJson();
+      final attachments = json['attachments'] as List;
+      expect(attachments.first.containsKey('localPath'), isFalse);
+    });
+
+    test('message history is trimmed to maxHistoryMessages', () {
+      final history = List.generate(
+        60,
+        (i) => ChatMessage(
+          id: 'm$i',
+          threadId: 't',
+          sender: MessageSender.user,
+          content: 'msg $i',
+          timestamp: DateTime(2025, 1, 1, 0, i),
+        ),
+      );
+
+      final request = ChatRequest(
+        threadId: 't-hist',
+        messageContent: 'hi',
+        spaceContext: SpaceContext(
+          spaceId: 's',
+          spaceName: 'S',
+          persona: SpacePersona.general,
+        ),
+        messageHistory: history,
+        maxHistoryMessages: 50,
+      );
+
+      expect(request.limitedHistory.length, 50);
+      expect(request.limitedHistory.first.id, 'm0'); // taking first 50 of 60
+    });
+  });
 }
 
 class _StubChatService implements AiChatService {
