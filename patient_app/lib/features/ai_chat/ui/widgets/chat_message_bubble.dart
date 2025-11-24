@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:patient_app/core/ai/chat/models/chat_message.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/features/ai_chat/ui/widgets/attachment_preview.dart';
+import 'package:patient_app/features/ai_chat/ui/widgets/action_hints_row.dart';
 
 /// Displays a chat message bubble with optional attachments and status UI.
 class ChatMessageBubble extends StatelessWidget {
@@ -12,11 +13,13 @@ class ChatMessageBubble extends StatelessWidget {
     required this.message,
     this.onRetry,
     this.onCopy,
+    this.onActionHintTap,
   });
 
   final ChatMessage message;
   final VoidCallback? onRetry;
   final ValueChanged<String>? onCopy;
+  final ValueChanged<String>? onActionHintTap;
 
   bool get _isUser => message.sender == MessageSender.user;
 
@@ -88,18 +91,9 @@ class ChatMessageBubble extends StatelessWidget {
                       ],
                       if (message.actionHints.isNotEmpty) ...[
                         const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 4,
-                          children: message.actionHints
-                              .map(
-                                (hint) => Chip(
-                                  label: Text(hint),
-                                  materialTapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                ),
-                              )
-                              .toList(),
+                        ActionHintsRow(
+                          hints: message.actionHints,
+                          onHintTapped: onActionHintTap,
                         ),
                       ],
                       const SizedBox(height: 8),

@@ -160,7 +160,7 @@
   - Handle different attachment types (photo, voice, file)
   - _Requirements: 4.3, 5.4, 6.3_
 
-- [ ] 20. Create ActionHintsRow widget
+- [x] 20. Create ActionHintsRow widget *(done — themed action chips + tap handler wired into chat bubble)*
   - Create `lib/features/ai_chat/ui/widgets/action_hints_row.dart`
   - Display action hints as tappable chips
   - Handle chip tap events

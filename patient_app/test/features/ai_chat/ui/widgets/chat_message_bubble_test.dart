@@ -102,4 +102,23 @@ void main() {
     expect(find.text('pic.jpg'), findsOneWidget);
     expect(find.byIcon(Icons.photo), findsOneWidget);
   });
+
+  testWidgets('invokes action hint tap handler', (tester) async {
+    var tapped = '';
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ChatMessageBubble(
+            message: baseMessage().copyWith(actionHints: ['Do thing']),
+            onActionHintTap: (hint) => tapped = hint,
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byType(ActionChip));
+    await tester.pumpAndSettle();
+
+    expect(tapped, 'Do thing');
+  });
 }
