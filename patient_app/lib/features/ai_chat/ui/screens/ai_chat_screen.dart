@@ -16,6 +16,7 @@ import 'package:patient_app/features/ai_chat/ui/controllers/ai_chat_controller.d
 import 'package:patient_app/features/ai_chat/ui/widgets/chat_composer.dart';
 import 'package:patient_app/features/ai_chat/ui/widgets/chat_header.dart';
 import 'package:patient_app/features/ai_chat/ui/widgets/data_usage_banner.dart';
+import 'package:patient_app/features/ai_chat/ui/widgets/error_message_bubble.dart';
 import 'package:patient_app/features/ai_chat/ui/widgets/message_list.dart';
 import 'package:patient_app/features/capture_core/api/capture_mode.dart';
 import 'package:patient_app/features/capture_modes/voice/voice_capture_service.dart';
@@ -65,12 +66,10 @@ class AiChatScreen extends ConsumerWidget {
             recordTitle: recordId,
           ),
           if (state.errorMessage != null)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                state.errorMessage!,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
+            ErrorMessageBubble(
+              message: state.errorMessage!,
+              showRetry: true,
+              onRetry: () => controller.loadInitial(),
             ),
           Expanded(
             child: MessageList(
