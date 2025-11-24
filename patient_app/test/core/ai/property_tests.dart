@@ -275,6 +275,54 @@ void main() {
       expect(request.limitedHistory.first.id, 'm0'); // taking first 50 of 60
     });
   });
+
+  group('Property tests - message persistence', () {
+    test('SendChatMessageUseCase persists user + AI messages', () async {
+      final rand = Random(2025);
+      for (var i = 0; i < 5; i++) {
+        final repo = _InMemoryThreadRepo();
+        final threadId = 'thread_$i';
+        await repo.saveThread(
+          ChatThread(
+            id: threadId,
+            spaceId: 'space_${i % 3}',
+            messages: const [],
+            createdAt: DateTime(2025, 1, 1),
+          ),
+        );
+
+        final useCase = SendChatMessageUseCase(
+          aiChatService: _StubChatService(
+            ChatResponse.success(messageContent: 'ai response $i'),
+          ),
+          chatThreadRepository: repo,
+          consentRepository: _StubConsentRepo(true),
+          attachmentHandler: _NoopAttachmentHandler(),
+          uuid: const Uuid(),
+        );
+
+        final content = 'msg_${rand.nextInt(1000)}';
+        final aiMsg = await useCase.execute(
+          threadId: threadId,
+          spaceContext: SpaceContext(
+            spaceId: 'space_${i % 3}',
+            spaceName: 'Space',
+            persona: SpacePersona.general,
+          ),
+          messageContent: content,
+        );
+
+        final stored = await repo.getById(threadId);
+        expect(aiMsg.content, 'ai response $i');
+        expect(stored, isNotNull);
+        expect(stored!.messages.length, greaterThanOrEqualTo(2)); // user + AI
+        final userStored = stored.messages.firstWhere((m) => m.sender == MessageSender.user);
+        final aiStored = stored.messages.firstWhere((m) => m.sender == MessageSender.ai);
+        expect(userStored.content, content);
+        expect(aiStored.content, 'ai response $i');
+      }
+    });
+  });
 }
 
 class _StubChatService implements AiChatService {

@@ -353,7 +353,7 @@
   - Attempt to send messages
   - Assert AiConsentRequiredException thrown when consent=false
 
-- [ ]* 42. Write property-based test for message persistence
+- [x]* 42. Write property-based test for message persistence
   - **Property 4: Message Persistence**
   - **Validates: Requirements 3.5**
   - Generate random messages
@@ -478,5 +478,6 @@
   - Confirm AI chat can be disabled via feature flag
   - Verify performance targets met (< 500ms render, smooth scrolling)
   - Ask user if questions arise
+
 
 

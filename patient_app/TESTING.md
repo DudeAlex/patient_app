@@ -570,3 +570,8 @@
 - **Command**: `flutter test test/core/ai/property_tests.dart`
 - **Scope**: Ensures attachments strip local paths and message history trims to configured max.
 - **Result**: Pass on Windows.
+
+# 2025-11-23 (Chat message persistence property test)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Property loop verifying SendChatMessageUseCase persists user + AI messages into repository.
+- **Result**: Pass on Windows.
