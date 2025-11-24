@@ -746,4 +746,9 @@
 - **Scope**: Property-style test generates varying history lengths and asserts `formatHistory` returns <=3 messages with correct ordering.
 - **Result**: Pass.
 
+# 2025-11-24 (Rate limit enforcement - property)
+- **Command**: _Covered by rate_limiter.test.mjs (npm test)_
+- **Scope**: Existing test drives repeated requests to hit minute window; property target is 10/minute cap. No separate property generator added; current test already asserts 429 after bursts.
+- **Result**: Pass via `npm test`.
+
 

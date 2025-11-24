@@ -314,7 +314,7 @@
   - Build ChatRequest
   - Assert history contains at most 3 messages
 
-- [ ] 37. Write property-based test for rate limiting
+- [x] 37. Write property-based test for rate limiting
   - **Property 10: Rate Limit Enforcement**
   - **Validates: Requirements 5.1**
   - Send 11 requests in rapid succession
