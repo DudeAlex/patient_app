@@ -221,7 +221,7 @@
   - Provide methods for sending messages, clearing chat, switching context
   - _Requirements: 3.2, 3.3, 3.4, 9.1, 9.2, 9.3, 16.3_
 
-- [ ] 27. Create AiChatScreen
+- [x] 27. Create AiChatScreen
   - Create `lib/features/ai_chat/ui/screens/ai_chat_screen.dart`
   - Implement full-screen layout with header, message list, and composer
   - Pass Space ID and optional record ID as parameters
