@@ -681,4 +681,9 @@
 - **Scope**: Added ping script to probe models via Together. Apriel returns chain-of-thought/length-limited reply; openai/gpt-oss-20b returns a concise hello. Gemma-3n-e4b-it is not available (404 from Together).
 - **Result**: Gemma failed (unsupported), Apriel succeeded (length stop at 64 tokens), OSS 20b succeeded (stop).
 
+# 2025-11-24 (Model ping update)
+- **Command**: `node server/scripts/ping_model.mjs google/gemma-3n-E4B-it`
+- **Scope**: Retried friendly model with Together-supported id; returns concise hello successfully.
+- **Result**: Pass.
+
 

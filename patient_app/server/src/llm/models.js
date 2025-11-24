@@ -1,5 +1,5 @@
 export const MODEL_CATALOG = {
-  chatFriendly: 'gemma-3n-e4b-it',
+  chatFriendly: 'google/gemma-3n-E4B-it',
   chatReasoning: 'ServiceNow-AI/Apriel-1.5-15b-Thinker',
   // Fallback chat model (OSS via Together)
   chatFallback: 'openai/gpt-oss-20b',
