@@ -626,4 +626,9 @@
 - **Scope**: Starts a local HTTP echo server, verifies payload/headers/correlation ID, and checks HttpAiChatService parses the echo response end-to-end.
 - **Result**: Pass.
 
+# 2025-11-24 (Chat offline/online integration)
+- **Command**: `flutter test test/integration/ai_chat_offline_flow_test.dart`
+- **Scope**: Fakes connectivity to validate offline queueing in AiChatController/MessageQueueService, ensures offline indicator state, and auto-retries queued messages when connectivity returns.
+- **Result**: Pass.
+
 

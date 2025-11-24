@@ -125,7 +125,7 @@
   - Verify UI displays message
   - _Requirements: 10.1_
 
-- [ ] 15. Write integration test for offline/online flow
+- [x] 15. Write integration test for offline/online flow
   - Disable network
   - Send message
   - Verify message queued locally
