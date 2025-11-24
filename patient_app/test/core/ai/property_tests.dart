@@ -26,6 +26,8 @@ import 'package:patient_app/core/ai/chat/services/message_queue_service.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
 import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
+import 'package:patient_app/core/ai/chat/logging_ai_chat_service.dart';
+import 'package:patient_app/core/ai/repositories/ai_call_log_repository.dart';
 import 'package:uuid/uuid.dart';
 
 class _StubConsentRepo implements AiConsentRepository {
@@ -407,6 +409,29 @@ void main() {
         );
         expect(msg.content.length <= 500, isTrue);
       }
+    });
+  });
+
+  group('Property tests - logging completeness placeholders', () {
+    test('LoggingAiChatService populates AiCallLogRepository on send', () async {
+      final repo = AiCallLogRepository(maxEntries: 5);
+      final service = LoggingAiChatService(
+        _StubChatService(ChatResponse.success(messageContent: 'hi')),
+        callLogRepository: repo,
+      );
+      await service.sendMessage(ChatRequest(
+        threadId: 't-log',
+        messageContent: 'hello',
+        spaceContext: SpaceContext(
+          spaceId: 'health',
+          spaceName: 'Health',
+          persona: SpacePersona.health,
+        ),
+        messageHistory: const [],
+      ));
+
+      expect(repo.entries, isNotEmpty);
+      expect(repo.entries.first.provider, isNotEmpty);
     });
   });
 }

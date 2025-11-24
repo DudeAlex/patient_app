@@ -586,7 +586,14 @@
 - **Scope**: Ensures MessageQueueService retains messages when processing fails (placeholder for full backoff coverage).
 - **Result**: Pass on Windows.
 
-# 2025-11-23 (Markdown rendering property placeholder)
+## 2025-11-23 (Markdown rendering property placeholder)
 - **Command**: `flutter test test/core/ai/property_tests.dart`
 - **Scope**: Sanity check that AI chat markdown content stays under a length cap in property-style loop.
 - **Result**: Pass on Windows.
+
+## 2025-11-23 (Logging completeness property placeholder)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Ensures logging decorator writes AiCallLog entries on send.
+- **Result**: Pass on Windows.
+
+
