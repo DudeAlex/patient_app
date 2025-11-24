@@ -149,7 +149,7 @@
   - Track retry delays
   - Assert delays follow 1s, 2s, 4s pattern (±20%)
 
-- [ ] 18. Write property-based test for offline queuing
+- [x] 18. Write property-based test for offline queuing
   - **Property 12: Offline Message Queuing**
   - **Validates: Requirements 7.1, 7.2**
   - Simulate offline state

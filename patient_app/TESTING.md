@@ -641,4 +641,9 @@
 - **Scope**: Forces retryable failures in HttpAiChatService and asserts observed delays stay within ±20% jitter of 1s and 2s base backoff intervals.
 - **Result**: Pass.
 
+# 2025-11-24 (Property: Offline message queuing)
+- **Command**: `flutter test test/property/ai_chat_offline_queue_property_test.dart`
+- **Scope**: Uses fake connectivity to queue multiple offline chat messages via AiChatController/MessageQueueService and verifies they send automatically on reconnect.
+- **Result**: Pass.
+
 
