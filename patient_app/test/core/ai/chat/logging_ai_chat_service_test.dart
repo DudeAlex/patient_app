@@ -4,6 +4,8 @@ import 'package:patient_app/core/ai/chat/logging_ai_chat_service.dart';
 import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/models/ai_call_log_entry.dart';
+import 'package:patient_app/core/ai/repositories/ai_call_log_repository.dart';
 import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
 import 'package:patient_app/core/ai/models/ai_summary_result.dart';
 import 'package:patient_app/core/domain/entities/information_item.dart';
@@ -86,26 +88,30 @@ void main() {
     final delegate = _StubChatService(
       response: ChatResponse.success(
         messageContent: 'Hi back',
-        metadata: const AiMessageMetadata(
+        metadata: AiMessageMetadata(
           tokensUsed: 10,
           latencyMs: 20,
           provider: 'fake',
         ),
       ),
     );
-    final service = LoggingAiChatService(delegate);
+    final callLogRepo = AiCallLogRepository(maxEntries: 5);
+    final service = LoggingAiChatService(delegate, callLogRepository: callLogRepo);
 
     final result = await service.sendMessage(_request());
 
     expect(delegate.sendCalls, 1);
     expect(result.messageContent, 'Hi back');
+    expect(callLogRepo.entries, isNotEmpty);
+    expect(callLogRepo.entries.first.provider, 'fake');
   });
 
   test('delegates sendMessageStream and yields chunks', () async {
     final delegate = _StubChatService(
       stream: Stream.value(const ChatResponseChunk(content: 'partial', isComplete: true)),
     );
-    final service = LoggingAiChatService(delegate);
+    final callLogRepo = AiCallLogRepository();
+    final service = LoggingAiChatService(delegate, callLogRepository: callLogRepo);
 
     final chunks = await service.sendMessageStream(_request()).toList();
 
@@ -116,12 +122,16 @@ void main() {
 
   test('propagates errors from delegate', () async {
     final delegate = _StubChatService(toThrow: AiConsentRequiredException());
-    final service = LoggingAiChatService(delegate);
+    final callLogRepo = AiCallLogRepository(maxEntries: 5);
+    final service = LoggingAiChatService(delegate, callLogRepository: callLogRepo);
 
     expect(
       () => service.sendMessage(_request()),
       throwsA(isA<AiConsentRequiredException>()),
     );
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+    expect(callLogRepo.entries.length, 1);
+    expect(callLogRepo.entries.first.success, isFalse);
   });
 
   test('delegates summarizeItem', () async {
@@ -141,3 +151,4 @@ void main() {
     expect(result.provider, 'stub');
   });
 }
+

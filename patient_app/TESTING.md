@@ -540,3 +540,8 @@
 - **Command**: `flutter test test/core/ai/chat/http_ai_chat_service_test.dart`
 - **Scope**: Payload construction and redaction, success parsing, retry/backoff on 5xx, non-retryable 4xx failure, and timeout behavior.
 - **Result**: Pass on Windows.
+
+# 2025-11-23 (Logging AI chat service tests)
+- **Command**: `flutter test test/core/ai/chat/logging_ai_chat_service_test.dart`
+- **Scope**: Ensures decorator delegates send/stream, records call logs on success/failure, and preserves summarize behavior.
+- **Result**: Pass on Windows.

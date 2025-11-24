@@ -299,7 +299,7 @@
   - Mock HTTP client for isolation
   - _Requirements: 9.2, 9.3, 9.4, 9.5, 16.5_
 
-- [ ] 36. Write unit tests for LoggingAiChatService
+- [x] 36. Write unit tests for LoggingAiChatService
   - Test log entries are created for message send
   - Test log entries are created for AI response
   - Test operation tracking with startOperation/endOperation
