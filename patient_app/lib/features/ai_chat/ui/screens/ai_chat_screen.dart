@@ -9,11 +9,14 @@ import 'package:patient_app/core/ai/chat/chat_providers.dart';
 import 'package:patient_app/core/ai/chat/models/chat_message.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
+import 'package:patient_app/core/storage/attachments.dart';
 import 'package:patient_app/features/ai_chat/ui/controllers/ai_chat_controller.dart';
 import 'package:patient_app/features/ai_chat/ui/widgets/chat_composer.dart';
 import 'package:patient_app/features/ai_chat/ui/widgets/chat_header.dart';
 import 'package:patient_app/features/ai_chat/ui/widgets/data_usage_banner.dart';
 import 'package:patient_app/features/ai_chat/ui/widgets/message_list.dart';
+import 'package:patient_app/features/capture_core/api/capture_mode.dart';
+import 'package:patient_app/features/capture_modes/voice/voice_capture_service.dart';
 
 /// AI Chat screen composed of header, data banner, messages, and composer.
 class AiChatScreen extends ConsumerWidget {
@@ -85,7 +88,12 @@ class AiChatScreen extends ConsumerWidget {
               state,
               controller,
             ),
-            onVoiceTap: () {},
+            onVoiceTap: () => _handleVoiceAttachment(
+              context,
+              ref,
+              state,
+              controller,
+            ),
             onFileTap: () {},
             onRemoveAttachment: (att) => controller.removeAttachment(att.id),
           ),
@@ -195,6 +203,89 @@ class AiChatScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Unable to attach photo: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleVoiceAttachment(
+    BuildContext context,
+    WidgetRef ref,
+    AiChatState state,
+    AiChatController controller,
+  ) async {
+    if (state.thread == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Chat is still loading')),
+      );
+      return;
+    }
+
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    final accessibility =
+        MediaQuery.maybeOf(context)?.accessibleNavigation ?? false;
+
+    final captureService = VoiceCaptureService();
+    final captureContext = CaptureContext(
+      sessionId: state.thread!.id,
+      locale: locale,
+      isAccessibilityEnabled: accessibility,
+      withUiContext: <T>(action) async => action(context),
+      onProcessing: (isProcessing) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        if (isProcessing) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Transcribing voice note...'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      },
+    );
+
+    final outcome = await captureService.captureVoice(captureContext);
+    if (outcome == null) return;
+
+    try {
+      final file =
+          await AttachmentsStorage.resolveRelativePath(outcome.artifact.relativePath);
+      final handler = ref.read(messageAttachmentHandlerProvider);
+      await handler.validateAttachment(file, AttachmentType.voice);
+
+      final sizeBytes = await file.length();
+      final transcription = (outcome.artifact.metadata['analysis']
+              as Map<String, Object?>?)?['transcription'] as String?;
+
+      final attachment = await handler.processAttachment(
+        sourceFile: file,
+        type: AttachmentType.voice,
+        targetThreadId: state.thread!.id,
+      );
+
+      controller.addAttachment(
+        attachment.copyWith(
+          transcription: transcription,
+          fileSizeBytes: sizeBytes,
+        ),
+      );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Voice note attached')),
+        );
+      }
+    } catch (e, stackTrace) {
+      await AppLogger.error(
+        'Failed to attach voice note',
+        error: e,
+        stackTrace: stackTrace,
+        context: {'threadId': state.thread?.id},
+      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Unable to attach voice note: $e')),
         );
       }
     }
