@@ -66,6 +66,7 @@ Project Layout
 - Specs: see `SPEC.md` for detailed, living requirements
 - Strategy & compassionate AI roadmap: see `AI_ASSISTED_LIFE_COMPANION_PLAN.md`
 - Canonical terminology: see `GLOSSARY.md`
+- Backend (Stage 1 echo): lightweight Node/Express server in `server/` (`npm start`, defaults to http://localhost:3030/api/v1/chat/echo`) for HTTP foundation testing.
 
 Prerequisites
 - Flutter stable ≥ 3.32
