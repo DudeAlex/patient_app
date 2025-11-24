@@ -711,4 +711,9 @@
 - **Scope**: HttpAiChatService now targets `/api/v1/chat/message`, uses 60s timeout, and parses finishReason/usage/provider/latency into metadata (plus tokens).
 - **Result**: Tests not run; endpoint update pending integrated verification.
 
+# 2025-11-24 (ChatRequest history update)
+- **Command**: _Not run (model change only)_
+- **Scope**: ChatRequest now limits history to 3 messages by default and serializes history as role/content pairs.
+- **Result**: Tests not run; model serialization change only.
+
 

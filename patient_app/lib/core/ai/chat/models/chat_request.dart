@@ -13,7 +13,7 @@ class ChatRequest {
     required this.spaceContext,
     List<MessageAttachment> attachments = const [],
     List<ChatMessage> messageHistory = const [],
-    this.maxHistoryMessages = 10,
+    this.maxHistoryMessages = 3,
   })  : assert(threadId.trim().isNotEmpty, 'threadId cannot be empty'),
         assert(
           messageContent.trim().isNotEmpty || attachments.isNotEmpty,
@@ -62,10 +62,8 @@ class ChatRequest {
       'messageHistory': limitedHistory
           .map(
             (m) => {
-              'sender': m.sender.name,
+              'role': m.sender == MessageSender.ai ? 'assistant' : 'user',
               'content': m.content,
-              'timestamp': m.timestamp.toIso8601String(),
-              'actionHints': m.actionHints,
             },
           )
           .toList(),

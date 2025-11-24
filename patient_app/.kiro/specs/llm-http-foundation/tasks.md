@@ -250,7 +250,7 @@
   - Log token usage
   - _Requirements: 2.3, 2.4_
 
-- [ ] 29. Update ChatRequest model
+- [x] 29. Update ChatRequest model
   - Add messageHistory field
   - Add maxHistoryMessages field (default 3)
   - Update toJson() to include history
