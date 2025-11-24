@@ -280,7 +280,7 @@
   - Mock LLM API for isolation
   - _Requirements: 10.2_
 
-- [ ] 33. Write unit tests for rate limiting (Backend)
+- [x] 33. Write unit tests for rate limiting (Backend)
   - Test 10 requests/minute limit
   - Test 100 requests/hour limit
   - Test 500 requests/day limit
