@@ -646,4 +646,9 @@
 - **Scope**: Uses fake connectivity to queue multiple offline chat messages via AiChatController/MessageQueueService and verifies they send automatically on reconnect.
 - **Result**: Pass.
 
+# 2025-11-24 (Stage 1 manual/documentation sweep)
+- **Command**: _Manual/Review_
+- **Scope**: Verified Stage 1 coverage via automated suites: echo integration, offline/online flow, property-based echo/backoff/offline queue. Service switching and UI timeout handling still require device/interactive runs.
+- **Result**: Manual UI runs not executed in this environment; outstanding: run Settings service switch, long-delay echo timeout, and in-app offline indicator on device/emulator.
+
 
