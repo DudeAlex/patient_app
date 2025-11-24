@@ -1,9 +1,8 @@
 import crypto from 'crypto';
 import { LlmError, classifyLlmError } from './errors.js';
+import { resolveChatModel } from './models.js';
 
-const DEFAULT_MODEL =
-  process.env.TOGETHER_MODEL ??
-  'meta-llama/Meta-Llama-3-70B-Instruct-Turbo';
+const DEFAULT_MODEL = resolveChatModel(process.env.TOGETHER_MODEL);
 const DEFAULT_TIMEOUT_MS = Number.parseInt(
   process.env.LLM_TIMEOUT_MS ?? '60000',
   10,

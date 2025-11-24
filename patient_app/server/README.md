@@ -17,7 +17,7 @@ npm run dev
 
 Environment
 - `TOGETHER_API_KEY`: API key for Together AI (required for Stage 2 LLM calls)
-- `TOGETHER_MODEL`: Optional override for model id (default: Meta Llama 3 Turbo)
+- `TOGETHER_MODEL`: Optional override for chat model id (default: see model catalog)
 - `LLM_TIMEOUT_MS`: Optional request timeout in milliseconds (default: 60000)
 
 Server defaults to `http://localhost:3030`.
@@ -73,4 +73,5 @@ Stage 2 LLM foundation
 - `src/llm/errors.js` defines structured errors used by the client.
 - `src/llm/prompt_template.js` provides the base system prompt (v1.0) with placeholders for history and user message.
 - `src/llm/history_manager.js` formats conversation history (last 3 turns, role/content pairs) for prompts.
+- `src/llm/models.js` catalogs default model ids (chat primary/fallback, image) and resolves chat model with optional env override.
 - The HTTP endpoint for LLM chat will be added in a later task; the client is ready for integration.
