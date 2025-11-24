@@ -346,7 +346,7 @@
   - Open chat from record detail screens
   - Assert context includes record information
 
-- [ ]* 41. Write property-based test for consent enforcement
+- [x]* 41. Write property-based test for consent enforcement
   - **Property 3: Consent Enforcement**
   - **Validates: Requirements 1.5**
   - Generate random consent states

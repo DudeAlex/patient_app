@@ -555,3 +555,8 @@
 - **Command**: `flutter test test/core/ai/chat/application/use_cases`
 - **Scope**: Send/Load/Clear/Switch use cases: consent enforcement, attachment processing, error propagation, thread creation/sorting/clearing.
 - **Result**: Pass on Windows.
+
+# 2025-11-23 (Chat consent property test)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Property-style loop verifying SendChatMessageUseCase enforces consent across random states.
+- **Result**: Pass on Windows.

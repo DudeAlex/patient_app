@@ -1,5 +1,6 @@
-import 'dart:math';
 import 'dart:async';
+import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +13,18 @@ import 'package:patient_app/core/ai/models/ai_summary_result.dart';
 import 'package:patient_app/core/ai/repositories/ai_consent_repository.dart';
 import 'package:patient_app/core/domain/entities/information_item.dart';
 import 'package:patient_app/features/information_items/application/use_cases/summarize_information_item_use_case.dart';
+import 'package:patient_app/core/ai/chat/application/use_cases/send_chat_message_use_case.dart';
+import 'package:patient_app/core/ai/chat/models/chat_message.dart';
+import 'package:patient_app/core/ai/chat/models/chat_request.dart';
+import 'package:patient_app/core/ai/chat/models/chat_response.dart';
+import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
+import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
+import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
+import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
+import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
+import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
+import 'package:uuid/uuid.dart';
 
 class _StubConsentRepo implements AiConsentRepository {
   bool consent;
@@ -99,6 +112,133 @@ void main() {
     );
     expect(callCount, 3);
   });
+
+  group('Property tests - chat consent enforcement', () {
+    final threadId = 't1';
+    final spaceContext = SpaceContext(
+      spaceId: 'health',
+      spaceName: 'Health',
+      persona: SpacePersona.health,
+    );
+
+    ChatRequest request() => ChatRequest(
+          threadId: threadId,
+          messageContent: 'hi',
+          spaceContext: spaceContext,
+          messageHistory: [
+            ChatMessage(
+              id: 'm1',
+              threadId: threadId,
+              sender: MessageSender.user,
+              content: 'prev',
+              timestamp: DateTime.now(),
+            ),
+          ],
+        );
+
+    test('SendChatMessageUseCase throws when consent is false', () async {
+      final rand = Random(7);
+      for (var i = 0; i < 10; i++) {
+        final consent = rand.nextBool();
+        final consentRepo = _StubConsentRepo(consent);
+        final useCase = SendChatMessageUseCase(
+          aiChatService: _StubChatService(
+            ChatResponse.success(messageContent: 'hello'),
+          ),
+          chatThreadRepository: _InMemoryThreadRepo(),
+          consentRepository: consentRepo,
+          attachmentHandler: _NoopAttachmentHandler(),
+          uuid: const Uuid(),
+        );
+
+        if (!consent) {
+          expect(
+            () => useCase.execute(
+              threadId: threadId,
+              spaceContext: spaceContext,
+              messageContent: 'hello',
+            ),
+            throwsA(isA<AiConsentRequiredException>()),
+          );
+        } else {
+          final response = await useCase.execute(
+            threadId: threadId,
+            spaceContext: spaceContext,
+            messageContent: 'hello',
+          );
+          expect(response.content, 'hello');
+        }
+      }
+    });
+  });
+}
+
+class _StubChatService implements AiChatService {
+  _StubChatService(this._response);
+  final ChatResponse _response;
+  @override
+  Future<ChatResponse> sendMessage(ChatRequest request) async => _response;
+  @override
+  Stream<ChatResponseChunk> sendMessageStream(ChatRequest request) async* {
+    yield ChatResponseChunk(content: _response.messageContent, isComplete: true);
+  }
+
+  @override
+  Future<AiSummaryResult> summarizeItem(InformationItem item) {
+    return Future.value(AiSummaryResult.success(summaryText: 'ok', provider: 'stub'));
+  }
+}
+
+class _InMemoryThreadRepo implements ChatThreadRepository {
+  final Map<String, ChatThread> _store = {};
+  @override
+  Future<void> addMessage(String threadId, ChatMessage message) async {
+    final thread = _store[threadId];
+    if (thread == null) return;
+    _store[threadId] = thread.addMessage(message);
+  }
+
+  @override
+  Future<void> deleteThread(String threadId) async {
+    _store.remove(threadId);
+  }
+
+  @override
+  Future<ChatThread?> getById(String threadId) async => _store[threadId];
+
+  @override
+  Future<List<ChatThread>> getBySpaceId(String spaceId, {int limit = 20, int offset = 0}) async {
+    final threads = _store.values.where((t) => t.spaceId == spaceId).toList();
+    return threads.skip(offset).take(limit).toList();
+  }
+
+  @override
+  Future<void> saveThread(ChatThread thread) async {
+    _store[thread.id] = thread;
+  }
+
+  @override
+  Future<void> updateMessageContent(String threadId, String messageId, String content) async {}
+
+  @override
+  Future<void> updateMessageMetrics(String threadId, String messageId, {int? tokensUsed, int? latencyMs}) async {}
+
+  @override
+  Future<void> updateMessageStatus(String threadId, String messageId, MessageStatus status,
+      {String? errorMessage, String? errorCode, bool? errorRetryable}) async {}
+}
+
+class _NoopAttachmentHandler implements MessageAttachmentHandler {
+  @override
+  Future<MessageAttachment> processAttachment(
+          {required File sourceFile, required AttachmentType type, required String targetThreadId}) async =>
+      MessageAttachment(id: 'noop', type: type);
+
+  @override
+  Future<void> deleteAttachment(MessageAttachment attachment) async {}
+
+  @override
+  Future<void> validateAttachment(File file, AttachmentType type) async {}
 }
 
 class _ImmediateAiService implements AiService {
