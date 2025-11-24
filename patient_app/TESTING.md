@@ -525,3 +525,8 @@
 - **Command**: `flutter test test/core/ai/chat/models/chat_models_test.dart`
 - **Scope**: Validates MessageAttachment metadata serialization, ChatMessage invariants/copyWith, and ChatThread addMessage behavior.
 - **Result**: Pass on Windows.
+
+# 2025-11-23 (Chat thread repository contract tests)
+- **Command**: `flutter test test/core/ai/chat/repositories/chat_thread_repository_domain_test.dart`
+- **Scope**: Domain-level expectations for ChatThread immutability/order and copyWith behavior to support repository contract.
+- **Result**: Pass on Windows.

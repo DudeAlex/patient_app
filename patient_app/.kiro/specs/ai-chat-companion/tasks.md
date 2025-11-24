@@ -273,7 +273,7 @@
   - Test ChatRequest and ChatResponse serialization
   - _Requirements: 1.2, 1.3, 3.5, 14.1, 14.2, 14.3, 14.4, 14.5_
 
-- [ ] 33. Write unit tests for repositories
+- [x] 33. Write unit tests for repositories
   - Test ChatThreadRepository CRUD operations
   - Test message querying and filtering
   - Test thread persistence and retrieval
