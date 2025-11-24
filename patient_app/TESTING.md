@@ -673,7 +673,7 @@
 
 # 2025-11-24 (Model catalog)
 - **Command**: _Not run (catalog/config only)_
-- **Scope**: Added `server/src/llm/models.js` to catalog default chat/image models and resolve chat model with optional env override; `TogetherClient` now consumes the resolver.
+- **Scope**: Added `server/src/llm/models.js` to catalog default chat/image models (friendly Gemma-3n-E4B-it, reasoning Apriel-1.5-15B-Thinker, fallback) and resolve chat model with optional env override; `TogetherClient` now consumes the resolver.
 - **Result**: Tests not run; config change only.
 
 
