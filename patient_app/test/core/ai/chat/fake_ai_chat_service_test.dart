@@ -68,6 +68,37 @@ void main() {
     expect(response.metadata.tokensUsed, greaterThan(0));
   });
 
+  test('education persona focuses on study guidance', () async {
+    final service = buildService();
+    final response = await service.sendMessage(
+      buildRequest(persona: SpacePersona.education, message: 'Need study plan'),
+    );
+
+    expect(response.isSuccess, isTrue);
+    expect(
+      response.messageContent.toLowerCase(),
+      allOf(contains('study'), contains('plan')),
+    );
+    expect(
+      response.actionHints.join(' ').toLowerCase(),
+      anyOf(contains('schedule'), contains('assignment')),
+    );
+  });
+
+  test('travel persona suggests itinerary-style actions', () async {
+    final service = buildService();
+    final response = await service.sendMessage(
+      buildRequest(persona: SpacePersona.travel, message: 'Plan a trip to Spain'),
+    );
+
+    expect(response.isSuccess, isTrue);
+    expect(response.actionHints, isNotEmpty);
+    expect(
+      response.actionHints.join(' ').toLowerCase(),
+      anyOf(contains('itinerary'), contains('booking')),
+    );
+  });
+
   test('streams response chunks and marks completion', () async {
     final service = buildService();
     final request = buildRequest(message: 'Plan trip soon');

@@ -530,3 +530,8 @@
 - **Command**: `flutter test test/core/ai/chat/repositories/chat_thread_repository_domain_test.dart`
 - **Scope**: Domain-level expectations for ChatThread immutability/order and copyWith behavior to support repository contract.
 - **Result**: Pass on Windows.
+
+# 2025-11-23 (Fake AI chat persona tests)
+- **Command**: `flutter test test/core/ai/chat/fake_ai_chat_service_test.dart`
+- **Scope**: Persona-specific responses/action hints (health, finance, education, travel), streaming completion, deterministic summaries.
+- **Result**: Pass on Windows.

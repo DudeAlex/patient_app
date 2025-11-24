@@ -280,7 +280,7 @@
   - Mock Isar for isolation
   - _Requirements: 10.3, 10.4_
 
-- [ ] 34. Write unit tests for FakeAiChatService
+- [x] 34. Write unit tests for FakeAiChatService
   - Test deterministic responses for each Space persona
   - Test Health persona: empathetic tone, safety disclaimers
   - Test Education persona: study-focused suggestions
