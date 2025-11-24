@@ -661,4 +661,9 @@
 - **Scope**: Added Together AI client with timeout and error classification in the Node server; no runnable endpoint yet. To verify later: call future `/api/v1/chat/message` with mock key and ensure timeouts/errors are classified correctly.
 - **Result**: Tests not run for this change (no endpoint exposed yet).
 
+# 2025-11-24 (Stage 2 system prompt template)
+- **Command**: _Not run (prompt template only)_
+- **Scope**: Added `server/src/llm/prompt_template.js` with v1.0 system prompt including placeholders for history and user message; updated README.
+- **Result**: Tests not run; template change only.
+
 

@@ -187,7 +187,7 @@
   - Implement error classification
   - _Requirements: 2.1, 2.5_
 
-- [ ] 22. Create system prompt template (Backend)
+- [x] 22. Create system prompt template (Backend)
   - Create prompt template file
   - Define base system instructions
   - Add guidelines for AI behavior
