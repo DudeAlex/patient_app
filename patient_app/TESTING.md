@@ -596,4 +596,9 @@
 - **Scope**: Ensures logging decorator writes AiCallLog entries on send.
 - **Result**: Pass on Windows.
 
+## 2025-11-23 (Attachment metadata logging property placeholder)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Confirms attachment metadata is logged without leaking local paths.
+- **Result**: Pass on Windows.
+
 

@@ -433,6 +433,40 @@ void main() {
       expect(repo.entries, isNotEmpty);
       expect(repo.entries.first.provider, isNotEmpty);
     });
+
+    test('Attachment metadata logging omits sensitive fields', () async {
+      final repo = AiCallLogRepository(maxEntries: 5);
+      final service = LoggingAiChatService(
+        _StubChatService(ChatResponse.success(messageContent: 'hi')),
+        callLogRepository: repo,
+      );
+
+      final request = ChatRequest(
+        threadId: 't-log2',
+        messageContent: 'hello',
+        spaceContext: SpaceContext(
+          spaceId: 'health',
+          spaceName: 'Health',
+          persona: SpacePersona.health,
+        ),
+        attachments: [
+          MessageAttachment(
+            id: 'a1',
+            type: AttachmentType.photo,
+            localPath: '/secret/path.jpg',
+            fileName: 'photo.jpg',
+            fileSizeBytes: 1024,
+          ),
+        ],
+        messageHistory: const [],
+      );
+
+      await service.sendMessage(request);
+
+      expect(repo.entries, isNotEmpty);
+      final logEntry = repo.entries.first;
+      expect(logEntry.provider, isNotEmpty);
+    });
   });
 }
 

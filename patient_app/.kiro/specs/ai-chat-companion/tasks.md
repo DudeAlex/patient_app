@@ -422,7 +422,7 @@
   - Check logs
   - Assert log entries exist with correct metadata (not content)
 
-- [ ]* 52. Write property-based test for attachment metadata logging
+- [x]* 52. Write property-based test for attachment metadata logging
   - **Property 14: Attachment Metadata Logging**
   - **Validates: Requirements 18.3**
   - Send messages with random attachments
@@ -478,6 +478,7 @@
   - Confirm AI chat can be disabled via feature flag
   - Verify performance targets met (< 500ms render, smooth scrolling)
   - Ask user if questions arise
+
 
 
 
