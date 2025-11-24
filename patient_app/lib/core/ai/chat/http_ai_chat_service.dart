@@ -27,13 +27,15 @@ class HttpAiChatService implements AiChatService {
     this.timeout = const Duration(seconds: 30),
     this.maxRetries = 3,
     Connectivity? connectivity,
-  }) : _connectivity = connectivity ?? Connectivity();
+    Future<List<ConnectivityResult>> Function()? connectivityCheck,
+  })  : _connectivityCheck =
+            connectivityCheck ?? (() => (connectivity ?? Connectivity()).checkConnectivity());
 
   final http.Client client;
   final String baseUrl;
   final Duration timeout;
   final int maxRetries;
-  final Connectivity _connectivity;
+  final Future<List<ConnectivityResult>> Function() _connectivityCheck;
   final Uuid _uuid = const Uuid();
   final Random _random = Random();
 
@@ -204,7 +206,7 @@ class HttpAiChatService implements AiChatService {
   }
 
   Future<void> _ensureOnline() async {
-    final results = await _connectivity.checkConnectivity();
+    final results = await _connectivityCheck();
     if (results.every((result) => result == ConnectivityResult.none)) {
       throw NetworkException();
     }
