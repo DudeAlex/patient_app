@@ -756,4 +756,9 @@
 - **Scope**: Need manual verification of live LLM endpoint with Together key, conversation continuity, history truncation, token usage logging, and rate limiting behavior.
 - **Result**: Not run here; to be executed on device/server.
 
+# 2025-11-24 (Stage 2 checkpoint)
+- **Command**: `cd server && npm test`
+- **Scope**: Full Node test suite covering LLM helpers, rate limiter, chat endpoint integration, LLM response validity, history limit enforcement.
+- **Result**: Pass.
+
 
