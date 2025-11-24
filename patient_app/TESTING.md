@@ -601,4 +601,9 @@
 - **Scope**: Confirms attachment metadata is logged without leaking local paths.
 - **Result**: Pass on Windows.
 
+## 2025-11-23 (Message list lazy-load/perf property tests)
+- **Command**: `flutter test test/features/ai_chat/ui/widgets/message_list_property_test.dart`
+- **Scope**: Asserts MessageList never renders above its initialVisibleCount cap and builds within 500ms for 100 messages.
+- **Result**: Pass on Windows.
+
 
