@@ -307,7 +307,7 @@
   - Test message content redaction
   - _Requirements: 18.1, 18.2, 18.3, 18.4_
 
-- [ ] 37. Write unit tests for use cases
+- [x] 37. Write unit tests for use cases
   - Test SendChatMessageUseCase consent checking
   - Test SendChatMessageUseCase message persistence
   - Test SendChatMessageUseCase attachment processing

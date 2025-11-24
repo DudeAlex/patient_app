@@ -550,3 +550,8 @@
 - **Command**: `flutter test test/features/ai_chat/ui/widgets`
 - **Scope**: Chat UI components (header, banner, message bubble, list lazy load/auto-scroll, composer, attachment previews, action hints) regression coverage.
 - **Result**: Pass on Windows.
+
+# 2025-11-23 (Chat use case tests)
+- **Command**: `flutter test test/core/ai/chat/application/use_cases`
+- **Scope**: Send/Load/Clear/Switch use cases: consent enforcement, attachment processing, error propagation, thread creation/sorting/clearing.
+- **Result**: Pass on Windows.
