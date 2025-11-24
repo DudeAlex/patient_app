@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 
@@ -69,6 +71,13 @@ class _ChatComposerState extends State<ChatComposer> {
                   .map(
                     (att) => InputChip(
                       key: ValueKey('attachment_${att.id}'),
+                      avatar: att.type == AttachmentType.photo &&
+                              att.localPath != null &&
+                              File(att.localPath!).existsSync()
+                          ? CircleAvatar(
+                              backgroundImage: FileImage(File(att.localPath!)),
+                            )
+                          : null,
                       label: Text(att.fileName ?? att.type.name),
                       onDeleted: widget.onRemoveAttachment != null
                           ? () => widget.onRemoveAttachment!(att)

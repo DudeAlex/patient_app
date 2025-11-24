@@ -1,10 +1,14 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
 import 'package:patient_app/core/ai/chat/chat_providers.dart';
 import 'package:patient_app/core/ai/chat/models/chat_message.dart';
+import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
+import 'package:patient_app/core/diagnostics/app_logger.dart';
 import 'package:patient_app/features/ai_chat/ui/controllers/ai_chat_controller.dart';
 import 'package:patient_app/features/ai_chat/ui/widgets/chat_composer.dart';
 import 'package:patient_app/features/ai_chat/ui/widgets/chat_header.dart';
@@ -75,7 +79,12 @@ class AiChatScreen extends ConsumerWidget {
             isOffline: state.isOffline,
             attachments: state.attachments,
             onSend: controller.sendMessage,
-            onPhotoTap: () {},
+            onPhotoTap: () => _handlePhotoAttachment(
+              context,
+              ref,
+              state,
+              controller,
+            ),
             onVoiceTap: () {},
             onFileTap: () {},
             onRemoveAttachment: (att) => controller.removeAttachment(att.id),
@@ -91,5 +100,103 @@ class AiChatScreen extends ConsumerWidget {
     if (provider.contains('fake')) return ChatHeaderStatus.fake;
     if (provider.contains('http')) return ChatHeaderStatus.remote;
     return ChatHeaderStatus.offline;
+  }
+
+  Future<void> _handlePhotoAttachment(
+    BuildContext context,
+    WidgetRef ref,
+    AiChatState state,
+    AiChatController controller,
+  ) async {
+    if (state.isOffline) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Offline - cannot attach photos')),
+      );
+      return;
+    }
+    if (state.thread == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Chat is still loading')),
+      );
+      return;
+    }
+
+    final picker = ImagePicker();
+    final xfile = await picker.pickImage(source: ImageSource.camera);
+    if (xfile == null) return;
+
+    final file = File(xfile.path);
+    final handler = ref.read(messageAttachmentHandlerProvider);
+
+    try {
+      await handler.validateAttachment(file, AttachmentType.photo);
+    } catch (e, stackTrace) {
+      await AppLogger.error(
+        'Photo attachment validation failed',
+        error: e,
+        stackTrace: stackTrace,
+        context: {'path': file.path},
+      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Photo too large or invalid: $e')),
+        );
+      }
+      return;
+    }
+
+    final sizeBytes = await file.length();
+    final sizeMb = (sizeBytes / (1024 * 1024)).toStringAsFixed(1);
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Attach photo to AI chat?'),
+        content: Text(
+          'This photo (~$sizeMb MB) will be added to your chat and may be '
+          'sent to the AI provider when you send the message. The original '
+          'file stays on your device.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Attach'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) {
+      return;
+    }
+
+    try {
+      final attachment = await handler.processAttachment(
+        sourceFile: file,
+        type: AttachmentType.photo,
+        targetThreadId: state.thread!.id,
+      );
+      controller.addAttachment(attachment);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Photo attached')),
+        );
+      }
+    } catch (e, stackTrace) {
+      await AppLogger.error(
+        'Failed to attach photo',
+        error: e,
+        stackTrace: stackTrace,
+        context: {'threadId': state.thread?.id},
+      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Unable to attach photo: $e')),
+        );
+      }
+    }
   }
 }

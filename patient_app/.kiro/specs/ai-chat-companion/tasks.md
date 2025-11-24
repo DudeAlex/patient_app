@@ -188,7 +188,7 @@
   - Show "Offline - cannot send" hint when offline
   - _Requirements: 3.1, 4.1, 5.1, 6.1, 9.3, 16.4_
 
-- [ ] 23. Implement photo picker integration
+- [x] 23. Implement photo picker integration
   - Integrate with existing photo capture functionality from M5
   - Show thumbnail preview in composer
   - Validate file size before attaching

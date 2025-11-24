@@ -490,3 +490,8 @@
 - **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
 - **Scope**: AiChatScreen renders with header, message list, and composer using stubbed dependencies.
 - **Result**: Pass on Windows; confirms chat UI and DI wiring build after nav updates.
+
+# 2025-11-23 (AI Chat Screen - photo attach update)
+- **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
+- **Scope**: Regression check after adding photo attachment flow and composer thumbnail avatars.
+- **Result**: Pass on Windows; chat UI still builds with new photo hooks present.
