@@ -741,4 +741,9 @@
 - **Scope**: Property-style test stubs TogetherClient, sends random messages through `/api/v1/chat/message`, and asserts non-empty message + usage metadata.
 - **Result**: Pass.
 
+# 2025-11-24 (Property: History limit enforcement)
+- **Command**: `cd server && npm test`
+- **Scope**: Property-style test generates varying history lengths and asserts `formatHistory` returns <=3 messages with correct ordering.
+- **Result**: Pass.
+
 

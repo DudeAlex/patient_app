@@ -307,7 +307,7 @@
   - Assert response contains non-empty message
   - Assert response contains valid token usage
 
-- [ ] 36. Write property-based test for history limit
+- [x] 36. Write property-based test for history limit
   - **Property 7: History Limit Enforcement**
   - **Validates: Requirements 3.3**
   - Generate chat threads with varying message counts (0-10)
