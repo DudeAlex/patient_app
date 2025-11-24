@@ -666,4 +666,9 @@
 - **Scope**: Added `server/src/llm/prompt_template.js` with v1.0 system prompt including placeholders for history and user message; updated README.
 - **Result**: Tests not run; template change only.
 
+# 2025-11-24 (Stage 2 history manager)
+- **Command**: _Not run (utility only)_
+- **Scope**: Added `server/src/llm/history_manager.js` to format the last 3 turns of conversation into role/content pairs for prompts; updated README.
+- **Result**: Tests not run; helper added for upcoming endpoint wiring.
+
 

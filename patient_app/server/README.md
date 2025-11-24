@@ -72,4 +72,5 @@ Stage 2 LLM foundation
 - `src/llm/together_client.js` implements a thin Together AI chat client with 60s timeout, correlation IDs, and error classification (auth/429/server/timeout).
 - `src/llm/errors.js` defines structured errors used by the client.
 - `src/llm/prompt_template.js` provides the base system prompt (v1.0) with placeholders for history and user message.
+- `src/llm/history_manager.js` formats conversation history (last 3 turns, role/content pairs) for prompts.
 - The HTTP endpoint for LLM chat will be added in a later task; the client is ready for integration.
