@@ -332,24 +332,24 @@
       - Dismiss file picker without selecting a file
       - Expected: Return to launcher without error message
       - Result: [Pending manual verification]
-    
+
     - **Test 2: File size exceeded**
       - Create a test file > 50 MB
       - Open capture launcher → tap "Upload File"
       - Select the large file
       - Expected: Error snackbar "File too large (X MB). Maximum size is 50 MB."
       - Result: [Pending manual verification]
-    
+
     - **Test 3: File access error**
       - Attempt to select a file with restricted permissions
       - Expected: Error snackbar "Could not access selected file"
       - Result: [Pending manual verification]
-    
+
     - **Test 4: Copy failure**
       - Simulate storage full or permission issue during copy
       - Expected: Error snackbar "Failed to copy file: [exception details]"
       - Result: [Pending manual verification]
-    
+
     - **Test 5: Successful upload after error**
       - Trigger an error (e.g., cancel picker)
       - Retry with valid file
@@ -376,25 +376,25 @@
       - Upload file → verify exists at `attachments/sessions/<sessionId>/file_<timestamp>_<name>`
       - Verify timestamped filename format
       - Verify file size matches original
-    
+
     - **Test 2: Original file preservation**
       - Upload file → verify source file still exists
       - Verify source file unchanged
-    
+
     - **Test 3: Record-attachment linking**
       - Upload and save → verify attachment.recordId matches record.id
       - Verify attachment appears in record detail view
       - Verify database relationship queryable
-    
+
     - **Test 4: Metadata completeness**
       - Upload PDF → verify kind="pdf", mimeType="application/pdf"
       - Upload JPEG → verify kind="image", mimeType="image/jpeg"
       - Verify sizeBytes, capturedAt, source="file", metadataJson populated
-    
+
     - **Test 5: Multiple uploads**
       - Upload multiple files in same session
       - Verify unique timestamped filenames (no collision)
-    
+
     - **Test 6: Persistence after restart**
       - Upload and save → restart app
       - Verify attachment still accessible
@@ -485,3 +485,8 @@
 - **Command**: `flutter test test/core/ai/property_tests.dart`
 - **Scope**: Summary length/hints constraints, consent enforcement, HTTP retry behavior.
 - **Result**: ✅ All property-based checks pass; constraints verified across randomized inputs.
+
+# 2025-11-23 (AI Chat Screen)
+- **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
+- **Scope**: AiChatScreen renders with header, message list, and composer using stubbed dependencies.
+- **Result**: Pass on Windows; confirms chat UI and DI wiring build after nav updates.

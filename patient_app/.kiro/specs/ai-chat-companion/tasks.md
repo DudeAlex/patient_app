@@ -234,7 +234,7 @@
   - Implement smooth scrolling to latest message
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 8.4, 20.1_
 
-- [ ] 28. Add AI icon to app navigation
+- [x] 28. Add AI icon to app navigation
   - Add AI icon to app bar or bottom navigation
   - Pass current Space ID when opening chat
   - Pass current record ID if on record detail screen

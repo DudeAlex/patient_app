@@ -3,8 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/ai/ai_config.dart';
+import '../../../core/ai/repositories/ai_config_repository.dart';
 import '../../../core/diagnostics/app_logger.dart';
+import '../../../core/di/app_container.dart';
 import '../../information_items/ui/widgets/information_item_summary_sheet.dart';
+import '../../ai_chat/ui/screens/ai_chat_screen.dart';
 import '../model/attachment.dart';
 import '../model/record_types.dart';
 import '../domain/entities/record.dart';
@@ -104,11 +108,48 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     final containerColor = theme.colorScheme.surfaceContainerHighest;
     final dateFormatter = DateFormat.yMMMMd();
     final dateTimeFormatter = DateFormat.yMMMMd().add_jm();
+    final aiConfigRepository =
+        AppContainer.instance.resolve<AiConfigRepository>();
+    final spaceProvider = context.watch<SpaceProvider>();
+    final spaceId = spaceProvider.currentSpace?.id ?? 'health';
 
     return Scaffold(
       appBar: AppBar(
         title: Text(_title),
         actions: [
+          // AI chat entry (hidden when ai_enabled=false)
+          StreamBuilder<AiConfig>(
+            stream: aiConfigRepository.stream,
+            initialData: aiConfigRepository.current,
+            builder: (context, snapshot) {
+              final aiEnabled = snapshot.data?.enabled ?? false;
+              if (!aiEnabled) return const SizedBox.shrink();
+              return IconButton(
+                icon: const Icon(Icons.smart_toy_outlined),
+                tooltip: 'AI chat',
+                onPressed: () {
+                  AppLogger.logNavigation(
+                    'RecordDetailScreen',
+                    'AiChatScreen',
+                    context: {
+                      'recordId': record.id,
+                      'spaceId': spaceId,
+                    },
+                  );
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => riverpod.ProviderScope(
+                        child: AiChatScreen(
+                          spaceId: spaceId,
+                          recordId: record.id.toString(),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.psychology_alt_outlined),
             tooltip: 'AI summary',
