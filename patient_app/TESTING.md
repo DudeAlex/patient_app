@@ -616,4 +616,9 @@
 - **Scope**: Validates echo payload build, correlation ID header, retry/backoff behaviour, non-retryable error classification, and timeout handling with injected connectivity.
 - **Result**: Pass.
 
+# 2025-11-24 (MessageQueueService unit tests)
+- **Command**: `flutter test test/core/ai/chat/services/message_queue_service_test.dart`
+- **Scope**: Ensures offline queue persistence (attachments stripped of localPath), successful dequeue removes items, failed sends remain queued, and expired entries (older than 7 days) are purged on load.
+- **Result**: Pass.
+
 
