@@ -68,7 +68,7 @@
   - Add start() and stop() lifecycle methods
   - _Requirements: 7.2, 7.3_
 
-- [ ] 8. Create offline indicator UI
+- [x] 8. Create offline indicator UI
   - Update ChatHeader widget to show offline status
   - Add offline pill to status indicator
   - Disable send button when offline

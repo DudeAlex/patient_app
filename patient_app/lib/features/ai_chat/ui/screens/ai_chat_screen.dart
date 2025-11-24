@@ -47,7 +47,7 @@ class AiChatScreen extends ConsumerWidget {
       appBar: ChatHeader(
         spaceName: state.spaceContext?.spaceName ?? spaceId,
         spaceIcon: Icons.chat_bubble_outline,
-        status: _statusFor(ref.read(aiChatServiceProvider)),
+        status: _statusFor(state.isOffline, ref.read(aiChatServiceProvider)),
         onClearChat: controller.clearChat,
         onChangeContext: () {},
       ),
@@ -108,8 +108,9 @@ class AiChatScreen extends ConsumerWidget {
     );
   }
 
-  ChatHeaderStatus _statusFor(AiChatService service) {
-    // Simple heuristic: use Fake vs Remote vs Offline.
+  ChatHeaderStatus _statusFor(bool isOffline, AiChatService service) {
+    if (isOffline) return ChatHeaderStatus.offline;
+    // Simple heuristic: use Fake vs Remote.
     final provider = service.runtimeType.toString().toLowerCase();
     if (provider.contains('fake')) return ChatHeaderStatus.fake;
     if (provider.contains('http')) return ChatHeaderStatus.remote;

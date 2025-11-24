@@ -18,6 +18,7 @@ import 'package:patient_app/core/ai/repositories/ai_consent_repository.dart';
 import 'package:patient_app/core/di/app_container.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
 import 'package:patient_app/core/ai/chat/services/message_queue_service.dart';
+import 'package:patient_app/core/ai/chat/services/connectivity_monitor.dart';
 
 /// Riverpod controller handling AI chat state for a given space.
 class AiChatController extends StateNotifier<AiChatState> {
@@ -30,6 +31,7 @@ class AiChatController extends StateNotifier<AiChatState> {
     required ChatThreadRepository chatThreadRepository,
     required SpaceContextBuilder spaceContextBuilder,
     required MessageQueueService messageQueueService,
+    required ConnectivityMonitor connectivityMonitor,
   })  : _sendChatMessageUseCase = sendChatMessageUseCase,
         _loadChatHistoryUseCase = loadChatHistoryUseCase,
         _clearChatThreadUseCase = clearChatThreadUseCase,
@@ -37,6 +39,7 @@ class AiChatController extends StateNotifier<AiChatState> {
         _chatThreadRepository = chatThreadRepository,
         _spaceContextBuilder = spaceContextBuilder,
         _messageQueueService = messageQueueService,
+        _connectivityMonitor = connectivityMonitor,
         super(AiChatState.loading()) {
     loadInitial();
   }
@@ -49,6 +52,7 @@ class AiChatController extends StateNotifier<AiChatState> {
   final ChatThreadRepository _chatThreadRepository;
   final SpaceContextBuilder _spaceContextBuilder;
   final MessageQueueService _messageQueueService;
+  final ConnectivityMonitor _connectivityMonitor;
 
   Future<void> loadInitial() async {
     state = state.copyWith(isLoading: true, errorMessage: null);
@@ -69,6 +73,16 @@ class AiChatController extends StateNotifier<AiChatState> {
       );
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
+  }
+
+  @override
+  void dispose() {
+    _connectivityMonitor.stop();
+    super.dispose();
+  }
+
+  Future<void> startConnectivityMonitoring() {
+    return _connectivityMonitor.start();
   }
 
   void setOffline(bool isOffline) {
@@ -209,6 +223,11 @@ final aiChatControllerProvider = StateNotifierProvider.family<AiChatController, 
       chatThreadRepository: chatRepo,
       preferences: container.resolve(),
     );
+    late final AiChatController controller;
+    final connectivityMonitor = ConnectivityMonitor(
+      messageQueueService: queueService,
+      onStatusChanged: (isOffline) => controller.setOffline(isOffline),
+    );
     final spaceBuilder = ref.read(spaceContextBuilderProvider);
     final switchUseCase = SwitchSpaceContextUseCase(
       loadChatHistoryUseCase: loadUseCase,
@@ -216,7 +235,7 @@ final aiChatControllerProvider = StateNotifierProvider.family<AiChatController, 
       spaceContextBuilder: spaceBuilder,
     );
 
-    return AiChatController(
+    controller = AiChatController(
       spaceId: spaceId,
       sendChatMessageUseCase: sendUseCase,
       loadChatHistoryUseCase: loadUseCase,
@@ -225,7 +244,10 @@ final aiChatControllerProvider = StateNotifierProvider.family<AiChatController, 
       chatThreadRepository: chatRepo,
       spaceContextBuilder: spaceBuilder,
       messageQueueService: queueService,
+      connectivityMonitor: connectivityMonitor,
     );
+    controller.startConnectivityMonitoring();
+    return controller;
   },
 );
 
