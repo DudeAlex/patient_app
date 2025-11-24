@@ -520,3 +520,8 @@
 - **Command**: (documentation-only change, no tests run)
 - **Scope**: Clarified that chat threads and chat attachment files/metadata are included in the encrypted Drive backup/restore flow.
 - **Result**: Not applicable (docs update).
+
+# 2025-11-23 (Chat domain model tests)
+- **Command**: `flutter test test/core/ai/chat/models/chat_models_test.dart`
+- **Scope**: Validates MessageAttachment metadata serialization, ChatMessage invariants/copyWith, and ChatThread addMessage behavior.
+- **Result**: Pass on Windows.

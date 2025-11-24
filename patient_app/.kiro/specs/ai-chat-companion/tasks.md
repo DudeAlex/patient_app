@@ -265,7 +265,7 @@
   - Implement restore functionality for chat threads
   - _Requirements: 10.5_
 
-- [ ] 32. Write unit tests for domain models
+- [x] 32. Write unit tests for domain models
   - Test ChatMessage immutability and JSON serialization
   - Test ChatThread message addition and ordering
   - Test MessageAttachment validation
