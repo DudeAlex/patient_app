@@ -580,3 +580,8 @@
 - **Command**: `flutter test test/core/ai/property_tests.dart`
 - **Scope**: Property loop verifying Fake AI health persona avoids prescriptive language and includes safety reminders.
 - **Result**: Pass on Windows.
+
+# 2025-11-23 (Offline queue/backoff property placeholder)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Ensures MessageQueueService retains messages when processing fails (placeholder for full backoff coverage).
+- **Result**: Pass on Windows.

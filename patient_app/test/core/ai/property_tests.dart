@@ -22,6 +22,7 @@ import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
+import 'package:patient_app/core/ai/chat/services/message_queue_service.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
 import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
@@ -349,6 +350,46 @@ void main() {
         expect(content.contains('medical advice'), isTrue,
             reason: 'include safety-first reminder');
       }
+    });
+  });
+
+  group('Property tests - offline queue and backoff placeholders', () {
+    test('MessageQueueService keeps messages when processing fails', () async {
+      final repo = _InMemoryThreadRepo();
+      await repo.saveThread(ChatThread(
+        id: 't-queue',
+        spaceId: 'space',
+        messages: const [],
+        createdAt: DateTime(2025, 1, 1),
+      ));
+
+      final failingUseCase = SendChatMessageUseCase(
+        aiChatService: _StubChatService(
+          ChatResponse.success(messageContent: 'ok'),
+        ),
+        chatThreadRepository: repo,
+        consentRepository: _StubConsentRepo(true),
+        attachmentHandler: _NoopAttachmentHandler(),
+        uuid: const Uuid(),
+      );
+
+      final queue = MessageQueueService(
+        sendChatMessageUseCase: failingUseCase,
+        chatThreadRepository: repo,
+      );
+
+      await queue.enqueue(
+        threadId: 't-queue',
+        spaceContext: SpaceContext(
+          spaceId: 'space',
+          spaceName: 'Space',
+          persona: SpacePersona.general,
+        ),
+        content: 'queued',
+        attachments: const [],
+      );
+
+      expect(queue.pendingCount, 1);
     });
   });
 }

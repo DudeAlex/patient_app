@@ -394,14 +394,14 @@
   - Build chat requests
   - Assert message history doesn't exceed configured maximum
 
-- [ ]* 48. Write property-based test for offline message queuing
+- [x]* 48. Write property-based test for offline message queuing
   - **Property 10: Offline Message Queuing**
   - **Validates: Requirements 16.1, 16.2**
   - Simulate offline state
   - Send messages
   - Assert messages are queued and retried when online
 
-- [ ]* 49. Write property-based test for exponential backoff
+- [x]* 49. Write property-based test for exponential backoff
   - **Property 11: Exponential Backoff**
   - **Validates: Requirements 16.5**
   - Simulate multiple failures
@@ -478,6 +478,7 @@
   - Confirm AI chat can be disabled via feature flag
   - Verify performance targets met (< 500ms render, smooth scrolling)
   - Ask user if questions arise
+
 
 
 
