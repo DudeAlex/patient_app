@@ -299,7 +299,7 @@
   - Verify UI displays message
   - _Requirements: 10.2_
 
-- [ ] 35. Write property-based test for LLM response validity
+- [x] 35. Write property-based test for LLM response validity
   - **Property 5: LLM Response Validity**
   - **Validates: Requirements 2.3**
   - Generate random messages

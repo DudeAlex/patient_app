@@ -736,4 +736,9 @@
 - **Scope**: Added integration test that stubs TogetherClient, hits `/api/v1/chat/message`, and asserts response/message/metadata fields.
 - **Result**: Pass.
 
+# 2025-11-24 (Property: LLM response validity)
+- **Command**: `cd server && npm test`
+- **Scope**: Property-style test stubs TogetherClient, sends random messages through `/api/v1/chat/message`, and asserts non-empty message + usage metadata.
+- **Result**: Pass.
+
 
