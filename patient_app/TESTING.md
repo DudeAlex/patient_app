@@ -751,4 +751,9 @@
 - **Scope**: Existing test drives repeated requests to hit minute window; property target is 10/minute cap. No separate property generator added; current test already asserts 429 after bursts.
 - **Result**: Pass via `npm test`.
 
+# 2025-11-24 (Stage 2 manual testing placeholder)
+- **Command**: _Manual UI/API tests pending_
+- **Scope**: Need manual verification of live LLM endpoint with Together key, conversation continuity, history truncation, token usage logging, and rate limiting behavior.
+- **Result**: Not run here; to be executed on device/server.
+
 

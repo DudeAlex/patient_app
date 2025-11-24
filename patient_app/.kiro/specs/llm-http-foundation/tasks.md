@@ -320,7 +320,7 @@
   - Send 11 requests in rapid succession
   - Assert 11th request returns HTTP 429
 
-- [ ] 38. Manual testing and documentation
+- [x] 38. Manual testing and documentation
   - Test LLM response generation
   - Test conversation continuity
   - Test history truncation
