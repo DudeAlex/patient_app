@@ -91,3 +91,6 @@ See `.kiro/specs/llm-stages-3-7-reference-incomplete/` for reference documentati
 **Stages Covered:** 1-2 (HTTP Foundation + Basic LLM Integration)  
 **Status:** Complete and ready for implementation  
 **Next Spec:** Create focused spec for Stage 3 after completing this one
+
+## Backend Reference
+- The Stage 1 echo endpoint is provided by the lightweight Node/Express server in `server/` (see `server/README.md` for setup, run, and endpoint contract).
