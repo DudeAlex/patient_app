@@ -651,4 +651,9 @@
 - **Scope**: Verified Stage 1 coverage via automated suites: echo integration, offline/online flow, property-based echo/backoff/offline queue. Service switching and UI timeout handling still require device/interactive runs.
 - **Result**: Manual UI runs not executed in this environment; outstanding: run Settings service switch, long-delay echo timeout, and in-app offline indicator on device/emulator.
 
+# 2025-11-24 (Stage 1 checkpoint)
+- **Command**: _Aggregated check_
+- **Scope**: Confirmed Stage 1 battery of automated tests (unit, integration, property) are green: HttpAiChatService, MessageQueueService, offline flow, echo integration, backoff property, offline queue property, echo property. Remaining manual UI checks noted above.
+- **Result**: Automated coverage passing; manual device checks pending when environment available.
+
 
