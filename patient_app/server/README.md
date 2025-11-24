@@ -15,6 +15,11 @@ npm start
 npm run dev
 ```
 
+Environment
+- `TOGETHER_API_KEY`: API key for Together AI (required for Stage 2 LLM calls)
+- `TOGETHER_MODEL`: Optional override for model id (default: Meta Llama 3 Turbo)
+- `LLM_TIMEOUT_MS`: Optional request timeout in milliseconds (default: 60000)
+
 Server defaults to `http://localhost:3030`.
 
 ## Endpoint
@@ -62,3 +67,8 @@ Server defaults to `http://localhost:3030`.
 ## Notes
 - Logs as JSON via `morgan`, including correlation IDs and response times.
 - No tests are defined yet (`npm test` will warn about a missing script).
+
+Stage 2 LLM foundation
+- `src/llm/together_client.js` implements a thin Together AI chat client with 60s timeout, correlation IDs, and error classification (auth/429/server/timeout).
+- `src/llm/errors.js` defines structured errors used by the client.
+- The HTTP endpoint for LLM chat will be added in a later task; the client is ready for integration.

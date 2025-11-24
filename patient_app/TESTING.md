@@ -656,4 +656,9 @@
 - **Scope**: Confirmed Stage 1 battery of automated tests (unit, integration, property) are green: HttpAiChatService, MessageQueueService, offline flow, echo integration, backoff property, offline queue property, echo property. Remaining manual UI checks noted above.
 - **Result**: Automated coverage passing; manual device checks pending when environment available.
 
+# 2025-11-24 (Stage 2 LLM client wiring)
+- **Command**: _Not run (backend client wiring only)_
+- **Scope**: Added Together AI client with timeout and error classification in the Node server; no runnable endpoint yet. To verify later: call future `/api/v1/chat/message` with mock key and ensure timeouts/errors are classified correctly.
+- **Result**: Tests not run for this change (no endpoint exposed yet).
+
 

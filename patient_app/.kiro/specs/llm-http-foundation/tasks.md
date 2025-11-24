@@ -178,7 +178,7 @@
 
 ## Stage 2: Basic LLM Integration
 
-- [ ] 21. Set up LLM provider integration (Backend)
+ - [x] 21. Set up LLM provider integration (Backend)
   - Choose LLM provider (Together AI recommended)
   - Create provider account and get API key
   - Store API key securely (environment variable)
