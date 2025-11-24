@@ -8,6 +8,7 @@ Mobile Backup Format (v1)
 - Filename: `patient-backup-v1.enc`
 - Content: ZIP of the entire app documents directory (Isar DB files + attachments)
 - Encryption: AES-GCM, 12-byte random nonce, key from `flutter_secure_storage`
+- Chat data: AI chat threads (Isar collection) and chat attachment files/metadata live in the same documents directory, so they are included automatically in backup/restore. Message content stays encrypted inside the archive; chat attachment binaries remain local and are packaged alongside other attachments.
 
 Operations
 - Backup (export):

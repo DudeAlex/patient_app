@@ -4,7 +4,6 @@ import '../../domain/entities/login_attempt.dart';
 import '../../domain/entities/session.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/value_objects/email.dart';
-import '../../domain/value_objects/password.dart';
 import '../../infrastructure/services/password_hasher.dart';
 import '../../infrastructure/services/token_generator.dart';
 import '../ports/auth_repository.dart';
@@ -100,7 +99,7 @@ class LoginWithEmailUseCase {
       final Email email;
       try {
         email = Email.create(emailString);
-      } on InvalidEmailException catch (e) {
+      } on InvalidEmailException catch (_) {
         // Record failed attempt
         await _recordFailedAttempt(
           attemptId: attemptId,

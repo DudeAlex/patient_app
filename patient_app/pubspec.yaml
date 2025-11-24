@@ -52,6 +52,7 @@ dependencies:
   file_picker: ^10.3.3
   image_picker: 1.0.7
   archive: 4.0.7
+  flutter_markdown: ^0.7.2
   image: ^4.5.4
   mailer: ^6.1.2
   google_drive_backup:

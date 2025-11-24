@@ -1,3 +1,10 @@
+# Testing Principles
+- Cover happy paths, failure paths, and edge cases (empty/invalid input, timeouts, offline, retries); don’t stop at “works once”.
+- Assert side effects and context, not just returns: status updates, `updatedAt`, file cleanup, logging hooks, and no leaked local paths or PHI.
+- Keep tests deterministic: fixed clocks/seeds, fakes over brittle mocks, and explicit configuration for latency/failure modes.
+- Prefer small, focused cases over large integration dumps; isolate layers with ports and verify mapping/validation at boundaries.
+- Log manual verification in this file with scope, commands, and outcomes; note missing tooling when tests can’t run.
+
 # 2025-11-21 (AI Summary manual check)
 - **Change Scope**
   - Manual QA of AI summary UI using the Cardiology follow-up fixture (Health space).
@@ -325,24 +332,24 @@
       - Dismiss file picker without selecting a file
       - Expected: Return to launcher without error message
       - Result: [Pending manual verification]
-    
+
     - **Test 2: File size exceeded**
       - Create a test file > 50 MB
       - Open capture launcher → tap "Upload File"
       - Select the large file
       - Expected: Error snackbar "File too large (X MB). Maximum size is 50 MB."
       - Result: [Pending manual verification]
-    
+
     - **Test 3: File access error**
       - Attempt to select a file with restricted permissions
       - Expected: Error snackbar "Could not access selected file"
       - Result: [Pending manual verification]
-    
+
     - **Test 4: Copy failure**
       - Simulate storage full or permission issue during copy
       - Expected: Error snackbar "Failed to copy file: [exception details]"
       - Result: [Pending manual verification]
-    
+
     - **Test 5: Successful upload after error**
       - Trigger an error (e.g., cancel picker)
       - Retry with valid file
@@ -369,25 +376,25 @@
       - Upload file → verify exists at `attachments/sessions/<sessionId>/file_<timestamp>_<name>`
       - Verify timestamped filename format
       - Verify file size matches original
-    
+
     - **Test 2: Original file preservation**
       - Upload file → verify source file still exists
       - Verify source file unchanged
-    
+
     - **Test 3: Record-attachment linking**
       - Upload and save → verify attachment.recordId matches record.id
       - Verify attachment appears in record detail view
       - Verify database relationship queryable
-    
+
     - **Test 4: Metadata completeness**
       - Upload PDF → verify kind="pdf", mimeType="application/pdf"
       - Upload JPEG → verify kind="image", mimeType="image/jpeg"
       - Verify sizeBytes, capturedAt, source="file", metadataJson populated
-    
+
     - **Test 5: Multiple uploads**
       - Upload multiple files in same session
       - Verify unique timestamped filenames (no collision)
-    
+
     - **Test 6: Persistence after restart**
       - Upload and save → restart app
       - Verify attachment still accessible
@@ -478,3 +485,175 @@
 - **Command**: `flutter test test/core/ai/property_tests.dart`
 - **Scope**: Summary length/hints constraints, consent enforcement, HTTP retry behavior.
 - **Result**: ✅ All property-based checks pass; constraints verified across randomized inputs.
+
+# 2025-11-23 (AI Chat Screen)
+- **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
+- **Scope**: AiChatScreen renders with header, message list, and composer using stubbed dependencies.
+- **Result**: Pass on Windows; confirms chat UI and DI wiring build after nav updates.
+
+# 2025-11-23 (AI Chat Screen - photo attach update)
+- **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
+- **Scope**: Regression check after adding photo attachment flow and composer thumbnail avatars.
+- **Result**: Pass on Windows; chat UI still builds with new photo hooks present.
+
+# 2025-11-23 (AI Chat Screen - voice attach update)
+- **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
+- **Scope**: Regression check after adding voice recording/attach flow with transcription metadata.
+- **Result**: Pass on Windows; chat UI still builds with voice capture hooks present.
+
+# 2025-11-23 (AI Chat Screen - file attach update)
+- **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
+- **Scope**: Regression check after adding file picker attach flow with size/consent dialog.
+- **Result**: Pass on Windows; chat UI still builds with file attach hooks present.
+
+# 2025-11-23 (AI Chat offline queue wiring)
+- **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
+- **Scope**: Regression check after introducing MessageQueueService dependency in AiChatController.
+- **Result**: Pass on Windows; chat widget still builds with queue wiring present.
+
+# 2025-11-23 (AI chat diagnostics filter)
+- **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
+- **Scope**: Regression check after adding AiCallLogRepository logging for chat and diagnostics filters.
+- **Result**: Pass on Windows; chat widget still builds with diagnostics wiring present.
+
+# 2025-11-23 (Chat backup note)
+- **Command**: (documentation-only change, no tests run)
+- **Scope**: Clarified that chat threads and chat attachment files/metadata are included in the encrypted Drive backup/restore flow.
+- **Result**: Not applicable (docs update).
+
+# 2025-11-23 (Chat domain model tests)
+- **Command**: `flutter test test/core/ai/chat/models/chat_models_test.dart`
+- **Scope**: Validates MessageAttachment metadata serialization, ChatMessage invariants/copyWith, and ChatThread addMessage behavior.
+- **Result**: Pass on Windows.
+
+# 2025-11-23 (Chat thread repository contract tests)
+- **Command**: `flutter test test/core/ai/chat/repositories/chat_thread_repository_domain_test.dart`
+- **Scope**: Domain-level expectations for ChatThread immutability/order and copyWith behavior to support repository contract.
+- **Result**: Pass on Windows.
+
+# 2025-11-23 (Fake AI chat persona tests)
+- **Command**: `flutter test test/core/ai/chat/fake_ai_chat_service_test.dart`
+- **Scope**: Persona-specific responses/action hints (health, finance, education, travel), streaming completion, deterministic summaries.
+- **Result**: Pass on Windows.
+
+# 2025-11-23 (HTTP AI chat service tests)
+- **Command**: `flutter test test/core/ai/chat/http_ai_chat_service_test.dart`
+- **Scope**: Payload construction and redaction, success parsing, retry/backoff on 5xx, non-retryable 4xx failure, and timeout behavior.
+- **Result**: Pass on Windows.
+
+# 2025-11-23 (Logging AI chat service tests)
+- **Command**: `flutter test test/core/ai/chat/logging_ai_chat_service_test.dart`
+- **Scope**: Ensures decorator delegates send/stream, records call logs on success/failure, and preserves summarize behavior.
+- **Result**: Pass on Windows.
+
+# 2025-11-23 (AI chat widget suite)
+- **Command**: `flutter test test/features/ai_chat/ui/widgets`
+- **Scope**: Chat UI components (header, banner, message bubble, list lazy load/auto-scroll, composer, attachment previews, action hints) regression coverage.
+- **Result**: Pass on Windows.
+
+# 2025-11-23 (Chat use case tests)
+- **Command**: `flutter test test/core/ai/chat/application/use_cases`
+- **Scope**: Send/Load/Clear/Switch use cases: consent enforcement, attachment processing, error propagation, thread creation/sorting/clearing.
+- **Result**: Pass on Windows.
+
+# 2025-11-23 (Chat consent property test)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Property-style loop verifying SendChatMessageUseCase enforces consent across random states.
+- **Result**: Pass on Windows.
+
+# 2025-11-23 (Chat context property tests)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Property checks for ChatRequest carrying space id/persona and record summaries retaining origin info.
+- **Result**: Pass on Windows.
+
+# 2025-11-23 (Chat payload safety property tests)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Ensures attachments strip local paths and message history trims to configured max.
+- **Result**: Pass on Windows.
+
+# 2025-11-23 (Chat message persistence property test)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Property loop verifying SendChatMessageUseCase persists user + AI messages into repository.
+- **Result**: Pass on Windows.
+
+# 2025-11-23 (Health persona tone property test)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Property loop verifying Fake AI health persona avoids prescriptive language and includes safety reminders.
+- **Result**: Pass on Windows.
+
+# 2025-11-23 (Offline queue/backoff property placeholder)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Ensures MessageQueueService retains messages when processing fails (placeholder for full backoff coverage).
+- **Result**: Pass on Windows.
+
+## 2025-11-23 (Markdown rendering property placeholder)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Sanity check that AI chat markdown content stays under a length cap in property-style loop.
+- **Result**: Pass on Windows.
+
+## 2025-11-23 (Logging completeness property placeholder)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Ensures logging decorator writes AiCallLog entries on send.
+- **Result**: Pass on Windows.
+
+## 2025-11-23 (Attachment metadata logging property placeholder)
+- **Command**: `flutter test test/core/ai/property_tests.dart`
+- **Scope**: Confirms attachment metadata is logged without leaking local paths.
+- **Result**: Pass on Windows.
+
+## 2025-11-23 (Message list lazy-load/perf property tests)
+- **Command**: `flutter test test/features/ai_chat/ui/widgets/message_list_property_test.dart`
+- **Scope**: Asserts MessageList never renders above its initialVisibleCount cap and builds within 500ms for 100 messages.
+- **Result**: Pass on Windows.
+
+# 2025-11-24 (Chat HTTP foundation lint)
+- **Command**: `dart analyze lib/core/ai/chat/http_ai_chat_service.dart lib/core/ai/chat/exceptions/chat_exceptions.dart`
+- **Scope**: Targeted lint pass for the new chat HTTP client and exception taxonomy.
+- **Result**: Pass (no issues for these files; project-wide warnings remain unchanged).
+
+# 2025-11-24 (HttpAiChatService unit tests)
+- **Command**: `flutter test test/core/ai/chat/http_ai_chat_service_test.dart`
+- **Scope**: Validates echo payload build, correlation ID header, retry/backoff behaviour, non-retryable error classification, and timeout handling with injected connectivity.
+- **Result**: Pass.
+
+# 2025-11-24 (MessageQueueService unit tests)
+- **Command**: `flutter test test/core/ai/chat/services/message_queue_service_test.dart`
+- **Scope**: Ensures offline queue persistence (attachments stripped of localPath), successful dequeue removes items, failed sends remain queued, and expired entries (older than 7 days) are purged on load.
+- **Result**: Pass.
+
+# 2025-11-24 (Chat echo integration)
+- **Command**: `flutter test test/integration/ai_chat_echo_integration_test.dart`
+- **Scope**: Starts a local HTTP echo server, verifies payload/headers/correlation ID, and checks HttpAiChatService parses the echo response end-to-end.
+- **Result**: Pass.
+
+# 2025-11-24 (Chat offline/online integration)
+- **Command**: `flutter test test/integration/ai_chat_offline_flow_test.dart`
+- **Scope**: Fakes connectivity to validate offline queueing in AiChatController/MessageQueueService, ensures offline indicator state, and auto-retries queued messages when connectivity returns.
+- **Result**: Pass.
+
+# 2025-11-24 (Property: HTTP connectivity round trip)
+- **Command**: `flutter test test/property/ai_chat_http_round_trip_property_test.dart`
+- **Scope**: Property-based check over random messages against the local echo endpoint ensuring HttpAiChatService returns `Echo: <message>` and preserves provider metadata.
+- **Result**: Pass.
+
+# 2025-11-24 (Property: Retry exponential backoff)
+- **Command**: `flutter test test/property/ai_chat_retry_backoff_property_test.dart`
+- **Scope**: Forces retryable failures in HttpAiChatService and asserts observed delays stay within ±20% jitter of 1s and 2s base backoff intervals.
+- **Result**: Pass.
+
+# 2025-11-24 (Property: Offline message queuing)
+- **Command**: `flutter test test/property/ai_chat_offline_queue_property_test.dart`
+- **Scope**: Uses fake connectivity to queue multiple offline chat messages via AiChatController/MessageQueueService and verifies they send automatically on reconnect.
+- **Result**: Pass.
+
+# 2025-11-24 (Stage 1 manual/documentation sweep)
+- **Command**: _Manual/Review_
+- **Scope**: Verified Stage 1 coverage via automated suites: echo integration, offline/online flow, property-based echo/backoff/offline queue. Service switching and UI timeout handling still require device/interactive runs.
+- **Result**: Manual UI runs not executed in this environment; outstanding: run Settings service switch, long-delay echo timeout, and in-app offline indicator on device/emulator.
+
+# 2025-11-24 (Stage 1 checkpoint)
+- **Command**: _Aggregated check_
+- **Scope**: Confirmed Stage 1 battery of automated tests (unit, integration, property) are green: HttpAiChatService, MessageQueueService, offline flow, echo integration, backoff property, offline queue property, echo property. Remaining manual UI checks noted above.
+- **Result**: Automated coverage passing; manual device checks pending when environment available.
+
+

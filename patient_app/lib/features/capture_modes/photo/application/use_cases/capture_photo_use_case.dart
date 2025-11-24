@@ -1,5 +1,4 @@
 import '../../../../capture_core/api/capture_artifact.dart';
-import '../../../../capture_core/api/capture_context_extensions.dart';
 import '../../../../capture_core/api/capture_mode.dart';
 import '../../../../capture_core/api/capture_result.dart';
 import '../../models/photo_capture_outcome.dart';
@@ -50,7 +49,7 @@ class CapturePhotoUseCase {
         // Show quality dialog and wait for user response
         final retry = await context.promptRetake!(
           'Photo looks blurry',
-          clarity!.reason ??
+          clarity.reason ??
               'We detected a low clarity score. Would you like to retake the photo?',
         );
 

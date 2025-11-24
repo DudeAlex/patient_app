@@ -16,6 +16,15 @@ import '../ai/repositories/ai_config_repository.dart';
 import '../ai/repositories/ai_config_repository_impl.dart';
 import '../ai/repositories/ai_consent_repository.dart';
 import '../ai/repositories/ai_consent_repository_impl.dart';
+import '../ai/chat/ai_chat_service.dart';
+import '../ai/chat/configurable_ai_chat_service.dart';
+import '../ai/chat/fake_ai_chat_service.dart';
+import '../ai/chat/http_ai_chat_service.dart';
+import '../ai/chat/logging_ai_chat_service.dart';
+import '../ai/chat/repositories/chat_thread_repository.dart';
+import '../ai/chat/repositories/chat_thread_repository_impl.dart';
+import '../ai/chat/services/message_attachment_handler.dart';
+import '../ai/chat/services/message_attachment_handler_impl.dart';
 import '../diagnostics/app_logger.dart';
 import '../infrastructure/storage/migration_service.dart';
 import '../infrastructure/storage/space_preferences.dart';
@@ -63,6 +72,10 @@ Future<void> bootstrapAppContainer() async {
     }
     await AppLogger.endOperation(migrationOp);
 
+    // Shared HTTP client
+    final httpClient = http.Client();
+    container.registerSingleton<http.Client>(httpClient);
+
     // Register AI dependencies
     final aiConfigRepository = AiConfigRepositoryImpl(sharedPreferences);
     await aiConfigRepository.loadConfig();
@@ -77,7 +90,28 @@ Future<void> bootstrapAppContainer() async {
         ConfigurableAiService(
           configRepository: aiConfigRepository,
           fakeService: FakeAiService(),
-          client: http.Client(),
+          client: httpClient,
+        ),
+        callLogRepository: aiCallLogRepository,
+      ),
+    );
+
+    // Register chat dependencies
+    container.registerLazySingleton<ChatThreadRepository>(
+      (_) => ChatThreadRepositoryImpl(recordsService.db),
+    );
+    container.registerLazySingleton<MessageAttachmentHandler>(
+      (_) => MessageAttachmentHandlerImpl(),
+    );
+    container.registerLazySingleton<AiChatService>(
+      (c) => LoggingAiChatService(
+        ConfigurableAiChatService(
+          configRepository: aiConfigRepository,
+          fakeService: FakeAiChatService(),
+          httpService: HttpAiChatService(
+            client: httpClient,
+            baseUrl: aiConfigRepository.current.remoteUrl,
+          ),
         ),
         callLogRepository: aiCallLogRepository,
       ),

@@ -10,6 +10,7 @@ import '../../features/authentication/infrastructure/models/session_isar_model.d
 import '../../features/authentication/infrastructure/models/login_attempt_isar_model.dart';
 import '../../features/authentication/infrastructure/models/mfa_pending_isar_model.dart';
 import '../infrastructure/storage/information_item_isar_model.dart';
+import '../ai/chat/data/entities/chat_thread_entity.dart';
 
 class IsarDatabase {
   static Isar? _instance;
@@ -33,6 +34,8 @@ class IsarDatabase {
       MfaPendingIsarModelSchema,
       // Universal schema
       InformationItemSchema,
+      // AI chat schema
+      ChatThreadEntitySchema,
     ],
         directory: dir.path,
         name: 'patient');

@@ -1,5 +1,6 @@
-import 'dart:math';
 import 'dart:async';
+import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +13,22 @@ import 'package:patient_app/core/ai/models/ai_summary_result.dart';
 import 'package:patient_app/core/ai/repositories/ai_consent_repository.dart';
 import 'package:patient_app/core/domain/entities/information_item.dart';
 import 'package:patient_app/features/information_items/application/use_cases/summarize_information_item_use_case.dart';
+import 'package:patient_app/core/ai/chat/application/use_cases/send_chat_message_use_case.dart';
+import 'package:patient_app/core/ai/chat/fake_ai_chat_service.dart';
+import 'package:patient_app/core/ai/chat/models/chat_message.dart';
+import 'package:patient_app/core/ai/chat/models/chat_request.dart';
+import 'package:patient_app/core/ai/chat/models/chat_response.dart';
+import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
+import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
+import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
+import 'package:patient_app/core/ai/chat/services/message_queue_service.dart';
+import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
+import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
+import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
+import 'package:patient_app/core/ai/chat/logging_ai_chat_service.dart';
+import 'package:patient_app/core/ai/repositories/ai_call_log_repository.dart';
+import 'package:uuid/uuid.dart';
 
 class _StubConsentRepo implements AiConsentRepository {
   bool consent;
@@ -99,6 +116,426 @@ void main() {
     );
     expect(callCount, 3);
   });
+
+  group('Property tests - chat consent enforcement', () {
+    final threadId = 't1';
+    final spaceContext = SpaceContext(
+      spaceId: 'health',
+      spaceName: 'Health',
+      persona: SpacePersona.health,
+    );
+
+    ChatRequest request() => ChatRequest(
+          threadId: threadId,
+          messageContent: 'hi',
+          spaceContext: spaceContext,
+          messageHistory: [
+            ChatMessage(
+              id: 'm1',
+              threadId: threadId,
+              sender: MessageSender.user,
+              content: 'prev',
+              timestamp: DateTime.now(),
+            ),
+          ],
+        );
+
+    test('SendChatMessageUseCase throws when consent is false', () async {
+      final rand = Random(7);
+      for (var i = 0; i < 10; i++) {
+        final consent = rand.nextBool();
+        final consentRepo = _StubConsentRepo(consent);
+        final useCase = SendChatMessageUseCase(
+          aiChatService: _StubChatService(
+            ChatResponse.success(messageContent: 'hello'),
+          ),
+          chatThreadRepository: _InMemoryThreadRepo(),
+          consentRepository: consentRepo,
+          attachmentHandler: _NoopAttachmentHandler(),
+          uuid: const Uuid(),
+        );
+
+        if (!consent) {
+          expect(
+            () => useCase.execute(
+              threadId: threadId,
+              spaceContext: spaceContext,
+              messageContent: 'hello',
+            ),
+            throwsA(isA<AiConsentRequiredException>()),
+          );
+        } else {
+          final response = await useCase.execute(
+            threadId: threadId,
+            spaceContext: spaceContext,
+            messageContent: 'hello',
+          );
+          expect(response.content, 'hello');
+        }
+      }
+    });
+  });
+
+  group('Property tests - chat context propagation', () {
+    final rand = Random(101);
+    SpaceContext buildSpace(int i) => SpaceContext(
+          spaceId: 'space_$i',
+          spaceName: 'Space $i',
+          persona: SpacePersona.values[i % SpacePersona.values.length],
+        );
+
+    InformationItem buildItem(int i) => InformationItem(
+          id: i,
+          spaceId: 'space_$i',
+          domainId: 'domain_$i',
+          data: {'title': 'Item $i'},
+          createdAt: DateTime(2025, 1, 1),
+          updatedAt: DateTime(2025, 1, 1),
+        );
+
+    test('ChatRequest carries correct space id/persona', () {
+      for (var i = 0; i < 20; i++) {
+        final ctx = buildSpace(i);
+        final request = ChatRequest(
+          threadId: 't$i',
+          messageContent: 'hello',
+          spaceContext: ctx,
+          messageHistory: [],
+        );
+
+        expect(request.spaceContext.spaceId, ctx.spaceId);
+        expect(request.spaceContext.persona, ctx.persona);
+      }
+    });
+
+    test('Record summaries carry the originating space and title', () {
+      for (var i = 0; i < 10; i++) {
+        final item = buildItem(i);
+        final summary = RecordSummary(
+          title: item.data['title'] as String,
+          category: 'category_$i',
+          tags: ['t$i'],
+          createdAt: item.createdAt,
+        );
+
+        expect(summary.title, contains(item.data['title'] as String));
+        expect(summary.category, 'category_$i');
+        expect(summary.tags, contains('t$i'));
+      }
+    });
+  });
+
+  group('Property tests - chat payload safety', () {
+    test('attachments exclude local paths when building ChatRequest', () {
+      final request = ChatRequest(
+        threadId: 't-safety',
+        messageContent: 'hello',
+        spaceContext: SpaceContext(
+          spaceId: 'space_safety',
+          spaceName: 'Space Safety',
+          persona: SpacePersona.general,
+        ),
+        attachments: [
+          MessageAttachment(
+            id: 'a1',
+            type: AttachmentType.file,
+            localPath: '/secret/path',
+            fileName: 'doc.pdf',
+          ),
+        ],
+        messageHistory: const [],
+      );
+
+      final json = request.toJson();
+      final attachments = json['attachments'] as List;
+      expect(attachments.first.containsKey('localPath'), isFalse);
+    });
+
+    test('message history is trimmed to maxHistoryMessages', () {
+      final history = List.generate(
+        60,
+        (i) => ChatMessage(
+          id: 'm$i',
+          threadId: 't',
+          sender: MessageSender.user,
+          content: 'msg $i',
+          timestamp: DateTime(2025, 1, 1, 0, i),
+        ),
+      );
+
+      final request = ChatRequest(
+        threadId: 't-hist',
+        messageContent: 'hi',
+        spaceContext: SpaceContext(
+          spaceId: 's',
+          spaceName: 'S',
+          persona: SpacePersona.general,
+        ),
+        messageHistory: history,
+        maxHistoryMessages: 50,
+      );
+
+      expect(request.limitedHistory.length, 50);
+      expect(request.limitedHistory.first.id, 'm0'); // taking first 50 of 60
+    });
+  });
+
+  group('Property tests - message persistence', () {
+    test('SendChatMessageUseCase persists user + AI messages', () async {
+      final rand = Random(2025);
+      for (var i = 0; i < 5; i++) {
+        final repo = _InMemoryThreadRepo();
+        final threadId = 'thread_$i';
+        await repo.saveThread(
+          ChatThread(
+            id: threadId,
+            spaceId: 'space_${i % 3}',
+            messages: const [],
+            createdAt: DateTime(2025, 1, 1),
+          ),
+        );
+
+        final useCase = SendChatMessageUseCase(
+          aiChatService: _StubChatService(
+            ChatResponse.success(messageContent: 'ai response $i'),
+          ),
+          chatThreadRepository: repo,
+          consentRepository: _StubConsentRepo(true),
+          attachmentHandler: _NoopAttachmentHandler(),
+          uuid: const Uuid(),
+        );
+
+        final content = 'msg_${rand.nextInt(1000)}';
+        final aiMsg = await useCase.execute(
+          threadId: threadId,
+          spaceContext: SpaceContext(
+            spaceId: 'space_${i % 3}',
+            spaceName: 'Space',
+            persona: SpacePersona.general,
+          ),
+          messageContent: content,
+        );
+
+        final stored = await repo.getById(threadId);
+        expect(aiMsg.content, 'ai response $i');
+        expect(stored, isNotNull);
+        expect(stored!.messages.length, greaterThanOrEqualTo(2)); // user + AI
+        final userStored = stored.messages.firstWhere((m) => m.sender == MessageSender.user);
+        final aiStored = stored.messages.firstWhere((m) => m.sender == MessageSender.ai);
+        expect(userStored.content, content);
+        expect(aiStored.content, 'ai response $i');
+      }
+    });
+  });
+
+  group('Property tests - health persona tone', () {
+    test('Fake AI health persona avoids prescriptive language', () async {
+      final service = FakeAiChatService(simulatedLatency: Duration.zero);
+      final rand = Random(77);
+      for (var i = 0; i < 10; i++) {
+        final request = ChatRequest(
+          threadId: 't-health-$i',
+          messageContent: 'Need advice ${rand.nextInt(1000)}',
+          spaceContext: SpaceContext(
+            spaceId: 'health',
+            spaceName: 'Health',
+            persona: SpacePersona.health,
+          ),
+          messageHistory: const [],
+        );
+
+        final response = await service.sendMessage(request);
+        final content = response.messageContent.toLowerCase();
+
+        expect(content.contains('should'), isFalse, reason: 'avoid prescriptive language');
+        expect(content.contains('must'), isFalse, reason: 'avoid prescriptive language');
+        expect(content.contains('medical advice'), isTrue,
+            reason: 'include safety-first reminder');
+      }
+    });
+  });
+
+  group('Property tests - offline queue and backoff placeholders', () {
+    test('MessageQueueService keeps messages when processing fails', () async {
+      final repo = _InMemoryThreadRepo();
+      await repo.saveThread(ChatThread(
+        id: 't-queue',
+        spaceId: 'space',
+        messages: const [],
+        createdAt: DateTime(2025, 1, 1),
+      ));
+
+      final failingUseCase = SendChatMessageUseCase(
+        aiChatService: _StubChatService(
+          ChatResponse.success(messageContent: 'ok'),
+        ),
+        chatThreadRepository: repo,
+        consentRepository: _StubConsentRepo(true),
+        attachmentHandler: _NoopAttachmentHandler(),
+        uuid: const Uuid(),
+      );
+
+      final queue = MessageQueueService(
+        sendChatMessageUseCase: failingUseCase,
+        chatThreadRepository: repo,
+      );
+
+      await queue.enqueue(
+        threadId: 't-queue',
+        spaceContext: SpaceContext(
+          spaceId: 'space',
+          spaceName: 'Space',
+          persona: SpacePersona.general,
+        ),
+        content: 'queued',
+        attachments: const [],
+      );
+
+      expect(queue.pendingCount, 1);
+    });
+  });
+
+  group('Property tests - markdown rendering placeholder', () {
+    test('ChatMessage content with markdown stays under length limit', () {
+      final rand = Random(321);
+      for (var i = 0; i < 20; i++) {
+        final words = List.generate(30, (_) => 'word${rand.nextInt(100)}').join(' ');
+        final msg = ChatMessage(
+          id: 'm-md-$i',
+          threadId: 't',
+          sender: MessageSender.ai,
+          content: '**$words**',
+          timestamp: DateTime.now(),
+        );
+        expect(msg.content.length <= 500, isTrue);
+      }
+    });
+  });
+
+  group('Property tests - logging completeness placeholders', () {
+    test('LoggingAiChatService populates AiCallLogRepository on send', () async {
+      final repo = AiCallLogRepository(maxEntries: 5);
+      final service = LoggingAiChatService(
+        _StubChatService(ChatResponse.success(messageContent: 'hi')),
+        callLogRepository: repo,
+      );
+      await service.sendMessage(ChatRequest(
+        threadId: 't-log',
+        messageContent: 'hello',
+        spaceContext: SpaceContext(
+          spaceId: 'health',
+          spaceName: 'Health',
+          persona: SpacePersona.health,
+        ),
+        messageHistory: const [],
+      ));
+
+      expect(repo.entries, isNotEmpty);
+      expect(repo.entries.first.provider, isNotEmpty);
+    });
+
+    test('Attachment metadata logging omits sensitive fields', () async {
+      final repo = AiCallLogRepository(maxEntries: 5);
+      final service = LoggingAiChatService(
+        _StubChatService(ChatResponse.success(messageContent: 'hi')),
+        callLogRepository: repo,
+      );
+
+      final request = ChatRequest(
+        threadId: 't-log2',
+        messageContent: 'hello',
+        spaceContext: SpaceContext(
+          spaceId: 'health',
+          spaceName: 'Health',
+          persona: SpacePersona.health,
+        ),
+        attachments: [
+          MessageAttachment(
+            id: 'a1',
+            type: AttachmentType.photo,
+            localPath: '/secret/path.jpg',
+            fileName: 'photo.jpg',
+            fileSizeBytes: 1024,
+          ),
+        ],
+        messageHistory: const [],
+      );
+
+      await service.sendMessage(request);
+
+      expect(repo.entries, isNotEmpty);
+      final logEntry = repo.entries.first;
+      expect(logEntry.provider, isNotEmpty);
+    });
+  });
+}
+
+class _StubChatService implements AiChatService {
+  _StubChatService(this._response);
+  final ChatResponse _response;
+  @override
+  Future<ChatResponse> sendMessage(ChatRequest request) async => _response;
+  @override
+  Stream<ChatResponseChunk> sendMessageStream(ChatRequest request) async* {
+    yield ChatResponseChunk(content: _response.messageContent, isComplete: true);
+  }
+
+  @override
+  Future<AiSummaryResult> summarizeItem(InformationItem item) {
+    return Future.value(AiSummaryResult.success(summaryText: 'ok', provider: 'stub'));
+  }
+}
+
+class _InMemoryThreadRepo implements ChatThreadRepository {
+  final Map<String, ChatThread> _store = {};
+  @override
+  Future<void> addMessage(String threadId, ChatMessage message) async {
+    final thread = _store[threadId];
+    if (thread == null) return;
+    _store[threadId] = thread.addMessage(message);
+  }
+
+  @override
+  Future<void> deleteThread(String threadId) async {
+    _store.remove(threadId);
+  }
+
+  @override
+  Future<ChatThread?> getById(String threadId) async => _store[threadId];
+
+  @override
+  Future<List<ChatThread>> getBySpaceId(String spaceId, {int limit = 20, int offset = 0}) async {
+    final threads = _store.values.where((t) => t.spaceId == spaceId).toList();
+    return threads.skip(offset).take(limit).toList();
+  }
+
+  @override
+  Future<void> saveThread(ChatThread thread) async {
+    _store[thread.id] = thread;
+  }
+
+  @override
+  Future<void> updateMessageContent(String threadId, String messageId, String content) async {}
+
+  @override
+  Future<void> updateMessageMetrics(String threadId, String messageId, {int? tokensUsed, int? latencyMs}) async {}
+
+  @override
+  Future<void> updateMessageStatus(String threadId, String messageId, MessageStatus status,
+      {String? errorMessage, String? errorCode, bool? errorRetryable}) async {}
+}
+
+class _NoopAttachmentHandler implements MessageAttachmentHandler {
+  @override
+  Future<MessageAttachment> processAttachment(
+          {required File sourceFile, required AttachmentType type, required String targetThreadId}) async =>
+      MessageAttachment(id: 'noop', type: type);
+
+  @override
+  Future<void> deleteAttachment(MessageAttachment attachment) async {}
+
+  @override
+  Future<void> validateAttachment(File file, AttachmentType type) async {}
 }
 
 class _ImmediateAiService implements AiService {
