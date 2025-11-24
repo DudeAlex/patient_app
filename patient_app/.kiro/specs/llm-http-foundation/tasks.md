@@ -101,7 +101,7 @@
   - Mock HTTP client for isolation
   - _Requirements: 10.1_
 
-- [ ] 12. Write unit tests for MessageQueueService
+- [x] 12. Write unit tests for MessageQueueService
   - Test message queuing when offline
   - Test queue persistence
   - Test queue processing when online
