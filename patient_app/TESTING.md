@@ -696,4 +696,9 @@
 - **Scope**: Added `/api/v1/chat/message` endpoint that builds system prompt, formats last 3 history messages, and calls Together via `TogetherClient` with maxTokens override.
 - **Result**: Not yet exercised; verify with local server + Together key when ready.
 
+# 2025-11-24 (Rate limiting middleware)
+- **Command**: _Not run (middleware only)_
+- **Scope**: Added in-memory rate limiter (10/min, 100/hr, 500/day) applied to chat endpoints; returns 429 with retryable flag and correlation id.
+- **Result**: Tests not run; middleware added.
+
 

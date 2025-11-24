@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import { SYSTEM_PROMPT_TEMPLATE } from './llm/prompt_template.js';
 import { formatHistory } from './llm/history_manager.js';
 import { TogetherClient } from './llm/together_client.js';
+import { rateLimiter } from './middleware/rate_limiter.js';
 
 dotenv.config();
 
@@ -130,6 +131,9 @@ app.post('/api/v1/chat/message', async (req, res) => {
     });
   }
 });
+
+// Apply rate limiting to chat endpoints
+app.use(['/api/v1/chat/echo', '/api/v1/chat/message'], rateLimiter);
 
 app.use((req, res) => {
   res.status(404).json({

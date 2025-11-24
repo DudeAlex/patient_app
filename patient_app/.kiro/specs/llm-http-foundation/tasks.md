@@ -224,7 +224,7 @@
   - Add error handling
   - _Requirements: 2.1, 2.2, 2.3_
 
-- [ ] 26. Implement rate limiting (Backend)
+- [x] 26. Implement rate limiting (Backend)
   - Set up Redis or in-memory cache
   - Implement sliding window algorithm
   - Enforce 10 requests/minute per user
