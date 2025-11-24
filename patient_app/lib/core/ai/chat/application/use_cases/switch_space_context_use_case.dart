@@ -2,6 +2,7 @@ import 'package:patient_app/core/ai/chat/application/use_cases/clear_chat_thread
 import 'package:patient_app/core/ai/chat/application/use_cases/load_chat_history_use_case.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
 
 /// Use case to switch chat context between spaces.
 ///
@@ -50,7 +51,4 @@ class SwitchSpaceResult {
   final SpaceContext spaceContext;
 }
 
-/// Abstraction for building SpaceContext (e.g., with recent records/persona).
-abstract class SpaceContextBuilder {
-  Future<SpaceContext> build(String spaceId);
-}
+

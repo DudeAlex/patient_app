@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/di/app_container.dart';
@@ -23,10 +24,7 @@ final spaceContextBuilderProvider = Provider<SpaceContextBuilder>((ref) {
   );
 });
 
-/// Builds SpaceContext with persona mapping and recent record summaries.
-abstract class SpaceContextBuilder {
-  Future<SpaceContext> build(String spaceId);
-}
+
 
 class DefaultSpaceContextBuilder implements SpaceContextBuilder {
   DefaultSpaceContextBuilder({
