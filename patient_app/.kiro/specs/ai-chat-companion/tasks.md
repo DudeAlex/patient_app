@@ -167,7 +167,7 @@
   - Style chips consistently with app theme
   - _Requirements: 17.2_
 
-- [ ] 21. Create MessageList widget
+- [x] 21. Create MessageList widget *(done — lazy list, load-more trigger, auto-scroll wiring)*
   - Create `lib/features/ai_chat/ui/widgets/message_list.dart`
   - Use ListView.builder for lazy loading
   - Load only 50 most recent messages initially
