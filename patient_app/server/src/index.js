@@ -1,6 +1,9 @@
+import dotenv from 'dotenv';
 import crypto from 'crypto';
 import express from 'express';
 import morgan from 'morgan';
+
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3030;

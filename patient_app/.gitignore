@@ -54,3 +54,6 @@ Mobile Health App Design/
 
 # Coverage reports
 coverage/
+
+# Local env for server (do not commit secrets)
+server/.env
