@@ -211,7 +211,7 @@
   - Show confirmation dialog with data usage details
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 7.5_
 
-- [ ] 26. Create AiChatController for state management
+- [x] 26. Create AiChatController for state management *(done — Riverpod controller with load/send/attachments/offline/switch + tests)*
   - Create `lib/features/ai_chat/ui/controllers/ai_chat_controller.dart`
   - Use Riverpod for state management
   - Manage chat thread loading state
