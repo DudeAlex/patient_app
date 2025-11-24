@@ -621,4 +621,9 @@
 - **Scope**: Ensures offline queue persistence (attachments stripped of localPath), successful dequeue removes items, failed sends remain queued, and expired entries (older than 7 days) are purged on load.
 - **Result**: Pass.
 
+# 2025-11-24 (Chat echo integration)
+- **Command**: `flutter test test/integration/ai_chat_echo_integration_test.dart`
+- **Scope**: Starts a local HTTP echo server, verifies payload/headers/correlation ID, and checks HttpAiChatService parses the echo response end-to-end.
+- **Result**: Pass.
+
 
