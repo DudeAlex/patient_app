@@ -109,7 +109,7 @@
   - Mock network connectivity
   - _Requirements: 10.1_
 
-- [ ] 13. Write unit tests for retry policy
+- [x] 13. Write unit tests for retry policy
   - Test exponential backoff calculation
   - Test jitter application (±20%)
   - Test max retries enforcement
