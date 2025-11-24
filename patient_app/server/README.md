@@ -77,3 +77,8 @@ Stage 2 LLM foundation
 - `scripts/ping_model.mjs` probes a model with a short prompt (uses .env key). Gemma may be unsupported on Together; Apriel and gpt-oss-20b succeed.
 - `src/llm/token_counter.js` estimates token usage for system prompt, history, and user message using tiktoken with model fallback.
 - The HTTP endpoint for LLM chat will be added in a later task; the client is ready for integration.
+
+Stage 2 LLM chat endpoint
+- `POST /api/v1/chat/message` accepts `{ message: string, history?: [{role, content}], maxTokens?: number }`.
+- Builds system prompt from `prompt_template`, formats last 3 history messages, and calls Together via `TogetherClient`.
+- Returns `{ message, metadata: { finishReason, usage, provider, correlationId } }` or structured error with `code`, `retryable`, `correlationId`.

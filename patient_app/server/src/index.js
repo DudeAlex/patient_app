@@ -2,6 +2,9 @@ import dotenv from 'dotenv';
 import crypto from 'crypto';
 import express from 'express';
 import morgan from 'morgan';
+import { SYSTEM_PROMPT_TEMPLATE } from './llm/prompt_template.js';
+import { formatHistory } from './llm/history_manager.js';
+import { TogetherClient } from './llm/together_client.js';
 
 dotenv.config();
 
@@ -67,6 +70,65 @@ app.post('/api/v1/chat/echo', (req, res) => {
   };
 
   return res.json(responsePayload);
+});
+
+app.post('/api/v1/chat/message', async (req, res) => {
+  const { message, history = [], maxTokens = 512 } = req.body ?? {};
+
+  if (!message || typeof message !== 'string' || !message.trim()) {
+    return res.status(400).json({
+      error: {
+        code: 'INVALID_REQUEST',
+        message: 'message is required',
+        correlationId: req.correlationId,
+        retryable: false,
+      },
+    });
+  }
+
+  try {
+    const formattedHistory = formatHistory(Array.isArray(history) ? history : []);
+    const historyText =
+      formattedHistory.length === 0
+        ? 'None'
+        : formattedHistory.map((m) => `${m.role}: ${m.content}`).join('\n');
+
+    const systemPrompt = SYSTEM_PROMPT_TEMPLATE.replace('{history}', historyText).replace(
+      '{user_message}',
+      message,
+    );
+
+    const client = new TogetherClient();
+    const response = await client.sendChat({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...formattedHistory,
+        { role: 'user', content: message },
+      ],
+      correlationId: req.correlationId,
+      maxTokens,
+    });
+
+    return res.json({
+      message: response.message,
+      metadata: {
+        finishReason: response.finishReason,
+        usage: response.usage,
+        provider: response.provider,
+        correlationId: response.correlationId,
+      },
+    });
+  } catch (error) {
+    const status = error.status || 502;
+    return res.status(status).json({
+      error: {
+        code: error.code || 'LLM_ERROR',
+        message: error.message || 'LLM request failed',
+        correlationId: req.correlationId,
+        retryable: error.retryable ?? false,
+      },
+    });
+  }
 });
 
 app.use((req, res) => {

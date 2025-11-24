@@ -213,7 +213,7 @@
   - Log token usage
   - _Requirements: 2.4, 4.2, 4.3_
 
-- [ ] 25. Create LLM chat endpoint (Backend)
+- [x] 25. Create LLM chat endpoint (Backend)
   - Create POST /api/v1/chat/message endpoint
   - Validate request format
   - Extract message and history

@@ -691,4 +691,9 @@
 - **Scope**: Added `server/src/llm/token_counter.js` to estimate token usage for system prompt, history, and user message (tiktoken with model fallback).
 - **Result**: Tests not run; helper added for upcoming endpoint wiring.
 
+# 2025-11-24 (LLM chat endpoint)
+- **Command**: _Not run (manual verification pending)_
+- **Scope**: Added `/api/v1/chat/message` endpoint that builds system prompt, formats last 3 history messages, and calls Together via `TogetherClient` with maxTokens override.
+- **Result**: Not yet exercised; verify with local server + Together key when ready.
+
 
