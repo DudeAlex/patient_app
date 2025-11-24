@@ -1,8 +1,8 @@
 export const MODEL_CATALOG = {
   chatFriendly: 'gemma-3n-e4b-it',
   chatReasoning: 'ServiceNow-AI/Apriel-1.5-15b-Thinker',
-  // Together no longer supports the old Meta-Llama-3-70B-Instruct-Turbo id; use supported chat fallback.
-  chatFallback: 'meta-llama/Llama-3-70b-chat-hf',
+  // Fallback chat model (OSS via Together)
+  chatFallback: 'openai/gpt-oss-20b',
   image: 'ServiceNow-AI/Apriel-1.5-15b-Thinker',
 };
 

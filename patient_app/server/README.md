@@ -73,5 +73,5 @@ Stage 2 LLM foundation
 - `src/llm/errors.js` defines structured errors used by the client.
 - `src/llm/prompt_template.js` provides the base system prompt (v1.0) with placeholders for history and user message.
 - `src/llm/history_manager.js` formats conversation history (last 3 turns, role/content pairs) for prompts.
-- `src/llm/models.js` catalogs default model ids (chat friendly Gemma-3n-E4B-it, reasoning Apriel-1.5-15B-Thinker, supported fallback meta-llama/Llama-3-70b-chat-hf, image Apriel) and resolves chat model with optional env override.
+- `src/llm/models.js` catalogs default model ids (chat friendly Gemma-3n-E4B-it, reasoning Apriel-1.5-15B-Thinker, fallback openai/gpt-oss-20b, image Apriel) and resolves chat model with optional env override.
 - The HTTP endpoint for LLM chat will be added in a later task; the client is ready for integration.
