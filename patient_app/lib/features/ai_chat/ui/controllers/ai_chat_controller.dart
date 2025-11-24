@@ -18,6 +18,7 @@ import 'package:patient_app/core/ai/chat/application/use_cases/send_chat_message
 import 'package:patient_app/core/ai/repositories/ai_consent_repository.dart';
 import 'package:patient_app/core/di/app_container.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
+import 'package:patient_app/core/ai/chat/services/message_queue_service.dart';
 
 /// Riverpod controller handling AI chat state for a given space.
 class AiChatController extends StateNotifier<AiChatState> {
@@ -29,12 +30,14 @@ class AiChatController extends StateNotifier<AiChatState> {
     required SwitchSpaceContextUseCase switchSpaceContextUseCase,
     required ChatThreadRepository chatThreadRepository,
     required SpaceContextBuilder spaceContextBuilder,
+    required MessageQueueService messageQueueService,
   })  : _sendChatMessageUseCase = sendChatMessageUseCase,
         _loadChatHistoryUseCase = loadChatHistoryUseCase,
         _clearChatThreadUseCase = clearChatThreadUseCase,
         _switchSpaceContextUseCase = switchSpaceContextUseCase,
         _chatThreadRepository = chatThreadRepository,
         _spaceContextBuilder = spaceContextBuilder,
+        _messageQueueService = messageQueueService,
         super(AiChatState.loading()) {
     loadInitial();
   }
@@ -46,6 +49,7 @@ class AiChatController extends StateNotifier<AiChatState> {
   final SwitchSpaceContextUseCase _switchSpaceContextUseCase;
   final ChatThreadRepository _chatThreadRepository;
   final SpaceContextBuilder _spaceContextBuilder;
+  final MessageQueueService _messageQueueService;
 
   Future<void> loadInitial() async {
     state = state.copyWith(isLoading: true, errorMessage: null);
@@ -70,6 +74,9 @@ class AiChatController extends StateNotifier<AiChatState> {
 
   void setOffline(bool isOffline) {
     state = state.copyWith(isOffline: isOffline);
+    if (!isOffline) {
+      _messageQueueService.processQueue();
+    }
   }
 
   void addAttachment(MessageAttachment attachment) {
@@ -85,7 +92,7 @@ class AiChatController extends StateNotifier<AiChatState> {
   Future<void> sendMessage(String content) async {
     if (state.thread == null || state.spaceContext == null) return;
     if (state.isOffline) {
-      state = state.copyWith(errorMessage: 'Offline - cannot send');
+      await _queueOffline(content);
       return;
     }
 
@@ -118,6 +125,30 @@ class AiChatController extends StateNotifier<AiChatState> {
     } catch (e, stackTrace) {
       await AppLogger.error(
         'Failed to send chat message',
+        error: e,
+        stackTrace: stackTrace,
+        context: {'threadId': state.thread?.id},
+      );
+      state = state.copyWith(isSending: false, errorMessage: e.toString());
+    }
+  }
+
+  Future<void> _queueOffline(String content) async {
+    try {
+      await _messageQueueService.enqueue(
+        threadId: state.thread!.id,
+        spaceContext: state.spaceContext!,
+        content: content,
+        attachments: state.attachments,
+      );
+      state = state.copyWith(
+        attachments: const [],
+        isSending: false,
+        errorMessage: 'Message queued for send when online',
+      );
+    } catch (e, stackTrace) {
+      await AppLogger.error(
+        'Failed to queue chat message offline',
         error: e,
         stackTrace: stackTrace,
         context: {'threadId': state.thread?.id},
@@ -174,6 +205,10 @@ final aiChatControllerProvider = StateNotifierProvider.family<AiChatController, 
       consentRepository: container.resolve<AiConsentRepository>(),
       attachmentHandler: attachmentHandler,
     );
+    final queueService = MessageQueueService(
+      sendChatMessageUseCase: sendUseCase,
+      chatThreadRepository: chatRepo,
+    );
     final spaceBuilder = ref.read(spaceContextBuilderProvider);
     final switchUseCase = SwitchSpaceContextUseCase(
       loadChatHistoryUseCase: loadUseCase,
@@ -189,6 +224,7 @@ final aiChatControllerProvider = StateNotifierProvider.family<AiChatController, 
       switchSpaceContextUseCase: switchUseCase,
       chatThreadRepository: chatRepo,
       spaceContextBuilder: spaceBuilder,
+      messageQueueService: queueService,
     );
   },
 );

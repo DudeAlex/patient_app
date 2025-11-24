@@ -17,6 +17,7 @@ import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
+import 'package:patient_app/core/ai/chat/services/message_queue_service.dart';
 import 'package:patient_app/core/ai/repositories/ai_consent_repository.dart';
 import 'package:patient_app/features/ai_chat/ui/controllers/ai_chat_controller.dart';
 import 'package:patient_app/features/ai_chat/ui/screens/ai_chat_screen.dart';
@@ -104,6 +105,16 @@ class _TestController extends AiChatController {
           ),
           chatThreadRepository: _StubThreadRepo(),
           spaceContextBuilder: _StubSpaceContextBuilder(),
+          messageQueueService: MessageQueueService(
+            sendChatMessageUseCase: SendChatMessageUseCase(
+              aiChatService: FakeAiChatService(simulatedLatency: Duration.zero),
+              chatThreadRepository: _StubThreadRepo(),
+              consentRepository: _StubConsentRepo(),
+              attachmentHandler: _StubAttachmentHandler(),
+              uuid: const Uuid(),
+            ),
+            chatThreadRepository: _StubThreadRepo(),
+          ),
         );
 
   @override
@@ -168,5 +179,4 @@ void main() {
     expect(find.byType(TextField), findsOneWidget);
   });
 }
-
 
