@@ -204,7 +204,7 @@
   - Handle empty history gracefully
   - _Requirements: 2.2, 3.1, 3.2, 3.3, 3.4, 3.5_
 
-- [ ] 24. Implement token counter (Backend)
+- [x] 24. Implement token counter (Backend)
   - Integrate provider's tokenizer (tiktoken or custom)
   - Count tokens in system prompt
   - Count tokens in history

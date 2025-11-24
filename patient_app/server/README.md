@@ -75,4 +75,5 @@ Stage 2 LLM foundation
 - `src/llm/history_manager.js` formats conversation history (last 3 turns, role/content pairs) for prompts.
 - `src/llm/models.js` catalogs default model ids (chat friendly google/gemma-3n-E4B-it, reasoning Apriel-1.5-15B-Thinker, fallback openai/gpt-oss-20b, image Apriel) and resolves chat model with optional env override.
 - `scripts/ping_model.mjs` probes a model with a short prompt (uses .env key). Gemma may be unsupported on Together; Apriel and gpt-oss-20b succeed.
+- `src/llm/token_counter.js` estimates token usage for system prompt, history, and user message using tiktoken with model fallback.
 - The HTTP endpoint for LLM chat will be added in a later task; the client is ready for integration.

@@ -686,4 +686,9 @@
 - **Scope**: Retried friendly model with Together-supported id; returns concise hello successfully.
 - **Result**: Pass.
 
+# 2025-11-24 (Token counter)
+- **Command**: _Not run (utility only)_
+- **Scope**: Added `server/src/llm/token_counter.js` to estimate token usage for system prompt, history, and user message (tiktoken with model fallback).
+- **Result**: Tests not run; helper added for upcoming endpoint wiring.
+
 
