@@ -68,3 +68,10 @@ export function rateLimiter(req, res, next) {
 
   next();
 }
+
+// Test helper to clear buckets.
+export function __resetRateLimiter() {
+  buckets.minute.clear();
+  buckets.hour.clear();
+  buckets.day.clear();
+}

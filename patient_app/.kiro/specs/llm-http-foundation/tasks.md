@@ -271,7 +271,7 @@
   - Log token usage from response
   - _Requirements: 3.1, 3.2_
 
-- [ ] 32. Write unit tests for LLM integration (Backend)
+- [x] 32. Write unit tests for LLM integration (Backend)
   - Test prompt construction with history
   - Test token counting
   - Test LLM API call

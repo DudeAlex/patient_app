@@ -726,4 +726,9 @@
 - **Scope**: SendChatMessageUseCase now defaults to 3 history messages, sends limited history, and logs token usage/latency/finishReason/modelVersion from AI responses.
 - **Result**: Tests not run; use case wiring change only.
 
+# 2025-11-24 (Server unit tests)
+- **Command**: `cd server && npm test`
+- **Scope**: Node test suites for prompt template placeholders, history formatting, model resolver, token counter, and rate limiter behavior.
+- **Result**: Pass.
+
 
