@@ -510,3 +510,8 @@
 - **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
 - **Scope**: Regression check after introducing MessageQueueService dependency in AiChatController.
 - **Result**: Pass on Windows; chat widget still builds with queue wiring present.
+
+# 2025-11-23 (AI chat diagnostics filter)
+- **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
+- **Scope**: Regression check after adding AiCallLogRepository logging for chat and diagnostics filters.
+- **Result**: Pass on Windows; chat widget still builds with diagnostics wiring present.

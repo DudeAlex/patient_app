@@ -4,7 +4,9 @@ import 'package:patient_app/core/ai/ai_service.dart';
 import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
 import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
+import 'package:patient_app/core/ai/models/ai_call_log_entry.dart';
 import 'package:patient_app/core/ai/models/ai_summary_result.dart';
+import 'package:patient_app/core/ai/repositories/ai_call_log_repository.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
 import 'package:patient_app/core/domain/entities/information_item.dart';
 
@@ -12,9 +14,13 @@ import 'package:patient_app/core/domain/entities/information_item.dart';
 ///
 /// Message content is intentionally excluded from logs to avoid leaking PHI.
 class LoggingAiChatService implements AiChatService {
-  LoggingAiChatService(this._delegate);
+  LoggingAiChatService(
+    this._delegate, {
+    AiCallLogRepository? callLogRepository,
+  }) : _callLogRepository = callLogRepository;
 
   final AiChatService _delegate;
+  final AiCallLogRepository? _callLogRepository;
 
   @override
   Future<ChatResponse> sendMessage(ChatRequest request) async {
@@ -39,6 +45,18 @@ class LoggingAiChatService implements AiChatService {
         },
         correlationId: opId,
       );
+      _callLogRepository?.add(
+        AiCallLogEntry(
+          timestamp: DateTime.now(),
+          spaceId: request.spaceContext.spaceId,
+          domainId: 'chat',
+          provider: response.metadata.provider,
+          latencyMs: response.metadata.latencyMs,
+          tokensUsed: response.metadata.tokensUsed,
+          confidence: response.metadata.confidence,
+          success: true,
+        ),
+      );
       return response;
     } catch (error, stackTrace) {
       await AppLogger.error(
@@ -47,6 +65,19 @@ class LoggingAiChatService implements AiChatService {
         stackTrace: stackTrace,
         context: context,
         correlationId: opId,
+      );
+      _callLogRepository?.add(
+        AiCallLogEntry(
+          timestamp: DateTime.now(),
+          spaceId: request.spaceContext.spaceId,
+          domainId: 'chat',
+          provider: 'chat',
+          latencyMs: 0,
+          tokensUsed: 0,
+          confidence: 0,
+          success: false,
+          errorMessage: error.toString(),
+        ),
       );
       rethrow;
     } finally {

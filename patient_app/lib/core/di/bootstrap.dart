@@ -113,6 +113,7 @@ Future<void> bootstrapAppContainer() async {
             baseUrl: aiConfigRepository.current.remoteUrl,
           ),
         ),
+        callLogRepository: aiCallLogRepository,
       ),
     );
 

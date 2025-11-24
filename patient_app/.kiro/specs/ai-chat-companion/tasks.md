@@ -250,7 +250,7 @@
   - Update message status in UI as messages send
   - _Requirements: 16.1, 16.2, 16.3, 16.4, 16.5_
 
-- [ ] 30. Add chat diagnostics to Diagnostic System UI
+- [x] 30. Add chat diagnostics to Diagnostic System UI
   - Create AI Chat section in Diagnostic System
   - Display last N chat interactions with timestamps
   - Show success/failure status, latency, tokens used
