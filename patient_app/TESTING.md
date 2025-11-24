@@ -676,4 +676,9 @@
 - **Scope**: Added `server/src/llm/models.js` to catalog default chat/image models (friendly Gemma-3n-E4B-it, reasoning Apriel-1.5-15B-Thinker, fallback openai/gpt-oss-20b, image Apriel) and resolve chat model with optional env override; `TogetherClient` now consumes the resolver.
 - **Result**: Tests not run; config change only.
 
+# 2025-11-24 (Model ping script)
+- **Command**: `node server/scripts/ping_model.mjs`, `node server/scripts/ping_model.mjs ServiceNow-AI/Apriel-1.5-15b-Thinker`, `node server/scripts/ping_model.mjs openai/gpt-oss-20b`
+- **Scope**: Added ping script to probe models via Together. Apriel returns chain-of-thought/length-limited reply; openai/gpt-oss-20b returns a concise hello. Gemma-3n-e4b-it is not available (404 from Together).
+- **Result**: Gemma failed (unsupported), Apriel succeeded (length stop at 64 tokens), OSS 20b succeeded (stop).
+
 
