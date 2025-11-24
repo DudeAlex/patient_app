@@ -706,4 +706,9 @@
 - **Scope**: Added request/response logging in Together client (model, correlation id, message count, maxTokens, latency) and exposed latencyMs in chat endpoint metadata.
 - **Result**: Tests not run; logging-only change.
 
+# 2025-11-24 (Client Stage 2 endpoint update)
+- **Command**: _Not run (client wiring only)_
+- **Scope**: HttpAiChatService now targets `/api/v1/chat/message`, uses 60s timeout, and parses finishReason/usage/provider/latency into metadata (plus tokens).
+- **Result**: Tests not run; endpoint update pending integrated verification.
+
 

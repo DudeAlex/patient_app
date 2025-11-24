@@ -242,7 +242,7 @@
   - Redact message content
   - _Requirements: 2.4, 4.2, 4.3, 4.4_
 
-- [ ] 28. Update HttpAiChatService for Stage 2
+- [x] 28. Update HttpAiChatService for Stage 2
   - Update endpoint to /api/v1/chat/message
   - Include message history in request
   - Increase timeout to 60 seconds

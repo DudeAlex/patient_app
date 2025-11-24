@@ -24,7 +24,7 @@ class HttpAiChatService implements AiChatService {
   HttpAiChatService({
     required this.client,
     required this.baseUrl,
-    this.timeout = const Duration(seconds: 30),
+    this.timeout = const Duration(seconds: 60),
     this.maxRetries = 3,
     Connectivity? connectivity,
     Future<List<ConnectivityResult>> Function()? connectivityCheck,
@@ -218,7 +218,7 @@ class HttpAiChatService implements AiChatService {
 
   Uri _buildEchoUri() {
     final base = Uri.parse(baseUrl);
-    return base.resolve('/api/v1/chat/echo');
+    return base.resolve('/api/v1/chat/message');
   }
 
   ChatResponse _responseFromJson(Map<String, dynamic> map) {
@@ -246,6 +246,7 @@ class HttpAiChatService implements AiChatService {
     final provider =
         metadata['llmProvider'] as String? ?? metadata['provider'] as String? ?? 'remote';
     final confidence = (metadata['confidence'] as num?)?.toDouble() ?? 0.0;
+    final finishReason = metadata['finishReason'] as String?;
 
     return ChatResponse(
       messageContent: map['message'] as String? ?? '',
@@ -255,6 +256,7 @@ class HttpAiChatService implements AiChatService {
         latencyMs: latencyMs,
         provider: provider,
         confidence: confidence,
+        finishReason: finishReason,
       ),
     );
   }
