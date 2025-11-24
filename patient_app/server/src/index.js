@@ -117,6 +117,7 @@ app.post('/api/v1/chat/message', async (req, res) => {
         usage: response.usage,
         provider: response.provider,
         correlationId: response.correlationId,
+        latencyMs: response.latencyMs,
       },
     });
   } catch (error) {

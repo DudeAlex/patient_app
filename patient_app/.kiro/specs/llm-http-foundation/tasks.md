@@ -234,7 +234,7 @@
   - Log rate limit violations
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 27. Add LLM-specific logging (Backend)
+- [x] 27. Add LLM-specific logging (Backend)
   - Log LLM request sent (provider, model, prompt tokens)
   - Log LLM response received (completion tokens, latency)
   - Log token usage per request

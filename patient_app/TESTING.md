@@ -701,4 +701,9 @@
 - **Scope**: Added in-memory rate limiter (10/min, 100/hr, 500/day) applied to chat endpoints; returns 429 with retryable flag and correlation id.
 - **Result**: Tests not run; middleware added.
 
+# 2025-11-24 (LLM logging)
+- **Command**: _Not run (logging only)_
+- **Scope**: Added request/response logging in Together client (model, correlation id, message count, maxTokens, latency) and exposed latencyMs in chat endpoint metadata.
+- **Result**: Tests not run; logging-only change.
+
 

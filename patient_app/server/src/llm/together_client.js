@@ -3,6 +3,11 @@ import { LlmError, classifyLlmError } from './errors.js';
 import { resolveChatModel } from './models.js';
 
 const DEFAULT_MODEL = resolveChatModel(process.env.TOGETHER_MODEL);
+const log = (...args) => {
+  if (process.env.NODE_ENV !== 'test') {
+    console.log(...args);
+  }
+};
 const DEFAULT_TIMEOUT_MS = Number.parseInt(
   process.env.LLM_TIMEOUT_MS ?? '60000',
   10,
@@ -43,10 +48,19 @@ export class TogetherClient {
     maxTokens = 512,
     temperature = 0.2,
   }) {
+    const start = Date.now();
+
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.timeoutMs);
 
     try {
+      log('[LLM] request', {
+        model: this.model,
+        correlationId,
+        messageCount: messages.length,
+        maxTokens,
+      });
+
       const response = await fetch(
         'https://api.together.xyz/v1/chat/completions',
         {
@@ -94,6 +108,7 @@ export class TogetherClient {
         usage: json?.usage ?? {},
         provider: 'together',
         correlationId,
+        latencyMs: Date.now() - start,
       };
     } catch (error) {
       if (error.name === 'AbortError') {
