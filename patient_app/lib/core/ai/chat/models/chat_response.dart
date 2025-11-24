@@ -62,6 +62,7 @@ class AiMessageMetadata {
     this.provider = 'unknown',
     this.confidence = 0.0,
     this.finishReason,
+    this.modelVersion,
   });
 
   /// Token usage reported by the provider.
@@ -79,12 +80,16 @@ class AiMessageMetadata {
   /// Provider finish reason (stop, length, etc.) when available.
   final String? finishReason;
 
+  /// Model version identifier when provided by the backend.
+  final String? modelVersion;
+
   AiMessageMetadata copyWith({
     int? tokensUsed,
     int? latencyMs,
     String? provider,
     double? confidence,
     String? finishReason,
+    String? modelVersion,
   }) {
     return AiMessageMetadata(
       tokensUsed: tokensUsed ?? this.tokensUsed,
@@ -92,6 +97,7 @@ class AiMessageMetadata {
       provider: provider ?? this.provider,
       confidence: confidence ?? this.confidence,
       finishReason: finishReason ?? this.finishReason,
+      modelVersion: modelVersion ?? this.modelVersion,
     );
   }
 
@@ -101,6 +107,7 @@ class AiMessageMetadata {
     String provider = 'unknown',
     double confidence = 0.0,
     String? finishReason,
+    String? modelVersion,
   }) {
     return AiMessageMetadata._raw(
       tokensUsed: tokensUsed,
@@ -108,6 +115,7 @@ class AiMessageMetadata {
       provider: provider,
       confidence: _clampConfidence(confidence),
       finishReason: finishReason,
+      modelVersion: modelVersion,
     );
   }
 

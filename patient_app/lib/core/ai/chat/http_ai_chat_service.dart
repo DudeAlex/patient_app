@@ -247,6 +247,7 @@ class HttpAiChatService implements AiChatService {
         metadata['llmProvider'] as String? ?? metadata['provider'] as String? ?? 'remote';
     final confidence = (metadata['confidence'] as num?)?.toDouble() ?? 0.0;
     final finishReason = metadata['finishReason'] as String?;
+    final modelVersion = metadata['modelVersion'] as String?;
 
     return ChatResponse(
       messageContent: map['message'] as String? ?? '',
@@ -257,6 +258,7 @@ class HttpAiChatService implements AiChatService {
         provider: provider,
         confidence: confidence,
         finishReason: finishReason,
+        modelVersion: modelVersion,
       ),
     );
   }

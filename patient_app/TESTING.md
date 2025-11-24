@@ -716,4 +716,9 @@
 - **Scope**: ChatRequest now limits history to 3 messages by default and serializes history as role/content pairs.
 - **Result**: Tests not run; model serialization change only.
 
+# 2025-11-24 (ChatResponse metadata update)
+- **Command**: _Not run (model change only)_
+- **Scope**: AiMessageMetadata now includes finishReason and modelVersion; HttpAiChatService parses these from LLM metadata.
+- **Result**: Tests not run; metadata parsing change only.
+
 

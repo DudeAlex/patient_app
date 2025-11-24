@@ -257,7 +257,7 @@
   - Format history as role/content pairs
   - _Requirements: 3.1, 3.3_
 
-- [ ] 30. Update ChatResponse model
+- [x] 30. Update ChatResponse model
   - Add tokenUsage field to AiMetadata
   - Add llmProvider field to AiMetadata
   - Add modelVersion field to AiMetadata
