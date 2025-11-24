@@ -290,7 +290,7 @@
   - Test simulated latency and failures
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 11.2, 12.1, 12.2, 12.3, 12.4, 12.5, 13.1, 13.2, 13.3, 13.4, 13.5_
 
-- [ ] 35. Write unit tests for HttpAiChatService
+- [x] 35. Write unit tests for HttpAiChatService
   - Test request payload construction
   - Test response parsing
   - Test retry logic with exponential backoff

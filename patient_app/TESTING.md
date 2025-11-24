@@ -535,3 +535,8 @@
 - **Command**: `flutter test test/core/ai/chat/fake_ai_chat_service_test.dart`
 - **Scope**: Persona-specific responses/action hints (health, finance, education, travel), streaming completion, deterministic summaries.
 - **Result**: Pass on Windows.
+
+# 2025-11-23 (HTTP AI chat service tests)
+- **Command**: `flutter test test/core/ai/chat/http_ai_chat_service_test.dart`
+- **Scope**: Payload construction and redaction, success parsing, retry/backoff on 5xx, non-retryable 4xx failure, and timeout behavior.
+- **Result**: Pass on Windows.
