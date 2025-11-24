@@ -545,3 +545,8 @@
 - **Command**: `flutter test test/core/ai/chat/logging_ai_chat_service_test.dart`
 - **Scope**: Ensures decorator delegates send/stream, records call logs on success/failure, and preserves summarize behavior.
 - **Result**: Pass on Windows.
+
+# 2025-11-23 (AI chat widget suite)
+- **Command**: `flutter test test/features/ai_chat/ui/widgets`
+- **Scope**: Chat UI components (header, banner, message bubble, list lazy load/auto-scroll, composer, attachment previews, action hints) regression coverage.
+- **Result**: Pass on Windows.

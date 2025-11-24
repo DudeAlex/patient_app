@@ -318,7 +318,7 @@
   - Mock AiChatService and repositories
   - _Requirements: 1.5, 3.2, 3.3, 3.4, 3.5, 10.1, 10.2, 10.3, 15.1, 15.2, 15.3_
 
-- [ ] 38. Write widget tests for UI components
+- [x] 38. Write widget tests for UI components
   - Test AiChatScreen initial render
   - Test ChatHeader context chip and status pill
   - Test DataUsageBanner display and dismissal
