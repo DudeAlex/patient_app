@@ -61,7 +61,7 @@
   - Add queue expiration (7 days)
   - _Requirements: 7.1, 7.2_
 
-- [ ] 7. Implement ConnectivityMonitor
+- [x] 7. Implement ConnectivityMonitor
   - Create `lib/core/ai/chat/services/connectivity_monitor.dart`
   - Listen to connectivity changes
   - Trigger queue processing on connectivity restored
