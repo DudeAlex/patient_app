@@ -606,4 +606,9 @@
 - **Scope**: Asserts MessageList never renders above its initialVisibleCount cap and builds within 500ms for 100 messages.
 - **Result**: Pass on Windows.
 
+# 2025-11-24 (Chat HTTP foundation lint)
+- **Command**: `dart analyze lib/core/ai/chat/http_ai_chat_service.dart lib/core/ai/chat/exceptions/chat_exceptions.dart`
+- **Scope**: Targeted lint pass for the new chat HTTP client and exception taxonomy.
+- **Result**: Pass (no issues for these files; project-wide warnings remain unchanged).
+
 
