@@ -203,7 +203,7 @@
   - Display voice note as attachment chip
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 25. Implement file picker integration
+- [x] 25. Implement file picker integration
   - Add file_picker package dependency
   - Support PDF, images, and text documents
   - Display filename and file type in composer

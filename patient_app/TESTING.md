@@ -500,3 +500,8 @@
 - **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
 - **Scope**: Regression check after adding voice recording/attach flow with transcription metadata.
 - **Result**: Pass on Windows; chat UI still builds with voice capture hooks present.
+
+# 2025-11-23 (AI Chat Screen - file attach update)
+- **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
+- **Scope**: Regression check after adding file picker attach flow with size/consent dialog.
+- **Result**: Pass on Windows; chat UI still builds with file attach hooks present.

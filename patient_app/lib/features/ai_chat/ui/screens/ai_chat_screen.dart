@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
 import 'package:patient_app/core/ai/chat/chat_providers.dart';
@@ -94,7 +95,12 @@ class AiChatScreen extends ConsumerWidget {
               state,
               controller,
             ),
-            onFileTap: () {},
+            onFileTap: () => _handleFileAttachment(
+              context,
+              ref,
+              state,
+              controller,
+            ),
             onRemoveAttachment: (att) => controller.removeAttachment(att.id),
           ),
         ],
@@ -203,6 +209,118 @@ class AiChatScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Unable to attach photo: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleFileAttachment(
+    BuildContext context,
+    WidgetRef ref,
+    AiChatState state,
+    AiChatController controller,
+  ) async {
+    if (state.isOffline) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Offline - cannot attach files')),
+      );
+      return;
+    }
+    if (state.thread == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Chat is still loading')),
+      );
+      return;
+    }
+
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'txt'],
+      withData: false,
+    );
+    if (result == null || result.files.isEmpty) return;
+
+    final picked = result.files.first;
+    final path = picked.path;
+    if (path == null) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Selected file has no local path')),
+        );
+      }
+      return;
+    }
+
+    final file = File(path);
+    final handler = ref.read(messageAttachmentHandlerProvider);
+
+    try {
+      await handler.validateAttachment(file, AttachmentType.file);
+    } catch (e, stackTrace) {
+      await AppLogger.error(
+        'File attachment validation failed',
+        error: e,
+        stackTrace: stackTrace,
+        context: {'path': file.path},
+      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('File too large or invalid: $e')),
+        );
+      }
+      return;
+    }
+
+    final sizeBytes = await file.length();
+    final sizeMb = (sizeBytes / (1024 * 1024)).toStringAsFixed(1);
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Attach file to AI chat?'),
+        content: Text(
+          'This file (~$sizeMb MB) will be added to your chat and may be '
+          'sent to the AI provider when you send the message. The original '
+          'file stays on your device.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Attach'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      final attachment = await handler.processAttachment(
+        sourceFile: file,
+        type: AttachmentType.file,
+        targetThreadId: state.thread!.id,
+      );
+      controller.addAttachment(
+        attachment.copyWith(fileSizeBytes: sizeBytes),
+      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('File attached')),
+        );
+      }
+    } catch (e, stackTrace) {
+      await AppLogger.error(
+        'Failed to attach file',
+        error: e,
+        stackTrace: stackTrace,
+        context: {'threadId': state.thread?.id},
+      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Unable to attach file: $e')),
         );
       }
     }
