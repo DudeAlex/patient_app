@@ -1,17 +1,15 @@
 import 'dart:convert';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:patient_app/core/ai/chat/exceptions/chat_exceptions.dart';
 import 'package:patient_app/core/ai/chat/http_ai_chat_service.dart';
-import 'package:patient_app/core/ai/chat/models/chat_request.dart';
-import 'package:patient_app/core/ai/chat/models/space_context.dart';
-import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
-import 'package:patient_app/core/ai/models/ai_error.dart';
-import 'package:patient_app/core/domain/entities/information_item.dart';
-
 import 'package:patient_app/core/ai/chat/models/chat_message.dart';
+import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
+import 'package:patient_app/core/ai/chat/models/space_context.dart';
 
 ChatRequest _request() {
   return ChatRequest(
@@ -45,7 +43,7 @@ ChatRequest _request() {
 }
 
 void main() {
-  test('sends payload and parses success response', () async {
+  test('sends payload, sets correlation header, and parses success response', () async {
     late http.Request captured;
     final client = MockClient((request) async {
       captured = request;
@@ -59,8 +57,8 @@ void main() {
           'actionHints': ['Do next thing'],
           'metadata': {
             'tokensUsed': 42,
-            'latencyMs': 1200,
-            'provider': 'remote',
+            'processingTimeMs': 1200,
+            'llmProvider': 'remote',
             'confidence': 0.75,
           }
         }),
@@ -72,12 +70,13 @@ void main() {
     final service = HttpAiChatService(
       client: client,
       baseUrl: 'https://api.example.com',
-      timeout: const Duration(seconds: 1),
+      connectivityCheck: () async => [ConnectivityResult.wifi],
     );
 
     final response = await service.sendMessage(_request());
 
-    expect(captured.url.toString(), 'https://api.example.com/chat/send');
+    expect(captured.url.toString(), 'https://api.example.com/api/v1/chat/echo');
+    expect(captured.headers.containsKey('X-Correlation-ID'), isTrue);
     expect(response.messageContent, 'Hi back');
     expect(response.actionHints, contains('Do next thing'));
     expect(response.metadata.tokensUsed, 42);
@@ -98,8 +97,8 @@ void main() {
     final service = HttpAiChatService(
       client: client,
       baseUrl: 'https://api.example.com',
-      timeout: const Duration(seconds: 1),
       maxRetries: 3,
+      connectivityCheck: () async => [ConnectivityResult.wifi],
     );
 
     final response = await service.sendMessage(_request());
@@ -108,24 +107,18 @@ void main() {
     expect(response.messageContent, 'ok');
   });
 
-  test('throws non-retryable status as provider unavailable', () async {
+  test('throws validation exception on non-retryable status', () async {
     final client = MockClient((_) async => http.Response('bad request', 400));
     final service = HttpAiChatService(
       client: client,
       baseUrl: 'https://api.example.com',
-      timeout: const Duration(seconds: 1),
       maxRetries: 2,
+      connectivityCheck: () async => [ConnectivityResult.wifi],
     );
 
     expect(
       () => service.sendMessage(_request()),
-      throwsA(
-        isA<AiProviderUnavailableException>().having(
-          (e) => e.error,
-          'error',
-          isA<AiError>().having((err) => err.isRetryable, 'retryable', isFalse),
-        ),
-      ),
+      throwsA(isA<ValidationException>()),
     );
   });
 
@@ -139,17 +132,12 @@ void main() {
       baseUrl: 'https://api.example.com',
       timeout: const Duration(milliseconds: 50),
       maxRetries: 1,
+      connectivityCheck: () async => [ConnectivityResult.wifi],
     );
 
     expect(
       () => service.sendMessage(_request()),
-      throwsA(
-        isA<AiProviderUnavailableException>().having(
-          (e) => e.error,
-          'error',
-          isA<AiError>().having((err) => err.isRetryable, 'retryable', isTrue),
-        ),
-      ),
+      throwsA(isA<ChatTimeoutException>()),
     );
   });
 }

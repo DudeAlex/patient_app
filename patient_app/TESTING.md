@@ -611,4 +611,9 @@
 - **Scope**: Targeted lint pass for the new chat HTTP client and exception taxonomy.
 - **Result**: Pass (no issues for these files; project-wide warnings remain unchanged).
 
+# 2025-11-24 (HttpAiChatService unit tests)
+- **Command**: `flutter test test/core/ai/chat/http_ai_chat_service_test.dart`
+- **Scope**: Validates echo payload build, correlation ID header, retry/backoff behaviour, non-retryable error classification, and timeout handling with injected connectivity.
+- **Result**: Pass.
+
 
