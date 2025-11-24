@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:patient_app/core/ai/ai_service.dart';
 import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
 import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
@@ -191,7 +190,6 @@ class FakeAiChatService implements AiChatService {
           'Check packing list',
         ];
       case SpacePersona.general:
-      default:
         return [
           'View recent records',
           'Add new information',
@@ -227,7 +225,6 @@ class FakeAiChatService implements AiChatService {
         }
         return "Let’s plan together. I can build a lightweight itinerary, packing list, and reminders for your $spaceName plans. What’s the next step you need?";
       case SpacePersona.general:
-      default:
         return "I’m here to help organize your information and suggest next steps. Tell me what you’re focusing on, and I’ll keep it concise and actionable.";
     }
   }

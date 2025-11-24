@@ -11,7 +11,6 @@ import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
-import 'package:patient_app/core/ai/chat/chat_providers.dart';
 import 'package:patient_app/core/ai/chat/providers/space_context_provider.dart';
 import 'package:patient_app/core/ai/chat/application/use_cases/send_chat_message_use_case.dart'
     as chat_use_cases;

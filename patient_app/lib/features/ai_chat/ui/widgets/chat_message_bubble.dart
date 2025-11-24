@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
 import 'package:patient_app/core/ai/chat/models/chat_message.dart';
-import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/features/ai_chat/ui/widgets/attachment_preview.dart';
 import 'package:patient_app/features/ai_chat/ui/widgets/action_hints_row.dart';
 
@@ -139,51 +138,5 @@ class ChatMessageBubble extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _AttachmentList extends StatelessWidget {
-  const _AttachmentList({required this.attachments});
-
-  final List<MessageAttachment> attachments;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: attachments
-          .map(
-            (att) => Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    _iconFor(att.type),
-                    size: 18,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    att.fileName ?? att.type.name,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
-              ),
-            ),
-          )
-          .toList(),
-    );
-  }
-
-  IconData _iconFor(AttachmentType type) {
-    switch (type) {
-      case AttachmentType.photo:
-        return Icons.photo;
-      case AttachmentType.voice:
-        return Icons.mic;
-      case AttachmentType.file:
-        return Icons.insert_drive_file;
-    }
   }
 }

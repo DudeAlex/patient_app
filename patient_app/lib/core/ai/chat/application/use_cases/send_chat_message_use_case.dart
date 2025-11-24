@@ -10,7 +10,6 @@ import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
 import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
-import 'package:patient_app/core/ai/models/ai_error.dart';
 import 'package:patient_app/core/ai/repositories/ai_consent_repository.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
 import 'package:uuid/uuid.dart';

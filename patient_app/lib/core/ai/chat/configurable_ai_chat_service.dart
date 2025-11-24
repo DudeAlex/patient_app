@@ -1,5 +1,3 @@
-import 'package:http/http.dart' as http;
-
 import 'package:patient_app/core/ai/ai_config.dart';
 import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
 import 'package:patient_app/core/ai/chat/http_ai_chat_service.dart';

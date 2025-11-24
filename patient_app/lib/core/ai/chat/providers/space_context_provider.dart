@@ -2,13 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
-import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/di/app_container.dart';
-import 'package:patient_app/core/domain/entities/information_item.dart';
 import 'package:patient_app/features/records/application/use_cases/fetch_recent_records_use_case.dart';
 import 'package:patient_app/features/records/data/records_service.dart';
-import 'package:patient_app/features/records/domain/entities/record.dart';
 
 /// Riverpod provider that builds [SpaceContext] for a given space.
 final spaceContextProvider =
@@ -32,11 +29,9 @@ class DefaultSpaceContextBuilder implements SpaceContextBuilder {
     required ChatThreadRepository chatThreadRepository,
     int maxRecords = 5,
   })  : _recordsServiceFuture = recordsServiceFuture,
-        _chatThreadRepository = chatThreadRepository,
         _maxRecords = maxRecords;
 
   final Future<RecordsService> _recordsServiceFuture;
-  final ChatThreadRepository _chatThreadRepository;
   final int _maxRecords;
 
   @override

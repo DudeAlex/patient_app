@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:patient_app/core/ai/ai_service.dart';
 import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
 import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';

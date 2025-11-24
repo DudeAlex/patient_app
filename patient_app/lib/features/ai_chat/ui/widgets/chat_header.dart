@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:patient_app/core/ai/ai_config.dart';
 
 /// Header for the AI chat screen showing space context and AI status.
 class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
