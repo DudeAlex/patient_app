@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
 import 'package:patient_app/core/ai/chat/chat_providers.dart';
 import 'package:patient_app/core/ai/chat/models/chat_message.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
+import 'package:patient_app/core/ai/ai_config.dart';
+import 'package:patient_app/core/ai/repositories/ai_config_repository.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
 import 'package:patient_app/core/storage/attachments.dart';
 import 'package:patient_app/features/ai_chat/ui/controllers/ai_chat_controller.dart';
@@ -18,6 +19,7 @@ import 'package:patient_app/features/ai_chat/ui/widgets/data_usage_banner.dart';
 import 'package:patient_app/features/ai_chat/ui/widgets/message_list.dart';
 import 'package:patient_app/features/capture_core/api/capture_mode.dart';
 import 'package:patient_app/features/capture_modes/voice/voice_capture_service.dart';
+import 'package:patient_app/core/di/app_container.dart';
 
 /// AI Chat screen composed of header, data banner, messages, and composer.
 class AiChatScreen extends ConsumerWidget {
@@ -42,12 +44,17 @@ class AiChatScreen extends ConsumerWidget {
     }
 
     final messages = state.thread?.messages ?? const <ChatMessage>[];
+    final aiConfig =
+        AppContainer.instance.resolve<AiConfigRepository>().current;
 
     return Scaffold(
       appBar: ChatHeader(
         spaceName: state.spaceContext?.spaceName ?? spaceId,
         spaceIcon: Icons.chat_bubble_outline,
-        status: _statusFor(state.isOffline, ref.read(aiChatServiceProvider)),
+        status: _statusFor(
+          isOffline: state.isOffline,
+          config: aiConfig,
+        ),
         onClearChat: controller.clearChat,
         onChangeContext: () {},
       ),
@@ -108,13 +115,15 @@ class AiChatScreen extends ConsumerWidget {
     );
   }
 
-  ChatHeaderStatus _statusFor(bool isOffline, AiChatService service) {
+  ChatHeaderStatus _statusFor({
+    required bool isOffline,
+    required AiConfig config,
+  }) {
     if (isOffline) return ChatHeaderStatus.offline;
-    // Simple heuristic: use Fake vs Remote.
-    final provider = service.runtimeType.toString().toLowerCase();
-    if (provider.contains('fake')) return ChatHeaderStatus.fake;
-    if (provider.contains('http')) return ChatHeaderStatus.remote;
-    return ChatHeaderStatus.offline;
+    if (!config.enabled || config.mode == AiMode.fake) {
+      return ChatHeaderStatus.fake;
+    }
+    return ChatHeaderStatus.remote;
   }
 
   Future<void> _handlePhotoAttachment(

@@ -75,7 +75,7 @@
   - Show "Offline - cannot send" hint in composer
   - _Requirements: 7.3, 7.4_
 
-- [ ] 9. Implement service switching (Fake/HTTP)
+- [x] 9. Implement service switching (Fake/HTTP)
   - Update AppContainer to support service selection
   - Add ai_mode configuration (fake/http)
   - Create service factory method
