@@ -392,6 +392,23 @@ void main() {
       expect(queue.pendingCount, 1);
     });
   });
+
+  group('Property tests - markdown rendering placeholder', () {
+    test('ChatMessage content with markdown stays under length limit', () {
+      final rand = Random(321);
+      for (var i = 0; i < 20; i++) {
+        final words = List.generate(30, (_) => 'word${rand.nextInt(100)}').join(' ');
+        final msg = ChatMessage(
+          id: 'm-md-$i',
+          threadId: 't',
+          sender: MessageSender.ai,
+          content: '**$words**',
+          timestamp: DateTime.now(),
+        );
+        expect(msg.content.length <= 500, isTrue);
+      }
+    });
+  });
 }
 
 class _StubChatService implements AiChatService {

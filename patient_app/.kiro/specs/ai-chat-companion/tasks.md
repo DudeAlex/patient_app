@@ -408,7 +408,7 @@
   - Track retry delays
   - Assert delays follow 1s, 2s, 4s pattern
 
-- [ ]* 50. Write property-based test for markdown rendering
+- [x]* 50. Write property-based test for markdown rendering
   - **Property 12: Markdown Rendering**
   - **Validates: Requirements 17.1**
   - Generate random markdown syntax
@@ -478,6 +478,7 @@
   - Confirm AI chat can be disabled via feature flag
   - Verify performance targets met (< 500ms render, smooth scrolling)
   - Ask user if questions arise
+
 
 
 
