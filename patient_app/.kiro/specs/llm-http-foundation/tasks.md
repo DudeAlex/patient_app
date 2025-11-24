@@ -52,7 +52,7 @@
   - Deploy to development environment
   - _Requirements: 1.1_
 
-- [ ] 6. Implement MessageQueueService for offline support
+- [x] 6. Implement MessageQueueService for offline support
   - Create `lib/core/ai/chat/services/message_queue_service.dart`
   - Implement queueMessage() method
   - Implement processQueue() method

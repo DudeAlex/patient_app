@@ -207,6 +207,7 @@ final aiChatControllerProvider = StateNotifierProvider.family<AiChatController, 
     final queueService = MessageQueueService(
       sendChatMessageUseCase: sendUseCase,
       chatThreadRepository: chatRepo,
+      preferences: container.resolve(),
     );
     final spaceBuilder = ref.read(spaceContextBuilderProvider);
     final switchUseCase = SwitchSpaceContextUseCase(
