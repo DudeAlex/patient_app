@@ -176,7 +176,7 @@
   - Support smooth scrolling
   - _Requirements: 8.4, 8.5, 20.1, 20.2, 20.3_
 
-- [ ] 22. Create ChatComposer widget
+- [x] 22. Create ChatComposer widget *(done — text + attachment shortcuts, send gating, offline hint)*
   - Create `lib/features/ai_chat/ui/widgets/chat_composer.dart`
   - Implement text input field with multi-line support
   - Add camera/photo picker button
