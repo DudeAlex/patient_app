@@ -631,4 +631,9 @@
 - **Scope**: Fakes connectivity to validate offline queueing in AiChatController/MessageQueueService, ensures offline indicator state, and auto-retries queued messages when connectivity returns.
 - **Result**: Pass.
 
+# 2025-11-24 (Property: HTTP connectivity round trip)
+- **Command**: `flutter test test/property/ai_chat_http_round_trip_property_test.dart`
+- **Scope**: Property-based check over random messages against the local echo endpoint ensuring HttpAiChatService returns `Echo: <message>` and preserves provider metadata.
+- **Result**: Pass.
+
 

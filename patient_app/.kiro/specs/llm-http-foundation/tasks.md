@@ -135,7 +135,7 @@
   - Verify message sent successfully
   - _Requirements: 10.1_
 
-- [ ] 16. Write property-based test for HTTP round trip
+- [x] 16. Write property-based test for HTTP round trip
   - **Property 1: HTTP Connectivity Round Trip**
   - **Validates: Requirements 1.1**
   - Generate random messages
