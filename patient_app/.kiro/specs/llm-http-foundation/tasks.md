@@ -142,7 +142,7 @@
   - Send to echo endpoint
   - Assert response contains "Echo: " + original message
 
-- [ ] 17. Write property-based test for retry backoff
+- [x] 17. Write property-based test for retry backoff
   - **Property 2: Retry Exponential Backoff**
   - **Validates: Requirements 1.3**
   - Simulate multiple failures

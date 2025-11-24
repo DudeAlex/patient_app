@@ -636,4 +636,9 @@
 - **Scope**: Property-based check over random messages against the local echo endpoint ensuring HttpAiChatService returns `Echo: <message>` and preserves provider metadata.
 - **Result**: Pass.
 
+# 2025-11-24 (Property: Retry exponential backoff)
+- **Command**: `flutter test test/property/ai_chat_retry_backoff_property_test.dart`
+- **Scope**: Forces retryable failures in HttpAiChatService and asserts observed delays stay within ±20% jitter of 1s and 2s base backoff intervals.
+- **Result**: Pass.
+
 
