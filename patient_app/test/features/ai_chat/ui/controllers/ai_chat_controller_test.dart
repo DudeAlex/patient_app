@@ -12,8 +12,7 @@ import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
-import 'package:patient_app/core/ai/chat/application/use_cases/send_chat_message_use_case.dart'
-    as chat_use_cases;
+import 'package:patient_app/core/ai/chat/services/message_queue_service.dart';
 import 'package:patient_app/core/ai/repositories/ai_consent_repository.dart';
 import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
 import 'package:patient_app/features/ai_chat/ui/controllers/ai_chat_controller.dart';
@@ -108,6 +107,22 @@ class _StubSpaceContextBuilder implements SpaceContextBuilder {
   }
 }
 
+class _StubMessageQueueService implements MessageQueueService {
+  @override
+  int get pendingCount => 0;
+
+  @override
+  Future<void> enqueue({
+    required String threadId,
+    required SpaceContext spaceContext,
+    required String content,
+    required List<MessageAttachment> attachments,
+  }) async {}
+
+  @override
+  Future<void> processQueue() async {}
+}
+
 void main() {
   test('loadInitial populates thread and context', () async {
     final repo = _InMemoryThreadRepo();
@@ -133,6 +148,7 @@ void main() {
       ),
       chatThreadRepository: repo,
       spaceContextBuilder: _StubSpaceContextBuilder(),
+      messageQueueService: _StubMessageQueueService(),
     );
 
     await controller.loadInitial();
@@ -166,6 +182,7 @@ void main() {
       ),
       chatThreadRepository: repo,
       spaceContextBuilder: _StubSpaceContextBuilder(),
+      messageQueueService: _StubMessageQueueService(),
     );
 
     await controller.loadInitial();
