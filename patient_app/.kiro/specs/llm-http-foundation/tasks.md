@@ -92,7 +92,7 @@
   - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
 
-- [ ] 11. Write unit tests for HttpAiChatService
+- [x] 11. Write unit tests for HttpAiChatService
   - Test request construction with correlation ID
   - Test timeout handling (30s)
   - Test retry logic with exponential backoff
