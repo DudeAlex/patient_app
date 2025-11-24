@@ -116,7 +116,7 @@
   - Test retry on transient errors only
   - _Requirements: 10.1_
 
-- [ ] 14. Write integration test for echo flow
+- [x] 14. Write integration test for echo flow
   - Start with empty chat thread
   - Send message via HttpAiChatService
   - Verify backend receives request
