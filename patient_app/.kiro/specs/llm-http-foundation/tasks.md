@@ -42,7 +42,7 @@
   - Redact message content from logs
   - _Requirements: 1.5, 4.1, 4.5_
 
-- [ ] 5. Create backend echo endpoint
+- [x] 5. Create backend echo endpoint
   - Set up backend project structure (Node.js/Python/Go)
   - Create POST /api/v1/chat/echo endpoint
   - Implement request validation
