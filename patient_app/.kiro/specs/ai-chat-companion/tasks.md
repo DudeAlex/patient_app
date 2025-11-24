@@ -258,7 +258,7 @@
   - Source data from AppLogger logs
   - _Requirements: 18.5_
 
-- [ ] 31. Implement chat data backup
+- [x] 31. Implement chat data backup
   - Extend backup system to include chat threads
   - Encrypt chat messages in backups
   - Include attachment metadata (not binaries) in backups

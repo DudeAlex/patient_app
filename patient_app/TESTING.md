@@ -515,3 +515,8 @@
 - **Command**: `flutter test test/features/ai_chat/ui/screens/ai_chat_screen_test.dart`
 - **Scope**: Regression check after adding AiCallLogRepository logging for chat and diagnostics filters.
 - **Result**: Pass on Windows; chat widget still builds with diagnostics wiring present.
+
+# 2025-11-23 (Chat backup note)
+- **Command**: (documentation-only change, no tests run)
+- **Scope**: Clarified that chat threads and chat attachment files/metadata are included in the encrypted Drive backup/restore flow.
+- **Result**: Not applicable (docs update).
