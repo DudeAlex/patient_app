@@ -44,7 +44,7 @@ class SendChatMessageUseCase {
     required SpaceContext spaceContext,
     required String messageContent,
     List<ChatAttachmentInput> attachments = const [],
-    int maxHistoryMessages = 10,
+    int maxHistoryMessages = 3,
   }) async {
     if (messageContent.trim().isEmpty && attachments.isEmpty) {
       throw ArgumentError('Message must include text or at least one attachment.');
@@ -172,6 +172,10 @@ class SendChatMessageUseCase {
           'spaceId': spaceContext.spaceId,
           'attachmentCount': processedAttachments.length,
           'provider': response.metadata.provider,
+          'tokensUsed': response.metadata.tokensUsed,
+          'latencyMs': response.metadata.latencyMs,
+          'finishReason': response.metadata.finishReason,
+          'modelVersion': response.metadata.modelVersion,
         },
         correlationId: opId,
       );

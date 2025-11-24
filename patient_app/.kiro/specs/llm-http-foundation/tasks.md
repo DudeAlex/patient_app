@@ -265,7 +265,7 @@
   - Update fromJson() to parse new fields
   - _Requirements: 2.3, 2.4_
 
-- [ ] 31. Update SendChatMessageUseCase
+- [x] 31. Update SendChatMessageUseCase
   - Load last 3 messages from thread
   - Include history in ChatRequest
   - Log token usage from response

@@ -721,4 +721,9 @@
 - **Scope**: AiMessageMetadata now includes finishReason and modelVersion; HttpAiChatService parses these from LLM metadata.
 - **Result**: Tests not run; metadata parsing change only.
 
+# 2025-11-24 (SendChatMessageUseCase history/token logging)
+- **Command**: _Not run (use case change only)_
+- **Scope**: SendChatMessageUseCase now defaults to 3 history messages, sends limited history, and logs token usage/latency/finishReason/modelVersion from AI responses.
+- **Result**: Tests not run; use case wiring change only.
+
 
