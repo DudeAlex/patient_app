@@ -5,6 +5,7 @@ import 'package:patient_app/core/application/services/space_manager.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
 import 'package:patient_app/core/domain/entities/space.dart';
 import 'package:patient_app/features/records/application/ports/records_repository.dart';
+import 'package:patient_app/features/records/application/ports/records_repository.dart';
 import 'package:patient_app/features/records/data/records_service.dart';
 import 'package:patient_app/features/records/domain/entities/record.dart';
 
@@ -12,14 +13,17 @@ import 'package:patient_app/features/records/domain/entities/record.dart';
 class SpaceContextBuilderImpl implements SpaceContextBuilder {
   SpaceContextBuilderImpl({
     required Future<RecordsService> recordsServiceFuture,
+    RecordsRepository? recordsRepositoryOverride,
     required SpaceManager spaceManager,
     RecordSummaryFormatter? formatter,
     this.maxRecords = 10,
   })  : _recordsServiceFuture = recordsServiceFuture,
+        _recordsRepositoryOverride = recordsRepositoryOverride,
         _spaceManager = spaceManager,
         _formatter = formatter ?? RecordSummaryFormatter();
 
   final Future<RecordsService> _recordsServiceFuture;
+  final RecordsRepository? _recordsRepositoryOverride;
   final SpaceManager _spaceManager;
   final RecordSummaryFormatter _formatter;
 
@@ -34,7 +38,7 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
       context: {'spaceId': spaceId, 'maxRecords': maxRecords},
       correlationId: opId,
     );
-    final recordsRepository = (await _recordsServiceFuture).records;
+    final recordsRepository = _recordsRepositoryOverride ?? (await _recordsServiceFuture).records;
     final space = await _spaceManager.getCurrentSpace();
     if (space.id != spaceId) {
       // Try to resolve the requested space explicitly.
