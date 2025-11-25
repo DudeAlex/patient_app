@@ -2,7 +2,7 @@
 
 ## Stage 3: Basic Space Context
 
-- [ ] 1. Create RecordSummaryFormatter
+- [x] 1. Create RecordSummaryFormatter
   - Create `lib/core/ai/chat/context/record_summary_formatter.dart`
   - Implement format() method
   - Implement note truncation (100 chars)
@@ -10,7 +10,7 @@
   - Handle missing fields gracefully
   - _Requirements: 2.2, 2.3_
 
-- [ ] 2. Create SpaceContextBuilder
+- [x] 2. Create SpaceContextBuilder
   - Create `lib/core/ai/chat/context/space_context_builder.dart`
   - Inject RecordsRepository and SpaceManager
   - Implement buildContext() method
