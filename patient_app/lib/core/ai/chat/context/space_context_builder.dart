@@ -28,6 +28,12 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
 
   @override
   Future<SpaceContext> build(String spaceId) async {
+    final opId = AppLogger.startOperation('space_context_build');
+    await AppLogger.info(
+      'Starting space context assembly',
+      context: {'spaceId': spaceId, 'maxRecords': maxRecords},
+      correlationId: opId,
+    );
     final recordsRepository = (await _recordsServiceFuture).records;
     final space = await _spaceManager.getCurrentSpace();
     if (space.id != spaceId) {
@@ -38,15 +44,20 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
         orElse: () => space,
       );
       if (match.id == spaceId) {
-        return _buildFromSpace(match, recordsRepository);
+        final context = await _buildFromSpace(match, recordsRepository, correlationId: opId);
+        await AppLogger.endOperation(opId);
+        return context;
       }
     }
-    return _buildFromSpace(space, recordsRepository);
+    final context = await _buildFromSpace(space, recordsRepository, correlationId: opId);
+    await AppLogger.endOperation(opId);
+    return context;
   }
 
   Future<SpaceContext> _buildFromSpace(
     Space space,
     RecordsRepository recordsRepository,
+    {String? correlationId},
   ) async {
     final recent = await recordsRepository.recent(limit: maxRecords * 2);
     final filtered = recent
@@ -69,6 +80,7 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
         'maxRecords': maxRecords,
         'estimatedTokens': estimatedTokens,
       },
+      correlationId: correlationId,
     );
 
     return SpaceContext(
