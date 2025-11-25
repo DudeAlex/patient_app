@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import crypto from 'crypto';
 import express from 'express';
 import morgan from 'morgan';
-import { SYSTEM_PROMPT_TEMPLATE } from './llm/prompt_template.js';
+import { buildPrompt } from './llm/prompt_template.js';
 import { formatHistory } from './llm/history_manager.js';
 import { TogetherClient } from './llm/together_client.js';
 import { rateLimiter } from './middleware/rate_limiter.js';
@@ -74,7 +74,7 @@ app.post('/api/v1/chat/echo', (req, res) => {
 });
 
 app.post('/api/v1/chat/message', async (req, res) => {
-  const { message, history = [], maxTokens = 512 } = req.body ?? {};
+  const { message, history = [], maxTokens = 1000, spaceContext = {} } = req.body ?? {};
 
   if (!message || typeof message !== 'string' || !message.trim()) {
     return res.status(400).json({
@@ -94,10 +94,16 @@ app.post('/api/v1/chat/message', async (req, res) => {
         ? 'None'
         : formattedHistory.map((m) => `${m.role}: ${m.content}`).join('\n');
 
-    const systemPrompt = SYSTEM_PROMPT_TEMPLATE.replace('{history}', historyText).replace(
-      '{user_message}',
-      message,
-    );
+    const systemPrompt = buildPrompt({
+      spaceName: spaceContext?.spaceName,
+      spaceDescription: spaceContext?.description,
+      categories: Array.isArray(spaceContext?.categories) ? spaceContext.categories : [],
+      recordSummaries: Array.isArray(spaceContext?.recentRecords)
+        ? spaceContext.recentRecords
+        : [],
+      historyText,
+      userMessage: message,
+    });
 
     const client = new TogetherClient();
     const response = await client.sendChat({
