@@ -27,7 +27,9 @@ Key Modules
   - `features/sync/` (SyncState repository, dirty tracking, future auto-sync runner)
   - Planned: `features/capture_core/`, `features/capture_modes/photo|scan|voice|file|email/`, `features/support_network/`, `features/vitals/`, etc. Each module owns its models/services/UI and exposes a compact API for other modules to consume.
 
-## Feature Module Methodology (“Lego” Architecture)
+## Feature Module Methodology ("Lego" Architecture)
+
+Think of the stack like a matryoshka doll: inner layers never know outer shells exist. Dependencies only point inward (domain <- application <- adapters <- framework), and each feature module snaps together like Lego without leaking details across layers.
 
 We design every milestone as a collection of modules that can be composed, replaced, or extended without touching unrelated code. Contributors should adhere to the following principles:
 
