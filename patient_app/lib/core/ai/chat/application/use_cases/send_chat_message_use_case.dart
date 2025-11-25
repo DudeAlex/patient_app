@@ -6,6 +6,7 @@ import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
@@ -22,17 +23,20 @@ class SendChatMessageUseCase {
     required ChatThreadRepository chatThreadRepository,
     required AiConsentRepository consentRepository,
     required MessageAttachmentHandler attachmentHandler,
+    required SpaceContextBuilder spaceContextBuilder,
     Uuid? uuid,
   })  : _aiChatService = aiChatService,
         _chatThreadRepository = chatThreadRepository,
         _consentRepository = consentRepository,
         _attachmentHandler = attachmentHandler,
+        _spaceContextBuilder = spaceContextBuilder,
         _uuid = uuid ?? const Uuid();
 
   final AiChatService _aiChatService;
   final ChatThreadRepository _chatThreadRepository;
   final AiConsentRepository _consentRepository;
   final MessageAttachmentHandler _attachmentHandler;
+  final SpaceContextBuilder _spaceContextBuilder;
   final Uuid _uuid;
 
   /// Sends a message and returns the AI-generated response message.
@@ -41,8 +45,9 @@ class SendChatMessageUseCase {
   /// AI provider failures after marking the user message as failed.
   Future<ChatMessage> execute({
     required String threadId,
-    required SpaceContext spaceContext,
+    required String spaceId,
     required String messageContent,
+    SpaceContext? spaceContextOverride,
     List<ChatAttachmentInput> attachments = const [],
     int maxHistoryMessages = 3,
   }) async {
@@ -62,7 +67,7 @@ class SendChatMessageUseCase {
       final thread = existingThread ??
           ChatThread(
             id: threadId,
-            spaceId: spaceContext.spaceId,
+            spaceId: spaceId,
             messages: const [],
           );
       if (existingThread == null) {
@@ -79,6 +84,22 @@ class SendChatMessageUseCase {
         );
         processedAttachments.add(processed);
       }
+
+      final Stopwatch contextStopwatch = Stopwatch()..start();
+      final spaceContext =
+          spaceContextOverride ?? await _spaceContextBuilder.build(spaceId);
+      contextStopwatch.stop();
+      await AppLogger.info(
+        'Built space context for chat',
+        context: {
+          'threadId': threadId,
+          'spaceId': spaceContext.spaceId,
+          'recordsIncluded': spaceContext.recentRecords.length,
+          'maxContextRecords': spaceContext.maxContextRecords,
+          'assemblyMs': contextStopwatch.elapsedMilliseconds,
+        },
+        correlationId: opId,
+      );
 
       // Persist user message as sending.
       final userMessage = ChatMessage(

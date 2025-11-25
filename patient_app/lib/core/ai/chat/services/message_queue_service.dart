@@ -102,7 +102,8 @@ class MessageQueueService {
         try {
           await _sendChatMessageUseCase.execute(
             threadId: queued.threadId,
-            spaceContext: queued.spaceContext,
+            spaceId: queued.spaceContext.spaceId,
+            spaceContextOverride: queued.spaceContext,
             messageContent: queued.content,
             attachments: queued.attachments,
           );

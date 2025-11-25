@@ -163,6 +163,11 @@ SpaceContext _context() => SpaceContext(
       persona: SpacePersona.health,
     );
 
+class _StubContextBuilder implements SpaceContextBuilder {
+  @override
+  Future<SpaceContext> build(String spaceId) async => _context();
+}
+
 void main() {
   test('sends chat message, processes attachments, and stores AI reply', () async {
     final repo = _InMemoryThreadRepo();
@@ -181,6 +186,7 @@ void main() {
       chatThreadRepository: repo,
       consentRepository: consent,
       attachmentHandler: attachments,
+      spaceContextBuilder: _StubContextBuilder(),
       uuid: const Uuid(),
     );
 
@@ -188,7 +194,8 @@ void main() {
 
     final aiMessage = await useCase.execute(
       threadId: 'thread-1',
-      spaceContext: _context(),
+      spaceId: _context().spaceId,
+      spaceContextOverride: _context(),
       messageContent: 'Hello',
       attachments: [
         ChatAttachmentInput(file: tempFile, type: AttachmentType.file),
@@ -215,13 +222,15 @@ void main() {
       chatThreadRepository: repo,
       consentRepository: _StubConsentRepo(false),
       attachmentHandler: _StubAttachmentHandler(),
+      spaceContextBuilder: _StubContextBuilder(),
       uuid: const Uuid(),
     );
 
     expect(
       () => useCase.execute(
         threadId: 't1',
-        spaceContext: _context(),
+        spaceId: _context().spaceId,
+        spaceContextOverride: _context(),
         messageContent: 'hi',
       ),
       throwsA(isA<AiConsentRequiredException>()),
@@ -242,7 +251,8 @@ void main() {
     await expectLater(
       () => useCase.execute(
         threadId: 't1',
-        spaceContext: _context(),
+        spaceId: _context().spaceId,
+        spaceContextOverride: _context(),
         messageContent: 'hi',
       ),
       throwsA(isA<AiProviderUnavailableException>()),

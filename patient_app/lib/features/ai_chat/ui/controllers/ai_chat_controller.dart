@@ -123,7 +123,8 @@ class AiChatController extends StateNotifier<AiChatState> {
 
       await _sendChatMessageUseCase.execute(
         threadId: state.thread!.id,
-        spaceContext: state.spaceContext!,
+        spaceId: state.spaceContext!.spaceId,
+        spaceContextOverride: state.spaceContext,
         messageContent: content,
         attachments: attachmentInputs,
       );
