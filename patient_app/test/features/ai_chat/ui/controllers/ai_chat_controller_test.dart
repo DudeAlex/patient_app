@@ -102,6 +102,8 @@ class _StubSpaceContextBuilder implements SpaceContextBuilder {
     return SpaceContext(
       spaceId: spaceId,
       spaceName: 'Space $spaceId',
+      description: 'Test space',
+      categories: const ['test'],
       persona: SpacePersona.general,
     );
   }

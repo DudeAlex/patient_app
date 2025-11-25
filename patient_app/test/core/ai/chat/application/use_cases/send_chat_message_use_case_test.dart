@@ -158,6 +158,8 @@ class _StubAiChatService implements AiChatService {
 SpaceContext _context() => SpaceContext(
       spaceId: 'health',
       spaceName: 'Health',
+      description: 'Health space',
+      categories: const ['test'],
       persona: SpacePersona.health,
     );
 

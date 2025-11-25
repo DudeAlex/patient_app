@@ -7,11 +7,14 @@ class SpaceContext {
     required this.spaceId,
     required this.spaceName,
     required this.persona,
+    required this.description,
+    List<String> categories = const [],
     List<RecordSummary> recentRecords = const [],
-    this.maxContextRecords = 5,
+    this.maxContextRecords = 10,
   })  : assert(spaceId.trim().isNotEmpty, 'spaceId cannot be empty'),
         assert(spaceName.trim().isNotEmpty, 'spaceName cannot be empty'),
         assert(maxContextRecords > 0, 'maxContextRecords must be > 0'),
+        categories = List.unmodifiable(categories),
         recentRecords = List.unmodifiable(recentRecords);
 
   /// Current space identifier (e.g., health, education).
@@ -22,6 +25,12 @@ class SpaceContext {
 
   /// Persona used to shape AI tone and guidance.
   final SpacePersona persona;
+
+  /// Brief description of the space to ground the AI.
+  final String description;
+
+  /// Space-specific categories to hint at common topics.
+  final List<String> categories;
 
   /// Recent records used for grounding responses.
   final List<RecordSummary> recentRecords;
@@ -37,6 +46,8 @@ class SpaceContext {
     String? spaceId,
     String? spaceName,
     SpacePersona? persona,
+    String? description,
+    List<String>? categories,
     List<RecordSummary>? recentRecords,
     int? maxContextRecords,
   }) {
@@ -44,9 +55,23 @@ class SpaceContext {
       spaceId: spaceId ?? this.spaceId,
       spaceName: spaceName ?? this.spaceName,
       persona: persona ?? this.persona,
+      description: description ?? this.description,
+      categories: categories ?? this.categories,
       recentRecords: recentRecords ?? this.recentRecords,
       maxContextRecords: maxContextRecords ?? this.maxContextRecords,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'spaceId': spaceId,
+      'spaceName': spaceName,
+      'description': description,
+      'categories': categories,
+      'persona': persona.name,
+      'recentRecords': recentRecords.map((r) => r.toJson()).toList(),
+      'maxContextRecords': maxContextRecords,
+    };
   }
 }
 

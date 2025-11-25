@@ -216,6 +216,8 @@ class _QueuedMessage {
       'spaceContext': {
         'spaceId': spaceContext.spaceId,
         'spaceName': spaceContext.spaceName,
+        'description': spaceContext.description,
+        'categories': spaceContext.categories,
         'persona': spaceContext.persona.name,
         'maxContextRecords': spaceContext.maxContextRecords,
         'recentRecords': spaceContext.limitedRecords
@@ -279,9 +281,14 @@ class _QueuedMessage {
       spaceContext: SpaceContext(
         spaceId: space['spaceId'] as String? ?? '',
         spaceName: space['spaceName'] as String? ?? '',
+        description: space['description'] as String? ?? '',
+        categories: (space['categories'] as List<dynamic>?)
+                ?.map((c) => c.toString())
+                .toList() ??
+            const [],
         persona: _parsePersona(space['persona'] as String?),
         recentRecords: recent,
-        maxContextRecords: space['maxContextRecords'] as int? ?? 5,
+        maxContextRecords: space['maxContextRecords'] as int? ?? 10,
       ),
       content: json['content'] as String? ?? '',
       attachments: attachmentInputs,

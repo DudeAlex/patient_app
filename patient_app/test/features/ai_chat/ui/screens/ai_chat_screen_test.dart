@@ -68,7 +68,13 @@ class _StubAttachmentHandler implements MessageAttachmentHandler {
 class _StubSpaceContextBuilder implements SpaceContextBuilder {
   @override
   Future<SpaceContext> build(String spaceId) async {
-    return SpaceContext(spaceId: spaceId, spaceName: 'Test Space', persona: SpacePersona.general);
+    return SpaceContext(
+      spaceId: spaceId,
+      spaceName: 'Test Space',
+      description: 'Test space',
+      categories: const ['test'],
+      persona: SpacePersona.general,
+    );
   }
 }
 
@@ -140,6 +146,8 @@ class _TestController extends AiChatController {
       spaceContext: SpaceContext(
         spaceId: 'health',
         spaceName: 'Health',
+        description: 'Health space',
+        categories: const ['test'],
         persona: SpacePersona.health,
       ),
     );

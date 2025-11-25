@@ -20,7 +20,7 @@
   - Estimate total token usage
   - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.5_
 
-- [ ] 3. Update SpaceContext model
+- [x] 3. Update SpaceContext model
   - Update `lib/core/ai/chat/models/space_context.dart`
   - Add description field
   - Add categories field

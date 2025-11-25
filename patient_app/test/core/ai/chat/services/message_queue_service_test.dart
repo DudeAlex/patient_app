@@ -107,6 +107,8 @@ void main() {
       spaceContext: SpaceContext(
         spaceId: 'health',
         spaceName: 'Health',
+        description: 'Health space',
+        categories: const ['test'],
         persona: SpacePersona.health,
       ),
       content: 'hi',
@@ -147,6 +149,8 @@ void main() {
       spaceContext: SpaceContext(
         spaceId: 'health',
         spaceName: 'Health',
+        description: 'Health space',
+        categories: const ['test'],
         persona: SpacePersona.health,
       ),
       content: 'hi',
@@ -169,6 +173,8 @@ void main() {
       spaceContext: SpaceContext(
         spaceId: 'health',
         spaceName: 'Health',
+        description: 'Health space',
+        categories: const ['test'],
         persona: SpacePersona.health,
       ),
       content: 'hi again',

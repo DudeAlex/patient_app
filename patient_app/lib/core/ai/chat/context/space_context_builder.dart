@@ -74,6 +74,8 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
     return SpaceContext(
       spaceId: space.id,
       spaceName: space.name,
+      description: space.description,
+      categories: space.categories,
       persona: _personaFor(space.id),
       recentRecords: summaries,
       maxContextRecords: maxRecords,

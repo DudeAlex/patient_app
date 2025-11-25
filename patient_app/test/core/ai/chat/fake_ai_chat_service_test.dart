@@ -27,6 +27,8 @@ void main() {
       spaceContext: SpaceContext(
         spaceId: 'space_1',
         spaceName: 'Health',
+        description: 'Test space',
+        categories: const ['test'],
         persona: persona,
       ),
       messageHistory: [

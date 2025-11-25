@@ -138,6 +138,8 @@ class _FakeSpaceContextBuilder implements SpaceContextBuilder {
     return SpaceContext(
       spaceId: spaceId,
       spaceName: 'Health',
+      description: 'Health space',
+      categories: const ['test'],
       persona: SpacePersona.health,
     );
   }

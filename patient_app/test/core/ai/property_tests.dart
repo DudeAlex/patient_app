@@ -122,6 +122,8 @@ void main() {
     final spaceContext = SpaceContext(
       spaceId: 'health',
       spaceName: 'Health',
+      description: 'Health space',
+      categories: const ['test'],
       persona: SpacePersona.health,
     );
 
@@ -181,6 +183,8 @@ void main() {
     SpaceContext buildSpace(int i) => SpaceContext(
           spaceId: 'space_$i',
           spaceName: 'Space $i',
+          description: 'Test space',
+          categories: const ['test'],
           persona: SpacePersona.values[i % SpacePersona.values.length],
         );
 
@@ -233,6 +237,8 @@ void main() {
         spaceContext: SpaceContext(
           spaceId: 'space_safety',
           spaceName: 'Space Safety',
+          description: 'Test space',
+          categories: const ['test'],
           persona: SpacePersona.general,
         ),
         attachments: [
@@ -269,6 +275,8 @@ void main() {
         spaceContext: SpaceContext(
           spaceId: 's',
           spaceName: 'S',
+          description: 'Test space',
+          categories: const ['test'],
           persona: SpacePersona.general,
         ),
         messageHistory: history,
@@ -311,6 +319,8 @@ void main() {
           spaceContext: SpaceContext(
             spaceId: 'space_${i % 3}',
             spaceName: 'Space',
+            description: 'Test space',
+            categories: const ['test'],
             persona: SpacePersona.general,
           ),
           messageContent: content,
@@ -339,6 +349,8 @@ void main() {
           spaceContext: SpaceContext(
             spaceId: 'health',
             spaceName: 'Health',
+            description: 'Health space',
+            categories: const ['test'],
             persona: SpacePersona.health,
           ),
           messageHistory: const [],
@@ -385,6 +397,8 @@ void main() {
         spaceContext: SpaceContext(
           spaceId: 'space',
           spaceName: 'Space',
+          description: 'Test space',
+          categories: const ['test'],
           persona: SpacePersona.general,
         ),
         content: 'queued',
@@ -425,6 +439,8 @@ void main() {
         spaceContext: SpaceContext(
           spaceId: 'health',
           spaceName: 'Health',
+          description: 'Health space',
+          categories: const ['test'],
           persona: SpacePersona.health,
         ),
         messageHistory: const [],
@@ -447,6 +463,8 @@ void main() {
         spaceContext: SpaceContext(
           spaceId: 'health',
           spaceName: 'Health',
+          description: 'Health space',
+          categories: const ['test'],
           persona: SpacePersona.health,
         ),
         attachments: [

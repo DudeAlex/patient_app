@@ -55,9 +55,12 @@ class ChatRequest {
       'spaceContext': {
         'spaceId': spaceContext.spaceId,
         'spaceName': spaceContext.spaceName,
+        'description': spaceContext.description,
+        'categories': spaceContext.categories,
         'persona': spaceContext.persona.name,
         'recentRecords':
             spaceContext.limitedRecords.map((r) => r.toJson()).toList(),
+        'maxContextRecords': spaceContext.maxContextRecords,
       },
       'messageHistory': limitedHistory
           .map(
