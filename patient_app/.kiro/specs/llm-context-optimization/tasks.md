@@ -29,26 +29,26 @@
   - Update toJson() method
   - _Requirements: 1.1, 1.2, 1.3_
 
-- [ ] 4. Create RecordSummary model
+- [x] 4. Create RecordSummary model
   - Create `lib/core/ai/chat/models/record_summary.dart`
   - Add fields: title, type, date, tags, summary
   - Implement toJson() method
   - Add validation (summary max 100 chars)
   - _Requirements: 2.2, 2.3_
 
-- [ ] 5. Update SendChatMessageUseCase for Stage 3
+- [x] 5. Update SendChatMessageUseCase for Stage 3
   - Load active Space ID
   - Call SpaceContextBuilder.buildContext()
   - Include SpaceContext in ChatRequest
   - Log context assembly time
   - _Requirements: 1.1, 2.1_
 
-- [ ] 6. Update ChatRequest model for Stage 3
+- [x] 6. Update ChatRequest model for Stage 3
   - Add context field (SpaceContext)
   - Update toJson() to include context
   - _Requirements: 1.1, 2.1_
 
-- [ ] 7. Update backend prompt template for Stage 3
+- [x] 7. Update backend prompt template for Stage 3
   - Add Space name, description, categories to prompt
   - Add record summaries section
   - Format as: "Title (Type) - Date - Tags: [...] - Summary"
@@ -62,14 +62,14 @@
   - Log assembly duration
   - _Requirements: 9.1, 9.2_
 
-- [ ] 9. Write unit tests for RecordSummaryFormatter
+- [x] 9. Write unit tests for RecordSummaryFormatter
   - Test note truncation at 100 chars
   - Test handling null/empty notes
   - Test token estimation
   - Test various record types
   - _Requirements: 10.1_
 
-- [ ] 10. Write unit tests for SpaceContextBuilder
+- [x] 10. Write unit tests for SpaceContextBuilder
   - Test loading Space metadata
   - Test loading last 10 records
   - Test record summary formatting
@@ -77,7 +77,7 @@
   - Mock RecordsRepository and SpaceManager
   - _Requirements: 10.1_
 
-- [ ] 11. Write integration test for Stage 3 flow
+- [x] 11. Write integration test for Stage 3 flow
   - Create Space with 15 records
   - Send chat message
   - Verify context includes last 10 records
@@ -85,21 +85,21 @@
   - Verify token budget ~4000
   - _Requirements: 10.4_
 
-- [ ] 12. Write property-based test for Space isolation
+- [x] 12. Write property-based test for Space isolation
   - **Property 1: Space Isolation**
   - **Validates: Requirements 1.4**
   - Generate random Spaces with records
   - Build context for each Space
   - Assert all records match Space ID
 
-- [ ] 13. Write property-based test for deleted record exclusion
+- [x] 13. Write property-based test for deleted record exclusion
   - **Property 2: Deleted Record Exclusion**
   - **Validates: Requirements 2.4**
   - Generate records with some deleted
   - Build context
   - Assert no deleted records included
 
-- [ ] 14. Write property-based test for summary truncation
+- [x] 14. Write property-based test for summary truncation
   - **Property 3: Record Summary Truncation**
   - **Validates: Requirements 2.3**
   - Generate records with long notes
