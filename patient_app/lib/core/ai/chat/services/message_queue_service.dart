@@ -224,9 +224,9 @@ class _QueuedMessage {
             .map(
               (record) => {
                 'title': record.title,
-                'category': record.category,
+                'type': record.type,
                 'tags': record.tags,
-                'summaryText': record.summaryText,
+                'summary': record.summary,
                 'createdAt': record.createdAt.toIso8601String(),
               },
             )
@@ -252,9 +252,12 @@ class _QueuedMessage {
         .map(
           (record) => RecordSummary(
             title: record['title'] as String? ?? '',
-            category: record['category'] as String? ?? '',
-            tags: (record['tags'] as List<dynamic>? ?? []).cast<String>(),
-            summaryText: record['summaryText'] as String?,
+            type: record['type'] as String? ?? '',
+            tags: (record['tags'] as List<dynamic>?)
+                    ?.map((t) => t.toString())
+                    .toList() ??
+                const [],
+            summary: record['summary'] as String?,
             createdAt: DateTime.tryParse(record['createdAt'] as String? ?? '') ??
                 DateTime.fromMillisecondsSinceEpoch(0),
           ),

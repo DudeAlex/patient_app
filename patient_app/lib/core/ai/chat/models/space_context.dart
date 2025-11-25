@@ -81,34 +81,40 @@ enum SpacePersona { health, education, finance, travel, general }
 /// Minimal summary of a record used for context grounding.
 @immutable
 class RecordSummary {
+  static const int maxSummaryLength = 100;
+
   RecordSummary({
     required this.title,
-    required this.category,
+    required this.type,
     List<String> tags = const [],
-    this.summaryText,
+    this.summary,
     required this.createdAt,
   })  : assert(title.trim().isNotEmpty, 'title cannot be empty'),
-        assert(category.trim().isNotEmpty, 'category cannot be empty'),
+        assert(type.trim().isNotEmpty, 'type cannot be empty'),
+        assert(
+          summary == null || summary.length <= maxSummaryLength,
+          'summary cannot exceed $maxSummaryLength characters',
+        ),
         tags = List.unmodifiable(tags);
 
   final String title;
-  final String category;
+  final String type;
   final List<String> tags;
-  final String? summaryText;
+  final String? summary;
   final DateTime createdAt;
 
   RecordSummary copyWith({
     String? title,
-    String? category,
+    String? type,
     List<String>? tags,
-    String? summaryText,
+    String? summary,
     DateTime? createdAt,
   }) {
     return RecordSummary(
       title: title ?? this.title,
-      category: category ?? this.category,
+      type: type ?? this.type,
       tags: tags ?? this.tags,
-      summaryText: summaryText ?? this.summaryText,
+      summary: summary ?? this.summary,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -116,9 +122,9 @@ class RecordSummary {
   Map<String, dynamic> toJson() {
     return {
       'title': title,
-      'category': category,
+      'type': type,
       'tags': tags,
-      'summary': summaryText,
+      'summary': summary,
       'createdAt': createdAt.toIso8601String(),
     };
   }

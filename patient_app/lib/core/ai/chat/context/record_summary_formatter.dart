@@ -15,9 +15,9 @@ class RecordSummaryFormatter {
   RecordSummary format(RecordEntity record) {
     return RecordSummary(
       title: record.title,
-      category: record.type,
+      type: record.type,
       tags: record.tags,
-      summaryText: _truncate(record.text),
+      summary: _truncate(record.text),
       createdAt: record.date,
     );
   }
@@ -26,9 +26,9 @@ class RecordSummaryFormatter {
   int estimateTokens(RecordSummary summary) {
     final parts = <String>[
       summary.title,
-      summary.category,
+      summary.type,
       ...summary.tags,
-      summary.summaryText ?? '',
+      summary.summary ?? '',
     ];
     final length = parts.fold<int>(0, (total, part) => total + part.length + 1);
     return max(1, (length / 4).ceil());
