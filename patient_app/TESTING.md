@@ -5,6 +5,18 @@
 - Prefer small, focused cases over large integration dumps; isolate layers with ports and verify mapping/validation at boundaries.
 - Log manual verification in this file with scope, commands, and outcomes; note missing tooling when tests can't run.
 
+# 2025-11-25 (Stage 3 Space Context manual check)
+- **Change Scope**
+  - Validate Stage 3 AI context assembly (space metadata + last 10 records) in chat.
+- **Verification**
+  - Not executed yet (pending emulator session). Planned steps:
+    - Seed 12+ records in Health space (vary tags/notes; include a deleted record).
+    - Run app in Remote mode with consent granted.
+    - Send chat message and inspect logs for context assembly (recordsIncluded=10, estimatedTokens logged).
+    - Verify response references recent records and omits deleted/other-space items.
+- **Result**
+  - Pending. No manual run in this session.
+
 # 2025-11-25 (LLM HTTP foundation manual check)
 - **Change Scope**
   - Verified Stage 1 echo endpoint and Remote-mode chat against the local dev server.
@@ -772,3 +784,14 @@
 - **Result**: Pass.
 
 
+# 2025-11-25 (LLM HTTP foundation manual check)
+- **Change Scope**
+  - Verified Stage 1 echo endpoint and Remote-mode chat against the local dev server.
+- **Verification**
+  - Server: `cd server && npm run dev` (listening on http://localhost:3030; Android emulator via http://10.0.2.2:3030).
+  - Echo: PowerShell POST to `/api/v1/chat/echo` with `threadId/message/timestamp/userId` returned `Echo: Hello, AI!` plus metadata.
+  - App: Android emulator (Pixel, debug) with AI features enabled, Remote mode selected, consent granted; chat message delivered and Remote response rendered.
+- **Result**
+  - Pass. No automated tests executed in this session. Client default remote URL now targets the dev server (10.0.2.2:3030 on emulator).
+
+# 2025-11-21 (AI Summary manual check)

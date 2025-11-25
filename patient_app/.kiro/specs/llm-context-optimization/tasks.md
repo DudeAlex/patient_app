@@ -106,14 +106,14 @@
   - Format summaries
   - Assert all summaries ≤ 100 chars
 
-- [ ] 15. Manual testing for Stage 3
+- [x] 15. Manual testing for Stage 3
   - Test Space context inclusion
   - Test record references in responses
   - Test Space switching
   - Document scenarios in TESTING.md
   - _Requirements: 11.1, 11.2, 11.3, 14.1, 14.2_
 
-- [ ] 16. Stage 3 checkpoint - Ensure all tests pass
+- [x] 16. Stage 3 checkpoint - Ensure all tests pass
   - Run all unit tests
   - Run integration tests
   - Run property-based tests
