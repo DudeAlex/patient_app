@@ -37,6 +37,10 @@ class RecordSummaryFormatter {
   String? _truncate(String? text) {
     if (text == null) return null;
     if (text.length <= maxNoteLength) return text;
-    return '${text.substring(0, maxNoteLength)}...';
+    // Keep the ellipsis within the max length budget.
+    if (maxNoteLength <= 3) {
+      return text.substring(0, maxNoteLength);
+    }
+    return '${text.substring(0, maxNoteLength - 3)}...';
   }
 }
