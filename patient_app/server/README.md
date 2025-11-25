@@ -21,6 +21,9 @@ Environment
 - `LLM_TIMEOUT_MS`: Optional request timeout in milliseconds (default: 60000)
 
 Server defaults to `http://localhost:3030`.
+The Flutter client now defaults to `http://10.0.2.2:3030` on Android emulators
+and `http://localhost:3030` elsewhere; adjust the `ai_remote_url` preference if
+you run the server on a different host.
 
 ## Endpoint
 - `POST /api/v1/chat/echo`

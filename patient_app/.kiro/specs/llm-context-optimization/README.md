@@ -1,0 +1,103 @@
+# LLM Context Optimization (Stages 3-4)
+
+## ✅ Status: COMPLETE - READY FOR IMPLEMENTATION
+
+This spec covers **Stages 3-4** of LLM integration for the Universal Life Companion AI Chat system.
+
+## Prerequisites:
+
+**Must complete first:**
+- ✅ Stage 1: HTTP Foundation (`.kiro/specs/llm-http-foundation/`)
+- ✅ Stage 2: Basic LLM Integration (`.kiro/specs/llm-http-foundation/`)
+
+## What's Covered:
+
+### Stage 3: Basic Space Context
+- Space awareness (name, description, categories)
+- Recent records (last 10 from active Space)
+- Record summaries (title, type, date, tags, notes truncated to 100 chars)
+- Token budget: 4000 tokens total
+- Basic context assembly and logging
+
+### Stage 4: Context Optimization
+- Date range filtering (7/14/30 days, default 14)
+- Relevance scoring (recency 70% + access frequency 30%)
+- Intelligent record selection (up to 20 records)
+- Token budget optimization (4800 tokens total)
+- Context truncation strategy
+- Comprehensive metrics and logging
+
+## Files in This Spec:
+
+- ✅ **requirements.md** - 15 complete requirements with EARS patterns
+- ✅ **design.md** - Complete architecture, components, data flows, risks, testing
+- ✅ **tasks.md** - 51 actionable implementation tasks
+- ✅ **README.md** - This file
+
+## Implementation Status:
+
+- [ ] Stage 3: Basic Space Context (Tasks 1-16)
+- [ ] Stage 4: Context Optimization (Tasks 17-51)
+
+## Key Features:
+
+✅ **Space Awareness**: AI understands user's active Space  
+✅ **Record References**: AI mentions specific user records  
+✅ **Smart Filtering**: Date range and relevance-based selection  
+✅ **Token Optimization**: 20-30% token savings vs naive approach  
+✅ **Quality Tracking**: User feedback and metrics  
+✅ **Configurable**: Adjustable date range and limits  
+
+## Token Budget Evolution:
+
+| Stage | System | Context | History | Response | Total |
+|-------|--------|---------|---------|----------|-------|
+| 2     | 500    | 0       | 1000    | 1000     | 2500  |
+| 3     | 500    | 1500    | 1000    | 1000     | 4000  |
+| 4     | 800    | 2000    | 1000    | 1000     | 4800  |
+
+## Performance Targets:
+
+**Stage 3:**
+- Context assembly: < 500ms
+- Total request time: < 5s (p95)
+- Token usage: ~4000 tokens avg
+
+**Stage 4:**
+- Context assembly: < 1s
+- Total request time: < 5s (p95)
+- Token usage: ~4500 tokens avg
+- Token savings: 20-30% vs naive approach
+
+## Next Steps:
+
+1. **Start Implementation**: Open `tasks.md` and begin with Task 1
+2. **Follow Order**: Complete Stage 3 before Stage 4
+3. **Test Thoroughly**: All testing tasks are required
+4. **Checkpoint**: Validate Stage 3 before moving to Stage 4
+
+## Future Stages:
+
+After completing Stages 3-4, you can implement:
+
+- **Stage 5**: Context Compression (summarization, deduplication, caching)
+- **Stage 6**: Intent-Driven Retrieval (RAG-like, keyword matching)
+- **Stage 7**: Full Intelligent AI (personas, error recovery, telemetry, tools)
+
+See `.kiro/specs/llm-stages-3-7-reference-incomplete/` for reference documentation.
+
+## Documentation:
+
+- Requirements follow EARS patterns
+- Design follows Clean Architecture principles
+- Tasks reference specific requirements
+- 10 correctness properties documented
+- Comprehensive testing strategy included
+
+---
+
+**Created:** 2024-11-24  
+**Stages Covered:** 3-4 (Space Context + Context Optimization)  
+**Prerequisites:** Stages 1-2 must be complete  
+**Status:** Complete and ready for implementation  
+**Next Spec:** Create focused spec for Stage 5 after completing this one

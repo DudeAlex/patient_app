@@ -5,11 +5,11 @@ Purpose: give any AI or contributor a single launchpad to the repo’s must-read
 ## Core Snapshot (read first)
 - **Mission & Scope**: Local-first patient records app with optional multi-modal capture (photo, scan, voice, keyboard, file, email) and consented AI assistance. Privacy is default; everything works offline first.
 - **Process Guardrails**: Work in tiny, verifiable increments, comment intent, and keep documentation in sync (`AGENTS.md` for full rules).
-- **Run Basics**: From `patient_app/`, use `flutter run -d chrome` (web) or follow the Android flow (`flutter clean`, `flutter pub get`, `dart run build_runner build --delete-conflicting-outputs`, then `flutter run -d <emulator>` with the Google server client id).
+- **Run Basics**: From `patient_app/`, use Android flow (`flutter clean`, `flutter pub get`, `dart run build_runner build --delete-conflicting-outputs`, then `flutter run -d <emulator>` with the Google server client id).
 - **Quality Gates**: After each change, run `dart analyze` or targeted tests as appropriate and log manual/automated results in `TESTING.md` (see its Testing Principles for expectations on coverage and determinism).
 - **Backup & Consent**: Mobile backups encrypt to `patient-backup-v1.enc` (AES-GCM) in Drive App Data; AI features require explicit opt-in and must keep originals local.
 - **Troubleshooting Triggers**: Symlink issues on Windows, emulator GPU/Play Services quirks, and Google auth scopes are documented in `TROUBLESHOOTING.md`.
-- **Roadmap**: Current milestone focus is M4 Auto Sync and upcoming multi-modal capture (see `TODO.md` and milestone plans).
+- **Roadmap**: see `TODO.md` and milestone plans
 - **Diagnostic System**: Comprehensive logging, crash detection, and memory monitoring are active. Logs are stored in app documents directory. Use `tool/get_crash_logs.ps1` to retrieve logs from emulator. See `CRASH_DETECTION_SUMMARY.md` and `DIAGNOSTIC_SYSTEM_INTEGRATION.md` for details.
 - **Logging Requirements**: All code must use `AppLogger` for significant operations, errors, and state changes. See `.kiro/steering/logging-guidelines.md` for mandatory practices.
 - **Flutter UI Performance**: All Flutter UI code must follow performance guidelines to prevent frame drops and crashes. See `.kiro/steering/flutter-ui-performance.md` for mandatory rules.
@@ -53,7 +53,7 @@ Each feature has its own subfolder with three key documents:
 - **`design.md`** - Architecture, components, data models, and correctness properties
 - **`tasks.md`** - Implementation plan with numbered, actionable coding tasks
 
-**Current specs include:**
+**Current specs include(outdated now needs to be updated):**
 - `ai-chat-companion/` - AI chat interface for patient records
 - `ai-summarization/` - AI-powered record summarization
 - `diagnostic-system/` - Logging, crash detection, and diagnostics

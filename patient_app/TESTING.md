@@ -1,9 +1,19 @@
 # Testing Principles
-- Cover happy paths, failure paths, and edge cases (empty/invalid input, timeouts, offline, retries); don’t stop at “works once”.
+- Cover happy paths, failure paths, and edge cases (empty/invalid input, timeouts, offline, retries); don't stop at "works once".
 - Assert side effects and context, not just returns: status updates, `updatedAt`, file cleanup, logging hooks, and no leaked local paths or PHI.
 - Keep tests deterministic: fixed clocks/seeds, fakes over brittle mocks, and explicit configuration for latency/failure modes.
 - Prefer small, focused cases over large integration dumps; isolate layers with ports and verify mapping/validation at boundaries.
-- Log manual verification in this file with scope, commands, and outcomes; note missing tooling when tests can’t run.
+- Log manual verification in this file with scope, commands, and outcomes; note missing tooling when tests can't run.
+
+# 2025-11-25 (LLM HTTP foundation manual check)
+- **Change Scope**
+  - Verified Stage 1 echo endpoint and Remote-mode chat against the local dev server.
+- **Verification**
+  - Server: `cd server && npm run dev` (listening on http://localhost:3030; Android emulator via http://10.0.2.2:3030).
+  - Echo: PowerShell POST to `/api/v1/chat/echo` with `threadId/message/timestamp/userId` returned `Echo: Hello, AI!` plus metadata.
+  - App: Android emulator (Pixel, debug) with AI features enabled, Remote mode selected, consent granted; chat message delivered and Remote response rendered.
+- **Result**
+  - Pass. No automated tests executed in this session. Client default remote URL now targets the dev server (10.0.2.2:3030 on emulator).
 
 # 2025-11-21 (AI Summary manual check)
 - **Change Scope**
