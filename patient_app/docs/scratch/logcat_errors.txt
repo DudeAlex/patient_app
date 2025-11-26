@@ -1,0 +1,6 @@
+Status: SCRATCH
+
+--------- beginning of kernel
+--------- beginning of main
+--------- beginning of system
+
