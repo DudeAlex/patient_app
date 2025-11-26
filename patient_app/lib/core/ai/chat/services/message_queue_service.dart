@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:patient_app/core/ai/chat/application/use_cases/send_chat_message_use_case.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/models/record_summary.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
 
@@ -228,7 +229,7 @@ class _QueuedMessage {
                 'type': record.type,
                 'tags': record.tags,
                 'summary': record.summary,
-                'createdAt': record.createdAt.toIso8601String(),
+                'date': record.date.toIso8601String(),
               },
             )
             .toList(),
@@ -259,7 +260,7 @@ class _QueuedMessage {
                     .toList() ??
                 const [],
             summary: record['summary'] as String?,
-            createdAt: DateTime.tryParse(record['createdAt'] as String? ?? '') ??
+            date: DateTime.tryParse(record['date'] as String? ?? record['createdAt'] as String? ?? '') ??
                 DateTime.fromMillisecondsSinceEpoch(0),
           ),
         )

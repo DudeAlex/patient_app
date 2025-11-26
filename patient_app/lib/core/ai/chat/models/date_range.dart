@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 /// Date range used to scope context assembly.
 @immutable
 class DateRange {
-  const DateRange({required this.start, required this.end})
+  DateRange({required this.start, required this.end})
       : assert(!end.isBefore(start), 'end must be on/after start');
 
   final DateTime start;

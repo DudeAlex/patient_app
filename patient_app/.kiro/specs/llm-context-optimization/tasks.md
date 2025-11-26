@@ -124,13 +124,13 @@
 
 ## Stage 4: Context Optimization
 
-- [ ] 17. Create DateRange model
+- [x] 17. Create DateRange model
   - Create `lib/core/ai/chat/models/date_range.dart`
   - Add start and end fields
   - Add factory methods: last7Days(), last14Days(), last30Days()
   - _Requirements: 4.1, 4.3_
 
-- [ ] 18. Create ContextFilters model
+- [x] 18. Create ContextFilters model
   - Create `lib/core/ai/chat/models/context_filters.dart`
   - Add dateRange field
   - Add maxRecords field
@@ -138,19 +138,19 @@
   - Implement toJson() method
   - _Requirements: 4.1, 5.1_
 
-- [ ] 19. Create TokenAllocation model
+- [x] 19. Create TokenAllocation model
   - Create `lib/core/ai/chat/models/token_allocation.dart`
   - Add fields: system, context, history, response, total
   - Implement toJson() method
   - _Requirements: 3.2, 7.1_
 
-- [ ] 20. Create ContextStats model
+- [x] 20. Create ContextStats model
   - Create `lib/core/ai/chat/models/context_stats.dart`
   - Add fields: recordsFiltered, recordsIncluded, tokensEstimated, tokensAvailable, compressionRatio, assemblyTime
   - Implement toJson() method
   - _Requirements: 9.1, 9.5_
 
-- [ ] 21. Create ContextFilterEngine
+- [x] 21. Create ContextFilterEngine
   - Create `lib/core/ai/chat/context/context_filter_engine.dart`
   - Implement filterRecords() method
   - Apply date range filter
@@ -159,7 +159,7 @@
   - Log filtering statistics
   - _Requirements: 4.1, 4.2, 5.1_
 
-- [ ] 22. Create RecordRelevanceScorer
+- [x] 22. Create RecordRelevanceScorer
   - Create `lib/core/ai/chat/context/record_relevance_scorer.dart`
   - Implement calculateScore() method
   - Calculate recency score (0-10)
@@ -168,6 +168,8 @@
   - Implement sortByRelevance() method
   - Log relevance scores
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
+
+**Pending follow-up: resolved** — AI chat tests now pass a `tokenBudgetAllocator` and payload expectations tolerate `filters`/`tokenBudget` where applicable across `test/integration`, `test/property`, `test/features/ai_chat`, and `test/core/ai`; suites are green.
 
 - [ ] 23. Create TokenBudgetAllocator
   - Create `lib/core/ai/chat/context/token_budget_allocator.dart`

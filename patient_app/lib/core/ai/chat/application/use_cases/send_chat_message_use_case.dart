@@ -6,6 +6,10 @@ import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/models/context_filters.dart';
+import 'package:patient_app/core/ai/chat/models/date_range.dart';
+import 'package:patient_app/core/ai/chat/models/token_allocation.dart';
+import 'package:patient_app/core/ai/chat/context/token_budget_allocator.dart';
 import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
@@ -24,12 +28,14 @@ class SendChatMessageUseCase {
     required AiConsentRepository consentRepository,
     required MessageAttachmentHandler attachmentHandler,
     required SpaceContextBuilder spaceContextBuilder,
+    TokenBudgetAllocator? tokenBudgetAllocator,
     Uuid? uuid,
   })  : _aiChatService = aiChatService,
         _chatThreadRepository = chatThreadRepository,
         _consentRepository = consentRepository,
         _attachmentHandler = attachmentHandler,
         _spaceContextBuilder = spaceContextBuilder,
+        _tokenBudgetAllocator = tokenBudgetAllocator ?? const TokenBudgetAllocator(),
         _uuid = uuid ?? const Uuid();
 
   final AiChatService _aiChatService;
@@ -37,6 +43,7 @@ class SendChatMessageUseCase {
   final AiConsentRepository _consentRepository;
   final MessageAttachmentHandler _attachmentHandler;
   final SpaceContextBuilder _spaceContextBuilder;
+  final TokenBudgetAllocator _tokenBudgetAllocator;
   final Uuid _uuid;
 
   /// Sends a message and returns the AI-generated response message.
@@ -61,6 +68,7 @@ class SendChatMessageUseCase {
     }
 
     final opId = AppLogger.startOperation('send_chat_message');
+    SpaceContext? builtContext;
     try {
       // Ensure thread exists.
       final existingThread = await _chatThreadRepository.getById(threadId);
@@ -88,7 +96,14 @@ class SendChatMessageUseCase {
       final Stopwatch contextStopwatch = Stopwatch()..start();
       final spaceContext =
           spaceContextOverride ?? await _spaceContextBuilder.build(spaceId);
+      builtContext = spaceContext;
       contextStopwatch.stop();
+      final tokenAllocation = _tokenBudgetAllocator.allocate();
+      final filters = ContextFilters(
+        dateRange: DateRange.last14Days(),
+        maxRecords: spaceContext.maxContextRecords,
+        spaceId: spaceContext.spaceId,
+      );
       await AppLogger.info(
         'Built space context for chat',
         context: {
@@ -125,6 +140,8 @@ class SendChatMessageUseCase {
         spaceContext: spaceContext,
         messageHistory: history,
         maxHistoryMessages: maxHistoryMessages,
+        filters: filters.toJson(),
+        tokenBudget: tokenAllocation.toJson(),
       );
 
       final ChatResponse response;
@@ -207,7 +224,10 @@ class SendChatMessageUseCase {
         'Chat message send failed',
         error: e,
         stackTrace: stackTrace,
-        context: {'threadId': threadId, 'spaceId': spaceContext.spaceId},
+        context: {
+          'threadId': threadId,
+          'spaceId': builtContext?.spaceId ?? spaceId,
+        },
         correlationId: opId,
       );
       rethrow;

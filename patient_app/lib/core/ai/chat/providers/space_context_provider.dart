@@ -4,6 +4,10 @@ import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
 import 'package:patient_app/core/ai/chat/context/record_summary_formatter.dart';
 import 'package:patient_app/core/ai/chat/context/space_context_builder.dart';
+import 'package:patient_app/core/ai/chat/context/context_filter_engine.dart';
+import 'package:patient_app/core/ai/chat/context/context_truncation_strategy.dart';
+import 'package:patient_app/core/ai/chat/context/record_relevance_scorer.dart';
+import 'package:patient_app/core/ai/chat/context/token_budget_allocator.dart';
 import 'package:patient_app/core/application/services/space_manager.dart';
 import 'package:patient_app/core/di/app_container.dart';
 import 'package:patient_app/core/infrastructure/storage/space_preferences.dart';
@@ -25,9 +29,16 @@ final spaceContextBuilderProvider = Provider<SpaceContextBuilder>((ref) {
     SpaceRegistry(),
   );
 
+  final tokenAllocator = TokenBudgetAllocator();
+
   return SpaceContextBuilderImpl(
     recordsServiceFuture: recordsServiceFuture,
+    filterEngine: ContextFilterEngine(),
+    relevanceScorer: RecordRelevanceScorer(),
+    tokenAllocation: tokenAllocator.allocate(),
+    truncationStrategy: const ContextTruncationStrategy(),
     spaceManager: spaceManager,
     formatter: RecordSummaryFormatter(),
+    maxRecords: tokenAllocator.context ~/ 100, // rough cap aligned to budget
   );
 });

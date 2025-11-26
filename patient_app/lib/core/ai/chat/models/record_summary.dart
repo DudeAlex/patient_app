@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 class RecordSummary {
   static const int maxSummaryLength = 100;
 
-  const RecordSummary({
+  RecordSummary({
     required this.title,
     required this.type,
     required this.date,

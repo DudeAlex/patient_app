@@ -16,6 +16,8 @@ import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/models/ai_summary_result.dart';
 import 'package:patient_app/core/domain/entities/information_item.dart';
+import '../../fakes/fake_token_budget_allocator.dart';
+import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
 import 'package:uuid/uuid.dart';
 
 class _InMemoryThreadRepo implements ChatThreadRepository {
@@ -186,6 +188,7 @@ void main() {
       chatThreadRepository: repo,
       consentRepository: consent,
       attachmentHandler: attachments,
+      tokenBudgetAllocator: const FakeTokenBudgetAllocator(),
       spaceContextBuilder: _StubContextBuilder(),
       uuid: const Uuid(),
     );
@@ -222,6 +225,7 @@ void main() {
       chatThreadRepository: repo,
       consentRepository: _StubConsentRepo(false),
       attachmentHandler: _StubAttachmentHandler(),
+      tokenBudgetAllocator: const FakeTokenBudgetAllocator(),
       spaceContextBuilder: _StubContextBuilder(),
       uuid: const Uuid(),
     );
@@ -245,6 +249,8 @@ void main() {
       chatThreadRepository: repo,
       consentRepository: _StubConsentRepo(true),
       attachmentHandler: _StubAttachmentHandler(),
+      tokenBudgetAllocator: const FakeTokenBudgetAllocator(),
+      spaceContextBuilder: _StubContextBuilder(),
       uuid: const Uuid(),
     );
 

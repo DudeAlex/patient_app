@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/models/record_summary.dart';
 import 'package:patient_app/features/records/domain/entities/record.dart';
 
 /// Formats records into compact summaries for AI context assembly.
@@ -18,7 +18,7 @@ class RecordSummaryFormatter {
       type: record.type,
       tags: record.tags,
       summary: _truncate(record.text),
-      createdAt: record.date,
+      date: record.date,
     );
   }
 

@@ -14,6 +14,8 @@ class ChatRequest {
     List<MessageAttachment> attachments = const [],
     List<ChatMessage> messageHistory = const [],
     this.maxHistoryMessages = 3,
+    this.filters,
+    this.tokenBudget,
   })  : assert(threadId.trim().isNotEmpty, 'threadId cannot be empty'),
         assert(
           messageContent.trim().isNotEmpty || attachments.isNotEmpty,
@@ -41,6 +43,12 @@ class ChatRequest {
   /// Maximum number of history messages to include in payloads.
   final int maxHistoryMessages;
 
+  /// Optional filters applied during context assembly (Stage 4).
+  final Object? filters;
+
+  /// Optional token allocation for this request (Stage 4).
+  final Object? tokenBudget;
+
   /// History trimmed to the configured maximum to avoid token overuse.
   List<ChatMessage> get limitedHistory =>
       messageHistory.take(maxHistoryMessages).toList(growable: false);
@@ -61,6 +69,10 @@ class ChatRequest {
         'recentRecords':
             spaceContext.limitedRecords.map((r) => r.toJson()).toList(),
         'maxContextRecords': spaceContext.maxContextRecords,
+        if (spaceContext.filters != null) 'filters': spaceContext.filters,
+        if (spaceContext.tokenAllocation != null)
+          'tokenAllocation': spaceContext.tokenAllocation,
+        if (spaceContext.stats != null) 'stats': spaceContext.stats,
       },
       'messageHistory': limitedHistory
           .map(
@@ -70,6 +82,8 @@ class ChatRequest {
             },
           )
           .toList(),
+      if (filters != null) 'filters': filters,
+      if (tokenBudget != null) 'tokenBudget': tokenBudget,
     };
   }
 }

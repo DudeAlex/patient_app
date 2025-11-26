@@ -20,8 +20,9 @@ class _FakeSendUseCase implements SendChatMessageUseCase {
   @override
   Future<ChatMessage> execute({
     required String threadId,
-    required SpaceContext spaceContext,
+    required String spaceId,
     required String messageContent,
+    SpaceContext? spaceContextOverride,
     List<ChatAttachmentInput> attachments = const [],
     int maxHistoryMessages = 10,
   }) async {

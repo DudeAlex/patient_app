@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:patient_app/core/ai/chat/models/record_summary.dart';
 
 /// Persona-aware context passed to AI chat operations.
 @immutable
@@ -11,6 +12,9 @@ class SpaceContext {
     List<String> categories = const [],
     List<RecordSummary> recentRecords = const [],
     this.maxContextRecords = 10,
+    this.filters,
+    this.tokenAllocation,
+    this.stats,
   })  : assert(spaceId.trim().isNotEmpty, 'spaceId cannot be empty'),
         assert(spaceName.trim().isNotEmpty, 'spaceName cannot be empty'),
         assert(maxContextRecords > 0, 'maxContextRecords must be > 0'),
@@ -38,6 +42,15 @@ class SpaceContext {
   /// Maximum records to include when building payloads.
   final int maxContextRecords;
 
+  /// Filters used during assembly (Stage 4).
+  final Object? filters;
+
+  /// Token allocation used during assembly (Stage 4).
+  final Object? tokenAllocation;
+
+  /// Stats captured during assembly (Stage 4).
+  final Object? stats;
+
   /// Returns records trimmed to the configured maximum to limit token use.
   List<RecordSummary> get limitedRecords =>
       recentRecords.take(maxContextRecords).toList(growable: false);
@@ -50,6 +63,9 @@ class SpaceContext {
     List<String>? categories,
     List<RecordSummary>? recentRecords,
     int? maxContextRecords,
+    Object? filters,
+    Object? tokenAllocation,
+    Object? stats,
   }) {
     return SpaceContext(
       spaceId: spaceId ?? this.spaceId,
@@ -59,6 +75,9 @@ class SpaceContext {
       categories: categories ?? this.categories,
       recentRecords: recentRecords ?? this.recentRecords,
       maxContextRecords: maxContextRecords ?? this.maxContextRecords,
+      filters: filters ?? this.filters,
+      tokenAllocation: tokenAllocation ?? this.tokenAllocation,
+      stats: stats ?? this.stats,
     );
   }
 
@@ -71,61 +90,12 @@ class SpaceContext {
       'persona': persona.name,
       'recentRecords': recentRecords.map((r) => r.toJson()).toList(),
       'maxContextRecords': maxContextRecords,
+      if (filters != null) 'filters': filters,
+      if (tokenAllocation != null) 'tokenAllocation': tokenAllocation,
+      if (stats != null) 'stats': stats,
     };
   }
 }
 
 /// Space-specific persona influencing AI tone and hints.
 enum SpacePersona { health, education, finance, travel, general }
-
-/// Minimal summary of a record used for context grounding.
-@immutable
-class RecordSummary {
-  static const int maxSummaryLength = 100;
-
-  RecordSummary({
-    required this.title,
-    required this.type,
-    List<String> tags = const [],
-    this.summary,
-    required this.createdAt,
-  })  : assert(title.trim().isNotEmpty, 'title cannot be empty'),
-        assert(type.trim().isNotEmpty, 'type cannot be empty'),
-        assert(
-          summary == null || summary.length <= maxSummaryLength,
-          'summary cannot exceed $maxSummaryLength characters',
-        ),
-        tags = List.unmodifiable(tags);
-
-  final String title;
-  final String type;
-  final List<String> tags;
-  final String? summary;
-  final DateTime createdAt;
-
-  RecordSummary copyWith({
-    String? title,
-    String? type,
-    List<String>? tags,
-    String? summary,
-    DateTime? createdAt,
-  }) {
-    return RecordSummary(
-      title: title ?? this.title,
-      type: type ?? this.type,
-      tags: tags ?? this.tags,
-      summary: summary ?? this.summary,
-      createdAt: createdAt ?? this.createdAt,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'title': title,
-      'type': type,
-      'tags': tags,
-      'summary': summary,
-      'createdAt': createdAt.toIso8601String(),
-    };
-  }
-}

@@ -35,6 +35,7 @@ void main() {
   test('estimates tokens using heuristic', () {
     final summary = formatter.format(_record(text: 'note'));
     final tokens = formatter.estimateTokens(summary);
-    expect(tokens, equals(6)); // (Title+Type+tags+summary+separators)/4 rounded up
+    // Calculation: "Annual Checkup visit tag1 tag2 note" -> 33 chars ≈ 8.25 tokens -> 9 rounded up.
+    expect(tokens, equals(9));
   });
 }

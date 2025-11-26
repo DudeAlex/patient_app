@@ -208,6 +208,7 @@ final aiChatControllerProvider = StateNotifierProvider.family<AiChatController, 
     final container = AppContainer.instance;
     final chatRepo = container.resolve<ChatThreadRepository>();
     final attachmentHandler = container.resolve<MessageAttachmentHandler>();
+    final spaceBuilder = ref.read(spaceContextBuilderProvider);
     final loadUseCase = LoadChatHistoryUseCase(chatThreadRepository: chatRepo);
     final clearUseCase = ClearChatThreadUseCase(
       chatThreadRepository: chatRepo,
@@ -218,6 +219,7 @@ final aiChatControllerProvider = StateNotifierProvider.family<AiChatController, 
       chatThreadRepository: chatRepo,
       consentRepository: container.resolve<AiConsentRepository>(),
       attachmentHandler: attachmentHandler,
+      spaceContextBuilder: spaceBuilder,
     );
     final queueService = MessageQueueService(
       sendChatMessageUseCase: sendUseCase,
@@ -229,7 +231,6 @@ final aiChatControllerProvider = StateNotifierProvider.family<AiChatController, 
       messageQueueService: queueService,
       onStatusChanged: (isOffline) => controller.setOffline(isOffline),
     );
-    final spaceBuilder = ref.read(spaceContextBuilderProvider);
     final switchUseCase = SwitchSpaceContextUseCase(
       loadChatHistoryUseCase: loadUseCase,
       clearChatThreadUseCase: clearUseCase,

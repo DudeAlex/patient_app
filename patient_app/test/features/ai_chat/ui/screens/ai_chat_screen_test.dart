@@ -18,10 +18,16 @@ import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
 import 'package:patient_app/core/ai/chat/services/message_queue_service.dart';
+import 'package:patient_app/core/ai/chat/services/connectivity_monitor.dart';
 import 'package:patient_app/core/ai/repositories/ai_consent_repository.dart';
+import 'package:patient_app/core/ai/repositories/ai_config_repository.dart';
+import 'package:patient_app/core/ai/ai_config.dart';
+import 'package:patient_app/core/di/app_container.dart';
 import 'package:patient_app/features/ai_chat/ui/controllers/ai_chat_controller.dart';
 import 'package:patient_app/features/ai_chat/ui/screens/ai_chat_screen.dart';
+import '../../../../core/ai/chat/fakes/fake_token_budget_allocator.dart';
 import 'package:uuid/uuid.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 // Stub implementations
 class _StubThreadRepo implements ChatThreadRepository {
@@ -78,6 +84,72 @@ class _StubSpaceContextBuilder implements SpaceContextBuilder {
   }
 }
 
+class _StubMessageQueueService implements MessageQueueService {
+  @override
+  int get pendingCount => 0;
+
+  @override
+  Future<void> enqueue({
+    required String threadId,
+    required SpaceContext spaceContext,
+    required String content,
+    required List<MessageAttachment> attachments,
+  }) async {}
+
+  @override
+  Future<void> processQueue() async {}
+}
+
+class _StubConnectivityMonitor implements ConnectivityMonitor {
+  _StubConnectivityMonitor(this._queue);
+  final MessageQueueService _queue;
+
+  @override
+  Connectivity get connectivity => Connectivity();
+
+  @override
+  MessageQueueService get messageQueueService => _queue;
+
+  @override
+  void Function(bool p1)? get onStatusChanged => null;
+
+  @override
+  Future<void> start() async {}
+
+  @override
+  Future<void> stop() async {}
+}
+
+class _StubAiConfigRepository implements AiConfigRepository {
+  _StubAiConfigRepository()
+      : _config = const AiConfig(
+          enabled: true,
+          mode: AiMode.fake,
+          remoteUrl: '',
+        );
+
+  AiConfig _config;
+
+  @override
+  AiConfig get current => _config;
+
+  @override
+  Stream<AiConfig> get stream => Stream.value(_config);
+
+  @override
+  Future<AiConfig> loadConfig() async => _config;
+
+  @override
+  Future<void> setEnabled(bool enabled) async {
+    _config = _config.copyWith(enabled: enabled);
+  }
+
+  @override
+  Future<void> setMode(AiMode mode) async {
+    _config = _config.copyWith(mode: mode);
+  }
+}
+
 // Test controller that sets up initial state
 class _TestController extends AiChatController {
   _TestController()
@@ -88,6 +160,8 @@ class _TestController extends AiChatController {
             chatThreadRepository: _StubThreadRepo(),
             consentRepository: _StubConsentRepo(),
             attachmentHandler: _StubAttachmentHandler(),
+            spaceContextBuilder: _StubSpaceContextBuilder(),
+            tokenBudgetAllocator: const FakeTokenBudgetAllocator(),
             uuid: const Uuid(),
           ),
           loadChatHistoryUseCase: LoadChatHistoryUseCase(
@@ -111,16 +185,8 @@ class _TestController extends AiChatController {
           ),
           chatThreadRepository: _StubThreadRepo(),
           spaceContextBuilder: _StubSpaceContextBuilder(),
-          messageQueueService: MessageQueueService(
-            sendChatMessageUseCase: SendChatMessageUseCase(
-              aiChatService: FakeAiChatService(simulatedLatency: Duration.zero),
-              chatThreadRepository: _StubThreadRepo(),
-              consentRepository: _StubConsentRepo(),
-              attachmentHandler: _StubAttachmentHandler(),
-              uuid: const Uuid(),
-            ),
-            chatThreadRepository: _StubThreadRepo(),
-          ),
+          messageQueueService: _StubMessageQueueService(),
+          connectivityMonitor: _StubConnectivityMonitor(_StubMessageQueueService()),
         );
 
   @override
@@ -155,6 +221,10 @@ class _TestController extends AiChatController {
 }
 
 void main() {
+  setUp(() {
+    AppContainer.instance.registerSingleton<AiConfigRepository>(_StubAiConfigRepository());
+  });
+
   testWidgets('renders chat screen with header, message list, and composer', (tester) async {
     await tester.pumpWidget(
       ProviderScope(

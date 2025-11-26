@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:patient_app/core/ai/chat/application/use_cases/clear_chat_thread_use_case.dart';
 import 'package:patient_app/core/ai/chat/application/use_cases/load_chat_history_use_case.dart';
 import 'package:patient_app/core/ai/chat/application/use_cases/send_chat_message_use_case.dart';
@@ -16,6 +17,8 @@ import 'package:patient_app/core/ai/chat/services/message_queue_service.dart';
 import 'package:patient_app/core/ai/repositories/ai_consent_repository.dart';
 import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
 import 'package:patient_app/features/ai_chat/ui/controllers/ai_chat_controller.dart';
+import 'package:patient_app/core/ai/chat/services/connectivity_monitor.dart';
+import '../../../../core/ai/chat/fakes/fake_token_budget_allocator.dart';
 import 'package:uuid/uuid.dart';
 
 class _InMemoryThreadRepo implements ChatThreadRepository {
@@ -125,6 +128,27 @@ class _StubMessageQueueService implements MessageQueueService {
   Future<void> processQueue() async {}
 }
 
+class _StubConnectivityMonitor implements ConnectivityMonitor {
+  _StubConnectivityMonitor(this._queue);
+
+  final MessageQueueService _queue;
+
+  @override
+  Connectivity get connectivity => Connectivity();
+
+  @override
+  MessageQueueService get messageQueueService => _queue;
+
+  @override
+  void Function(bool p1)? get onStatusChanged => null;
+
+  @override
+  Future<void> start() async {}
+
+  @override
+  Future<void> stop() async {}
+}
+
 void main() {
   test('loadInitial populates thread and context', () async {
     final repo = _InMemoryThreadRepo();
@@ -136,8 +160,12 @@ void main() {
       chatThreadRepository: repo,
       consentRepository: _StubConsentRepo(),
       attachmentHandler: attachmentHandler,
+      spaceContextBuilder: _StubSpaceContextBuilder(),
+      tokenBudgetAllocator: const FakeTokenBudgetAllocator(),
       uuid: const Uuid(),
     );
+    final messageQueue = _StubMessageQueueService();
+    final connectivityMonitor = _StubConnectivityMonitor(messageQueue);
     final controller = AiChatController(
       spaceId: 'health',
       sendChatMessageUseCase: sendUseCase,
@@ -150,7 +178,8 @@ void main() {
       ),
       chatThreadRepository: repo,
       spaceContextBuilder: _StubSpaceContextBuilder(),
-      messageQueueService: _StubMessageQueueService(),
+      messageQueueService: messageQueue,
+      connectivityMonitor: connectivityMonitor,
     );
 
     await controller.loadInitial();
@@ -170,8 +199,12 @@ void main() {
       chatThreadRepository: repo,
       consentRepository: _StubConsentRepo(),
       attachmentHandler: attachmentHandler,
+      spaceContextBuilder: _StubSpaceContextBuilder(),
+      tokenBudgetAllocator: const FakeTokenBudgetAllocator(),
       uuid: const Uuid(),
     );
+    final messageQueue = _StubMessageQueueService();
+    final connectivityMonitor = _StubConnectivityMonitor(messageQueue);
     final controller = AiChatController(
       spaceId: 'health',
       sendChatMessageUseCase: sendUseCase,
@@ -184,7 +217,8 @@ void main() {
       ),
       chatThreadRepository: repo,
       spaceContextBuilder: _StubSpaceContextBuilder(),
-      messageQueueService: _StubMessageQueueService(),
+      messageQueueService: messageQueue,
+      connectivityMonitor: connectivityMonitor,
     );
 
     await controller.loadInitial();
