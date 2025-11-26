@@ -25,6 +25,11 @@ Local-first personal information system with optional encrypted Drive backup and
 - Specs: `.kiro/specs/`; steering: `.kiro/steering/`.
 - Backend (stage 1 echo): `server/` (`npm start`, http://localhost:3030/api/v1/chat/echo).
 
+## Working rules for agents
+- First reads: `docs/core/AI_AGENT_START_HERE.md` and `docs/core/PROJECT_WORKING_RULES.md`.
+- Active plans and task lists live under `.kiro/`; read `.kiro/specs/*/tasks.md` at the beginning of each work session to know the current stage.
+- Do not modify `.kiro` unless explicitly instructed.
+
 ## Prereqs
 - Flutter >= 3.32; Android Studio + emulator; Windows: elevated PowerShell or Developer Mode (symlinks).
 

@@ -2,7 +2,18 @@ Status: ACTIVE
 
 # AI Agent Start Here
 
-Purpose: give any AI or contributor a single launchpad to the repo’s must-read guidance while keeping the source documents in their canonical locations.
+Purpose: give any AI or contributor a single launchpad to the repo's must-read guidance while keeping the source documents in their canonical locations.
+
+## Where active plans and tasks live
+- All active plans, stage roadmaps, and task lists for AI and system architecture live under `.kiro/`; treat it as the authoritative source for current work.
+- `.kiro/specs/*/tasks.md` files hold stage-by-stage task lists with checkboxes.
+- Always read the relevant `.kiro/specs/*/tasks.md` at the beginning of each work session to know the current stage and pending tasks.
+- Do not modify `.kiro` unless explicitly instructed.
+
+## When you start working
+- Read `docs/core/README.md` for the high-level map.
+- Read `docs/core/PROJECT_WORKING_RULES.md` for working rules.
+- Read `.kiro/specs/*/tasks.md` to see the current stage and tasks.
 
 ## Core Snapshot (read first)
 - **Mission & Scope**: Local-first patient records app with optional multi-modal capture (photo, scan, voice, keyboard, file, email) and consented AI assistance. Privacy is default; everything works offline first.
