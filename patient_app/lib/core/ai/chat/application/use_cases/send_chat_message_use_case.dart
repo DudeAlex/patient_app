@@ -68,6 +68,7 @@ class SendChatMessageUseCase {
     }
 
     final opId = AppLogger.startOperation('send_chat_message');
+    final dateRange = DateRange.last14Days();
     SpaceContext? builtContext;
     try {
       // Ensure thread exists.
@@ -95,12 +96,12 @@ class SendChatMessageUseCase {
 
       final Stopwatch contextStopwatch = Stopwatch()..start();
       final spaceContext =
-          spaceContextOverride ?? await _spaceContextBuilder.build(spaceId);
+          spaceContextOverride ?? await _spaceContextBuilder.build(spaceId, dateRange: dateRange);
       builtContext = spaceContext;
       contextStopwatch.stop();
       final tokenAllocation = _tokenBudgetAllocator.allocate();
       final filters = ContextFilters(
-        dateRange: DateRange.last14Days(),
+        dateRange: dateRange,
         maxRecords: spaceContext.maxContextRecords,
         spaceId: spaceContext.spaceId,
       );
