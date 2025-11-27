@@ -209,7 +209,10 @@
   - NOTE: ✅ COMPLETE - DateRange.last14Days() passed to SpaceContextBuilder; ContextFilters and TokenAllocation included in ChatRequest. ⏳ PENDING - Surfacing ContextStats in response metadata requires Task 28 (adding contextStats field to AiMessageMetadata model). Implemented in commit `253a1ca`.
   - _Requirements: 4.1, 7.1, 9.5_
 
-- [ ] 27. Update ChatRequest model for Stage 4
+- [x] 27. Update ChatRequest model for Stage 4
+
+
+
   - Add filters field (ContextFilters)
   - Add tokenBudget field (TokenAllocation)
   - Update toJson() to include new fields

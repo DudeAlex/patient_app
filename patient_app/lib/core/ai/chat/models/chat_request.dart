@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 
 import 'chat_message.dart';
+import 'context_filters.dart';
 import 'message_attachment.dart';
 import 'space_context.dart';
+import 'token_allocation.dart';
 
 /// DTO carrying all inputs needed to send a chat message to an AI provider.
 @immutable
@@ -44,10 +46,10 @@ class ChatRequest {
   final int maxHistoryMessages;
 
   /// Optional filters applied during context assembly (Stage 4).
-  final Object? filters;
+  final ContextFilters? filters;
 
   /// Optional token allocation for this request (Stage 4).
-  final Object? tokenBudget;
+  final TokenAllocation? tokenBudget;
 
   /// History trimmed to the configured maximum to avoid token overuse.
   List<ChatMessage> get limitedHistory =>
@@ -82,8 +84,8 @@ class ChatRequest {
             },
           )
           .toList(),
-      if (filters != null) 'filters': filters,
-      if (tokenBudget != null) 'tokenBudget': tokenBudget,
+      if (filters != null) 'filters': filters!.toJson(),
+      if (tokenBudget != null) 'tokenBudget': tokenBudget!.toJson(),
     };
   }
 }

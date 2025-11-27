@@ -141,8 +141,8 @@ class SendChatMessageUseCase {
         spaceContext: spaceContext,
         messageHistory: history,
         maxHistoryMessages: maxHistoryMessages,
-        filters: filters.toJson(),
-        tokenBudget: tokenAllocation.toJson(),
+        filters: filters,
+        tokenBudget: tokenAllocation,
       );
 
       final ChatResponse response;
