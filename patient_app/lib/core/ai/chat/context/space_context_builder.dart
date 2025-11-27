@@ -8,6 +8,7 @@ import 'package:patient_app/core/ai/chat/models/context_filters.dart';
 import 'package:patient_app/core/ai/chat/models/context_stats.dart';
 import 'package:patient_app/core/ai/chat/models/date_range.dart';
 import 'package:patient_app/core/ai/chat/models/token_allocation.dart';
+import 'package:patient_app/core/ai/chat/context/token_budget_allocator.dart';
 import 'package:patient_app/core/application/services/space_manager.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
 import 'package:patient_app/core/domain/entities/space.dart';
@@ -23,17 +24,17 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
     required SpaceManager spaceManager,
     required ContextFilterEngine filterEngine,
     required RecordRelevanceScorer relevanceScorer,
-    required TokenAllocation tokenAllocation,
+    required TokenBudgetAllocator tokenBudgetAllocator,
     required ContextTruncationStrategy truncationStrategy,
     RecordSummaryFormatter? formatter,
-    this.maxRecords = 10,
+    this.maxRecords = 20,
     DateRange? dateRange,
   })  : _recordsServiceFuture = recordsServiceFuture,
         _recordsRepositoryOverride = recordsRepositoryOverride,
         _spaceManager = spaceManager,
         _filterEngine = filterEngine,
         _relevanceScorer = relevanceScorer,
-        _tokenAllocation = tokenAllocation,
+        _tokenBudgetAllocator = tokenBudgetAllocator,
         _truncationStrategy = truncationStrategy,
         _dateRange = dateRange ?? DateRange.last14Days(),
         _formatter = formatter ?? RecordSummaryFormatter();
@@ -43,7 +44,7 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
   final SpaceManager _spaceManager;
   final ContextFilterEngine _filterEngine;
   final RecordRelevanceScorer _relevanceScorer;
-  final TokenAllocation _tokenAllocation;
+  final TokenBudgetAllocator _tokenBudgetAllocator;
   final ContextTruncationStrategy _truncationStrategy;
   final DateRange _dateRange;
   final RecordSummaryFormatter _formatter;
@@ -54,9 +55,15 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
   @override
   Future<SpaceContext> build(String spaceId) async {
     final opId = AppLogger.startOperation('space_context_build');
+    final stopwatch = Stopwatch()..start();
     await AppLogger.info(
       'Starting space context assembly',
-      context: {'spaceId': spaceId, 'maxRecords': maxRecords},
+      context: {
+        'spaceId': spaceId,
+        'maxRecords': maxRecords,
+        'dateRangeStart': _dateRange.start.toIso8601String(),
+        'dateRangeEnd': _dateRange.end.toIso8601String(),
+      },
       correlationId: opId,
     );
     final recordsRepository = _recordsRepositoryOverride ?? (await _recordsServiceFuture).records;
@@ -69,12 +76,22 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
         orElse: () => space,
       );
       if (match.id == spaceId) {
-        final context = await _buildFromSpace(match, recordsRepository, correlationId: opId);
+        final context = await _buildFromSpace(
+          match,
+          recordsRepository,
+          correlationId: opId,
+          stopwatch: stopwatch,
+        );
         await AppLogger.endOperation(opId);
         return context;
       }
     }
-    final context = await _buildFromSpace(space, recordsRepository, correlationId: opId);
+    final context = await _buildFromSpace(
+      space,
+      recordsRepository,
+      correlationId: opId,
+      stopwatch: stopwatch,
+    );
     await AppLogger.endOperation(opId);
     return context;
   }
@@ -83,23 +100,25 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
     Space space,
     RecordsRepository recordsRepository, {
     String? correlationId,
+    Stopwatch? stopwatch,
   }) async {
-    final recent = await recordsRepository.recent(limit: 200);
+    final allRecords = await _loadAllRecords(recordsRepository, space.id);
     final filters = ContextFilters(
       dateRange: _dateRange,
       spaceId: space.id,
       maxRecords: maxRecords,
     );
     final filtered = await _filterEngine.filterRecords(
-      recent,
+      allRecords,
       spaceId: space.id,
       dateRange: _dateRange,
     );
 
     final sorted = await _relevanceScorer.sortByRelevance(filtered);
+    final tokenAllocation = _tokenBudgetAllocator.allocate();
     final summaries = _truncationStrategy.truncateToFit(
       sorted,
-      availableTokens: _tokenAllocation.context,
+      availableTokens: tokenAllocation.context,
       formatter: _formatter,
       maxRecords: maxRecords,
     );
@@ -107,26 +126,30 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
       0,
       (total, summary) => total + _formatter.estimateTokens(summary),
     );
+    final assemblyTime = stopwatch?.elapsed ?? Duration.zero;
 
     final stats = ContextStats(
       recordsFiltered: filtered.length,
       recordsIncluded: summaries.length,
       tokensEstimated: estimatedTokens,
-      tokensAvailable: _tokenAllocation.context,
+      tokensAvailable: tokenAllocation.context,
       compressionRatio: filtered.isEmpty ? 0 : summaries.length / filtered.length,
-      assemblyTime: Duration.zero,
+      assemblyTime: assemblyTime,
     );
 
     await AppLogger.info(
       'Built space context',
       context: {
         'spaceId': space.id,
+        'recordsTotal': allRecords.length,
         'recordsConsidered': filtered.length,
         'recordsIncluded': summaries.length,
         'maxRecords': maxRecords,
         'estimatedTokens': estimatedTokens,
         'dateRangeStart': _dateRange.start.toIso8601String(),
         'dateRangeEnd': _dateRange.end.toIso8601String(),
+        'tokensAvailable': tokenAllocation.context,
+        'assemblyMs': assemblyTime.inMilliseconds,
       },
       correlationId: correlationId,
     );
@@ -140,14 +163,29 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
       recentRecords: summaries,
       maxContextRecords: maxRecords,
       filters: filters,
-      tokenAllocation: _tokenAllocation,
+      tokenAllocation: tokenAllocation,
       stats: stats,
     );
   }
 
-  bool _belongsToSpace(RecordEntity record, String spaceId) {
-    if (record.deletedAt != null) return false;
-    return record.spaceId == spaceId;
+  Future<List<RecordEntity>> _loadAllRecords(
+    RecordsRepository recordsRepository,
+    String spaceId, {
+    int pageSize = 100,
+  }) async {
+    final records = <RecordEntity>[];
+    var offset = 0;
+    while (true) {
+      final page = await recordsRepository.fetchPage(
+        offset: offset,
+        limit: pageSize,
+        spaceId: spaceId,
+      );
+      records.addAll(page);
+      if (page.length < pageSize) break;
+      offset += pageSize;
+    }
+    return records;
   }
 
   SpacePersona _personaFor(String spaceId) {

@@ -35,7 +35,7 @@ final spaceContextBuilderProvider = Provider<SpaceContextBuilder>((ref) {
     recordsServiceFuture: recordsServiceFuture,
     filterEngine: ContextFilterEngine(),
     relevanceScorer: RecordRelevanceScorer(),
-    tokenAllocation: tokenAllocator.allocate(),
+    tokenBudgetAllocator: tokenAllocator,
     truncationStrategy: const ContextTruncationStrategy(),
     spaceManager: spaceManager,
     formatter: RecordSummaryFormatter(),

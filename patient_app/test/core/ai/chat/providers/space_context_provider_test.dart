@@ -11,7 +11,7 @@ import 'package:patient_app/core/ai/chat/context/record_relevance_scorer.dart';
 import 'package:patient_app/core/ai/chat/context/context_truncation_strategy.dart';
 import 'package:patient_app/core/ai/chat/context/record_summary_formatter.dart';
 import 'package:patient_app/core/ai/chat/context/space_context_builder.dart';
-import 'package:patient_app/core/ai/chat/models/token_allocation.dart';
+import 'package:patient_app/core/ai/chat/context/token_budget_allocator.dart';
 import 'package:patient_app/core/ai/chat/models/date_range.dart';
 import 'package:patient_app/core/application/services/space_manager.dart';
 import 'package:patient_app/core/application/ports/space_repository.dart';
@@ -22,7 +22,6 @@ import 'package:patient_app/features/records/application/ports/records_repositor
 import 'package:patient_app/features/records/application/use_cases/fetch_recent_records_use_case.dart';
 import 'package:patient_app/features/records/data/records_service.dart';
 import 'package:patient_app/features/records/domain/entities/record.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 
 class _StubRecordsService implements RecordsService {
@@ -53,9 +52,28 @@ class _StubRecordsRepository implements RecordsRepository {
     return sorted.take(limit).toList();
   }
 
-  // Unused members
   @override
-  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+  Future<List<RecordEntity>> fetchPage({
+    required int offset,
+    required int limit,
+    String? query,
+    String? spaceId,
+  }) async {
+    final filtered = spaceId == null
+        ? _records
+        : _records.where((record) => record.spaceId == spaceId).toList();
+    final sorted = [...filtered]..sort((a, b) => b.date.compareTo(a.date));
+    return sorted.skip(offset).take(limit).toList();
+  }
+
+  @override
+  Future<RecordEntity> save(RecordEntity record) async => record;
+
+  @override
+  Future<RecordEntity?> byId(int id) async => _records.firstWhere((r) => r.id == id);
+
+  @override
+  Future<void> delete(int id) async {}
 }
 
 class _StubThreadRepo implements ChatThreadRepository {
@@ -213,12 +231,12 @@ void main() {
             spaceManager: _StubSpaceManager('health'),
             filterEngine: ContextFilterEngine(),
             relevanceScorer: _TestRelevanceScorer(),
-            tokenAllocation: const TokenAllocation(
+            tokenBudgetAllocator: const TokenBudgetAllocator(
+              total: 4800,
               system: 800,
               context: 2000,
               history: 1000,
               response: 1000,
-              total: 4800,
             ),
             truncationStrategy: const ContextTruncationStrategy(),
             formatter: RecordSummaryFormatter(),
@@ -247,12 +265,12 @@ void main() {
       spaceManager: _StubSpaceManager('custom_space'),
       filterEngine: ContextFilterEngine(),
       relevanceScorer: _TestRelevanceScorer(),
-      tokenAllocation: const TokenAllocation(
+      tokenBudgetAllocator: const TokenBudgetAllocator(
+        total: 4800,
         system: 800,
         context: 2000,
         history: 1000,
         response: 1000,
-        total: 4800,
       ),
       truncationStrategy: const ContextTruncationStrategy(),
       formatter: RecordSummaryFormatter(),
