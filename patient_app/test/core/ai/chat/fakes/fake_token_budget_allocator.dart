@@ -18,5 +18,13 @@ class FakeTokenBudgetAllocator extends TokenBudgetAllocator {
   final TokenAllocation _allocation;
 
   @override
-  TokenAllocation allocate() => _allocation;
+  TokenAllocation allocate({
+    int? totalOverride,
+    int? systemOverride,
+    int? contextOverride,
+    int? historyOverride,
+    int? responseOverride,
+  }) {
+    return _allocation;
+  }
 }

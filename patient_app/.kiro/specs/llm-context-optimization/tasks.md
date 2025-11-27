@@ -171,7 +171,7 @@
 
 **Pending follow-up: resolved** — AI chat tests now pass a `tokenBudgetAllocator` and payload expectations tolerate `filters`/`tokenBudget` where applicable across `test/integration`, `test/property`, `test/features/ai_chat`, and `test/core/ai`; suites are green.
 
-- [ ] 23. Create TokenBudgetAllocator
+- [x] 23. Create TokenBudgetAllocator
   - Create `lib/core/ai/chat/context/token_budget_allocator.dart`
   - Implement allocate() method
   - Define budget: system (800), context (2000), history (1000), response (1000)
