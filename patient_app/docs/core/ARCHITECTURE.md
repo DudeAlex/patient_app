@@ -7,6 +7,9 @@ Status: ACTIVE
 - Backup: optional AES-GCM export to Google Drive App Data (mobile).
 - Modes: Local Only (default) and opt-in AI-Assisted (Together AI) for enrichment/encouragement.
 
+## Technology and Infrastructure Selection Principles
+To ensure long term maintainability and consistency, the project should rely on well established community solutions for all generic technical infrastructure. This includes areas such as configuration and dependency management, networking and external communication, data storage and caching, authentication and security, logging and observability, background and scheduled processing, state and workflow management, user interaction layers, intelligent and AI assisted features, testing and quality assurance, build and deployment processes, monitoring and analytics, and developer tooling. Custom infrastructure may be implemented only when the project has specific requirements that cannot be met by existing tools. In such cases, the decision must be documented with a clear rationale, identified trade offs, and maintenance expectations.
+
 ## Key Modules
 - `lib/ui/`: app shell and navigation (`ui/app.dart`, `ui/settings/settings_screen.dart`).
 - `lib/core/`: shared infra (Isar open, attachments root, Space entities/gradients, SpaceManager service/ports, SharedPreferences storage, migrations). Planned cross-cutting: AI processing, support network, email ingest, vitals service.
