@@ -103,6 +103,8 @@ app.post('/api/v1/chat/message', async (req, res) => {
         : [],
       historyText,
       userMessage: message,
+      contextStats: spaceContext?.stats || null,
+      filters: spaceContext?.filters || null,
     });
 
     const client = new TogetherClient();

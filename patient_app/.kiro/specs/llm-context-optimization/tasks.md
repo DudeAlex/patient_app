@@ -226,7 +226,9 @@
   - Update fromJson() to parse stats
   - _Requirements: 9.5_
 
-- [ ] 29. Update backend prompt template for Stage 4
+- [x] 29. Update backend prompt template for Stage 4
+
+
   - Add context notes: "Showing X of Y records"
   - Add date range note: "Date range: last N days"
   - Add acknowledgment: "Older records may be excluded"
