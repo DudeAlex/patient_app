@@ -215,6 +215,14 @@ class SendChatMessageUseCase {
           'latencyMs': response.metadata.latencyMs,
           'finishReason': response.metadata.finishReason,
           'modelVersion': response.metadata.modelVersion,
+          if (response.metadata.contextStats != null) 'contextStats': {
+            'recordsFiltered': response.metadata.contextStats!.recordsFiltered,
+            'recordsIncluded': response.metadata.contextStats!.recordsIncluded,
+            'tokensEstimated': response.metadata.contextStats!.tokensEstimated,
+            'tokensAvailable': response.metadata.contextStats!.tokensAvailable,
+            'compressionRatio': response.metadata.contextStats!.compressionRatio,
+            'assemblyTimeMs': response.metadata.contextStats!.assemblyTime.inMilliseconds,
+          },
         },
         correlationId: opId,
       );
