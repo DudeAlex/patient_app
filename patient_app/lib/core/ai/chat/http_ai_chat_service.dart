@@ -238,6 +238,8 @@ class HttpAiChatService implements AiChatService {
     }
 
     final metadata = map['metadata'] as Map<String, dynamic>? ?? const {};
+    
+    // Parse metadata with backward compatibility for different field names
     final tokenUsage = metadata['tokenUsage'] as Map<String, dynamic>?;
     final tokensUsed =
         tokenUsage?['total'] as int? ?? metadata['tokensUsed'] as int? ?? 0;
@@ -248,18 +250,22 @@ class HttpAiChatService implements AiChatService {
     final confidence = (metadata['confidence'] as num?)?.toDouble() ?? 0.0;
     final finishReason = metadata['finishReason'] as String?;
     final modelVersion = metadata['modelVersion'] as String?;
+    
+    // Build normalized metadata map for fromJson
+    final normalizedMetadata = {
+      'tokensUsed': tokensUsed,
+      'latencyMs': latencyMs,
+      'provider': provider,
+      'confidence': confidence,
+      if (finishReason != null) 'finishReason': finishReason,
+      if (modelVersion != null) 'modelVersion': modelVersion,
+      if (metadata['contextStats'] != null) 'contextStats': metadata['contextStats'],
+    };
 
     return ChatResponse(
       messageContent: map['message'] as String? ?? '',
       actionHints: (map['actionHints'] as List?)?.cast<String>() ?? const [],
-      metadata: AiMessageMetadata(
-        tokensUsed: tokensUsed,
-        latencyMs: latencyMs,
-        provider: provider,
-        confidence: confidence,
-        finishReason: finishReason,
-        modelVersion: modelVersion,
-      ),
+      metadata: AiMessageMetadata.fromJson(normalizedMetadata),
     );
   }
 

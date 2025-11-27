@@ -200,13 +200,14 @@
   - Generate ContextStats
   - _Requirements: 4.1, 5.1, 6.1, 7.1_
 
-- [x] 26. Update SendChatMessageUseCase for Stage 4
+- [*?] 26. Update SendChatMessageUseCase for Stage 4
   - Get date range from configuration (default 14 days)
   - Pass date range to SpaceContextBuilder
   - Include ContextFilters in ChatRequest
   - Include TokenAllocation in ChatRequest
   - Include ContextStats in response metadata
-  - NOTE: ✅ COMPLETE - DateRange.last14Days() passed to SpaceContextBuilder; ContextFilters and TokenAllocation included in ChatRequest. ⏳ PENDING - Surfacing ContextStats in response metadata requires Task 28 (adding contextStats field to AiMessageMetadata model). Implemented in commit `253a1ca`.
+  - NOTE: ✅ COMPLETE - DateRange.last14Days() passed to SpaceContextBuilder; ContextFilters and TokenAllocation included in ChatRequest. 
+  ⏳ PENDING - Surfacing ContextStats in response metadata requires Task 28 (adding contextStats field to AiMessageMetadata model). Implemented in commit `253a1ca`.
   - _Requirements: 4.1, 7.1, 9.5_
 
 - [x] 27. Update ChatRequest model for Stage 4
@@ -218,7 +219,9 @@
   - Update toJson() to include new fields
   - _Requirements: 4.1, 7.1_
 
-- [ ] 28. Update ChatResponse model for Stage 4
+- [x] 28. Update ChatResponse model for Stage 4
+
+
   - Add contextStats field to metadata
   - Update fromJson() to parse stats
   - _Requirements: 9.5_
