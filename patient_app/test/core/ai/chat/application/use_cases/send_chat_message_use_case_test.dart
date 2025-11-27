@@ -6,6 +6,7 @@ import 'package:patient_app/core/ai/chat/models/chat_message.dart';
 import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/models/date_range.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
 import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
@@ -167,7 +168,7 @@ SpaceContext _context() => SpaceContext(
 
 class _StubContextBuilder implements SpaceContextBuilder {
   @override
-  Future<SpaceContext> build(String spaceId) async => _context();
+  Future<SpaceContext> build(String spaceId, {DateRange? dateRange}) async => _context();
 }
 
 void main() {

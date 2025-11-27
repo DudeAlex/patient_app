@@ -53,16 +53,20 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
   final int maxRecords;
 
   @override
-  Future<SpaceContext> build(String spaceId) async {
+  Future<SpaceContext> build(
+    String spaceId, {
+    DateRange? dateRange,
+  }) async {
     final opId = AppLogger.startOperation('space_context_build');
     final stopwatch = Stopwatch()..start();
+    final effectiveDateRange = dateRange ?? _dateRange;
     await AppLogger.info(
       'Starting space context assembly',
       context: {
         'spaceId': spaceId,
         'maxRecords': maxRecords,
-        'dateRangeStart': _dateRange.start.toIso8601String(),
-        'dateRangeEnd': _dateRange.end.toIso8601String(),
+        'dateRangeStart': effectiveDateRange.start.toIso8601String(),
+        'dateRangeEnd': effectiveDateRange.end.toIso8601String(),
       },
       correlationId: opId,
     );
@@ -81,6 +85,7 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
           recordsRepository,
           correlationId: opId,
           stopwatch: stopwatch,
+          dateRange: effectiveDateRange,
         );
         await AppLogger.endOperation(opId);
         return context;
@@ -91,6 +96,7 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
       recordsRepository,
       correlationId: opId,
       stopwatch: stopwatch,
+      dateRange: effectiveDateRange,
     );
     await AppLogger.endOperation(opId);
     return context;
@@ -101,17 +107,18 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
     RecordsRepository recordsRepository, {
     String? correlationId,
     Stopwatch? stopwatch,
+    required DateRange dateRange,
   }) async {
     final allRecords = await _loadAllRecords(recordsRepository, space.id);
     final filters = ContextFilters(
-      dateRange: _dateRange,
+      dateRange: dateRange,
       spaceId: space.id,
       maxRecords: maxRecords,
     );
     final filtered = await _filterEngine.filterRecords(
       allRecords,
       spaceId: space.id,
-      dateRange: _dateRange,
+      dateRange: dateRange,
     );
 
     final sorted = await _relevanceScorer.sortByRelevance(filtered);
@@ -146,8 +153,8 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
         'recordsIncluded': summaries.length,
         'maxRecords': maxRecords,
         'estimatedTokens': estimatedTokens,
-        'dateRangeStart': _dateRange.start.toIso8601String(),
-        'dateRangeEnd': _dateRange.end.toIso8601String(),
+        'dateRangeStart': dateRange.start.toIso8601String(),
+        'dateRangeEnd': dateRange.end.toIso8601String(),
         'tokensAvailable': tokenAllocation.context,
         'assemblyMs': assemblyTime.inMilliseconds,
       },

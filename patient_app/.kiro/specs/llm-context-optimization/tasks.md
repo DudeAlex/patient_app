@@ -179,7 +179,7 @@
   - Enforce minimum response reservation (1000 tokens)
   - _Requirements: 3.2, 7.1, 7.2, 7.4_
 
-- [ ] 24. Create ContextTruncationStrategy
+- [x] 24. Create ContextTruncationStrategy
   - Create `lib/core/ai/chat/context/context_truncation_strategy.dart`
   - Implement truncateToFit() method
   - Iterate through sorted records
@@ -189,7 +189,7 @@
   - Log truncation events
   - _Requirements: 5.1, 5.2, 7.3, 7.4_
 
-- [ ] 25. Update SpaceContextBuilder for Stage 4
+- [x] 25. Update SpaceContextBuilder for Stage 4
   - Inject ContextFilterEngine, RecordRelevanceScorer, TokenBudgetAllocator, ContextTruncationStrategy
   - Load ALL records from Space (not just last 10)
   - Apply date range filter
