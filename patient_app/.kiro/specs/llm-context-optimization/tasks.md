@@ -206,7 +206,7 @@
   - Include ContextFilters in ChatRequest
   - Include TokenAllocation in ChatRequest
   - Include ContextStats in response metadata
-  - NOTE (in-progress context): date range now passed from SendChatMessageUseCase to SpaceContextBuilder; ContextFilters/TokenAllocation already included in ChatRequest. Remaining follow-up: surface ContextStats in response metadata and ensure ChatRequest/Response model updates (tasks 27-28) are wired to this use case. Implemented pieces are in commit `d40118e` (view with `git show d40118e` or `git show d40118e:lib/core/ai/chat/application/use_cases/send_chat_message_use_case.dart`).
+  - NOTE: ✅ COMPLETE - DateRange.last14Days() passed to SpaceContextBuilder; ContextFilters and TokenAllocation included in ChatRequest. ⏳ PENDING - Surfacing ContextStats in response metadata requires Task 28 (adding contextStats field to AiMessageMetadata model). Implemented in commit `253a1ca`.
   - _Requirements: 4.1, 7.1, 9.5_
 
 - [ ] 27. Update ChatRequest model for Stage 4
