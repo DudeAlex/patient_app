@@ -340,13 +340,19 @@
 - [x] 42. Write property-based test for relevance sorting
 
 
+
+
+
   - **Property 7: Relevance Sorting**
   - **Validates: Requirements 6.4**
   - Generate records with random scores
   - Sort by relevance
   - Assert descending order
 
-- [ ] 43. Write property-based test for response token reservation
+- [x] 43. Write property-based test for response token reservation
+
+
+
   - **Property 8: Response Token Reservation**
   - **Validates: Requirements 7.2**
   - Generate random token allocations
