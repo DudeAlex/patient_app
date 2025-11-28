@@ -320,13 +320,16 @@
 - [x] 40. Write property-based test for date range filtering
 
 
+
   - **Property 5: Date Range Filtering**
   - **Validates: Requirements 4.2**
   - Generate records with random dates
   - Apply date range filter
   - Assert all records within range
 
-- [ ] 41. Write property-based test for record count limit
+- [x] 41. Write property-based test for record count limit
+
+
   - **Property 6: Record Count Limit**
   - **Validates: Requirements 5.1**
   - Generate large record sets (50-100)
