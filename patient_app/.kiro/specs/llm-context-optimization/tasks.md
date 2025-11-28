@@ -254,14 +254,14 @@
   - Add factory methods for Stage 3 and Stage 4
   - _Requirements: 4.1, 4.5, 5.5_
 
-- [ ] 32. Add Settings UI for date range
+- [x] 32. Add Settings UI for date range *(done — Context Settings card with date range selection and persistence)*
   - Update Settings screen
   - Add "Context Settings" section
   - Add date range dropdown (7/14/30 days)
   - Persist selection in SharedPreferences
   - _Requirements: 4.5_
 
-- [ ] 33. Add viewCount field to Record model
+- [x] 33. Add viewCount field to Record model
   - Update Record Isar schema
   - Add viewCount field (default 0)
   - Increment on record view

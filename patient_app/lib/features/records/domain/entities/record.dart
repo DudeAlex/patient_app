@@ -24,6 +24,7 @@ class RecordEntity {
     required String title,
     String? text,
     List<String>? tags,
+    int viewCount = 0,
     required DateTime createdAt,
     required DateTime updatedAt,
     DateTime? deletedAt,
@@ -40,6 +41,7 @@ class RecordEntity {
       'title': validatedTitle,
       'text': text,
       'tags': tags ?? [],
+      'viewCount': viewCount,
     };
 
     final item = InformationItem(
@@ -71,6 +73,7 @@ class RecordEntity {
   String get title => _item.data['title'] as String;
   String? get text => _item.data['text'] as String?;
   List<String> get tags => List<String>.unmodifiable(_item.data['tags'] as List? ?? []);
+  int get viewCount => (_item.data['viewCount'] as num?)?.toInt() ?? 0;
 
   /// Convenience helper to clone the entity with updated fields.
   RecordEntity copyWith({
@@ -81,6 +84,7 @@ class RecordEntity {
     String? title,
     String? text,
     List<String>? tags,
+    int? viewCount,
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? deletedAt,
@@ -94,6 +98,7 @@ class RecordEntity {
       title: title ?? this.title,
       text: text ?? this.text,
       tags: tags ?? this.tags,
+      viewCount: viewCount ?? this.viewCount,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,

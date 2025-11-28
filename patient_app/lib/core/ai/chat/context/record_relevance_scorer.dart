@@ -9,7 +9,7 @@ class RecordRelevanceScorer {
     now ??= DateTime.now();
     final daysOld = now.difference(record.date).inDays;
     final recencyScore = max(0, 10 - (daysOld / 30) * 10);
-    final frequency = accessCount ?? 0;
+    final frequency = accessCount ?? record.viewCount;
     final frequencyScore = min(10.0, frequency.toDouble());
     return (recencyScore * 0.7) + (frequencyScore * 0.3);
   }

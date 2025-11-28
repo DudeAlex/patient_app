@@ -71,6 +71,11 @@ const RecordSchema = CollectionSchema(
       id: 10,
       name: r'updatedAt',
       type: IsarType.dateTime,
+    ),
+    r'viewCount': PropertySchema(
+      id: 11,
+      name: r'viewCount',
+      type: IsarType.long,
     )
   },
   estimateSize: _recordEstimateSize,
@@ -139,6 +144,19 @@ const RecordSchema = CollectionSchema(
       properties: [
         IndexPropertySchema(
           name: r'text',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    ),
+    r'viewCount': IndexSchema(
+      id: 4360704296638439930,
+      name: r'viewCount',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'viewCount',
           type: IndexType.value,
           caseSensitive: false,
         )
@@ -233,6 +251,7 @@ void _recordSerialize(
   writer.writeString(offsets[8], object.type);
   writer.writeString(offsets[9], object.typeDateIndex);
   writer.writeDateTime(offsets[10], object.updatedAt);
+  writer.writeLong(offsets[11], object.viewCount);
 }
 
 Record _recordDeserialize(
@@ -252,6 +271,7 @@ Record _recordDeserialize(
   object.title = reader.readString(offsets[7]);
   object.type = reader.readString(offsets[8]);
   object.updatedAt = reader.readDateTime(offsets[10]);
+  object.viewCount = reader.readLong(offsets[11]);
   return object;
 }
 
@@ -284,6 +304,8 @@ P _recordDeserializeProp<P>(
       return (reader.readString(offset)) as P;
     case 10:
       return (reader.readDateTime(offset)) as P;
+    case 11:
+      return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -320,6 +342,14 @@ extension RecordQueryWhereSort on QueryBuilder<Record, Record, QWhere> {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         const IndexWhereClause.any(indexName: r'text'),
+      );
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhere> anyViewCount() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'viewCount'),
       );
     });
   }
@@ -763,6 +793,96 @@ extension RecordQueryWhere on QueryBuilder<Record, Record, QWhereClause> {
               upper: [''],
             ));
       }
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause> viewCountEqualTo(
+      int viewCount) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'viewCount',
+        value: [viewCount],
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause> viewCountNotEqualTo(
+      int viewCount) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'viewCount',
+              lower: [],
+              upper: [viewCount],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'viewCount',
+              lower: [viewCount],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'viewCount',
+              lower: [viewCount],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'viewCount',
+              lower: [],
+              upper: [viewCount],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause> viewCountGreaterThan(
+    int viewCount, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'viewCount',
+        lower: [viewCount],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause> viewCountLessThan(
+    int viewCount, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'viewCount',
+        lower: [],
+        upper: [viewCount],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterWhereClause> viewCountBetween(
+    int lowerViewCount,
+    int upperViewCount, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'viewCount',
+        lower: [lowerViewCount],
+        includeLower: includeLower,
+        upper: [upperViewCount],
+        includeUpper: includeUpper,
+      ));
     });
   }
 
@@ -2299,6 +2419,59 @@ extension RecordQueryFilter on QueryBuilder<Record, Record, QFilterCondition> {
       ));
     });
   }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> viewCountEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'viewCount',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> viewCountGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'viewCount',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> viewCountLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'viewCount',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterFilterCondition> viewCountBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'viewCount',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension RecordQueryObject on QueryBuilder<Record, Record, QFilterCondition> {}
@@ -2423,6 +2596,18 @@ extension RecordQuerySortBy on QueryBuilder<Record, Record, QSortBy> {
   QueryBuilder<Record, Record, QAfterSortBy> sortByUpdatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterSortBy> sortByViewCount() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'viewCount', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterSortBy> sortByViewCountDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'viewCount', Sort.desc);
     });
   }
 }
@@ -2559,6 +2744,18 @@ extension RecordQuerySortThenBy on QueryBuilder<Record, Record, QSortThenBy> {
       return query.addSortBy(r'updatedAt', Sort.desc);
     });
   }
+
+  QueryBuilder<Record, Record, QAfterSortBy> thenByViewCount() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'viewCount', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Record, Record, QAfterSortBy> thenByViewCountDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'viewCount', Sort.desc);
+    });
+  }
 }
 
 extension RecordQueryWhereDistinct on QueryBuilder<Record, Record, QDistinct> {
@@ -2635,6 +2832,12 @@ extension RecordQueryWhereDistinct on QueryBuilder<Record, Record, QDistinct> {
       return query.addDistinctBy(r'updatedAt');
     });
   }
+
+  QueryBuilder<Record, Record, QDistinct> distinctByViewCount() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'viewCount');
+    });
+  }
 }
 
 extension RecordQueryProperty on QueryBuilder<Record, Record, QQueryProperty> {
@@ -2707,6 +2910,12 @@ extension RecordQueryProperty on QueryBuilder<Record, Record, QQueryProperty> {
   QueryBuilder<Record, DateTime, QQueryOperations> updatedAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'updatedAt');
+    });
+  }
+
+  QueryBuilder<Record, int, QQueryOperations> viewCountProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'viewCount');
     });
   }
 }
