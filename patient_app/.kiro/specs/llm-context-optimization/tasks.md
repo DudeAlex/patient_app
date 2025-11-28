@@ -229,13 +229,14 @@
 - [x] 29. Update backend prompt template for Stage 4
 
 
+
   - Add context notes: "Showing X of Y records"
   - Add date range note: "Date range: last N days"
   - Add acknowledgment: "Older records may be excluded"
   - Update token budget to 4800 total
   - _Requirements: 3.1, 3.2, 8.1, 8.2_
 
-- [ ] 30. Add comprehensive context logging
+- [x] 30. Add comprehensive context logging *(done — all logging implemented and tested)*
   - Log date range used
   - Log records filtered vs included
   - Log relevance scores

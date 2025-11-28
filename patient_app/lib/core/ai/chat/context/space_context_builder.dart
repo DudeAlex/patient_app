@@ -7,7 +7,6 @@ import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/models/context_filters.dart';
 import 'package:patient_app/core/ai/chat/models/context_stats.dart';
 import 'package:patient_app/core/ai/chat/models/date_range.dart';
-import 'package:patient_app/core/ai/chat/models/token_allocation.dart';
 import 'package:patient_app/core/ai/chat/context/token_budget_allocator.dart';
 import 'package:patient_app/core/application/services/space_manager.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
@@ -110,11 +109,22 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
     required DateRange dateRange,
   }) async {
     final allRecords = await _loadAllRecords(recordsRepository, space.id);
+    
+    await AppLogger.info(
+      'Loaded all records for space',
+      context: {
+        'spaceId': space.id,
+        'totalRecords': allRecords.length,
+      },
+      correlationId: correlationId,
+    );
+
     final filters = ContextFilters(
       dateRange: dateRange,
       spaceId: space.id,
       maxRecords: maxRecords,
     );
+    
     final filtered = await _filterEngine.filterRecords(
       allRecords,
       spaceId: space.id,
@@ -122,13 +132,16 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
     );
 
     final sorted = await _relevanceScorer.sortByRelevance(filtered);
+    
     final tokenAllocation = _tokenBudgetAllocator.allocate();
+    
     final summaries = _truncationStrategy.truncateToFit(
       sorted,
       availableTokens: tokenAllocation.context,
       formatter: _formatter,
       maxRecords: maxRecords,
     );
+    
     final estimatedTokens = summaries.fold<int>(
       0,
       (total, summary) => total + _formatter.estimateTokens(summary),
@@ -144,19 +157,40 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
       assemblyTime: assemblyTime,
     );
 
+    // Comprehensive final logging
     await AppLogger.info(
       'Built space context',
       context: {
         'spaceId': space.id,
-        'recordsTotal': allRecords.length,
-        'recordsConsidered': filtered.length,
-        'recordsIncluded': summaries.length,
-        'maxRecords': maxRecords,
-        'estimatedTokens': estimatedTokens,
-        'dateRangeStart': dateRange.start.toIso8601String(),
-        'dateRangeEnd': dateRange.end.toIso8601String(),
-        'tokensAvailable': tokenAllocation.context,
-        'assemblyMs': assemblyTime.inMilliseconds,
+        'spaceName': space.name,
+        'dateRange': {
+          'start': dateRange.start.toIso8601String(),
+          'end': dateRange.end.toIso8601String(),
+          'days': dateRange.end.difference(dateRange.start).inDays,
+        },
+        'records': {
+          'total': allRecords.length,
+          'afterFiltering': filtered.length,
+          'included': summaries.length,
+          'maxAllowed': maxRecords,
+        },
+        'tokenAllocation': {
+          'total': tokenAllocation.total,
+          'system': tokenAllocation.system,
+          'context': tokenAllocation.context,
+          'history': tokenAllocation.history,
+          'response': tokenAllocation.response,
+        },
+        'tokenUsage': {
+          'estimated': estimatedTokens,
+          'available': tokenAllocation.context,
+          'utilizationPercent': tokenAllocation.context > 0
+              ? ((estimatedTokens / tokenAllocation.context) * 100).toStringAsFixed(1)
+              : '0.0',
+        },
+        'compressionRatio': stats.compressionRatio.toStringAsFixed(3),
+        'assemblyTimeMs': assemblyTime.inMilliseconds,
+        'assemblyTimeSeconds': (assemblyTime.inMilliseconds / 1000).toStringAsFixed(3),
       },
       correlationId: correlationId,
     );

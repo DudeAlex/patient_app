@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:patient_app/core/ai/chat/models/token_allocation.dart';
+import 'package:patient_app/core/diagnostics/app_logger.dart';
 
 /// Allocates token budget across prompt sections.
 class TokenBudgetAllocator {
@@ -61,12 +63,32 @@ class TokenBudgetAllocator {
     );
     final contextTokens = min(contextOverride ?? context, availableContext);
 
-    return TokenAllocation(
+    final allocation = TokenAllocation(
       system: systemTokens,
       context: contextTokens,
       history: historyTokens,
       response: responseTokens,
       total: availableTotal,
     );
+
+    // Log token allocation breakdown
+    unawaited(
+      AppLogger.info(
+        'Token budget allocated',
+        context: {
+          'total': allocation.total,
+          'system': allocation.system,
+          'context': allocation.context,
+          'history': allocation.history,
+          'response': allocation.response,
+          'contextAvailable': availableContext,
+          'contextRequested': contextOverride ?? context,
+          'contextAllocated': contextTokens,
+          'minimumResponseReservation': minimumResponseReservation,
+        },
+      ),
+    );
+
+    return allocation;
   }
 }
