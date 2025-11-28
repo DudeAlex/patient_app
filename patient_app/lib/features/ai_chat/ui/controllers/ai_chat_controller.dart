@@ -5,6 +5,7 @@ import 'package:patient_app/core/ai/chat/application/use_cases/clear_chat_thread
 import 'package:patient_app/core/ai/chat/application/use_cases/load_chat_history_use_case.dart';
 import 'package:patient_app/core/ai/chat/application/use_cases/send_chat_message_use_case.dart';
 import 'package:patient_app/core/ai/chat/application/use_cases/switch_space_context_use_case.dart';
+import 'package:patient_app/core/ai/chat/models/chat_message.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
