@@ -33,7 +33,7 @@ Status: ACTIVE
 - [KNOWN_ISSUES_AND_FIXES](core/KNOWN_ISSUES_AND_FIXES.md)
 
 **Modules**
-- AI: [ai_integration_plan](modules/ai/ai_integration_plan.md), [ai_quality_journal](modules/ai/ai_quality_journal.md), [fixtures](modules/ai/fixtures.md)
+- AI: [ai_integration_plan](modules/ai/ai_integration_plan.md), [ai_quality_journal](modules/ai/ai_quality_journal.md), [fixtures](modules/ai/fixtures.md), [LLM_CONTEXT_OPTIMIZATION](ai/LLM_CONTEXT_OPTIMIZATION.md)
 - Backup: [google_drive_backup](modules/backup/google_drive_backup.md)
 - Backend: [server_README](modules/backend/server_README.md)
 - Capture: [FILE_UPLOAD_FEATURE](modules/capture/FILE_UPLOAD_FEATURE.md), [test_file_upload_persistence](modules/capture/test_file_upload_persistence.md), [ATTACHMENT_PERSISTENCE_VERIFICATION](modules/capture/ATTACHMENT_PERSISTENCE_VERIFICATION.md), [capture_core](modules/capture/capture_core.md), [photo_mode](modules/capture/photo_mode.md), [voice_mode](modules/capture/voice_mode.md), [document_scan_mode](modules/capture/document_scan_mode.md)
