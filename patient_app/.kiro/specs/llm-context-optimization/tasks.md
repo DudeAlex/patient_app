@@ -372,6 +372,7 @@
 
 
 
+
   - Test date range filtering
   - Test relevance scoring
   - Test token budget optimization
@@ -379,7 +380,9 @@
   - Document scenarios in TESTING.md
   - _Requirements: 14.1, 14.2, 14.3, 14.4_
 
-- [ ] 46. Measure token savings
+- [x] 46. Measure token savings
+
+
   - Compare Stage 3 vs Stage 4 token usage
   - Calculate average savings percentage
   - Verify 20-30% savings achieved
