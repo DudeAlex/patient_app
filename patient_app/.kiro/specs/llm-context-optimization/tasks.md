@@ -245,7 +245,7 @@
   - Log assembly time
   - _Requirements: 9.1, 9.2, 9.3, 9.4_
 
-- [ ] 31. Create ContextConfig for configuration
+- [x] 31. Create ContextConfig for configuration *(done — config class with factory methods created and tested)*
   - Create `lib/core/ai/chat/config/context_config.dart`
   - Add maxRecordsStage3 (10)
   - Add maxRecordsStage4 (20)
