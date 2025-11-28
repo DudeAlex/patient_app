@@ -289,7 +289,7 @@
   - Test response reservation enforcement
   - _Requirements: 10.3_
 
-- [ ] 37. Write unit tests for ContextTruncationStrategy
+- [x] 37. Write unit tests for ContextTruncationStrategy
   - Test truncation to fit budget
   - Test 20-record limit
   - Test lowest-score-first removal
