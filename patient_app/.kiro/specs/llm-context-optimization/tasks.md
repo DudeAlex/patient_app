@@ -358,7 +358,9 @@
   - Generate random token allocations
   - Assert ≥ 1000 tokens reserved for response
 
-- [ ] 44. Write property-based test for truncation precedence
+- [x] 44. Write property-based test for truncation precedence
+
+
   - **Property 10: Truncation Precedence**
   - **Validates: Requirements 7.3**
   - Generate scored records
