@@ -307,7 +307,9 @@
   - NOTE: ⏸️ PARTIALLY COMPLETE - Test file created at `test/integration/ai_chat_stage4_integration_test.dart` with comprehensive test cases covering all requirements. Needs type casting fixes for SpaceContext fields (stats/filters/tokenAllocation are Object? and need casting). Test structure and assertions are correct, just needs minor type fixes to compile.
   - _Requirements: 10.4_
 
-- [ ] 39. Write property-based test for token budget enforcement
+- [x] 39. Write property-based test for token budget enforcement
+
+
   - **Property 4: Token Budget Enforcement**
   - **Validates: Requirements 3.1, 3.2**
   - Generate random record sets
