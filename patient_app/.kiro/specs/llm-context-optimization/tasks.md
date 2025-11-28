@@ -283,7 +283,7 @@
   - Test sorting by relevance
   - _Requirements: 10.2_
 
-- [ ] 36. Write unit tests for TokenBudgetAllocator
+- [x] 36. Write unit tests for TokenBudgetAllocator
   - Test budget allocation strategy
   - Test available token calculation
   - Test response reservation enforcement
