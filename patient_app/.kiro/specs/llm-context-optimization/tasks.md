@@ -310,13 +310,16 @@
 - [x] 39. Write property-based test for token budget enforcement
 
 
+
   - **Property 4: Token Budget Enforcement**
   - **Validates: Requirements 3.1, 3.2**
   - Generate random record sets
   - Build optimized context
   - Assert total tokens ≤ budget
 
-- [ ] 40. Write property-based test for date range filtering
+- [x] 40. Write property-based test for date range filtering
+
+
   - **Property 5: Date Range Filtering**
   - **Validates: Requirements 4.2**
   - Generate records with random dates
