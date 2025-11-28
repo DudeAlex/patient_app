@@ -255,3 +255,153 @@ Savings Percentage: _______%
 - Document any anomalies or unexpected behavior
 
 **Status:** PENDING - Awaiting measurement execution
+
+
+---
+
+## Context Metrics Dashboard
+
+### Overview
+Context optimization metrics are tracked automatically via AppLogger for every AI chat request. A Context Metrics card is available in the Settings screen to provide an overview.
+
+### Accessing Metrics
+
+**Via Settings Screen:**
+1. Open Settings
+2. Scroll to "Context Metrics" card
+3. View summary of tracked metrics
+
+**Via Application Logs:**
+1. Run `.\get_crash_logs.ps1` to retrieve logs
+2. Search for log entries with these keys:
+   - `Context truncation complete`
+   - `Token budget allocated`
+   - `Scored records by relevance`
+   - `Context filtering complete`
+
+### Metrics Tracked
+
+#### Per-Request Metrics
+Each AI chat request logs the following context metrics:
+
+**Context Stats (ContextStats model):**
+- `recordsFiltered`: Total records after date range filtering
+- `recordsIncluded`: Number of records actually included in context (≤20)
+- `tokensEstimated`: Estimated tokens for included records
+- `tokensAvailable`: Available token budget for context
+- `compressionRatio`: Ratio of included/filtered records
+- `assemblyTime`: Time taken to build context (milliseconds)
+
+**Token Allocation (TokenAllocation model):**
+- `total`: Total token budget (4800)
+- `system`: Tokens for system prompt (800)
+- `context`: Tokens allocated for context (≤2000)
+- `history`: Tokens for conversation history (1000)
+- `response`: Tokens reserved for response (≥1000)
+
+**Truncation Events:**
+- `recordsConsidered`: Total records evaluated
+- `droppedForBudget`: Records dropped due to token budget
+- `droppedForRecordLimit`: Records dropped due to 20-record limit
+- `skippedForExceedingBudget`: Individual records exceeding budget
+- `truncationReasons`: List of reasons for truncation
+- `utilizationPercent`: Percentage of available tokens used
+
+**Relevance Scoring:**
+- `inputCount`: Number of records scored
+- `topScore`: Highest relevance score
+- `bottomScore`: Lowest relevance score
+- `avgScore`: Average relevance score
+- `medianScore`: Median relevance score
+- `top5Scores`: Details of top 5 scoring records
+
+### Analyzing Metrics
+
+#### Average Records per Request
+```bash
+# Search logs for "recordsIncluded"
+grep "recordsIncluded" retrieved_logs/*.log | grep -oP '"recordsIncluded":\s*\K\d+' | awk '{sum+=$1; count++} END {print "Average:", sum/count}'
+```
+
+#### Average Token Usage
+```bash
+# Search logs for "tokensUsed"
+grep "tokensUsed" retrieved_logs/*.log | grep -oP '"tokensUsed":\s*\K\d+' | awk '{sum+=$1; count++} END {print "Average:", sum/count}'
+```
+
+#### Assembly Time Distribution
+```bash
+# Search logs for "assemblyTime"
+grep "assemblyTime" retrieved_logs/*.log | grep -oP '"assemblyTime":\s*\K\d+' | sort -n
+```
+
+#### Truncation Frequency
+```bash
+# Count truncation events
+grep "truncationReasons" retrieved_logs/*.log | wc -l
+```
+
+### Performance Targets
+
+**Stage 4 Optimization Goals:**
+- Assembly time: < 500ms
+- Token utilization: 80-95% of available context budget
+- Records included: 10-20 (depending on content)
+- Truncation: Only when necessary (>20 records or budget exceeded)
+- Compression ratio: 0.2-0.4 (20-40% of filtered records included)
+
+### Troubleshooting
+
+**High Assembly Time (>500ms):**
+- Check number of records being filtered
+- Verify database query performance
+- Review relevance scoring complexity
+
+**Low Token Utilization (<50%):**
+- May indicate too few records in date range
+- Check if records are very short
+- Verify truncation isn't too aggressive
+
+**Frequent Truncation:**
+- Expected when >20 records in date range
+- Check if token budget is appropriate
+- Review record summary lengths
+
+**Low Compression Ratio (<0.1):**
+- May indicate date range is too narrow
+- Check if most records are being filtered out
+- Verify relevance scoring is working
+
+### Example Log Entry
+
+```json
+{
+  "level": "INFO",
+  "message": "Context truncation complete",
+  "context": {
+    "recordsConsidered": 45,
+    "recordsIncluded": 18,
+    "droppedForBudget": 2,
+    "droppedForRecordLimit": 25,
+    "skippedForExceedingBudget": 0,
+    "availableTokens": 2000,
+    "tokensUsed": 1847,
+    "tokensRemaining": 153,
+    "maxRecords": 20,
+    "truncationReasons": ["Record limit reached (20 records)"],
+    "utilizationPercent": "92.4"
+  }
+}
+```
+
+### Dashboard Future Enhancements
+
+Potential improvements for the metrics dashboard:
+- Real-time metric aggregation
+- Historical trend charts
+- Per-space metric breakdown
+- Comparison across date ranges
+- Export metrics to CSV
+- Performance alerts/warnings
+
+**Status:** Basic dashboard implemented, advanced features pending
