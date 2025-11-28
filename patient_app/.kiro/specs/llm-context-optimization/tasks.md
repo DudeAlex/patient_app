@@ -330,13 +330,16 @@
 - [x] 41. Write property-based test for record count limit
 
 
+
   - **Property 6: Record Count Limit**
   - **Validates: Requirements 5.1**
   - Generate large record sets (50-100)
   - Build optimized context
   - Assert ≤ 20 records included
 
-- [ ] 42. Write property-based test for relevance sorting
+- [x] 42. Write property-based test for relevance sorting
+
+
   - **Property 7: Relevance Sorting**
   - **Validates: Requirements 6.4**
   - Generate records with random scores
