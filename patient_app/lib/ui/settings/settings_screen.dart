@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import '../../core/ai/ai_config.dart';
 import '../../core/ai/repositories/ai_config_repository.dart';
 import '../../core/ai/repositories/ai_consent_repository.dart';
+import '../../core/ai/chat/repositories/context_config_repository.dart';
 import '../../core/di/app_container.dart';
 import '../../features/information_items/ui/widgets/ai_consent_dialog.dart';
 import '../../features/records/data/records_service.dart';
@@ -35,6 +36,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       AppContainer.instance.resolve<AiConfigRepository>();
   late final AiConsentRepository _aiConsentRepository =
       AppContainer.instance.resolve<AiConsentRepository>();
+  late final ContextConfigRepository _contextConfigRepository =
+      AppContainer.instance.resolve<ContextConfigRepository>();
 
   String? _email;
   bool _busy = false;
@@ -53,6 +56,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _aiConfigBusy = false;
   bool _aiConsentEnabled = false;
   bool _aiConsentBusy = false;
+  int _dateRangeDays = 14;
+  bool _dateRangeBusy = false;
 
   @override
   void initState() {
@@ -63,6 +68,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     _loadAiConfig();
     _loadAiConsent();
+    _loadContextConfig();
   }
 
   @override
@@ -107,6 +113,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
       setState(() => _aiConsentEnabled = granted);
     } catch (e) {
       debugPrint('[Settings] Failed to load AI consent: $e');
+    }
+  }
+
+  Future<void> _loadContextConfig() async {
+    try {
+      final days = await _contextConfigRepository.getDateRangeDays();
+      if (!mounted) return;
+      setState(() => _dateRangeDays = days);
+    } catch (e) {
+      debugPrint('[Settings] Failed to load context config: $e');
+    }
+  }
+
+  Future<void> _updateDateRange(int days) async {
+    setState(() => _dateRangeBusy = true);
+    try {
+      await _contextConfigRepository.setDateRangeDays(days);
+      if (!mounted) return;
+      setState(() => _dateRangeDays = days);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Context date range set to $days days'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update date range: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _dateRangeBusy = false);
+      }
     }
   }
 
@@ -537,6 +576,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onChanged: _toggleAiConsent,
             ),
             const SizedBox(height: 16),
+            _ContextSettingsCard(
+              dateRangeDays: _dateRangeDays,
+              busy: _dateRangeBusy,
+              onDateRangeChanged: _updateDateRange,
+            ),
+            const SizedBox(height: 16),
             if (!isWeb) _BackupKeyCard(onManageKeys: _showBackupKeyDialog),
             if (!isWeb) const SizedBox(height: 16),
             _DiagnosticsCard(
@@ -866,6 +911,70 @@ class _AiConsentCard extends StatelessWidget {
               child: LinearProgressIndicator(),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class _ContextSettingsCard extends StatelessWidget {
+  const _ContextSettingsCard({
+    required this.dateRangeDays,
+    required this.onDateRangeChanged,
+    this.busy = false,
+  });
+
+  final int dateRangeDays;
+  final bool busy;
+  final ValueChanged<int> onDateRangeChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Context Settings',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Controls how much historical data the AI companion can access when generating responses.',
+              style: TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Date range',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [7, 14, 30].map((days) {
+                final selected = dateRangeDays == days;
+                return ChoiceChip(
+                  label: Text('$days days'),
+                  selected: selected,
+                  onSelected: busy
+                      ? null
+                      : (_) => onDateRangeChanged(days),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Only records within the selected time range will be included in AI context. Default: 14 days.',
+              style: TextStyle(color: Colors.grey),
+            ),
+            if (busy)
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: LinearProgressIndicator(),
+              ),
+          ],
+        ),
       ),
     );
   }
