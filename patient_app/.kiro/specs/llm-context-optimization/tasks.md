@@ -276,7 +276,7 @@
   - Test filter combinations
   - _Requirements: 10.1_
 
-- [ ] 35. Write unit tests for RecordRelevanceScorer
+- [x] 35. Write unit tests for RecordRelevanceScorer
   - Test recency scoring (0-10 scale)
   - Test frequency scoring (0-10 scale)
   - Test combined score calculation
