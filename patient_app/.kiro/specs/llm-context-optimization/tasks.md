@@ -361,13 +361,17 @@
 - [x] 44. Write property-based test for truncation precedence
 
 
+
   - **Property 10: Truncation Precedence**
   - **Validates: Requirements 7.3**
   - Generate scored records
   - Truncate to fit budget
   - Assert lower scores removed first
 
-- [ ] 45. Manual testing for Stage 4
+- [x] 45. Manual testing for Stage 4
+
+
+
   - Test date range filtering
   - Test relevance scoring
   - Test token budget optimization
