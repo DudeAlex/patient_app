@@ -82,6 +82,19 @@ class AiChatScreen extends ConsumerWidget {
                 );
               },
               onActionHintTap: (hint) => controller.sendMessage(hint),
+              onFeedback: (messageId, feedback) {
+                controller.provideFeedback(messageId, feedback);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      feedback == MessageFeedback.positive
+                          ? 'Thanks for your feedback!'
+                          : 'Feedback recorded. We\'ll work to improve.',
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
               onLoadMore: () {},
             ),
           ),

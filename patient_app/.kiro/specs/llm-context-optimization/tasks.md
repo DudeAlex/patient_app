@@ -383,13 +383,17 @@
 - [x] 46. Measure token savings
 
 
+
   - Compare Stage 3 vs Stage 4 token usage
   - Calculate average savings percentage
   - Verify 20-30% savings achieved
   - Document findings
   - _Requirements: 15.4_
 
-- [ ] 47. Collect user feedback
+- [x] 47. Collect user feedback
+
+
+
   - Add thumbs up/down buttons to AI responses
   - Store feedback with message ID
   - Track feedback scores per stage

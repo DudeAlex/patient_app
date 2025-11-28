@@ -15,6 +15,7 @@ class MessageList extends StatefulWidget {
     this.onRetry,
     this.onCopy,
     this.onActionHintTap,
+    this.onFeedback,
     this.initialVisibleCount = 50,
   });
 
@@ -32,6 +33,9 @@ class MessageList extends StatefulWidget {
 
   /// Callback for tapping an action hint.
   final ValueChanged<String>? onActionHintTap;
+
+  /// Callback for providing feedback on a message.
+  final void Function(String messageId, MessageFeedback feedback)? onFeedback;
 
   /// Number of messages to show initially and to add per page.
   final int initialVisibleCount;
@@ -144,6 +148,9 @@ class _MessageListState extends State<MessageList> {
           onRetry: widget.onRetry,
           onCopy: widget.onCopy,
           onActionHintTap: widget.onActionHintTap,
+          onFeedback: widget.onFeedback != null
+              ? (feedback) => widget.onFeedback!(message.id, feedback)
+              : null,
         );
       },
     );

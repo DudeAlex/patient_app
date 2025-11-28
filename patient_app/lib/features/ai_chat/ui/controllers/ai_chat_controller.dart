@@ -171,6 +171,30 @@ class AiChatController extends StateNotifier<AiChatState> {
     }
   }
 
+  Future<void> provideFeedback(String messageId, MessageFeedback feedback) async {
+    if (state.thread == null) return;
+    try {
+      await _chatThreadRepository.updateMessageFeedback(
+        state.thread!.id,
+        messageId,
+        feedback,
+      );
+      // Reload thread to update UI
+      await loadInitial();
+    } catch (e, stackTrace) {
+      await AppLogger.error(
+        'Failed to provide message feedback',
+        error: e,
+        stackTrace: stackTrace,
+        context: {
+          'threadId': state.thread?.id,
+          'messageId': messageId,
+          'feedback': feedback.name,
+        },
+      );
+    }
+  }
+
   Future<void> clearChat() async {
     if (state.thread == null) return;
     await _clearChatThreadUseCase.execute(state.thread!.id);

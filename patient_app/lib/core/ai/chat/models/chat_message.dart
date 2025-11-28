@@ -21,6 +21,8 @@ class ChatMessage {
     List<String> actionHints = const [],
     this.aiMetadata,
     this.error,
+    this.feedback,
+    this.feedbackTimestamp,
   })  : assert(id.trim().isNotEmpty, 'id cannot be empty'),
         assert(threadId.trim().isNotEmpty, 'threadId cannot be empty'),
         assert(
@@ -60,10 +62,17 @@ class ChatMessage {
   /// Error context for failed sends/responses.
   final AiError? error;
 
+  /// User feedback for AI responses (thumbs up/down).
+  final MessageFeedback? feedback;
+
+  /// Timestamp when feedback was provided.
+  final DateTime? feedbackTimestamp;
+
   bool get hasAttachments => attachments.isNotEmpty;
   bool get isUserMessage => sender == MessageSender.user;
   bool get isAiMessage => sender == MessageSender.ai;
   bool get isFailed => status == MessageStatus.failed;
+  bool get hasFeedback => feedback != null;
 
   ChatMessage copyWith({
     String? id,
@@ -76,6 +85,8 @@ class ChatMessage {
     List<String>? actionHints,
     AiMessageMetadata? aiMetadata,
     AiError? error,
+    MessageFeedback? feedback,
+    DateTime? feedbackTimestamp,
   }) {
     return ChatMessage(
       id: id ?? this.id,
@@ -88,6 +99,8 @@ class ChatMessage {
       actionHints: actionHints ?? this.actionHints,
       aiMetadata: aiMetadata ?? this.aiMetadata,
       error: error ?? this.error,
+      feedback: feedback ?? this.feedback,
+      feedbackTimestamp: feedbackTimestamp ?? this.feedbackTimestamp,
     );
   }
 }
@@ -97,3 +110,9 @@ enum MessageSender { user, ai }
 
 /// Delivery status for messages.
 enum MessageStatus { sending, sent, failed }
+
+/// User feedback rating for AI messages.
+enum MessageFeedback {
+  positive, // Thumbs up
+  negative, // Thumbs down
+}

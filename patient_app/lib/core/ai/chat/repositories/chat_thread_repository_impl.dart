@@ -208,6 +208,44 @@ class ChatThreadRepositoryImpl implements ChatThreadRepository {
       }
     });
   }
+
+  @override
+  Future<void> updateMessageFeedback(
+    String threadId,
+    String messageId,
+    MessageFeedback feedback,
+  ) async {
+    await _isar.writeTxn(() async {
+      final thread = await _isar.chatThreadEntitys.getByThreadId(threadId);
+      if (thread != null) {
+        final updatedMessages = thread.messages.map((msg) {
+          if (msg.id == messageId) {
+            msg.feedback = feedback;
+            msg.feedbackTimestamp = DateTime.now();
+          }
+          return msg;
+        }).toList();
+
+        thread.messages = updatedMessages;
+        thread.updatedAt = DateTime.now();
+        
+        await _isar.chatThreadEntitys.putByThreadId(thread);
+        await AppLogger.info(
+          'Updated chat message feedback',
+          context: {
+            'threadId': threadId,
+            'messageId': messageId,
+            'feedback': feedback.name,
+          },
+        );
+      } else {
+        await AppLogger.error(
+          'Chat thread not found when updating message feedback',
+          context: {'threadId': threadId, 'messageId': messageId},
+        );
+      }
+    });
+  }
 }
 
 // Mappers
@@ -262,6 +300,8 @@ extension ChatMessageMapper on ChatMessageEntity {
               code: errorCode,
             )
           : null,
+      feedback: feedback,
+      feedbackTimestamp: feedbackTimestamp,
     );
   }
 }
@@ -283,6 +323,8 @@ extension ChatMessageDomainMapper on ChatMessage {
       errorMessage: error?.message,
       errorCode: error?.code,
       errorRetryable: error?.isRetryable,
+      feedback: feedback,
+      feedbackTimestamp: feedbackTimestamp,
     );
   }
 }

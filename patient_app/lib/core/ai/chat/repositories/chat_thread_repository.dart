@@ -50,4 +50,11 @@ abstract class ChatThreadRepository {
     int? tokensUsed,
     int? latencyMs,
   });
+
+  /// Updates user feedback for a specific message.
+  Future<void> updateMessageFeedback(
+    String threadId,
+    String messageId,
+    MessageFeedback feedback,
+  );
 }
