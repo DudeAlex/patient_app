@@ -14,8 +14,8 @@ class ContextConfigRepositoryImpl implements ContextConfigRepository {
   @override
   Future<int> getDateRangeDays() async {
     final days = _preferences.getInt(_dateRangeDaysKey);
-    // Validate that stored value is one of the allowed options
-    if (days != null && (days == 7 || days == 14 || days == 30)) {
+    // Validate that stored value is between 1 and 1095 (approximately 3 years)
+    if (days != null && days >= 1 && days <= 1095) {
       return days;
     }
     return _defaultDateRangeDays;
@@ -24,11 +24,11 @@ class ContextConfigRepositoryImpl implements ContextConfigRepository {
   @override
   Future<void> setDateRangeDays(int days) async {
     // Validate input
-    if (days != 7 && days != 14 && days != 30) {
+    if (days < 1 || days > 1095) {
       throw ArgumentError.value(
         days,
         'days',
-        'Date range must be 7, 14, or 30 days',
+        'Date range must be between 1 and 1095 days (approximately 3 years)',
       );
     }
     await _preferences.setInt(_dateRangeDaysKey, days);
