@@ -206,6 +206,9 @@ ChatMessageEntity _chatMessageEntityDeserialize(
     errorCode: reader.readStringOrNull(offsets[4]),
     errorMessage: reader.readStringOrNull(offsets[5]),
     errorRetryable: reader.readBoolOrNull(offsets[6]),
+    feedback: _ChatMessageEntityfeedbackValueEnumMap[
+        reader.readStringOrNull(offsets[7])],
+    feedbackTimestamp: reader.readDateTimeOrNull(offsets[8]),
     id: reader.readStringOrNull(offsets[9]) ?? '',
     latencyMs: reader.readLongOrNull(offsets[10]),
     provider: reader.readStringOrNull(offsets[11]),
@@ -218,9 +221,6 @@ ChatMessageEntity _chatMessageEntityDeserialize(
     timestamp: reader.readDateTimeOrNull(offsets[14]),
     tokensUsed: reader.readLongOrNull(offsets[15]),
   );
-  object.feedback = _ChatMessageEntityfeedbackValueEnumMap[
-      reader.readStringOrNull(offsets[7])];
-  object.feedbackTimestamp = reader.readDateTimeOrNull(offsets[8]);
   return object;
 }
 

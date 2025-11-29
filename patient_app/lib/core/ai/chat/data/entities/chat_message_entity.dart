@@ -23,6 +23,8 @@ class ChatMessageEntity {
     this.errorMessage,
     this.errorCode,
     this.errorRetryable,
+    this.feedback,
+    this.feedbackTimestamp,
   });
 
   /// Stable message id (matches domain model).

@@ -64,6 +64,7 @@ class HttpAiChatService implements AiChatService {
               'threadId': request.threadId,
               'endpoint': uri.toString(),
               'attempt': attempt,
+              'userMessage': request.messageContent, // Log user message in dev
               'messageLength': request.messageContent.length,
               'attachments': request.attachments.length,
               'stage': 1,
@@ -97,6 +98,9 @@ class HttpAiChatService implements AiChatService {
                 'provider': chatResponse.metadata.provider,
                 'latencyMs': latency,
                 'tokensUsed': chatResponse.metadata.tokensUsed,
+                'responseContent': chatResponse.messageContent, // Log actual response in dev
+                'responseLength': chatResponse.messageContent.length,
+                'actionHints': chatResponse.actionHints,
               },
               correlationId: correlationId,
             );
