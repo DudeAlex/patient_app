@@ -53,7 +53,11 @@
   - Ensure proper error handling for provider initialization
   - _Requirements: 1.1_
 
-- [ ] 6. Add custom date range UI to Settings screen
+- [x] 6. Add custom date range UI to Settings screen
+
+
+
+
   - Add state variables: `_isCustomDateRange`, `_customDaysController`, `_customDaysError`
   - Add "Custom" choice chip alongside preset options (7, 14, 30 days)
   - Show text input field when custom mode is selected
@@ -62,6 +66,7 @@
   - _Requirements: 8.1, 8.2, 8.3, 8.9_
 
 - [ ] 7. Implement custom date range validation in UI
+
   - Validate input is a valid integer
   - Validate input is between 1 and 1095
   - Show error messages for invalid input

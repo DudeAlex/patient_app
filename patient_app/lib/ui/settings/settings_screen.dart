@@ -59,6 +59,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _aiConsentBusy = false;
   int _dateRangeDays = 14;
   bool _dateRangeBusy = false;
+  bool _isCustomDateRange = false;
+  final TextEditingController _customDaysController = TextEditingController();
+  String? _customDaysError;
 
   @override
   void initState() {
@@ -75,6 +78,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void dispose() {
     _autoSyncSubscription?.cancel();
+    _customDaysController.dispose();
     super.dispose();
   }
 
@@ -121,7 +125,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final days = await _contextConfigRepository.getDateRangeDays();
       if (!mounted) return;
-      setState(() => _dateRangeDays = days);
+      setState(() {
+        _dateRangeDays = days;
+        // Detect if the value is custom (not one of the presets)
+        _isCustomDateRange = ![7, 14, 30].contains(days);
+        if (_isCustomDateRange) {
+          _customDaysController.text = days.toString();
+        }
+      });
     } catch (e) {
       debugPrint('[Settings] Failed to load context config: $e');
     }
@@ -132,10 +143,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       await _contextConfigRepository.setDateRangeDays(days);
       if (!mounted) return;
-      setState(() => _dateRangeDays = days);
+      setState(() {
+        _dateRangeDays = days;
+        _isCustomDateRange = false;
+        _customDaysError = null;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Context date range set to $days days'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update date range: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _dateRangeBusy = false);
+      }
+    }
+  }
+
+  Future<void> _applyCustomDateRange() async {
+    final text = _customDaysController.text.trim();
+    final days = int.tryParse(text);
+
+    if (days == null) {
+      setState(() => _customDaysError = 'Please enter a valid number');
+      return;
+    }
+
+    if (days < 1 || days > 1095) {
+      setState(() => _customDaysError = 'Must be between 1 and 1095 (up to 3 years)');
+      return;
+    }
+
+    setState(() {
+      _customDaysError = null;
+      _dateRangeBusy = true;
+    });
+
+    try {
+      await _contextConfigRepository.setDateRangeDays(days);
+      if (!mounted) return;
+      setState(() => _dateRangeDays = days);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Context date range set to $days days (custom)'),
         ),
       );
     } catch (e) {
@@ -580,7 +635,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _ContextSettingsCard(
               dateRangeDays: _dateRangeDays,
               busy: _dateRangeBusy,
+              isCustomDateRange: _isCustomDateRange,
+              customDaysController: _customDaysController,
+              customDaysError: _customDaysError,
               onDateRangeChanged: _updateDateRange,
+              onCustomModeToggled: () {
+                setState(() {
+                  _isCustomDateRange = true;
+                  _customDaysError = null;
+                  _customDaysController.text = _dateRangeDays.toString();
+                });
+              },
+              onApplyCustomDateRange: _applyCustomDateRange,
             ),
             const SizedBox(height: 16),
             const ContextMetricsCard(),
@@ -923,12 +989,22 @@ class _ContextSettingsCard extends StatelessWidget {
   const _ContextSettingsCard({
     required this.dateRangeDays,
     required this.onDateRangeChanged,
+    required this.isCustomDateRange,
+    required this.customDaysController,
+    required this.onCustomModeToggled,
+    required this.onApplyCustomDateRange,
+    this.customDaysError,
     this.busy = false,
   });
 
   final int dateRangeDays;
   final bool busy;
+  final bool isCustomDateRange;
+  final TextEditingController customDaysController;
+  final String? customDaysError;
   final ValueChanged<int> onDateRangeChanged;
+  final VoidCallback onCustomModeToggled;
+  final VoidCallback onApplyCustomDateRange;
 
   @override
   Widget build(BuildContext context) {
@@ -955,22 +1031,57 @@ class _ContextSettingsCard extends StatelessWidget {
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
-              children: [7, 14, 30].map((days) {
-                final selected = dateRangeDays == days;
-                return ChoiceChip(
-                  label: Text('$days days'),
-                  selected: selected,
-                  onSelected: busy
-                      ? null
-                      : (_) => onDateRangeChanged(days),
-                );
-              }).toList(),
+              children: [
+                ...[7, 14, 30].map((days) {
+                  final selected = dateRangeDays == days && !isCustomDateRange;
+                  return ChoiceChip(
+                    label: Text('$days days'),
+                    selected: selected,
+                    onSelected: busy
+                        ? null
+                        : (_) => onDateRangeChanged(days),
+                  );
+                }),
+                ChoiceChip(
+                  label: const Text('Custom'),
+                  selected: isCustomDateRange,
+                  onSelected: busy ? null : (_) => onCustomModeToggled(),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            const Text(
-              'Only records within the selected time range will be included in AI context. Default: 14 days.',
-              style: TextStyle(color: Colors.grey),
-            ),
+            if (isCustomDateRange) ...[
+              const SizedBox(height: 12),
+              TextField(
+                controller: customDaysController,
+                keyboardType: TextInputType.number,
+                enabled: !busy,
+                decoration: InputDecoration(
+                  labelText: 'Number of days (1-1095)',
+                  helperText: 'Up to 3 years',
+                  errorText: customDaysError,
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.check),
+                    onPressed: busy ? null : onApplyCustomDateRange,
+                  ),
+                  border: const OutlineInputBorder(),
+                ),
+                onSubmitted: busy ? null : (_) => onApplyCustomDateRange(),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Larger date ranges allow the AI to access older records, but the system '
+                'will prioritize the most recent and relevant information to fit within '
+                'token limits. Typically 10-20 records are included regardless of range.',
+                style: TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+            ],
+            if (!isCustomDateRange) ...[
+              const SizedBox(height: 4),
+              const Text(
+                'Only records within the selected time range will be included in AI context. Default: 14 days.',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
             if (busy)
               const Padding(
                 padding: EdgeInsets.only(top: 8),
