@@ -165,20 +165,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  void _validateCustomDateRange(String text) {
+    // Clear error when user starts typing
+    if (_customDaysError != null) {
+      setState(() => _customDaysError = null);
+    }
+  }
+
   Future<void> _applyCustomDateRange() async {
     final text = _customDaysController.text.trim();
+    
+    // Validate input is not empty
+    if (text.isEmpty) {
+      setState(() => _customDaysError = 'Please enter a number');
+      return;
+    }
+    
+    // Validate input is a valid integer
     final days = int.tryParse(text);
-
     if (days == null) {
       setState(() => _customDaysError = 'Please enter a valid number');
       return;
     }
 
+    // Validate input is between 1 and 1095
     if (days < 1 || days > 1095) {
       setState(() => _customDaysError = 'Must be between 1 and 1095 (up to 3 years)');
       return;
     }
 
+    // Clear error and set busy state
     setState(() {
       _customDaysError = null;
       _dateRangeBusy = true;
@@ -647,6 +663,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 });
               },
               onApplyCustomDateRange: _applyCustomDateRange,
+              onCustomInputChanged: _validateCustomDateRange,
             ),
             const SizedBox(height: 16),
             const ContextMetricsCard(),
@@ -994,6 +1011,7 @@ class _ContextSettingsCard extends StatelessWidget {
     required this.onCustomModeToggled,
     required this.onApplyCustomDateRange,
     this.customDaysError,
+    this.onCustomInputChanged,
     this.busy = false,
   });
 
@@ -1005,6 +1023,7 @@ class _ContextSettingsCard extends StatelessWidget {
   final ValueChanged<int> onDateRangeChanged;
   final VoidCallback onCustomModeToggled;
   final VoidCallback onApplyCustomDateRange;
+  final ValueChanged<String>? onCustomInputChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -1065,6 +1084,7 @@ class _ContextSettingsCard extends StatelessWidget {
                   ),
                   border: const OutlineInputBorder(),
                 ),
+                onChanged: onCustomInputChanged,
                 onSubmitted: busy ? null : (_) => onApplyCustomDateRange(),
               ),
               const SizedBox(height: 8),
