@@ -21,6 +21,7 @@ import '../../features/sync/domain/entities/auto_sync_cadence.dart';
 import '../../features/sync/domain/entities/auto_sync_status.dart';
 import '../screens/ai_diagnostics_screen.dart';
 import '../screens/design_showcase_screen.dart';
+import 'widgets/context_metrics_card.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -581,6 +582,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               busy: _dateRangeBusy,
               onDateRangeChanged: _updateDateRange,
             ),
+            const SizedBox(height: 16),
+            const ContextMetricsCard(),
             const SizedBox(height: 16),
             if (!isWeb) _BackupKeyCard(onManageKeys: _showBackupKeyDialog),
             if (!isWeb) const SizedBox(height: 16),
