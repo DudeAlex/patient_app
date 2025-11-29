@@ -19,7 +19,14 @@ class LoggerService {
     required this.environmentContext,
     required this.writers,
     PrivacyFilter? privacyFilter,
-  }) : privacyFilter = privacyFilter ?? PrivacyFilter();
+  }) : privacyFilter = privacyFilter ?? PrivacyFilter(
+          // Use config setting if provided, otherwise check environment
+          // In dev/debug mode, show all data for debugging
+          // In production, redact sensitive data for privacy
+          enableRedaction: config.enableRedaction || 
+                          environmentContext.environment == 'prod' || 
+                          environmentContext.environment == 'production',
+        );
 
   /// Log an entry if it passes all filters
   Future<void> log(LogEntry entry) async {

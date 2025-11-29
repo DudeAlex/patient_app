@@ -14,6 +14,7 @@ class LogConfig {
   final List<String> moduleFilters;
   final List<String> moduleExcludes;
   final int performanceThreshold;
+  final bool enableRedaction;
 
   const LogConfig({
     required this.minLevel,
@@ -24,6 +25,7 @@ class LogConfig {
     required this.moduleFilters,
     required this.moduleExcludes,
     required this.performanceThreshold,
+    this.enableRedaction = false, // Default to false for development
   });
 
   /// Default configuration for development
@@ -36,6 +38,7 @@ class LogConfig {
     moduleFilters: ['*'],
     moduleExcludes: [],
     performanceThreshold: 1000, // 1 second
+    enableRedaction: false, // Show all data in development
   );
 
   /// Load configuration from JSON asset file
@@ -69,6 +72,7 @@ class LogConfig {
               .toList() ??
           [],
       performanceThreshold: json['performanceThreshold'] as int? ?? 1000,
+      enableRedaction: json['enableRedaction'] as bool? ?? false,
     );
   }
 
@@ -82,6 +86,7 @@ class LogConfig {
         'moduleFilters': moduleFilters,
         'moduleExcludes': moduleExcludes,
         'performanceThreshold': performanceThreshold,
+        'enableRedaction': enableRedaction,
       };
 
   /// Check if a module should be logged based on filters
@@ -123,6 +128,7 @@ class LogConfig {
     List<String>? moduleFilters,
     List<String>? moduleExcludes,
     int? performanceThreshold,
+    bool? enableRedaction,
   }) {
     return LogConfig(
       minLevel: minLevel ?? this.minLevel,
@@ -133,6 +139,7 @@ class LogConfig {
       moduleFilters: moduleFilters ?? this.moduleFilters,
       moduleExcludes: moduleExcludes ?? this.moduleExcludes,
       performanceThreshold: performanceThreshold ?? this.performanceThreshold,
+      enableRedaction: enableRedaction ?? this.enableRedaction,
     );
   }
 }

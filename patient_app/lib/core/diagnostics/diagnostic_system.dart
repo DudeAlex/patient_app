@@ -46,15 +46,11 @@ class DiagnosticSystem {
         ));
       }
       
-      // Create privacy filter
-      final privacyFilter = PrivacyFilter();
-      
-      // Create logger service
+      // Create logger service (privacy filter will be created automatically)
       _loggerService = LoggerService(
         config: config,
         environmentContext: environmentContext,
         writers: writers,
-        privacyFilter: privacyFilter,
       );
       
       // Initialize AppLogger
