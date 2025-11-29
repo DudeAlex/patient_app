@@ -100,13 +100,23 @@
   - Log truncation events with large date ranges
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-- [ ] 10. Add confirmation messages for setting changes
+- [x] 10. Add confirmation messages for setting changes
+
+
+
+
+
   - Show snackbar when date range is updated
   - Include the new value in the message
   - Distinguish between preset and custom values in message
   - _Requirements: 7.2_
 
-- [ ] 11. Write unit tests for DateRange.lastNDays()
+
+- [x] 11. Write unit tests for DateRange.lastNDays()
+
+
+
+
   - Test that `lastNDays(7)` creates 7-day range
   - Test that `lastNDays(14)` creates 14-day range
   - Test that `lastNDays(30)` creates 30-day range
@@ -117,7 +127,11 @@
   - Test that start date is exactly N days before end
   - _Requirements: 5.1, 5.2, 5.4, 5.6_
 
-- [ ] 12. Write unit tests for ContextConfigRepository validation
+- [x] 12. Write unit tests for ContextConfigRepository validation
+
+
+
+
   - Test that values 1-1095 are accepted
   - Test that 0 is rejected
   - Test that negative values are rejected
@@ -126,30 +140,50 @@
   - Test that missing setting returns default (14)
   - _Requirements: 5.1, 5.2, 5.4, 5.7_
 
-- [ ] 13. Write unit tests for custom date range UI validation
+- [x] 13. Write unit tests for custom date range UI validation
+
+
+
+
+
   - Test that valid input (1-1095) is accepted
   - Test that invalid input shows error message
   - Test that non-numeric input shows error message
   - Test that error messages are cleared when valid input is entered
   - Test that preset and custom modes can be switched
   - _Requirements: 5.1, 5.4_
+-
 
-- [ ] 14. Write property test for date range setting round-trip
+- [x] 14. Write property test for date range setting round-trip
+
+
+
+
   - **Property 1: Date range setting is read from repository**
   - Generate random date range values (1-1095)
   - Set via `setDateRangeDays()`
   - Read via `getDateRangeDays()`
   - Assert returned value equals set value
   - _Requirements: 5.5, 1.1_
+-
 
-- [ ] 15. Write property test for date range calculation correctness
+- [x] 15. Write property test for date range calculation correctness
+
+
+
+
   - **Property 2: Date range calculation matches setting**
   - Generate random date range values (1-1095)
   - Create `DateRange` using `lastNDays(n)`
   - Assert `end.difference(start).inDays` equals input value
   - _Requirements: 5.5, 1.2_
+-
 
-- [ ] 16. Write property test for invalid values using default
+- [x] 16. Write property test for invalid values using default
+
+
+
+
   - **Property 4: Default fallback is consistent**
   - Generate random invalid integers (< 1 or > 1095)
   - Attempt to set via `setDateRangeDays()` (should throw)
@@ -158,7 +192,10 @@
   - Assert returned value is 14 (default)
   - _Requirements: 5.5, 3.1, 3.2, 3.3_
 
-- [ ] 17. Write property test for token budget enforcement
+-
+
+- [x] 17. Write property test for token budget enforcement
+
   - **Property 7: Token budget enforcement with large date ranges**
   - Generate random date ranges (including 1095)
   - Create 50-200 test records
@@ -167,7 +204,8 @@
   - Assert records are truncated if necessary
   - _Requirements: 5.5, 3.1, 3.2, 3.3_
 
-- [ ] 18. Write integration test for end-to-end date range application
+- [x] 18. Write integration test for end-to-end date range application
+
   - Set date range to 7 days in Settings
   - Send AI chat message
   - Verify context assembly log shows 7-day range
@@ -175,14 +213,22 @@
   - Repeat for 30 days and custom value (e.g., 45 days)
   - _Requirements: 5.3, 5.4, 1.1, 1.2, 1.3, 4.1, 4.2_
 
-- [ ] 19. Write integration test for setting persistence
+- [x] 19. Write integration test for setting persistence
+
   - Set date range to custom value (e.g., 90 days)
   - Restart app (simulate by recreating provider)
   - Send AI chat message
   - Verify 90-day range is used
   - _Requirements: 5.3, 7.5_
 
-- [ ] 20. Write integration test for setting changes
+
+- [x] 20. Write integration test for setting changes
+
+
+
+
+
+
   - Set date range to 7 days
   - Send AI chat message (verify 7 days in logs)
   - Change to 1095 days
@@ -190,7 +236,12 @@
   - Verify AI responses mention correct ranges
   - _Requirements: 5.3, 1.3, 7.3_
 
-- [ ] 21. Write integration test for large date ranges with many records
+
+
+- [x] 21. Write integration test for large date ranges with many records
+
+
+
   - Create 100 test records spanning 3 years
   - Set date range to 1095 days
   - Build space context
@@ -199,8 +250,14 @@
   - Verify most recent records are prioritized
   - Verify truncation logging is present
   - _Requirements: 5.3, 3.1, 3.2, 3.3_
+-
 
-- [ ] 22. Manual testing and verification
+- [x] 22. Manual testing and verification
+
+
+
+
+
   - Test preset options (7, 14, 30 days) in Settings UI
   - Test custom input with valid values (1, 45, 90, 365, 1095)
   - Test custom input with invalid values (0, -1, 1096, "abc")
@@ -214,5 +271,11 @@
   - Verify token budget is enforced
   - _Requirements: All_
 
-- [ ] 23. Final checkpoint - Ensure all tests pass
+- [x] 23. Final checkpoint - Ensure all tests pass
+
+
+
+
+
+
   - Ensure all tests pass, ask the user if questions arise.
