@@ -90,6 +90,13 @@ Future<void> bootstrapAppContainer() async {
     container.registerLazySingleton<ContextConfigRepository>(
       (c) => ContextConfigRepositoryImpl(c.resolve<SharedPreferences>()),
     );
+    await AppLogger.info(
+      'ContextConfigRepository registered in container',
+      context: {
+        'registrationType': 'lazySingleton',
+        'stage': 'bootstrap',
+      },
+    );
     container.registerLazySingleton<AiService>(
       (_) => LoggingAiService(
         ConfigurableAiService(
