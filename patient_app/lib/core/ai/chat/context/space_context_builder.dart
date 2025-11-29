@@ -147,6 +147,42 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
       (total, summary) => total + _formatter.estimateTokens(summary),
     );
     final assemblyTime = stopwatch?.elapsed ?? Duration.zero;
+    
+    // Log truncation events, especially with large date ranges
+    final dateRangeDays = dateRange.end.difference(dateRange.start).inDays;
+    final truncatedCount = sorted.length - summaries.length;
+    if (truncatedCount > 0) {
+      await AppLogger.info(
+        'Context truncation applied',
+        context: {
+          'dateRangeDays': dateRangeDays,
+          'recordsAfterDateFilter': filtered.length,
+          'recordsAfterRelevanceSort': sorted.length,
+          'recordsIncluded': summaries.length,
+          'truncatedCount': truncatedCount,
+          'tokenBudget': tokenAllocation.context,
+          'tokensUsed': estimatedTokens,
+          'maxRecordsLimit': maxRecords,
+          'truncationReason': truncatedCount > 0 
+              ? (sorted.length > maxRecords ? 'maxRecords limit' : 'token budget')
+              : 'none',
+        },
+        correlationId: correlationId,
+      );
+    } else if (dateRangeDays > 30) {
+      // Log when large date ranges don't require truncation (informational)
+      await AppLogger.info(
+        'Large date range processed without truncation',
+        context: {
+          'dateRangeDays': dateRangeDays,
+          'recordsAfterDateFilter': filtered.length,
+          'recordsIncluded': summaries.length,
+          'tokenBudget': tokenAllocation.context,
+          'tokensUsed': estimatedTokens,
+        },
+        correlationId: correlationId,
+      );
+    }
 
     final stats = ContextStats(
       recordsFiltered: filtered.length,

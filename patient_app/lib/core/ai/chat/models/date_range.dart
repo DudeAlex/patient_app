@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:patient_app/core/diagnostics/app_logger.dart';
 
 /// Date range used to scope context assembly.
 @immutable
@@ -21,8 +22,21 @@ class DateRange {
   factory DateRange.lastNDays(int days) {
     assert(days >= 1 && days <= 1095, 'days must be between 1 and 1095');
     final now = DateTime.now();
+    final start = now.subtract(Duration(days: days));
+    
+    // Log DateRange creation
+    AppLogger.info(
+      'DateRange created',
+      context: {
+        'days': days,
+        'start': start.toIso8601String(),
+        'end': now.toIso8601String(),
+        'isCustom': ![7, 14, 30].contains(days),
+      },
+    );
+    
     return DateRange(
-      start: now.subtract(Duration(days: days)),
+      start: start,
       end: now,
     );
   }

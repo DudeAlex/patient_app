@@ -11,6 +11,7 @@ import '../../core/ai/repositories/ai_config_repository.dart';
 import '../../core/ai/repositories/ai_consent_repository.dart';
 import '../../core/ai/chat/repositories/context_config_repository.dart';
 import '../../core/di/app_container.dart';
+import '../../core/diagnostics/app_logger.dart';
 import '../../features/information_items/ui/widgets/ai_consent_dialog.dart';
 import '../../features/records/data/records_service.dart';
 import '../../features/sync/application/use_cases/mark_auto_sync_success_use_case.dart';
@@ -141,6 +142,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _updateDateRange(int days) async {
     setState(() => _dateRangeBusy = true);
     try {
+      final previousValue = _dateRangeDays;
       await _contextConfigRepository.setDateRangeDays(days);
       if (!mounted) return;
       setState(() {
@@ -148,6 +150,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _isCustomDateRange = false;
         _customDaysError = null;
       });
+      
+      // Log preset date range change
+      await AppLogger.info(
+        'User updated date range (preset)',
+        context: {
+          'dateRangeDays': days,
+          'previousValue': previousValue,
+          'isCustom': false,
+        },
+      );
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Context date range set to $days days'),
@@ -201,9 +214,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
 
     try {
+      final previousValue = _dateRangeDays;
       await _contextConfigRepository.setDateRangeDays(days);
       if (!mounted) return;
       setState(() => _dateRangeDays = days);
+      
+      // Log custom date range change
+      await AppLogger.info(
+        'User set custom date range',
+        context: {
+          'dateRangeDays': days,
+          'previousValue': previousValue,
+          'isCustom': true,
+        },
+      );
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Context date range set to $days days (custom)'),
