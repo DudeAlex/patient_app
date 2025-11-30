@@ -43,7 +43,8 @@ dart run tools/bulk_test_data_import/import_data.dart --help
 |--------|-------|-------------|---------|
 | `--file` | `-f` | Path to JSON file to import | |
 | `--dataset` | `-d` | Pre-packaged dataset to import (small, medium, large, stage4) |
-| `--db-path` | | Path to Isar database file | Default app database location |
+| `--db-path` | Path to Isar database file | Default app database location |
+| `--device` | | Target device/emulator database via adb (pulls, modifies, and pushes back) | false |
 | `--clear` | `-c` | Clear all existing data before import | false |
 | `--dry-run` | | Validate and preview import without modifying database | false |
 | `--verbose` | `-v` | Enable verbose output | false |
@@ -71,6 +72,9 @@ dart run tools/bulk_test_data_import/import_data.dart --clear
 
 # Import from custom JSON file
 dart run tools/bulk_test_data_import/import_data.dart --file ./path/to/custom_data.json
+
+# Import to device/emulator database (requires connected device)
+dart run tools/bulk_test_data_import/import_data.dart --dataset medium --device
 ```
 
 ## JSON Schema
@@ -129,6 +133,36 @@ The tool includes four pre-packaged datasets for different testing scenarios:
 2. **Medium Dataset** (`--dataset medium`): 50 records for moderate testing
 3. **Large Dataset** (`--dataset large`): 89 records for comprehensive testing
 4. **Stage 4 Dataset** (`--dataset stage4`): 96 records optimized for Stage 4 AI context testing with varied dates and viewCounts
+
+## Device Import Mode
+
+The tool now supports importing directly to a connected Android device or emulator using the `--device` flag. This feature allows you to populate test data that will appear in the actual app UI on the device.
+
+### Requirements
+
+- Android device connected via USB or emulator running
+- Android SDK platform-tools (adb) in your PATH
+- Patient app installed on the device/emulator
+
+### Usage
+
+```bash
+# Import dataset to device
+dart run tools/bulk_test_data_import/import_data.dart --dataset medium --device
+
+# Import from file to device
+dart run tools/bulk_test_data_import/import_data.dart --file data.json --device
+
+# Import with clearing existing data on device
+dart run tools/bulk_test_data_import/import_data.dart --dataset small --device --clear
+```
+
+### How it works
+
+1. The tool pulls the app database from the device using `adb shell run-as`
+2. Applies the import operations to the local copy of the database
+3. Pushes the updated database back to the device
+4. Optionally restarts the app to ensure changes are visible
 
 ## Troubleshooting
 

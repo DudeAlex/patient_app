@@ -18,10 +18,19 @@ class DatabaseService {
       await Directory(dir).create(recursive: true);
     }
 
+    String dbName = path.basename(dbPath);
+    // If the database name is 'patient.isar', use 'patient' as the Isar name
+    if (dbName == 'patient.isar') {
+      dbName = 'patient';
+    } else {
+      // Remove the extension to get the name
+      dbName = dbName.replaceAll(RegExp(r'\.isar$'), '');
+    }
+
     _isar = await Isar.open(
       [storage.RecordSchema],
       directory: dir,
-      name: path.basename(dbPath),
+      name: dbName,
     );
   }
 

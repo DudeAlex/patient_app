@@ -4,13 +4,13 @@ import 'package:args/src/usage_exception.dart';
 import 'package:path/path.dart' as path;
 import 'lib/database_service.dart';
 import 'lib/core_import_service.dart';
-import 'lib/models/test_data_import.dart';
 
 class CliArgs {
   final String? filePath;
   final String? datasetName;
   final String? dbPath;
- final bool clear;
+  final bool device;
+  final bool clear;
   final bool dryRun;
   final bool verbose;
   final bool web;
@@ -20,6 +20,7 @@ class CliArgs {
     this.filePath,
     this.datasetName,
     this.dbPath,
+    required this.device,
     required this.clear,
     required this.dryRun,
     required this.verbose,
@@ -39,6 +40,11 @@ class CliInterface {
          help: 'Pre-packaged dataset to import (small, medium, large, stage4)',
        )
        ..addOption('db-path', help: 'Path to Isar database file')
+       ..addFlag(
+         'device',
+         help: 'Target device/emulator database via adb (pulls, modifies, and pushes back)',
+         defaultsTo: false,
+       )
        ..addFlag(
          'clear',
          abbr: 'c',
@@ -105,6 +111,7 @@ class CliInterface {
         filePath: results['file'],
         datasetName: results['dataset'],
         dbPath: results['db-path'],
+        device: results['device'],
         clear: results['clear'],
         dryRun: results['dry-run'],
         verbose: results['verbose'],
@@ -129,6 +136,20 @@ class CliInterface {
 
       // Determine database path
       String dbPath = cliArgs.dbPath ?? _getDefaultDbPath();
+      
+      // Handle device mode if requested
+      if (cliArgs.device) {
+        outputSuccess('Device mode enabled - pulling database from device...');
+        final deviceDbPath = await _pullDatabaseFromDevice();
+        if (deviceDbPath == null) {
+          outputError('Failed to pull database from device');
+          return 5; // Device error
+        }
+        dbPath = deviceDbPath;
+        
+        // Add cleanup hook to push database back to device on success
+        // We'll handle this after the import operations
+      }
 
       // Create database service
       final dbService = DatabaseService(dbPath);
@@ -268,7 +289,20 @@ class CliInterface {
         outputSuccess('Database cleared successfully');
       }
 
+      // Close database connection
       await dbService.close();
+      
+      // If in device mode, push the updated database back to the device
+      if (cliArgs.device) {
+        outputSuccess('Device mode enabled - pushing updated database back to device...');
+        final pushResult = await _pushDatabaseToDevice(dbPath);
+        if (!pushResult) {
+          outputError('Failed to push database back to device');
+          return 6; // Device push error
+        }
+        outputSuccess('Database successfully pushed back to device');
+      }
+
       return 0; // Success
     } catch (e) {
       if (e is UsageException) {
@@ -285,7 +319,7 @@ class CliInterface {
   /// Outputs progress updates
   void outputProgress(String message, int current, int total) {
     final percent = total > 0 ? (current / total * 100).round() : 0;
-    stdout.write('\r$message $current/$total (${percent}%)');
+    stdout.write('\r$message $current/$total ($percent%)');
     if (current == total && total > 0) {
       stdout.writeln(); // New line when complete
     }
@@ -309,6 +343,7 @@ class CliInterface {
     print('  -f, --file <path>          Path to JSON file to import');
     print('  -d, --dataset <name>       Pre-packaged dataset to import (small, medium, large, stage4)');
     print('  --db-path <path>           Path to Isar database file');
+    print('  --device                   Target device/emulator database via adb (pulls, modifies, and pushes back)');
     print('  -c, --clear                Clear all existing data before import');
     print('  --dry-run                  Validate and preview import without modifying database');
     print('  -v, --verbose              Enable verbose output');
@@ -320,6 +355,7 @@ class CliInterface {
     print('  Import from file: dart run tools/bulk_test_data_import/import_data.dart --file data.json');
     print('  Import dataset:   dart run tools/bulk_test_data_import/import_data.dart --dataset medium --clear');
     print('  Dry run:          dart run tools/bulk_test_data_import/import_data.dart --file data.json --dry-run');
+    print('  Device import:    dart run tools/bulk_test_data_import/import_data.dart --dataset medium --device');
     print('  Start web:        dart run tools/bulk_test_data_import/import_data.dart --web');
   }
 
@@ -344,7 +380,137 @@ class CliInterface {
       );
     }
 
-    return path.join(dbDir, 'isar.isar');
+    return path.join(dbDir, 'patient.isar');
+  }
+
+  /// Pulls the database from the device via adb
+  Future<String?> _pullDatabaseFromDevice() async {
+    try {
+      // Check if adb is available
+      final adbResult = await Process.run('adb', ['version']);
+      if (adbResult.exitCode != 0) {
+        outputError('adb is not available in PATH. Please install Android SDK platform-tools.');
+        return null;
+      }
+
+      outputProgress('Checking for connected devices...', 0, 1);
+      
+      // Check for connected devices
+      final devicesResult = await Process.run('adb', ['devices']);
+      if (devicesResult.exitCode != 0) {
+        outputError('Failed to list connected devices: ${devicesResult.stderr}');
+        return null;
+      }
+
+      final deviceOutput = devicesResult.stdout.toString();
+      if (!deviceOutput.contains('device') || deviceOutput.contains('device\n') || deviceOutput.contains('device\r\n')) {
+        // Check if there's actually a connected device (excluding the header line)
+        final lines = deviceOutput.split('\n');
+        bool hasDevice = false;
+        for (final line in lines) {
+          if (line.trim().isNotEmpty && !line.contains('List of devices attached') && line.contains('\tdevice') && !line.contains('unauthorized')) {
+            hasDevice = true;
+            break;
+          }
+        }
+        if (!hasDevice) {
+          outputError('No connected Android device found. Please connect a device or start an emulator.');
+          return null;
+        }
+      }
+
+      outputProgress('Pulling database from device...', 0, 1);
+      
+      // Create a temporary file to store the pulled database
+      final tempDir = Directory.systemTemp;
+      final tempDbFile = File('${tempDir.path}/patient_device.isar');
+      
+      // Pull the database from the device using run-as
+      final appId = 'com.example.patient_app';
+      final deviceDbPath = '/data/data/$appId/files/patient.isar';
+      
+      // Use run-as to read the database file and save it locally
+      final result = await Process.run('adb', [
+        'shell',
+        'run-as',
+        appId,
+        'cat',
+        deviceDbPath
+      ]);
+      
+      if (result.exitCode != 0) {
+        outputError('Failed to pull database from device: ${result.stderr}');
+        return null;
+      }
+
+      // Write the database content to the temporary file
+      await tempDbFile.writeAsBytes(result.stdout);
+      outputSuccess('Database pulled successfully to: ${tempDbFile.path}');
+      
+      return tempDbFile.path;
+    } catch (e) {
+      outputError('Error pulling database from device: $e');
+      return null;
+    }
+  }
+
+  /// Pushes the updated database back to the device via adb
+  Future<bool> _pushDatabaseToDevice(String localDbPath) async {
+    try {
+      outputProgress('Pushing database back to device...', 0, 1);
+      
+      final appId = 'com.example.patient_app';
+      final deviceDbPath = '/data/data/$appId/files/patient.isar';
+      final tempDevicePath = '/sdcard/patient.isar';
+      
+      // First, push the file to the external storage (which doesn't require root)
+      final pushResult = await Process.run('adb', [
+        'push',
+        localDbPath,
+        tempDevicePath
+      ]);
+      
+      if (pushResult.exitCode != 0) {
+        outputError('Failed to push database to device: ${pushResult.stderr}');
+        return false;
+      }
+
+      // Then, move the file to the app's private directory using run-as
+      final moveResult = await Process.run('adb', [
+        'shell',
+        'run-as',
+        appId,
+        'cp',
+        tempDevicePath,
+        deviceDbPath
+      ]);
+      
+      if (moveResult.exitCode != 0) {
+        outputError('Failed to move database to app directory: ${moveResult.stderr}');
+        return false;
+      }
+
+      // Optionally, restart the app to make sure Isar picks up the changes
+      final restartResult = await Process.run('adb', [
+        'shell',
+        'am',
+        'force-stop',
+        appId
+      ]);
+      
+      if (restartResult.exitCode != 0) {
+        outputError('Warning: Failed to restart app after database update: ${restartResult.stderr}');
+        // We don't fail the operation for this, just warn the user
+      } else {
+        outputSuccess('App restarted successfully');
+      }
+
+      outputSuccess('Database pushed back to device successfully');
+      return true;
+    } catch (e) {
+      outputError('Error pushing database to device: $e');
+      return false;
+    }
   }
 }
 
