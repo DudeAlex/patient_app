@@ -3,8 +3,8 @@
     {
       "title": "Morning Blood Pressure Reading",
       "type": "vital_signs",
-      "date": "2024-11-25T08:00:00Z",
-      "content": "Blood pressure: 120/80 mmHg, Pulse: 72 bpm",
+      "date": "2025-09-12T08:00:00Z",
+      "content": "Blood pressure: 118/76 mmHg, Pulse: 68 bpm - baseline reading for new medication trial",
       "spaceId": "health",
       "viewCount": 5,
       "tags": ["cardiovascular", "monitoring", "daily"]
@@ -12,8 +12,8 @@
     {
       "title": "Cardiology Follow-up Appointment",
       "type": "doctor_visit",
-      "date": "2024-11-20T14:30:00Z",
-      "content": "Regular checkup with Dr. Smith. ECG results normal. Continue current medication.",
+      "date": "2025-10-15T14:30:00Z",
+      "content": "Cardiology follow-up after stress test. Medication dosage adjusted. Exercise recommendations updated based on recent activity levels.",
       "spaceId": "health",
       "viewCount": 3,
       "tags": ["cardiology", "appointment", "medication"]
@@ -21,8 +21,8 @@
     {
       "title": "Lab Results: Complete Blood Count",
       "type": "lab_result",
-      "date": "2024-11-18T09:15:00Z",
-      "content": "Hemoglobin: 14.2 g/dL, White blood cell count: 6.8 K/uL, Platelets: 280 K/uL - All within normal limits.",
+      "date": "2025-11-05T09:15:00Z",
+      "content": "Comprehensive metabolic panel shows improved glucose levels. Kidney function markers within normal range. Continue current diet plan.",
       "spaceId": "health",
       "viewCount": 8,
       "tags": ["lab", "bloodwork", "normal"]
@@ -30,8 +30,8 @@
     {
       "title": "Team Meeting - Q4 Budget Planning",
       "type": "meeting",
-      "date": "2024-11-26T10:00:00Z",
-      "content": "Discussed budget allocations for next quarter. Marketing gets 15% increase. IT budget approved for new software licenses.",
+      "date": "2025-11-18T10:00:00Z",
+      "content": "Q4 budget planning meeting with department heads. Marketing budget increased by 12%, R&D allocation expanded for new product development.",
       "spaceId": "business",
       "viewCount": 12,
       "tags": ["budget", "planning", "team"]
@@ -39,8 +39,8 @@
     {
       "title": "Client Proposal - ABC Corporation",
       "type": "proposal",
-      "date": "2024-11-22T16:45:00Z",
-      "content": "Submitted proposal for enterprise software solution. Timeline: 6 months, Budget: $250k. Awaiting feedback by Dec 5.",
+      "date": "2025-10-22T16:45:00Z",
+      "content": "Enterprise software proposal presented to client committee. Technical requirements aligned with infrastructure upgrade timeline. Decision expected by month end.",
       "spaceId": "business",
       "viewCount": 7,
       "tags": ["proposal", "client", "software"]
@@ -48,8 +48,8 @@
     {
       "title": "Project Status Update - Mobile App",
       "type": "project_update",
-      "date": "2024-11-24T11:30:00Z",
-      "content": "iOS development 80% complete. Android team caught up after delay. Testing phase begins Dec 1.",
+      "date": "2025-11-14T11:30:0Z",
+      "content": "Mobile app development status: iOS 85% complete, Android 78% complete. Cross-platform compatibility issues resolved. UAT phase begins next week.",
       "spaceId": "business",
       "viewCount": 15,
       "tags": ["mobile", "project", "status"]
@@ -57,8 +57,8 @@
     {
       "title": "Research Paper: Quantum Computing",
       "type": "research",
-      "date": "2024-11-27T13:20:00Z",
-      "content": "Analyzed recent developments in quantum computing algorithms. Shor's algorithm implementation showing promising results for cryptography applications.",
+      "date": "2025-09-20T13:20:0Z",
+      "content": "Research on machine learning optimization techniques. Comparative analysis of gradient descent variants for neural network training efficiency.",
       "spaceId": "education",
       "viewCount": 6,
       "tags": ["quantum", "research", "algorithms"]
@@ -66,8 +66,8 @@
     {
       "title": "Midterm Exam Results - Advanced Calculus",
       "type": "exam",
-      "date": "2024-11-19T15:00:00Z",
-      "content": "Score: 87/100. Strong performance on integration problems. Need to improve series convergence understanding.",
+      "date": "2025-10-08T15:00:00Z",
+      "content": "Advanced calculus exam results: 92/100. Excellent grasp of multivariable concepts. Minor errors in complex integration techniques noted.",
       "spaceId": "education",
       "viewCount": 4,
       "tags": ["exam", "calculus", "math"]
@@ -75,8 +75,8 @@
     {
       "title": "Lecture Notes: Machine Learning",
       "type": "lecture",
-      "date": "2024-11-23T09:00:00Z",
-      "content": "Covered supervised learning algorithms. Focus on decision trees and random forests. Practical examples with sklearn.",
+      "date": "2025-11-03T09:00:00Z",
+      "content": "Lecture on reinforcement learning applications. Explored Q-learning algorithms and their implementation in game AI systems.",
       "spaceId": "education",
       "viewCount": 9,
       "tags": ["ml", "notes", "algorithms"]
@@ -84,8 +84,8 @@
     {
       "title": "Exercise Log - Cardio Training",
       "type": "exercise",
-      "date": "2024-11-28T07:00:00Z",
-      "content": "30 min treadmill run at 6 mph, 20 min cycling, 15 min stretching. Heart rate average 140 bpm.",
+      "date": "2025-11-22T07:00:00Z",
+      "content": "Morning exercise routine: 5K run with tempo intervals. Heart rate zones 2 and 3 maintained for 35 minutes. Hydration levels optimal.",
       "spaceId": "health",
       "viewCount": 2,
       "tags": ["cardio", "fitness", "training"]
@@ -93,8 +93,8 @@
     {
       "title": "Contract Review - Vendor Agreement",
       "type": "contract",
-      "date": "2024-11-15T13:45:00Z",
-      "content": "Reviewed terms for new office supply vendor. Favored pricing for 2-year commitment. Legal team to approve final clauses.",
+      "date": "2025-10-28T13:45:00Z",
+      "content": "Vendor contract review completed. Terms negotiated for 3-year agreement with volume discounts. Legal approval obtained for implementation.",
       "spaceId": "business",
       "viewCount": 10,
       "tags": ["legal", "vendor", "contract"]
@@ -102,8 +102,8 @@
     {
       "title": "Assignment: Data Structures Implementation",
       "type": "assignment",
-      "date": "2024-11-21T18:30:00Z",
-      "content": "Implemented binary search tree and hash table in C++. Performance testing shows O(log n) search time for BST.",
+      "date": "2025-09-15T18:30:00Z",
+      "content": "Database optimization assignment completed. Implemented indexing strategies and query performance improvements. Results show 40% faster retrieval.",
       "spaceId": "education",
       "viewCount": 3,
       "tags": ["programming", "data-structures", "c++"]
@@ -111,8 +111,8 @@
     {
       "title": "Medication Schedule Update",
       "type": "medication",
-      "date": "2024-11-17T10:15:00Z",
-      "content": "Added Lisinopril 10mg daily morning, changed Metformin to twice daily. Monitor for side effects.",
+      "date": "2025-11-10T10:15:00Z",
+      "content": "Medication adjustment: Added vitamin D supplement, reduced statin dosage based on cholesterol panel results. Follow-up in 4 weeks scheduled.",
       "spaceId": "health",
       "viewCount": 11,
       "tags": ["medication", "prescription", "schedule"]
@@ -120,8 +120,8 @@
     {
       "title": "Client Meeting Notes - New Project",
       "type": "client_note",
-      "date": "2024-11-29T14:00:00Z",
-      "content": "Discussed requirements for e-commerce platform. Key features: payment integration, inventory management, mobile responsive.",
+      "date": "2025-11-25T14:00:00Z",
+      "content": "Client meeting for e-commerce platform redesign. Focus on user experience improvements and payment gateway integration. Timeline adjusted for holiday season launch.",
       "spaceId": "business",
       "viewCount": 8,
       "tags": ["client", "meeting", "requirements"]
@@ -129,8 +129,8 @@
     {
       "title": "Course Syllabus - Organic Chemistry",
       "type": "course",
-      "date": "2024-11-16T08:00:00Z",
-      "content": "Week 1-3: Structure and bonding. Week 4-6: Alkanes and cycloalkanes. Lab component includes synthesis experiments.",
+      "date": "2025-09-08T08:00:0Z",
+      "content": "Organic chemistry course outline. Laboratory safety protocols and experimental techniques review. First synthesis lab scheduled for next week.",
       "spaceId": "education",
       "viewCount": 1,
       "tags": ["syllabus", "chemistry", "organic"]
@@ -138,8 +138,8 @@
     {
       "title": "Annual Physical Examination",
       "type": "doctor_visit",
-      "date": "2024-11-10T09:30:00Z",
-      "content": "General checkup. Height: 5'10\", Weight: 165 lbs, BMI: 23.7. All vitals normal. Recommended annual screening tests.",
+      "date": "2025-10-12T09:30:00Z",
+      "content": "Comprehensive health screening. Weight: 167 lbs, Blood pressure: 118/76 mmHg. Annual physical with updated immunization schedule.",
       "spaceId": "health",
       "viewCount": 14,
       "tags": ["annual", "checkup", "screening"]
@@ -147,8 +147,8 @@
     {
       "title": "Sales Report - November",
       "type": "project_update",
-      "date": "2024-11-30T09:00:00Z",
-      "content": "Monthly sales: $1.2M (10% above target). Top performers: West region, Product line A. Q4 forecast adjusted upward.",
+      "date": "2025-11-28T09:00:00Z",
+      "content": "November sales report: $1.25M achieved (15% above target). West region led with 35% of total sales. Q4 forecast adjusted to $3.8M.",
       "spaceId": "business",
       "viewCount": 18,
       "tags": ["sales", "report", "forecast"]
@@ -156,8 +156,8 @@
     {
       "title": "Study Group Meeting - Physics",
       "type": "study_note",
-      "date": "2024-11-25T16:00:00Z",
-      "content": "Reviewed thermodynamics concepts. Worked through practice problems on heat engines and entropy calculations.",
+      "date": "2025-10-18T16:00:00Z",
+      "content": "Physics study group session: quantum mechanics problem solving. Focused on wave-particle duality and Schrödinger equation applications.",
       "spaceId": "education",
       "viewCount": 5,
       "tags": ["study", "physics", "thermodynamics"]
@@ -165,8 +165,8 @@
     {
       "title": "Symptom Tracker - Allergy Episode",
       "type": "symptom",
-      "date": "2024-11-26T12:30:00Z",
-      "content": "Experienced sneezing, runny nose, itchy eyes. Symptoms started after exposure to pollen. Relief with antihistamine.",
+      "date": "2025-09-22T12:30:00Z",
+      "content": "Seasonal allergy tracking during high pollen period. Symptoms correlate with ragweed exposure. Preventive medication timing optimized.",
       "spaceId": "health",
       "viewCount": 7,
       "tags": ["allergy", "symptoms", "tracking"]
@@ -174,8 +174,8 @@
     {
       "title": "Board Meeting Minutes",
       "type": "meeting",
-      "date": "2024-11-14T15:00:00Z",
-      "content": "Approved new sustainability initiative. Budget allocated for solar panel installation. Next meeting Dec 12.",
+      "date": "2025-11-06T15:00:0Z",
+      "content": "Board meeting: sustainability initiative approved with $2M budget allocation. Solar panel installation scheduled for Q1 2026. Progress review monthly.",
       "spaceId": "business",
       "viewCount": 20,
       "tags": ["board", "minutes", "sustainability"]
@@ -183,8 +183,8 @@
     {
       "title": "Dental Checkup and Cleaning",
       "type": "doctor_visit",
-      "date": "2024-11-05T11:00:00Z",
-      "content": "Routine cleaning and examination. No cavities found. Recommended whitening treatment. Next appointment in 6 months.",
+      "date": "2025-10-10T11:00:00Z",
+      "content": "Dental examination: minor tartar buildup, no new cavities. Gum health improved with new brushing technique. Whitening treatment completed.",
       "spaceId": "health",
       "viewCount": 6,
       "tags": ["dental", "cleaning", "routine"]
@@ -192,8 +192,8 @@
     {
       "title": "Marketing Campaign Performance",
       "type": "project_update",
-      "date": "2024-11-22T10:30:00Z",
-      "content": "Social media campaign showing 15% engagement rate. Email open rate 28%. ROI: 4.2:1. Extending successful ad groups.",
+      "date": "2025-11-16T10:30:00Z",
+      "content": "Q4 marketing campaign performance analysis. Social media engagement increased 22% from previous quarter. Email conversion rate at 4.2%.",
       "spaceId": "business",
       "viewCount": 16,
       "tags": ["marketing", "performance", "roi"]
@@ -201,8 +201,8 @@
     {
       "title": "Thesis Proposal Defense",
       "type": "exam",
-      "date": "2024-11-18T13:00:00Z",
-      "content": "Presented research proposal on neural networks for image recognition. Committee approved with minor revisions required.",
+      "date": "2025-10-05T13:00:00Z",
+      "content": "Thesis proposal defense on computer vision algorithms. Committee approved with suggestions for additional validation experiments. Next milestone: data collection.",
       "spaceId": "education",
       "viewCount": 9,
       "tags": ["thesis", "defense", "proposal"]
@@ -210,7 +210,7 @@
     {
       "title": "Cholesterol Panel Results",
       "type": "lab_result",
-      "date": "2024-11-12T08:45:00Z",
+      "date": "2025-11-12T08:45:00Z",
       "content": "Total cholesterol: 185 mg/dL, LDL: 110 mg/dL, HDL: 5 mg/dL, Triglycerides: 100 mg/dL. All values in healthy range.",
       "spaceId": "health",
       "viewCount": 7,
@@ -219,8 +219,8 @@
     {
       "title": "Quarterly Financial Review",
       "type": "meeting",
-      "date": "2024-11-27T14:00:00Z",
-      "content": "Reviewed Q3 financials. Revenue up 12% YoY. Expenses within budget. Approved expansion to European market.",
+      "date": "2025-10-25T14:00:00Z",
+      "content": "Q3 financial review meeting. Revenue growth 14% YoY, operational expenses 3% under budget. European market expansion approved with $5M allocation.",
       "spaceId": "business",
       "viewCount": 19,
       "tags": ["finance", "review", "revenue"]
@@ -228,8 +228,8 @@
     {
       "title": "Graduate Seminar: Advanced Algorithms",
       "type": "lecture",
-      "date": "2024-11-21T10:00:00Z",
-      "content": "Explored graph algorithms and complexity theory. Covered Dijkstra's algorithm and A* search optimization.",
+      "date": "2025-09-18T10:00:00Z",
+      "content": "Advanced algorithms seminar: dynamic programming applications. Explored optimal substructure in resource allocation problems and caching strategies.",
       "spaceId": "education",
       "viewCount": 4,
       "tags": ["seminar", "algorithms", "graph"]
@@ -237,8 +237,8 @@
     {
       "title": "Physical Therapy Session",
       "type": "doctor_visit",
-      "date": "2024-11-13T16:00:00Z",
-      "content": "Week 3 of rehabilitation after ankle injury. Range of motion improved 15%. Strengthening exercises added to routine.",
+      "date": "2025-11-08T16:00:00Z",
+      "content": "Physical therapy session 5 of 12: ankle rehabilitation progress. Range of motion at 90% of baseline. Balance exercises introduced for next phase.",
       "spaceId": "health",
       "viewCount": 3,
       "tags": ["therapy", "rehabilitation", "injury"]
@@ -246,8 +246,8 @@
     {
       "title": "Product Launch Strategy Meeting",
       "type": "meeting",
-      "date": "2024-11-28T09:00:00Z",
-      "content": "Finalized launch timeline for new product. Marketing materials approved. Sales team trained on key features.",
+      "date": "2025-11-20T09:00:00Z",
+      "content": "Product launch strategy finalization meeting. Go-to-market plan approved with $500K marketing budget. Sales team equipped with new demo materials.",
       "spaceId": "business",
       "viewCount": 17,
       "tags": ["launch", "strategy", "product"]
@@ -255,8 +255,8 @@
     {
       "title": "Research Paper: Blockchain Applications",
       "type": "research",
-      "date": "2024-11-19T14:30:0Z",
-      "content": "Investigated blockchain use cases in supply chain management. Identified efficiency gains of 20-30% in documentation processes.",
+      "date": "2025-10-14T14:30:0Z",
+      "content": "Blockchain research paper on decentralized identity verification. Implementation model shows potential for 45% cost reduction in verification processes.",
       "spaceId": "education",
       "viewCount": 8,
       "tags": ["blockchain", "research", "supply-chain"]
@@ -264,8 +264,8 @@
     {
       "title": "Vitamin D Level Test",
       "type": "lab_result",
-      "date": "2024-11-08T09:20:00Z",
-      "content": "Vitamin D level: 32 ng/mL. Slightly below optimal range. Recommended supplement 100 IU daily.",
+      "date": "2025-09-25T09:20:0Z",
+      "content": "Vitamin D3 level: 34 ng/mL. Within acceptable range but below optimal. Recommended 1500 IU daily supplement during winter months.",
       "spaceId": "health",
       "viewCount": 5,
       "tags": ["vitamin", "supplement", "lab"]
@@ -273,8 +273,8 @@
     {
       "title": "Investor Presentation - Series B Funding",
       "type": "meeting",
-      "date": "2024-11-16T15:30:0Z",
-      "content": "Presented growth metrics and expansion plans. Positive feedback from potential investors. Next meeting scheduled for Dec 1.",
+      "date": "2025-10-30T15:30:0Z",
+      "content": "Series B funding presentation to investors. Demonstrated 40% quarterly growth and 25% profit margin. Investor due diligence scheduled for next week.",
       "spaceId": "business",
       "viewCount": 22,
       "tags": ["investor", "funding", "presentation"]
@@ -282,8 +282,8 @@
     {
       "title": "Final Project Submission - Software Engineering",
       "type": "assignment",
-      "date": "2024-11-24T23:59:00Z",
-      "content": "Submitted collaborative project: web-based task management system. Built with React and Node.js. Features user authentication and real-time updates.",
+      "date": "2025-11-15T23:59:00Z",
+      "content": "Final project submission: distributed file storage system with encryption. Implemented using Go and PostgreSQL. Performance testing exceeded requirements.",
       "spaceId": "education",
       "viewCount": 6,
       "tags": ["project", "software", "react"]
@@ -291,8 +291,8 @@
     {
       "title": "Eye Exam Results",
       "type": "doctor_visit",
-      "date": "2024-11-03T10:15:00Z",
-      "content": "Vision: 20/20 in both eyes. No signs of eye disease. Prescribed new glasses with anti-reflective coating.",
+      "date": "2025-09-30T10:15:00Z",
+      "content": "Eye examination results: 20/15 vision in right eye, 20/20 in left. No signs of glaucoma or macular degeneration. New progressive lenses prescribed.",
       "spaceId": "health",
       "viewCount": 4,
       "tags": ["eye", "vision", "exam"]
@@ -300,8 +300,8 @@
     {
       "title": "Competitor Analysis Report",
       "type": "project_update",
-      "date": "2024-11-20T13:45:00Z",
-      "content": "Analyzed 5 main competitors. Identified pricing gaps in premium segment. Recommendation: develop new product tier.",
+      "date": "2025-11-12T13:45:00Z",
+      "content": "Competitive analysis report completed. Identified 3 emerging competitors in market. Pricing strategy recommendations for premium tier development.",
       "spaceId": "business",
       "viewCount": 13,
       "tags": ["competitor", "analysis", "pricing"]
@@ -309,8 +309,8 @@
     {
       "title": "Dissertation Chapter 3 Review",
       "type": "study_note",
-      "date": "2024-11-15T11:30:00Z",
-      "content": "Completed methodology section. Advisor provided feedback on statistical analysis approach. Next review scheduled for Nov 29.",
+      "date": "2025-10-20T11:30:00Z",
+      "content": "Dissertation methodology chapter completed. Statistical analysis approach validated by advisor. Data collection phase begins next week.",
       "spaceId": "education",
       "viewCount": 7,
       "tags": ["dissertation", "chapter", "methodology"]
@@ -318,8 +318,8 @@
     {
       "title": "Blood Glucose Monitoring",
       "type": "vital_signs",
-      "date": "2024-11-26T07:30:00Z",
-      "content": "Fasting glucose: 95 mg/dL. Post-meal (2h): 135 mg/dL. Within target range for diabetes management.",
+      "date": "2025-11-18T07:30:00Z",
+      "content": "Morning glucose monitoring: 92 mg/dL fasting, 130 mg/dL post-breakfast. Consistent readings indicate effective diabetes management plan.",
       "spaceId": "health",
       "viewCount": 8,
       "tags": ["glucose", "diabetes", "monitoring"]
@@ -327,8 +327,8 @@
     {
       "title": "Partnership Agreement Negotiation",
       "type": "contract",
-      "date": "2024-11-11T16:00:0Z",
-      "content": "Finalized terms for strategic partnership with TechCorp. Revenue sharing model agreed at 60/40 split. Contract signing Dec 10.",
+      "date": "2025-10-08T16:00:0Z",
+      "content": "Strategic partnership agreement with InnovateTech finalized. Joint development initiative for AI solutions. Revenue sharing 70/30 based on investment.",
       "spaceId": "business",
       "viewCount": 14,
       "tags": ["partnership", "negotiation", "contract"]
@@ -336,8 +336,8 @@
     {
       "title": "Group Project: Environmental Science",
       "type": "assignment",
-      "date": "2024-11-17T17:00:00Z",
-      "content": "Analyzed local water quality data. Found elevated nitrogen levels in 3 of 10 testing sites. Presentation due Nov 30.",
+      "date": "2025-09-14T17:00:00Z",
+      "content": "Environmental science project: microplastic analysis in local waterways. Found 0.8 particles per liter in urban areas. Results presentation next week.",
       "spaceId": "education",
       "viewCount": 5,
       "tags": ["environmental", "water", "project"]
@@ -345,8 +345,8 @@
     {
       "title": "MRI Results: Knee Injury",
       "type": "lab_result",
-      "date": "2024-11-09T14:10:00Z",
-      "content": "No structural damage to ACL or meniscus. Minor cartilage wear consistent with age. Physical therapy recommended.",
+      "date": "2025-11-04T14:10:00Z",
+      "content": "Knee MRI results: minor meniscus tear, no ACL damage. Rehabilitation plan prescribed with 6-week recovery timeline. Avoid high-impact activities.",
       "spaceId": "health",
       "viewCount": 9,
       "tags": ["mri", "knee", "injury"]
@@ -354,8 +354,8 @@
     {
       "title": "Remote Work Policy Update",
       "type": "meeting",
-      "date": "2024-11-23T11:00:00Z",
-      "content": "Approved hybrid work model: 3 days in office, 2 days remote. New collaboration tools to be implemented by Dec 15.",
+      "date": "2025-11-17T11:00:00Z",
+      "content": "Remote work policy implementation meeting. Approved flexible schedule: 2 days office, 3 days remote. New collaboration tools training scheduled.",
       "spaceId": "business",
       "viewCount": 11,
       "tags": ["remote", "policy", "work"]
@@ -363,8 +363,8 @@
     {
       "title": "Lab Report: Organic Synthesis",
       "type": "assignment",
-      "date": "2024-11-22T15:30:00Z",
-      "content": "Synthesized aspirin with 87% yield. IR and NMR confirmed product structure. Minor impurity detected, purification recommended.",
+      "date": "2025-10-16T15:30:00Z",
+      "content": "Organic synthesis lab: ibuprofen synthesis achieved 82% yield. Spectroscopic analysis confirmed structure. Purification process improved for better results.",
       "spaceId": "education",
       "viewCount": 6,
       "tags": ["organic", "synthesis", "lab"]
@@ -372,8 +372,8 @@
     {
       "title": "Annual Flu Vaccination",
       "type": "medication",
-      "date": "2024-11-01T10:45:00Z",
-      "content": "Received flu vaccine (quadrivalent). No adverse reactions. Protection effective for 6 months. Next vaccination in fall 2025.",
+      "date": "2025-09-05T10:45:00Z",
+      "content": "Annual flu vaccination administered (quadrivalent strain). No immediate reactions observed. Immunity develops over 2-week period. Follow-up not required.",
       "spaceId": "health",
       "viewCount": 2,
       "tags": ["vaccination", "flu", "prevention"]
@@ -381,8 +381,8 @@
     {
       "title": "Customer Satisfaction Survey Results",
       "type": "project_update",
-      "date": "2024-11-29T10:15:0Z",
-      "content": "Overall satisfaction: 4.2/5.0. Top feedback: product quality and delivery speed. Areas for improvement: customer support response time.",
+      "date": "2025-11-24T10:15:0Z",
+      "content": "Customer satisfaction survey Q4 results: 4.4/5.0 average. Positive feedback on product reliability. Action items: reduce support response time by 25%.",
       "spaceId": "business",
       "viewCount": 15,
       "tags": ["satisfaction", "survey", "feedback"]
@@ -390,8 +390,8 @@
     {
       "title": "Conference Paper: AI Ethics",
       "type": "research",
-      "date": "2024-11-14T12:00:00Z",
-      "content": "Examined bias in machine learning models. Proposed framework for ethical AI development. Paper accepted for publication.",
+      "date": "2025-10-22T12:00:00Z",
+      "content": "AI ethics research paper on algorithmic fairness completed. Framework for bias detection in recommendation systems accepted for conference presentation.",
       "spaceId": "education",
       "viewCount": 10,
       "tags": ["ai", "ethics", "research"]
@@ -399,8 +399,8 @@
     {
       "title": "X-ray Results: Chest",
       "type": "lab_result",
-      "date": "2024-11-06T09:30:00Z",
-      "content": "Lungs clear, no signs of infection or abnormality. Heart size normal. Minor age-related changes in rib structure.",
+      "date": "2025-11-01T09:30:00Z",
+      "content": "Chest X-ray results: clear lung fields, no acute abnormalities. Cardiac silhouette within normal limits. Age-related calcification noted in costochondral junctions.",
       "spaceId": "health",
       "viewCount": 3,
       "tags": ["x-ray", "chest", "lung"]
@@ -408,8 +408,8 @@
     {
       "title": "Sales Team Training Session",
       "type": "meeting",
-      "date": "2024-11-25T13:00:00Z",
-      "content": "Trained on new CRM system and consultative selling techniques. Role-playing exercises for customer objections.",
+      "date": "2025-11-19T13:00:00Z",
+      "content": "Sales team training: new CRM implementation and consultative selling methodologies. Practice sessions on handling complex customer requirements.",
       "spaceId": "business",
       "viewCount": 8,
       "tags": ["sales", "training", "crm"]
@@ -417,8 +417,8 @@
     {
       "title": "Course Project: Database Design",
       "type": "assignment",
-      "date": "2024-11-20T20:00:00Z",
-      "content": "Designed normalized database for university system. Implemented in PostgreSQL. Achieved 3NF normalization standards.",
+      "date": "2025-10-12T20:00:00Z",
+      "content": "Database design project completed: student information system with academic records. Implemented referential integrity and optimized query performance.",
       "spaceId": "education",
       "viewCount": 4,
       "tags": ["database", "design", "sql"]
@@ -426,8 +426,8 @@
     {
       "title": "Sleep Study Results",
       "type": "lab_result",
-      "date": "2024-11-11T08:15:00Z",
-      "content": "Sleep efficiency: 85%, REM sleep: 22% of total sleep. Mild sleep apnea detected. CPAP therapy recommended.",
+      "date": "2025-11-06T08:15:00Z",
+      "content": "Sleep study results: sleep efficiency 82%, REM 25%, mild obstructive sleep apnea with 8 events per hour. CPAP therapy initiated with pressure titration.",
       "spaceId": "health",
       "viewCount": 12,
       "tags": ["sleep", "study", "apnea"]
@@ -435,8 +435,8 @@
     {
       "title": "Board of Directors Strategy Session",
       "type": "meeting",
-      "date": "2024-11-18T09:00:00Z",
-      "content": "Discussed 5-year strategic plan. Focus on international expansion and digital transformation. Budget allocation approved.",
+      "date": "2025-10-28T09:00:00Z",
+      "content": "Board strategic planning session: 5-year roadmap with focus on sustainable growth and technology innovation. Budget allocation approved for digital transformation.",
       "spaceId": "business",
       "viewCount": 25,
       "tags": ["board", "strategy", "expansion"]
@@ -444,8 +444,8 @@
     {
       "title": "Final Exam Study Schedule",
       "type": "study_note",
-      "date": "2024-11-26T18:00:00Z",
-      "content": "Created study plan for finals week. 3 hours daily for Advanced Statistics, 2 hours for Financial Accounting.",
+      "date": "2025-11-22T18:00:00Z",
+      "content": "Finals study schedule: 4 hours daily for Advanced Calculus, 2.5 hours for Linear Algebra. Practice exams scheduled for weekend review.",
       "spaceId": "education",
       "viewCount": 3,
       "tags": ["study", "schedule", "finals"]

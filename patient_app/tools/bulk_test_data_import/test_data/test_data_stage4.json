@@ -3,8 +3,8 @@
     {
       "title": "Patient Health Summary - Comprehensive Analysis",
       "type": "health_summary",
-      "date": "2024-11-30T09:00:00Z",
-      "content": "Comprehensive analysis of patient health data across multiple dimensions. Includes vital signs, lab results, medication history, and treatment outcomes. This record is designed to test the AI's ability to process complex, multi-faceted health information and provide contextual insights.",
+      "date": "2025-11-15T09:00:0Z",
+      "content": "Multi-dimensional patient health assessment integrating biometric data, lifestyle factors, and genetic markers. AI context processing test with comprehensive clinical insights.",
       "spaceId": "health",
       "viewCount": 850,
       "tags": ["ai_context", "comprehensive", "analysis", "health"]
@@ -12,8 +12,8 @@
     {
       "title": "Business Strategy Meeting - Q4 Performance Review",
       "type": "meeting",
-      "date": "2024-11-29T14:00:00Z",
-      "content": "Detailed review of Q4 business performance with extensive data analysis. Covers sales metrics, market trends, competitive positioning, and strategic initiatives. Designed to test AI's ability to extract business insights from complex meeting notes.",
+      "date": "2025-10-18T14:00:00Z",
+      "content": "Q4 performance analysis incorporating customer feedback, operational metrics, and market dynamics. AI evaluation of strategic decision-making from complex business documentation.",
       "spaceId": "business",
       "viewCount": 720,
       "tags": ["ai_context", "business", "strategy", "analysis"]
@@ -21,8 +21,8 @@
     {
       "title": "Advanced Calculus Lecture Notes - Integration Techniques",
       "type": "lecture",
-      "date": "2024-11-28T10:30:00Z",
-      "content": "Comprehensive lecture notes covering advanced integration techniques including substitution, integration by parts, and partial fractions. Detailed examples and proofs included to test AI's ability to understand complex mathematical concepts.",
+      "date": "2025-09-12T10:30:00Z",
+      "content": "Advanced mathematical concepts: tensor calculus and differential geometry applications. Complex proofs with real-world applications for AI comprehension assessment.",
       "spaceId": "education",
       "viewCount": 680,
       "tags": ["ai_context", "mathematics", "calculus", "education"]
@@ -30,8 +30,8 @@
     {
       "title": "Cardiovascular Risk Assessment with Multiple Factors",
       "type": "lab_result",
-      "date": "2024-11-27T08:15:00Z",
-      "content": "Comprehensive cardiovascular risk assessment incorporating cholesterol panel, blood pressure readings, family history, lifestyle factors, and genetic markers. Complex analysis designed to test AI's ability to synthesize multiple data points for clinical decision making.",
+      "date": "2025-10-22T08:15:00Z",
+      "content": "Cardiovascular health evaluation combining biomarker analysis, imaging data, and lifestyle assessment. Multi-parameter analysis for AI clinical decision support testing.",
       "spaceId": "health",
       "viewCount": 920,
       "tags": ["ai_context", "cardiovascular", "risk", "clinical"]
@@ -39,8 +39,8 @@
     {
       "title": "Market Analysis Report - Tech Industry Trends",
       "type": "project_update",
-      "date": "2024-11-26T11:45:00Z",
-      "content": "In-depth market analysis of technology industry trends including AI adoption, cloud computing growth, cybersecurity challenges, and emerging technologies. Comprehensive dataset for testing AI's business intelligence capabilities.",
+      "date": "2025-11-08T11:45:00Z",
+      "content": "Technology sector analysis: AI implementation trends, blockchain applications, and quantum computing readiness. Business intelligence dataset for advanced AI analytics.",
       "spaceId": "business",
       "viewCount": 890,
       "tags": ["ai_context", "market", "analysis", "trends"]
@@ -48,8 +48,8 @@
     {
       "title": "Research Paper: Quantum Computing Applications in Cryptography",
       "type": "research",
-      "date": "2024-11-25T13:20:00Z",
-      "content": "Extensive research paper examining quantum computing applications in cryptographic systems. Covers Shor's algorithm, quantum key distribution, and post-quantum cryptography. Complex technical content for AI comprehension testing.",
+      "date": "2025-09-20T13:20:00Z",
+      "content": "Quantum information theory research: quantum error correction, entanglement protocols, and quantum-classical interface challenges. Advanced technical analysis for AI processing.",
       "spaceId": "education",
       "viewCount": 750,
       "tags": ["ai_context", "quantum", "cryptography", "research"]
@@ -57,8 +57,8 @@
     {
       "title": "Diabetes Management Plan with Comprehensive Monitoring",
       "type": "medication",
-      "date": "2024-11-24T07:30:00Z",
-      "content": "Detailed diabetes management plan including medication schedule, dietary guidelines, exercise regimen, and glucose monitoring protocols. Designed to test AI's ability to manage complex, ongoing health conditions.",
+      "date": "2025-11-03T07:30:00Z",
+      "content": "Comprehensive chronic disease management: integrated care protocols, patient monitoring systems, and outcome prediction models. AI testing for longitudinal health management.",
       "spaceId": "health",
       "viewCount": 810,
       "tags": ["ai_context", "diabetes", "management", "monitoring"]
@@ -66,8 +66,8 @@
     {
       "title": "Competitive Analysis: Enterprise Software Solutions",
       "type": "project_update",
-      "date": "2024-11-23T15:10:00Z",
-      "content": "Comprehensive competitive analysis of enterprise software solutions comparing features, pricing, implementation complexity, and customer satisfaction. Detailed comparison matrix for AI analysis.",
+      "date": "2025-10-14T15:10:00Z",
+      "content": "Enterprise software evaluation matrix: feature comparison, TCO analysis, integration complexity, and user adoption metrics. Competitive intelligence for AI business analysis.",
       "spaceId": "business",
       "viewCount": 770,
       "tags": ["ai_context", "competitive", "analysis", "software"]
@@ -75,8 +75,8 @@
     {
       "title": "Thesis: Machine Learning Models for Predictive Analytics",
       "type": "exam",
-      "date": "2024-11-22T16:45:00Z",
-      "content": "Research thesis examining various machine learning models for predictive analytics in business applications. Includes model comparisons, performance metrics, and implementation strategies.",
+      "date": "2025-11-18T16:45:00Z",
+      "content": "Machine learning model evaluation: comparative analysis of ensemble methods, neural architectures, and interpretability metrics. Performance benchmarking for AI research.",
       "spaceId": "education",
       "viewCount": 830,
       "tags": ["ai_context", "ml", "thesis", "analytics"]
@@ -84,8 +84,8 @@
     {
       "title": "Genetic Testing Results with Comprehensive Analysis",
       "type": "lab_result",
-      "date": "2024-11-21T09:20:00Z",
-      "content": "Comprehensive genetic testing results with detailed analysis of predisposition to various conditions, drug metabolism variants, and hereditary factors. Complex genetic data for AI interpretation.",
+      "date": "2025-09-25T09:20:00Z",
+      "content": "Genomic analysis report: polygenic risk scores, pharmacogenomic markers, and hereditary cancer screening. Complex genetic data interpretation for AI clinical decision support.",
       "spaceId": "health",
       "viewCount": 950,
       "tags": ["ai_context", "genetic", "testing", "analysis"]
@@ -93,8 +93,8 @@
     {
       "title": "Financial Forecasting Model for Startup Evaluation",
       "type": "project_update",
-      "date": "2024-11-20T10:00:00Z",
-      "content": "Sophisticated financial forecasting model for evaluating startup investment opportunities. Includes multiple scenarios, risk factors, and market assumptions. Complex financial data for AI analysis.",
+      "date": "2025-10-30T10:00:00Z",
+      "content": "Financial modeling framework: Monte Carlo simulations, risk-adjusted returns, and scenario analysis for investment evaluation. Complex financial analytics for AI processing.",
       "spaceId": "business",
       "viewCount": 870,
       "tags": ["ai_context", "finance", "forecasting", "investment"]
@@ -102,8 +102,8 @@
     {
       "title": "Advanced Physics Concepts: Relativity and Quantum Mechanics",
       "type": "lecture",
-      "date": "2024-11-19T11:30:00Z",
-      "content": "Comprehensive lecture notes covering advanced physics concepts including special and general relativity, quantum mechanics principles, and their applications. Complex theoretical content for AI comprehension.",
+      "date": "2025-11-12T11:30:00Z",
+      "content": "Theoretical physics concepts: quantum field theory, gauge invariance, and string theory applications. Advanced theoretical framework for AI understanding of complex physics.",
       "spaceId": "education",
       "viewCount": 720,
       "tags": ["ai_context", "physics", "relativity", "quantum"]
@@ -111,8 +111,8 @@
     {
       "title": "Comprehensive Mental Health Assessment and Treatment Plan",
       "type": "doctor_visit",
-      "date": "2024-11-18T14:15:00Z",
-      "content": "Detailed mental health assessment including psychological evaluation, treatment history, medication response, and therapy outcomes. Comprehensive treatment plan with multiple modalities for AI analysis.",
+      "date": "2025-10-05T14:15:00Z",
+      "content": "Mental health evaluation: psychological assessments, treatment efficacy analysis, and personalized intervention planning. Multi-modal data integration for AI clinical support.",
       "spaceId": "health",
       "viewCount": 880,
       "tags": ["ai_context", "mental", "health", "treatment"]
@@ -120,8 +120,8 @@
     {
       "title": "Mergers and Acquisitions Due Diligence Report",
       "type": "contract",
-      "date": "2024-11-17T12:30:00Z",
-      "content": "Comprehensive due diligence report for potential acquisition including financial analysis, legal considerations, operational synergies, and risk assessment. Complex business evaluation for AI processing.",
+      "date": "2025-09-18T12:30:00Z",
+      "content": "M&A due diligence analysis: financial modeling, regulatory compliance, operational integration, and cultural assessment. Complex business intelligence for AI evaluation.",
       "spaceId": "business",
       "viewCount": 910,
       "tags": ["ai_context", "m&a", "due_diligence", "acquisition"]
@@ -129,8 +129,8 @@
     {
       "title": "Dissertation: AI Ethics in Healthcare Decision Making",
       "type": "research",
-      "date": "2024-11-16T13:45:00Z",
-      "content": "Extensive research dissertation examining ethical considerations in AI-assisted healthcare decisions. Covers bias, transparency, accountability, and patient autonomy. Complex ethical analysis for AI understanding.",
+      "date": "2025-11-25T13:45:00Z",
+      "content": "AI ethics dissertation: algorithmic fairness, explainable AI, and healthcare bias mitigation. Ethical framework development for AI decision-making systems.",
       "spaceId": "education",
       "viewCount": 790,
       "tags": ["ai_context", "ethics", "ai", "healthcare"]
@@ -138,8 +138,8 @@
     {
       "title": "Advanced Diagnostic Imaging Results with Clinical Correlation",
       "type": "lab_result",
-      "date": "2024-11-15T08:45:00Z",
-      "content": "Comprehensive imaging results including MRI, CT, and specialized scans with detailed clinical correlation. Complex medical imaging data with multiple findings for AI interpretation.",
+      "date": "2025-10-10T08:45:00Z",
+      "content": "Advanced medical imaging analysis: multi-modal diagnostic integration, radiomics features, and clinical correlation. Complex imaging data for AI diagnostic support.",
       "spaceId": "health",
       "viewCount": 930,
       "tags": ["ai_context", "imaging", "diagnostic", "clinical"]
@@ -147,8 +147,8 @@
     {
       "title": "Global Expansion Strategy with Market Entry Analysis",
       "type": "project_update",
-      "date": "2024-11-14T09:30:00Z",
-      "content": "Detailed global expansion strategy including market entry analysis, regulatory considerations, cultural factors, and competitive landscape. Comprehensive international business plan for AI evaluation.",
+      "date": "2025-11-20T09:30:00Z",
+      "content": "International market entry strategy: regulatory compliance, cultural adaptation, and competitive positioning. Global expansion analytics for AI business intelligence.",
       "spaceId": "business",
       "viewCount": 860,
       "tags": ["ai_context", "expansion", "global", "strategy"]
@@ -156,8 +156,8 @@
     {
       "title": "Advanced Programming Concepts: Distributed Systems",
       "type": "lecture",
-      "date": "2024-11-13T10:15:00Z",
-      "content": "Comprehensive lecture notes on distributed systems including consensus algorithms, fault tolerance, scalability patterns, and cloud architectures. Complex technical content for AI understanding.",
+      "date": "2025-09-08T10:15:00Z",
+      "content": "Distributed computing systems: consensus protocols, fault tolerance mechanisms, and microservices architecture. Advanced technical concepts for AI comprehension.",
       "spaceId": "education",
       "viewCount": 710,
       "tags": ["ai_context", "programming", "distributed", "systems"]
@@ -165,8 +165,8 @@
     {
       "title": "Chronic Disease Management with Multi-Specialty Coordination",
       "type": "medication",
-      "date": "2024-11-12T15:00:00Z",
-      "content": "Comprehensive chronic disease management plan coordinating care across multiple specialties. Includes medication reconciliation, monitoring protocols, and care transition plans for AI analysis.",
+      "date": "2025-10-28T15:00:00Z",
+      "content": "Multi-specialty care coordination: integrated treatment protocols, medication management, and outcome tracking. Chronic disease analytics for AI healthcare support.",
       "spaceId": "health",
       "viewCount": 840,
       "tags": ["ai_context", "chronic", "disease", "coordination"]
@@ -174,8 +174,8 @@
     {
       "title": "Venture Capital Investment Thesis with Portfolio Analysis",
       "type": "project_update",
-      "date": "2024-11-11T16:20:00Z",
-      "content": "Detailed investment thesis with portfolio analysis including sector allocation, risk metrics, performance projections, and exit strategies. Complex financial analysis for AI evaluation.",
+      "date": "2025-11-05T16:20:00Z",
+      "content": "Investment portfolio optimization: risk-return analysis, sector diversification, and performance attribution. Financial analytics for AI investment decision support.",
       "spaceId": "business",
       "viewCount": 890,
       "tags": ["ai_context", "vc", "investment", "portfolio"]
@@ -183,8 +183,8 @@
     {
       "title": "Advanced Research Methods in Social Sciences",
       "type": "course",
-      "date": "2024-11-10T11:00:00Z",
-      "content": "Comprehensive course material on advanced research methods including statistical analysis, experimental design, data collection techniques, and ethical considerations. Complex methodology for AI understanding.",
+      "date": "2025-09-15T11:00:00Z",
+      "content": "Research methodology course: experimental design, statistical inference, and data analysis techniques. Advanced research methods for AI comprehension of academic work.",
       "spaceId": "education",
       "viewCount": 680,
       "tags": ["ai_context", "research", "methods", "social_sciences"]
@@ -192,8 +192,8 @@
     {
       "title": "Preventive Health Screening with Risk Stratification",
       "type": "doctor_visit",
-      "date": "2024-11-09T07:45:00Z",
-      "content": "Comprehensive preventive health screening with detailed risk stratification based on family history, lifestyle factors, and biomarkers. Personalized prevention plan for AI analysis.",
+      "date": "2025-10-20T07:45:00Z",
+      "content": "Preventive health assessment: risk stratification algorithms, biomarker analysis, and personalized intervention planning. Preventive care analytics for AI support.",
       "spaceId": "health",
       "viewCount": 760,
       "tags": ["ai_context", "preventive", "screening", "risk"]
@@ -201,8 +201,8 @@
     {
       "title": "Digital Transformation Strategy with Technology Roadmap",
       "type": "project_update",
-      "date": "2024-11-08T13:30:00Z",
-      "content": "Comprehensive digital transformation strategy with detailed technology roadmap, implementation phases, and ROI projections. Complex strategic plan for AI evaluation.",
+      "date": "2025-11-16T13:30:00Z",
+      "content": "Digital transformation roadmap: technology adoption strategy, change management, and ROI modeling. Strategic planning analytics for AI business intelligence.",
       "spaceId": "business",
       "viewCount": 820,
       "tags": ["ai_context", "digital", "transformation", "strategy"]
@@ -210,8 +210,8 @@
     {
       "title": "Advanced Data Science Techniques: Deep Learning Applications",
       "type": "lecture",
-      "date": "2024-11-07T14:45:00Z",
-      "content": "Comprehensive lecture on deep learning applications including neural network architectures, training methodologies, and practical implementations. Complex technical content for AI understanding.",
+      "date": "2025-09-22T14:45:00Z",
+      "content": "Deep learning architectures: transformer models, attention mechanisms, and generative networks. Advanced neural network concepts for AI comprehension.",
       "spaceId": "education",
       "viewCount": 740,
       "tags": ["ai_context", "data_science", "deep_learning", "neural_networks"]
@@ -219,8 +219,8 @@
     {
       "title": "Comprehensive Medication Review with Drug Interaction Analysis",
       "type": "medication",
-      "date": "2024-11-06T08:30:00Z",
-      "content": "Detailed medication review with comprehensive drug interaction analysis, dosing optimization, and monitoring recommendations. Complex pharmaceutical data for AI evaluation.",
+      "date": "2025-10-12T08:30:00Z",
+      "content": "Pharmacokinetic analysis: drug interactions, metabolic pathways, and therapeutic optimization. Complex pharmaceutical data for AI clinical decision support.",
       "spaceId": "health",
       "viewCount": 800,
       "tags": ["ai_context", "medication", "pharmaceutical", "interaction"]
@@ -228,8 +228,8 @@
     {
       "title": "Corporate Restructuring Plan with Financial Impact Analysis",
       "type": "project_update",
-      "date": "2024-11-05T09:15:00Z",
-      "content": "Comprehensive corporate restructuring plan with detailed financial impact analysis, operational changes, and stakeholder considerations. Complex business reorganization for AI analysis.",
+      "date": "2025-11-10T09:15:00Z",
+      "content": "Corporate restructuring analysis: financial impact modeling, operational changes, and stakeholder management. Business reorganization analytics for AI evaluation.",
       "spaceId": "business",
       "viewCount": 870,
       "tags": ["ai_context", "restructuring", "financial", "impact"]
@@ -237,8 +237,8 @@
     {
       "title": "Advanced Linguistics: Computational Language Processing",
       "type": "course",
-      "date": "2024-11-04T10:45:00Z",
-      "content": "Comprehensive course material on computational linguistics including natural language processing, syntax analysis, and semantic modeling. Complex linguistic concepts for AI understanding.",
+      "date": "2025-09-05T10:45:00Z",
+      "content": "Computational linguistics: NLP algorithms, semantic analysis, and language model architectures. Advanced linguistic processing for AI comprehension.",
       "spaceId": "education",
       "viewCount": 690,
       "tags": ["ai_context", "linguistics", "nlp", "computation"]
@@ -246,8 +246,8 @@
     {
       "title": "Advanced Cardiac Monitoring with Continuous Data Analysis",
       "type": "vital_signs",
-      "date": "2024-11-03T11:30:00Z",
-      "content": "Continuous cardiac monitoring data with advanced analysis including arrhythmia detection, heart rate variability, and predictive modeling. Complex physiological data for AI interpretation.",
+      "date": "2025-10-25T11:30:00Z",
+      "content": "Cardiac monitoring analytics: arrhythmia classification, hemodynamic patterns, and predictive modeling. Advanced physiological data analysis for AI interpretation.",
       "spaceId": "health",
       "viewCount": 900,
       "tags": ["ai_context", "cardiac", "monitoring", "physiological"]
@@ -255,8 +255,8 @@
     {
       "title": "IPO Preparation Strategy with Regulatory Compliance",
       "type": "project_update",
-      "date": "2024-11-02T12:15:00Z",
-      "content": "Comprehensive IPO preparation strategy including regulatory compliance, financial reporting, investor relations, and market positioning. Complex financial transaction for AI analysis.",
+      "date": "2025-11-22T12:15:00Z",
+      "content": "IPO preparation analytics: regulatory compliance, financial modeling, and market positioning. Complex financial transaction analysis for AI evaluation.",
       "spaceId": "business",
       "viewCount": 940,
       "tags": ["ai_context", "ipo", "regulatory", "compliance"]
@@ -264,8 +264,8 @@
     {
       "title": "Advanced Neuroscience: Cognitive Function Assessment",
       "type": "research",
-      "date": "2024-11-01T13:00:00Z",
-      "content": "Comprehensive research on cognitive function assessment including neuroimaging, behavioral tests, and computational models. Complex neuroscience data for AI understanding.",
+      "date": "2025-09-30T13:00:00Z",
+      "content": "Cognitive neuroscience research: neuroimaging analysis, behavioral assessment, and computational modeling. Advanced neuroscience data for AI understanding.",
       "spaceId": "education",
       "viewCount": 770,
       "tags": ["ai_context", "neuroscience", "cognitive", "research"]
@@ -273,8 +273,8 @@
     {
       "title": "Comprehensive Cancer Screening with Genetic Risk Assessment",
       "type": "lab_result",
-      "date": "2024-10-31T08:00:00Z",
-      "content": "Comprehensive cancer screening results with detailed genetic risk assessment, biomarker analysis, and personalized screening recommendations. Complex oncological data for AI interpretation.",
+      "date": "2025-10-15T08:00:00Z",
+      "content": "Oncological risk assessment: genetic screening, biomarker analysis, and personalized prevention strategies. Complex cancer screening data for AI interpretation.",
       "spaceId": "health",
       "viewCount": 960,
       "tags": ["ai_context", "cancer", "screening", "oncology"]
@@ -282,8 +282,8 @@
     {
       "title": "Supply Chain Optimization with AI Integration",
       "type": "project_update",
-      "date": "2024-10-30T09:45:00Z",
-      "content": "Detailed supply chain optimization plan integrating AI technologies for demand forecasting, inventory management, and logistics coordination. Complex operational data for AI analysis.",
+      "date": "2025-11-08T09:45:00Z",
+      "content": "Supply chain analytics: demand forecasting, inventory optimization, and logistics coordination. AI-integrated supply chain management for business intelligence.",
       "spaceId": "business",
       "viewCount": 850,
       "tags": ["ai_context", "supply_chain", "optimization", "ai"]
@@ -291,8 +291,8 @@
     {
       "title": "Advanced Economics: Behavioral Finance Models",
       "type": "course",
-      "date": "2024-10-29T10:30:00Z",
-      "content": "Comprehensive material on behavioral finance models including cognitive biases, market anomalies, and investor psychology. Complex economic concepts for AI understanding.",
+      "date": "2025-09-18T10:30:00Z",
+      "content": "Behavioral finance analysis: cognitive biases, market inefficiencies, and investor behavior modeling. Complex economic concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 700,
       "tags": ["ai_context", "economics", "behavioral", "finance"]
@@ -300,8 +300,8 @@
     {
       "title": "Advanced Pulmonary Function Testing with Clinical Correlation",
       "type": "lab_result",
-      "date": "2024-10-28T11:15:00Z",
-      "content": "Comprehensive pulmonary function testing results with detailed clinical correlation, including spirometry, lung volumes, and diffusion capacity. Complex respiratory data for AI interpretation.",
+      "date": "2025-10-22T11:15:00Z",
+      "content": "Pulmonary function analytics: spirometry data, lung volumes, and gas exchange analysis. Complex respiratory diagnostics for AI clinical interpretation.",
       "spaceId": "health",
       "viewCount": 820,
       "tags": ["ai_context", "pulmonary", "function", "respiratory"]
@@ -309,8 +309,8 @@
     {
       "title": "Mergers & Acquisitions Integration Strategy",
       "type": "project_update",
-      "date": "2024-10-27T12:00:00Z",
-      "content": "Comprehensive integration strategy for post-acquisition operations including cultural alignment, system integration, and value realization. Complex business integration for AI analysis.",
+      "date": "2025-11-18T12:00:00Z",
+      "content": "Post-merger integration strategy: cultural alignment, system integration, and value creation modeling. Complex M&A analytics for AI business analysis.",
       "spaceId": "business",
       "viewCount": 880,
       "tags": ["ai_context", "m&a", "integration", "operations"]
@@ -318,8 +318,8 @@
     {
       "title": "Advanced Psychology: Cognitive Behavioral Therapy Techniques",
       "type": "lecture",
-      "date": "2024-10-26T13:45:00Z",
-      "content": "Comprehensive lecture on cognitive behavioral therapy techniques including intervention strategies, outcome measures, and case studies. Complex psychological concepts for AI understanding.",
+      "date": "2025-09-10T13:45:00Z",
+      "content": "Cognitive behavioral therapy research: intervention efficacy, outcome measures, and therapeutic mechanisms. Advanced psychological concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 730,
       "tags": ["ai_context", "psychology", "cbt", "therapy"]
@@ -327,8 +327,8 @@
     {
       "title": "Advanced Endocrinology: Hormone Panel with Comprehensive Analysis",
       "type": "lab_result",
-      "date": "2024-10-25T07:30:00Z",
-      "content": "Comprehensive hormone panel with detailed analysis of endocrine function, including thyroid, adrenal, and reproductive hormones. Complex endocrinological data for AI interpretation.",
+      "date": "2025-10-08T07:30:00Z",
+      "content": "Endocrine function analysis: hormone panel, metabolic markers, and regulatory pathway assessment. Complex endocrinological data for AI clinical interpretation.",
       "spaceId": "health",
       "viewCount": 870,
       "tags": ["ai_context", "endocrinology", "hormone", "analysis"]
@@ -336,8 +336,8 @@
     {
       "title": "Blockchain Implementation Strategy for Financial Services",
       "type": "project_update",
-      "date": "2024-10-24T08:15:00Z",
-      "content": "Comprehensive blockchain implementation strategy for financial services including security protocols, regulatory compliance, and scalability considerations. Complex technology strategy for AI analysis.",
+      "date": "2025-11-14T08:15:00Z",
+      "content": "Blockchain technology strategy: security protocols, regulatory compliance, and scalability modeling. Financial services blockchain implementation for AI analysis.",
       "spaceId": "business",
       "viewCount": 910,
       "tags": ["ai_context", "blockchain", "finance", "strategy"]
@@ -345,8 +345,8 @@
     {
       "title": "Advanced Chemistry: Organic Synthesis and Mechanisms",
       "type": "lecture",
-      "date": "2024-10-23T09:00:00Z",
-      "content": "Comprehensive lecture on organic synthesis and reaction mechanisms including stereochemistry, catalysis, and industrial applications. Complex chemical concepts for AI understanding.",
+      "date": "2025-09-25T09:00:00Z",
+      "content": "Organic synthesis research: catalytic mechanisms, stereochemistry, and industrial applications. Advanced chemical concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 670,
       "tags": ["ai_context", "chemistry", "organic", "synthesis"]
@@ -354,8 +354,8 @@
     {
       "title": "Advanced Gastroenterology: Comprehensive Digestive Health Assessment",
       "type": "doctor_visit",
-      "date": "2024-10-22T10:30:00Z",
-      "content": "Comprehensive digestive health assessment including endoscopy results, microbiome analysis, and nutritional evaluation. Complex gastroenterological data for AI interpretation.",
+      "date": "2025-10-30T10:30:00Z",
+      "content": "Gastroenterological assessment: endoscopy data, microbiome analysis, and metabolic evaluation. Complex digestive health data for AI clinical interpretation.",
       "spaceId": "health",
       "viewCount": 840,
       "tags": ["ai_context", "gastroenterology", "digestive", "assessment"]
@@ -363,7 +363,7 @@
     {
       "title": "Cryptocurrency Market Analysis with Risk Assessment",
       "type": "project_update",
-      "date": "2024-10-21T11:15:00Z",
+      "date": "2025-10-21T11:15:00Z",
       "content": "Detailed cryptocurrency market analysis including price trends, volatility metrics, and regulatory impact assessment. Complex financial analysis for AI evaluation.",
       "spaceId": "business",
       "viewCount": 790,
@@ -372,8 +372,8 @@
     {
       "title": "Advanced Biology: Genomics and Proteomics Integration",
       "type": "research",
-      "date": "2024-10-20T12:00:00Z",
-      "content": "Comprehensive research on genomics and proteomics integration including sequencing technologies, data analysis, and clinical applications. Complex biological data for AI understanding.",
+      "date": "2025-09-12T12:00:00Z",
+      "content": "Genomics and proteomics research: sequencing analysis, protein structure prediction, and clinical applications. Complex biological data for AI understanding.",
       "spaceId": "education",
       "viewCount": 760,
       "tags": ["ai_context", "biology", "genomics", "proteomics"]
@@ -381,8 +381,8 @@
     {
       "title": "Advanced Nephrology: Kidney Function Assessment with Treatment Plan",
       "type": "lab_result",
-      "date": "2024-10-19T13:30:00Z",
-      "content": "Comprehensive kidney function assessment including GFR, proteinuria, and electrolyte balance with detailed treatment recommendations. Complex nephrological data for AI interpretation.",
+      "date": "2025-10-18T13:30:00Z",
+      "content": "Nephrological function analysis: GFR modeling, proteinuria assessment, and electrolyte balance. Complex kidney function data for AI clinical interpretation.",
       "spaceId": "health",
       "viewCount": 890,
       "tags": ["ai_context", "nephrology", "kidney", "function"]
@@ -390,8 +390,8 @@
     {
       "title": "Artificial Intelligence Implementation Roadmap for Enterprise",
       "type": "project_update",
-      "date": "2024-10-18T07:45:00Z",
-      "content": "Comprehensive AI implementation roadmap including technology stack, data requirements, ethical considerations, and ROI projections. Complex enterprise strategy for AI analysis.",
+      "date": "2025-11-25T07:45:00Z",
+      "content": "AI implementation strategy: technology architecture, data governance, and ROI modeling. Enterprise AI adoption roadmap for AI strategic analysis.",
       "spaceId": "business",
       "viewCount": 930,
       "tags": ["ai_context", "ai", "implementation", "enterprise"]
@@ -399,8 +399,8 @@
     {
       "title": "Advanced Mathematics: Differential Geometry Applications",
       "type": "lecture",
-      "date": "2024-10-17T08:30:00Z",
-      "content": "Comprehensive lecture on differential geometry applications including tensor calculus, manifolds, and applications in physics. Complex mathematical concepts for AI understanding.",
+      "date": "2025-09-08T08:30:00Z",
+      "content": "Differential geometry applications: tensor calculus, Riemannian manifolds, and physics applications. Advanced mathematical concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 650,
       "tags": ["ai_context", "mathematics", "differential", "geometry"]
@@ -408,8 +408,8 @@
     {
       "title": "Advanced Ophthalmology: Comprehensive Eye Health Assessment",
       "type": "lab_result",
-      "date": "2024-10-16T09:15:00Z",
-      "content": "Comprehensive eye health assessment including visual field testing, OCT imaging, and intraocular pressure measurements. Complex ophthalmological data for AI interpretation.",
+      "date": "2025-10-14T09:15:00Z",
+      "content": "Ophthalmological assessment: visual field analysis, OCT imaging, and pressure modeling. Complex eye health data for AI clinical interpretation.",
       "spaceId": "health",
       "viewCount": 780,
       "tags": ["ai_context", "ophthalmology", "eye", "assessment"]
@@ -417,8 +417,8 @@
     {
       "title": "Sustainable Business Practices with ESG Integration",
       "type": "project_update",
-      "date": "2024-10-15T10:00:00Z",
-      "content": "Comprehensive sustainable business practices plan with ESG integration, carbon footprint analysis, and sustainability metrics. Complex environmental strategy for AI evaluation.",
+      "date": "2025-11-12T10:00:00Z",
+      "content": "Sustainability strategy: ESG integration, carbon footprint modeling, and environmental metrics. Sustainable business analytics for AI evaluation.",
       "spaceId": "business",
       "viewCount": 860,
       "tags": ["ai_context", "sustainability", "esg", "environmental"]
@@ -426,8 +426,8 @@
     {
       "title": "Advanced Physics: Particle Physics and Standard Model",
       "type": "lecture",
-      "date": "2024-10-14T11:45:00Z",
-      "content": "Comprehensive lecture on particle physics and the Standard Model including fundamental particles, forces, and experimental evidence. Complex physics concepts for AI understanding.",
+      "date": "2025-09-20T11:45:00Z",
+      "content": "Particle physics research: Standard Model, fundamental forces, and experimental evidence. Advanced physics concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 710,
       "tags": ["ai_context", "physics", "particle", "standard_model"]
@@ -435,8 +435,8 @@
     {
       "title": "Advanced Rheumatology: Autoimmune Disease Management",
       "type": "medication",
-      "date": "2024-10-13T12:30:00Z",
-      "content": "Comprehensive autoimmune disease management plan including immunosuppressive therapy, monitoring protocols, and lifestyle modifications. Complex rheumatological data for AI interpretation.",
+      "date": "2025-10-28T12:30:00Z",
+      "content": "Autoimmune disease management: immunosuppressive protocols, biomarker monitoring, and lifestyle interventions. Complex rheumatological data for AI interpretation.",
       "spaceId": "health",
       "viewCount": 850,
       "tags": ["ai_context", "rheumatology", "autoimmune", "disease"]
@@ -444,8 +444,8 @@
     {
       "title": "Cross-Border Investment Analysis with Regulatory Compliance",
       "type": "project_update",
-      "date": "2024-10-12T13:15:00Z",
-      "content": "Detailed cross-border investment analysis including regulatory compliance, tax implications, and currency risk management. Complex international finance for AI evaluation.",
+      "date": "2025-11-03T13:15:00Z",
+      "content": "International investment analysis: regulatory compliance, currency hedging, and tax optimization. Complex cross-border finance for AI evaluation.",
       "spaceId": "business",
       "viewCount": 900,
       "tags": ["ai_context", "investment", "cross-border", "regulatory"]
@@ -453,8 +453,8 @@
     {
       "title": "Advanced Literature: Postcolonial Theory Analysis",
       "type": "course",
-      "date": "2024-10-11T07:00:00Z",
-      "content": "Comprehensive analysis of postcolonial theory in literature including key theorists, literary examples, and cultural implications. Complex literary concepts for AI understanding.",
+      "date": "2025-09-16T07:00:00Z",
+      "content": "Postcolonial literature analysis: theoretical frameworks, cultural implications, and historical contexts. Complex literary concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 620,
       "tags": ["ai_context", "literature", "postcolonial", "theory"]
@@ -462,8 +462,8 @@
     {
       "title": "Advanced Dermatology: Comprehensive Skin Health Assessment",
       "type": "lab_result",
-      "date": "2024-10-10T08:45:00Z",
-      "content": "Comprehensive skin health assessment including dermatoscopy, biopsy results, and allergy testing with treatment recommendations. Complex dermatological data for AI interpretation.",
+      "date": "2025-10-20T08:45:00Z",
+      "content": "Dermatological assessment: imaging analysis, biopsy results, and allergy testing. Complex skin health data for AI clinical interpretation.",
       "spaceId": "health",
       "viewCount": 740,
       "tags": ["ai_context", "dermatology", "skin", "assessment"]
@@ -471,8 +471,8 @@
     {
       "title": "Mergers & Acquisitions: Valuation Models and Pricing Strategy",
       "type": "project_update",
-      "date": "2024-10-09T09:30:00Z",
-      "content": "Comprehensive valuation models for M&A transactions including DCF analysis, comparable company analysis, and precedent transaction analysis. Complex financial modeling for AI evaluation.",
+      "date": "2025-11-18T09:30:00Z",
+      "content": "M&A valuation modeling: DCF analysis, comparable transactions, and precedent modeling. Complex financial analytics for AI evaluation.",
       "spaceId": "business",
       "viewCount": 920,
       "tags": ["ai_context", "m&a", "valuation", "pricing"]
@@ -480,8 +480,8 @@
     {
       "title": "Advanced Philosophy: Ethics in Artificial Intelligence",
       "type": "lecture",
-      "date": "2024-10-08T10:15:00Z",
-      "content": "Comprehensive lecture on ethics in artificial intelligence including bias, fairness, accountability, and moral decision-making. Complex philosophical concepts for AI understanding.",
+      "date": "2025-09-05T10:15:00Z",
+      "content": "AI ethics research: algorithmic bias, fairness metrics, and accountability frameworks. Complex ethical concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 680,
       "tags": ["ai_context", "philosophy", "ethics", "ai"]
@@ -489,8 +489,8 @@
     {
       "title": "Advanced Hematology: Blood Disorder Comprehensive Evaluation",
       "type": "lab_result",
-      "date": "2024-10-07T11:00:00Z",
-      "content": "Comprehensive blood disorder evaluation including complete blood count, coagulation studies, and genetic testing with treatment protocols. Complex hematological data for AI interpretation.",
+      "date": "2025-10-12T11:00:00Z",
+      "content": "Hematological assessment: blood count analysis, coagulation studies, and genetic markers. Complex blood disorder data for AI clinical interpretation.",
       "spaceId": "health",
       "viewCount": 880,
       "tags": ["ai_context", "hematology", "blood", "disorder"]
@@ -498,8 +498,8 @@
     {
       "title": "Initial Public Offering: Financial Reporting and Compliance",
       "type": "project_update",
-      "date": "2024-10-06T12:45:00Z",
-      "content": "Comprehensive financial reporting requirements for IPO including SEC filings, audit procedures, and ongoing compliance obligations. Complex financial regulation for AI evaluation.",
+      "date": "2025-11-10T12:45:00Z",
+      "content": "IPO financial reporting: SEC compliance, audit procedures, and regulatory requirements. Complex financial regulation for AI evaluation.",
       "spaceId": "business",
       "viewCount": 950,
       "tags": ["ai_context", "ipo", "financial", "compliance"]
@@ -507,8 +507,8 @@
     {
       "title": "Advanced Sociology: Social Network Analysis",
       "type": "research",
-      "date": "2024-10-05T13:30:00Z",
-      "content": "Comprehensive research on social network analysis including mathematical models, data visualization, and behavioral patterns. Complex social science concepts for AI understanding.",
+      "date": "2025-09-22T13:30:00Z",
+      "content": "Social network analysis: mathematical models, behavioral patterns, and data visualization. Complex social science concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 750,
       "tags": ["ai_context", "sociology", "social_network", "analysis"]
@@ -516,8 +516,8 @@
     {
       "title": "Advanced Urology: Prostate Health Comprehensive Assessment",
       "type": "lab_result",
-      "date": "2024-10-04T07:15:00Z",
-      "content": "Comprehensive prostate health assessment including PSA levels, imaging results, and genetic markers with personalized treatment recommendations. Complex urological data for AI interpretation.",
+      "date": "2025-10-25T07:15:00Z",
+      "content": "Urological assessment: PSA analysis, imaging data, and genetic markers. Complex prostate health data for AI clinical interpretation.",
       "spaceId": "health",
       "viewCount": 810,
       "tags": ["ai_context", "urology", "prostate", "assessment"]
@@ -525,8 +525,8 @@
     {
       "title": "Venture Capital Due Diligence: Technology Startup Evaluation",
       "type": "project_update",
-      "date": "2024-10-03T08:00:00Z",
-      "content": "Comprehensive due diligence evaluation of technology startup including market analysis, technical assessment, team evaluation, and financial projections. Complex investment analysis for AI evaluation.",
+      "date": "2025-11-05T08:00:00Z",
+      "content": "Technology startup evaluation: market analysis, technical assessment, and financial modeling. Complex due diligence for AI investment analysis.",
       "spaceId": "business",
       "viewCount": 890,
       "tags": ["ai_context", "vc", "due_diligence", "startup"]
@@ -534,8 +534,8 @@
     {
       "title": "Advanced Linguistics: Historical Language Development",
       "type": "course",
-      "date": "2024-10-02T09:45:00Z",
-      "content": "Comprehensive course on historical language development including proto-languages, language families, and evolution patterns. Complex linguistic concepts for AI understanding.",
+      "date": "2025-09-14T09:45:00Z",
+      "content": "Historical linguistics: proto-languages, evolution patterns, and language families. Complex linguistic concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 640,
       "tags": ["ai_context", "linguistics", "historical", "language"]
@@ -543,8 +543,8 @@
     {
       "title": "Advanced Orthopedics: Joint Replacement Comprehensive Care Plan",
       "type": "doctor_visit",
-      "date": "2024-10-01T10:30:00Z",
-      "content": "Comprehensive care plan for joint replacement including pre-operative assessment, surgical procedure details, rehabilitation protocol, and long-term monitoring. Complex orthopedic data for AI interpretation.",
+      "date": "2025-10-18T10:30:00Z",
+      "content": "Orthopedic care planning: pre-operative assessment, surgical protocols, and rehabilitation modeling. Complex joint replacement data for AI interpretation.",
       "spaceId": "health",
       "viewCount": 860,
       "tags": ["ai_context", "orthopedics", "joint", "replacement"]
@@ -552,8 +552,8 @@
     {
       "title": "Private Equity Investment Strategy with Portfolio Management",
       "type": "project_update",
-      "date": "2024-09-30T11:15:00Z",
-      "content": "Comprehensive private equity investment strategy including target identification, valuation, portfolio construction, and exit planning. Complex investment strategy for AI evaluation.",
+      "date": "2025-11-22T11:15:00Z",
+      "content": "Private equity strategy: target identification, valuation modeling, and portfolio optimization. Complex investment strategy for AI evaluation.",
       "spaceId": "business",
       "viewCount": 910,
       "tags": ["ai_context", "private_equity", "investment", "portfolio"]
@@ -561,8 +561,8 @@
     {
       "title": "Advanced Mathematics: Topology and Its Applications",
       "type": "lecture",
-      "date": "2024-09-29T12:00:00Z",
-      "content": "Comprehensive lecture on topology and its applications including metric spaces, continuity, and topological invariants. Complex mathematical concepts for AI understanding.",
+      "date": "2025-09-08T12:00:00Z",
+      "content": "Topology research: metric spaces, continuity, and topological invariants. Advanced mathematical concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 660,
       "tags": ["ai_context", "mathematics", "topology", "applications"]
@@ -570,8 +570,8 @@
     {
       "title": "Advanced Psychiatry: Mental Health Treatment Optimization",
       "type": "medication",
-      "date": "2024-09-28T13:45:00Z",
-      "content": "Comprehensive mental health treatment optimization including medication management, therapy integration, and outcome monitoring. Complex psychiatric data for AI interpretation.",
+      "date": "2025-10-15T13:45:00Z",
+      "content": "Psychiatric treatment optimization: medication management, therapy integration, and outcome modeling. Complex mental health data for AI interpretation.",
       "spaceId": "health",
       "viewCount": 940,
       "tags": ["ai_context", "psychiatry", "mental", "treatment"]
@@ -579,8 +579,8 @@
     {
       "title": "International Trade Compliance with Risk Management",
       "type": "project_update",
-      "date": "2024-09-27T07:30:0Z",
-      "content": "Comprehensive international trade compliance plan including customs regulations, trade agreements, and risk management strategies. Complex international business for AI evaluation.",
+      "date": "2025-11-08T07:30:0Z",
+      "content": "International trade compliance: customs regulations, trade agreements, and risk modeling. Complex global business for AI evaluation.",
       "spaceId": "business",
       "viewCount": 870,
       "tags": ["ai_context", "trade", "compliance", "risk"]
@@ -588,8 +588,8 @@
     {
       "title": "Advanced Physics: Quantum Field Theory Fundamentals",
       "type": "research",
-      "date": "2024-09-26T08:15:00Z",
-      "content": "Comprehensive research on quantum field theory fundamentals including field quantization, Feynman diagrams, and renormalization. Complex physics concepts for AI understanding.",
+      "date": "2025-09-20T08:15:00Z",
+      "content": "Quantum field theory research: field quantization, Feynman diagrams, and renormalization. Advanced physics concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 720,
       "tags": ["ai_context", "physics", "quantum", "field_theory"]
@@ -597,8 +597,8 @@
     {
       "title": "Advanced Neurology: Comprehensive Brain Health Assessment",
       "type": "lab_result",
-      "date": "2024-09-25T09:00:0Z",
-      "content": "Comprehensive brain health assessment including neuroimaging, cognitive testing, and biomarker analysis with treatment recommendations. Complex neurological data for AI interpretation.",
+      "date": "2025-10-30T09:00:0Z",
+      "content": "Neurological assessment: neuroimaging analysis, cognitive testing, and biomarker modeling. Complex brain health data for AI interpretation.",
       "spaceId": "health",
       "viewCount": 970,
       "tags": ["ai_context", "neurology", "brain", "assessment"]
@@ -606,8 +606,8 @@
     {
       "title": "Corporate Finance: Capital Structure Optimization",
       "type": "project_update",
-      "date": "2024-09-24T10:45:00Z",
-      "content": "Comprehensive capital structure optimization analysis including debt-equity ratios, cost of capital, and financial risk assessment. Complex financial strategy for AI evaluation.",
+      "date": "2025-11-16T10:45:00Z",
+      "content": "Capital structure optimization: debt-equity modeling, cost of capital analysis, and risk assessment. Complex financial strategy for AI evaluation.",
       "spaceId": "business",
       "viewCount": 840,
       "tags": ["ai_context", "corporate", "finance", "capital"]
@@ -615,8 +615,8 @@
     {
       "title": "Advanced Economics: Game Theory Applications",
       "type": "lecture",
-      "date": "2024-09-23T11:30:00Z",
-      "content": "Comprehensive lecture on game theory applications including Nash equilibrium, strategic decision making, and auction theory. Complex economic concepts for AI understanding.",
+      "date": "2025-09-12T11:30:00Z",
+      "content": "Game theory applications: Nash equilibrium, strategic decision modeling, and auction theory. Complex economic concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 690,
       "tags": ["ai_context", "economics", "game_theory", "applications"]
@@ -624,8 +624,8 @@
     {
       "title": "Advanced Immunology: Immune System Comprehensive Analysis",
       "type": "lab_result",
-      "date": "2024-09-22T12:15:00Z",
-      "content": "Comprehensive immune system analysis including immunoglobulin levels, lymphocyte subsets, and autoimmune markers with treatment protocols. Complex immunological data for AI interpretation.",
+      "date": "2025-10-10T12:15:00Z",
+      "content": "Immunological assessment: immunoglobulin analysis, lymphocyte subsets, and autoimmune markers. Complex immune system data for AI interpretation.",
       "spaceId": "health",
       "viewCount": 830,
       "tags": ["ai_context", "immunology", "immune", "analysis"]
@@ -633,8 +633,8 @@
     {
       "title": "Real Estate Investment Trust Analysis with Market Trends",
       "type": "project_update",
-      "date": "2024-09-21T13:00:00Z",
-      "content": "Comprehensive REIT analysis including property portfolio, market trends, dividend yields, and risk factors. Complex real estate finance for AI evaluation.",
+      "date": "2025-11-03T13:00:00Z",
+      "content": "REIT analysis: property portfolio, market trends, and dividend modeling. Complex real estate finance for AI evaluation.",
       "spaceId": "business",
       "viewCount": 780,
       "tags": ["ai_context", "reit", "real_estate", "investment"]
@@ -642,8 +642,8 @@
     {
       "title": "Advanced Computer Science: Algorithmic Complexity Theory",
       "type": "course",
-      "date": "2024-09-20T07:45:00Z",
-      "content": "Comprehensive course on algorithmic complexity theory including P vs NP, computational complexity classes, and approximation algorithms. Complex computer science concepts for AI understanding.",
+      "date": "2025-09-28T07:45:00Z",
+      "content": "Algorithmic complexity research: P vs NP, computational classes, and approximation algorithms. Advanced computer science concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 700,
       "tags": ["ai_context", "computer_science", "algorithm", "complexity"]
@@ -651,8 +651,8 @@
     {
       "title": "Advanced Gynecology: Reproductive Health Comprehensive Assessment",
       "type": "lab_result",
-      "date": "2024-09-19T08:30:00Z",
-      "content": "Comprehensive reproductive health assessment including hormonal evaluation, imaging studies, and genetic screening with personalized care plans. Complex gynecological data for AI interpretation.",
+      "date": "2025-10-22T08:30:00Z",
+      "content": "Reproductive health assessment: hormonal evaluation, imaging analysis, and genetic screening. Complex gynecological data for AI interpretation.",
       "spaceId": "health",
       "viewCount": 770,
       "tags": ["ai_context", "gynecology", "reproductive", "health"]
@@ -660,8 +660,8 @@
     {
       "title": "Hedge Fund Strategy Analysis with Performance Metrics",
       "type": "project_update",
-      "date": "2024-09-18T09:15:00Z",
-      "content": "Comprehensive hedge fund strategy analysis including performance metrics, risk-adjusted returns, and market exposure assessment. Complex investment analysis for AI evaluation.",
+      "date": "2025-11-14T09:15:00Z",
+      "content": "Hedge fund strategy analysis: performance metrics, risk modeling, and market exposure. Complex investment analysis for AI evaluation.",
       "spaceId": "business",
       "viewCount": 850,
       "tags": ["ai_context", "hedge_fund", "strategy", "performance"]
@@ -669,8 +669,8 @@
     {
       "title": "Advanced Linguistics: Computational Syntax Analysis",
       "type": "research",
-      "date": "2024-09-17T10:00:00Z",
-      "content": "Comprehensive research on computational syntax analysis including parsing algorithms, grammatical frameworks, and natural language processing applications. Complex linguistic concepts for AI understanding.",
+      "date": "2025-09-06T10:00:00Z",
+      "content": "Computational syntax research: parsing algorithms, grammatical frameworks, and NLP applications. Complex linguistic concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 730,
       "tags": ["ai_context", "linguistics", "syntax", "computation"]
@@ -678,8 +678,8 @@
     {
       "title": "Advanced Cardiology: Heart Disease Prevention and Management",
       "type": "medication",
-      "date": "2024-09-16T11:45:00Z",
-      "content": "Comprehensive heart disease prevention and management plan including lifestyle modifications, medication protocols, and monitoring strategies. Complex cardiological data for AI interpretation.",
+      "date": "2025-10-18T11:45:00Z",
+      "content": "Cardiology prevention plan: lifestyle modifications, medication protocols, and monitoring systems. Complex heart disease data for AI interpretation.",
       "spaceId": "health",
       "viewCount": 920,
       "tags": ["ai_context", "cardiology", "heart", "disease"]
@@ -687,8 +687,8 @@
     {
       "title": "Private Credit Investment Analysis with Risk Assessment",
       "type": "project_update",
-      "date": "2024-09-15T12:30:00Z",
-      "content": "Comprehensive private credit investment analysis including credit risk assessment, collateral evaluation, and yield projections. Complex credit analysis for AI evaluation.",
+      "date": "2025-11-20T12:30:00Z",
+      "content": "Private credit analysis: credit risk modeling, collateral evaluation, and yield projections. Complex credit analysis for AI evaluation.",
       "spaceId": "business",
       "viewCount": 880,
       "tags": ["ai_context", "private_credit", "investment", "risk"]
@@ -696,8 +696,8 @@
     {
       "title": "Advanced Philosophy: Philosophy of Mind and Consciousness",
       "type": "lecture",
-      "date": "2024-09-14T13:15:00Z",
-      "content": "Comprehensive lecture on philosophy of mind and consciousness including materialism, dualism, and hard problem of consciousness. Complex philosophical concepts for AI understanding.",
+      "date": "2025-09-10T13:15:00Z",
+      "content": "Philosophy of mind research: materialism, dualism, and consciousness modeling. Complex philosophical concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 670,
       "tags": ["ai_context", "philosophy", "mind", "consciousness"]
@@ -705,7 +705,7 @@
     {
       "title": "Advanced Pulmonology: Respiratory Disease Management",
       "type": "doctor_visit",
-      "date": "2024-09-13T07:00:00Z",
+      "date": "2025-09-13T07:00:0Z",
       "content": "Comprehensive respiratory disease management including pulmonary function tests, treatment protocols, and lifestyle recommendations. Complex pulmonological data for AI interpretation.",
       "spaceId": "health",
       "viewCount": 800,
@@ -714,8 +714,8 @@
     {
       "title": "Commodity Trading Strategy with Market Analysis",
       "type": "project_update",
-      "date": "2024-09-12T08:45:00Z",
-      "content": "Comprehensive commodity trading strategy including market analysis, supply-demand dynamics, and risk management protocols. Complex trading strategy for AI evaluation.",
+      "date": "2025-11-05T08:45:00Z",
+      "content": "Commodity trading strategy: market analysis, supply-demand modeling, and risk management. Complex trading strategy for AI evaluation.",
       "spaceId": "business",
       "viewCount": 820,
       "tags": ["ai_context", "commodity", "trading", "strategy"]
@@ -723,8 +723,8 @@
     {
       "title": "Advanced Mathematics: Abstract Algebra Applications",
       "type": "course",
-      "date": "2024-09-11T09:30:00Z",
-      "content": "Comprehensive course on abstract algebra applications including group theory, ring theory, and field extensions. Complex mathematical concepts for AI understanding.",
+      "date": "2025-09-18T09:30:00Z",
+      "content": "Abstract algebra research: group theory, ring theory, and field extensions. Advanced mathematical concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 630,
       "tags": ["ai_context", "mathematics", "algebra", "abstract"]
@@ -732,8 +732,8 @@
     {
       "title": "Advanced Oncology: Cancer Treatment Protocol Optimization",
       "type": "lab_result",
-      "date": "2024-09-10T10:15:00Z",
-      "content": "Comprehensive cancer treatment protocol optimization including chemotherapy regimens, targeted therapy options, and monitoring schedules. Complex oncological data for AI interpretation.",
+      "date": "2025-10-15T10:15:00Z",
+      "content": "Oncological treatment optimization: chemotherapy protocols, targeted therapy, and monitoring schedules. Complex cancer treatment data for AI interpretation.",
       "spaceId": "health",
       "viewCount": 980,
       "tags": ["ai_context", "oncology", "cancer", "treatment"]
@@ -741,8 +741,8 @@
     {
       "title": "Foreign Exchange Strategy with Currency Risk Management",
       "type": "project_update",
-      "date": "2024-09-09T11:00:0Z",
-      "content": "Comprehensive foreign exchange strategy including currency risk management, hedging protocols, and market trend analysis. Complex forex strategy for AI evaluation.",
+      "date": "2025-11-12T11:00:0Z",
+      "content": "Foreign exchange strategy: currency risk modeling, hedging protocols, and trend analysis. Complex forex strategy for AI evaluation.",
       "spaceId": "business",
       "viewCount": 860,
       "tags": ["ai_context", "forex", "currency", "risk"]
@@ -750,8 +750,8 @@
     {
       "title": "Advanced Anthropology: Cultural Evolution Theory",
       "type": "research",
-      "date": "2024-09-08T12:45:00Z",
-      "content": "Comprehensive research on cultural evolution theory including memetics, cultural transmission, and anthropological evidence. Complex anthropological concepts for AI understanding.",
+      "date": "2025-09-25T12:45:00Z",
+      "content": "Cultural evolution research: memetics, transmission models, and anthropological evidence. Complex anthropological concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 680,
       "tags": ["ai_context", "anthropology", "cultural", "evolution"]
@@ -759,8 +759,8 @@
     {
       "title": "Advanced Endocrinology: Diabetes Technology Integration",
       "type": "medication",
-      "date": "2024-09-07T13:30:00Z",
-      "content": "Comprehensive diabetes technology integration including CGM systems, insulin pumps, and AI-based glucose prediction. Complex endocrinological data for AI interpretation.",
+      "date": "2025-10-20T13:30:00Z",
+      "content": "Diabetes technology integration: CGM systems, insulin pumps, and glucose prediction models. Complex endocrinological data for AI interpretation.",
       "spaceId": "health",
       "viewCount": 910,
       "tags": ["ai_context", "endocrinology", "diabetes", "technology"]
@@ -768,8 +768,8 @@
     {
       "title": "Infrastructure Investment Analysis with ESG Considerations",
       "type": "project_update",
-      "date": "2024-09-06T07:15:00Z",
-      "content": "Comprehensive infrastructure investment analysis including ESG considerations, regulatory frameworks, and long-term sustainability. Complex investment analysis for AI evaluation.",
+      "date": "2025-11-18T07:15:00Z",
+      "content": "Infrastructure investment analysis: ESG considerations, regulatory frameworks, and sustainability modeling. Complex investment analysis for AI evaluation.",
       "spaceId": "business",
       "viewCount": 890,
       "tags": ["ai_context", "infrastructure", "investment", "esg"]
@@ -777,8 +777,8 @@
     {
       "title": "Advanced Physics: Condensed Matter Theory",
       "type": "lecture",
-      "date": "2024-09-05T08:00:00Z",
-      "content": "Comprehensive lecture on condensed matter theory including crystal structures, band theory, and superconductivity. Complex physics concepts for AI understanding.",
+      "date": "2025-09-14T08:00:00Z",
+      "content": "Condensed matter research: crystal structures, band theory, and superconductivity. Advanced physics concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 710,
       "tags": ["ai_context", "physics", "condensed", "matter"]
@@ -786,8 +786,8 @@
     {
       "title": "Advanced Geriatrics: Comprehensive Aging Assessment",
       "type": "doctor_visit",
-      "date": "2024-09-04T09:45:00Z",
-      "content": "Comprehensive aging assessment including cognitive evaluation, functional capacity, and age-related disease prevention. Complex geriatric data for AI interpretation.",
+      "date": "2025-10-10T09:45:00Z",
+      "content": "Geriatric assessment: cognitive evaluation, functional capacity, and age-related disease prevention. Complex aging data for AI interpretation.",
       "spaceId": "health",
       "viewCount": 870,
       "tags": ["ai_context", "geriatrics", "aging", "assessment"]
@@ -795,8 +795,8 @@
     {
       "title": "Cryptocurrency Derivatives Trading Strategy",
       "type": "project_update",
-      "date": "2024-09-03T10:30:00Z",
-      "content": "Comprehensive cryptocurrency derivatives trading strategy including futures, options, and risk management protocols. Complex trading strategy for AI evaluation.",
+      "date": "2025-11-25T10:30:00Z",
+      "content": "Cryptocurrency derivatives strategy: futures, options, and risk management protocols. Complex derivatives trading for AI evaluation.",
       "spaceId": "business",
       "viewCount": 930,
       "tags": ["ai_context", "crypto", "derivatives", "trading"]
@@ -804,8 +804,8 @@
     {
       "title": "Advanced Biology: Systems Biology and Network Analysis",
       "type": "research",
-      "date": "2024-09-02T11:15:00Z",
-      "content": "Comprehensive research on systems biology and network analysis including metabolic pathways, gene regulatory networks, and computational modeling. Complex biological concepts for AI understanding.",
+      "date": "2025-09-22T11:15:00Z",
+      "content": "Systems biology research: metabolic pathways, gene networks, and computational modeling. Complex biological concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 740,
       "tags": ["ai_context", "biology", "systems", "network"]
@@ -813,8 +813,8 @@
     {
       "title": "Advanced Nephrology: Dialysis Management Optimization",
       "type": "lab_result",
-      "date": "2024-09-01T12:00:00Z",
-      "content": "Comprehensive dialysis management optimization including fluid balance, electrolyte management, and treatment scheduling. Complex nephrological data for AI interpretation.",
+      "date": "2025-10-28T12:00:00Z",
+      "content": "Dialysis management optimization: fluid balance, electrolyte management, and scheduling. Complex nephrological data for AI interpretation.",
       "spaceId": "health",
       "viewCount": 890,
       "tags": ["ai_context", "nephrology", "dialysis", "management"]
@@ -822,8 +822,8 @@
     {
       "title": "Alternative Investment Portfolio Construction",
       "type": "project_update",
-      "date": "2024-08-31T13:45:00Z",
-      "content": "Comprehensive alternative investment portfolio construction including hedge funds, private equity, real estate, and commodities. Complex portfolio strategy for AI evaluation.",
+      "date": "2025-11-15T13:45:00Z",
+      "content": "Alternative investment portfolio: hedge funds, private equity, real estate, and commodities. Complex portfolio construction for AI evaluation.",
       "spaceId": "business",
       "viewCount": 900,
       "tags": ["ai_context", "alternative", "investment", "portfolio"]
@@ -831,8 +831,8 @@
     {
       "title": "Advanced Chemistry: Quantum Chemistry Applications",
       "type": "lecture",
-      "date": "2024-08-30T07:30:00Z",
-      "content": "Comprehensive lecture on quantum chemistry applications including molecular orbital theory, computational chemistry, and spectroscopy. Complex chemical concepts for AI understanding.",
+      "date": "2025-09-08T07:30:00Z",
+      "content": "Quantum chemistry research: molecular orbital theory, computational methods, and spectroscopy. Advanced chemical concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 650,
       "tags": ["ai_context", "chemistry", "quantum", "applications"]
@@ -840,8 +840,8 @@
     {
       "title": "Advanced Ophthalmology: Vision Correction Technology",
       "type": "lab_result",
-      "date": "2024-08-29T08:15:00Z",
-      "content": "Comprehensive vision correction technology assessment including LASIK, IOL options, and refractive surgery outcomes. Complex ophthalmological data for AI interpretation.",
+      "date": "2025-10-18T08:15:00Z",
+      "content": "Vision correction technology: LASIK, IOL options, and refractive surgery outcomes. Complex ophthalmological data for AI interpretation.",
       "spaceId": "health",
       "viewCount": 760,
       "tags": ["ai_context", "ophthalmology", "vision", "correction"]
@@ -849,8 +849,8 @@
     {
       "title": "Sustainable Finance: Green Bond Market Analysis",
       "type": "project_update",
-      "date": "2024-08-28T09:00:00Z",
-      "content": "Comprehensive green bond market analysis including ESG criteria, impact measurement, and sustainability reporting. Complex sustainable finance for AI evaluation.",
+      "date": "2025-11-08T09:00:00Z",
+      "content": "Green bond market analysis: ESG criteria, impact measurement, and sustainability modeling. Complex sustainable finance for AI evaluation.",
       "spaceId": "business",
       "viewCount": 840,
       "tags": ["ai_context", "sustainable", "finance", "green_bond"]
@@ -858,8 +858,8 @@
     {
       "title": "Advanced Mathematics: Differential Equations in Biology",
       "type": "course",
-      "date": "2024-08-27T10:45:00Z",
-      "content": "Comprehensive course on differential equations in biological systems including population dynamics, epidemiological models, and biochemical reactions. Complex mathematical concepts for AI understanding.",
+      "date": "2025-09-16T10:45:00Z",
+      "content": "Differential equations in biology: population dynamics, epidemiological models, and biochemical reactions. Complex mathematical concepts for AI understanding.",
       "spaceId": "education",
       "viewCount": 660,
       "tags": ["ai_context", "mathematics", "differential", "biology"]
