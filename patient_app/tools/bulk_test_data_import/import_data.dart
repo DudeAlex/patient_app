@@ -427,11 +427,32 @@ class CliInterface {
       
       // Pull the database from the device using run-as
       final appId = 'com.example.patient_app';
-      final deviceDbPath = '/data/data/$appId/files/patient.isar';
+      final deviceDbPath = '/data/user/0/$appId/app_flutter/patient.isar';
+      
+      // Ensure the database exists on device
+      final existsResult = await Process.run('adb', [
+        'shell',
+        'run-as',
+        appId,
+        'sh',
+        '-c',
+        '[ -f $deviceDbPath ] && echo exists || echo missing',
+      ]);
+      final exists = existsResult.exitCode == 0 &&
+          (existsResult.stdout as String).trim().contains('exists');
+      
+      if (!exists) {
+        outputSuccess('Database not found on device; creating a fresh database locally.');
+        // Create an empty database locally so we can import into it and push back.
+        final tempDb = DatabaseService(tempDbFile.path);
+        await tempDb.open();
+        await tempDb.close();
+        return tempDbFile.path;
+      }
       
       // Use run-as to read the database file and save it locally
       final result = await Process.run('adb', [
-        'shell',
+        'exec-out',
         'run-as',
         appId,
         'cat',
@@ -444,7 +465,7 @@ class CliInterface {
       }
 
       // Write the database content to the temporary file
-      await tempDbFile.writeAsBytes(result.stdout);
+      await tempDbFile.writeAsBytes(result.stdout is List<int> ? result.stdout as List<int> : (result.stdout as String).codeUnits);
       outputSuccess('Database pulled successfully to: ${tempDbFile.path}');
       
       return tempDbFile.path;
@@ -460,35 +481,50 @@ class CliInterface {
       outputProgress('Pushing database back to device...', 0, 1);
       
       final appId = 'com.example.patient_app';
-      final deviceDbPath = '/data/data/$appId/files/patient.isar';
-      final tempDevicePath = '/sdcard/patient.isar';
-      
-      // First, push the file to the external storage (which doesn't require root)
-      final pushResult = await Process.run('adb', [
-        'push',
-        localDbPath,
-        tempDevicePath
+      final deviceDbPath = '/data/user/0/$appId/app_flutter/patient.isar';
+      final tempPushPath = '/data/local/tmp/patient_import.isar';
+
+      // Ensure target directory exists
+      final mkdirResult = await Process.run('adb', [
+        'shell',
+        'run-as',
+        appId,
+        'mkdir',
+        '-p',
+        '/data/user/0/$appId/app_flutter'
       ]);
-      
-      if (pushResult.exitCode != 0) {
-        outputError('Failed to push database to device: ${pushResult.stderr}');
+      if (mkdirResult.exitCode != 0) {
+        outputError('Failed to create app_flutter directory: ${mkdirResult.stderr}');
         return false;
       }
 
-      // Then, move the file to the app's private directory using run-as
+      // Push file to a temporary world-readable location
+      final pushResult = await Process.run('adb', [
+        'push',
+        localDbPath,
+        tempPushPath,
+      ]);
+      if (pushResult.exitCode != 0) {
+        outputError('Failed to push database to temp path: ${pushResult.stderr}');
+        return false;
+      }
+
+      // Move the file into the app sandbox using run-as (has access to temp path)
       final moveResult = await Process.run('adb', [
         'shell',
         'run-as',
         appId,
         'cp',
-        tempDevicePath,
-        deviceDbPath
+        tempPushPath,
+        deviceDbPath,
       ]);
-      
       if (moveResult.exitCode != 0) {
         outputError('Failed to move database to app directory: ${moveResult.stderr}');
         return false;
       }
+
+      // Clean up temp file
+      await Process.run('adb', ['shell', 'rm', tempPushPath]);
 
       // Optionally, restart the app to make sure Isar picks up the changes
       final restartResult = await Process.run('adb', [
