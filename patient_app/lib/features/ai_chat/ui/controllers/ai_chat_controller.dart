@@ -70,7 +70,11 @@ class AiChatController extends StateNotifier<AiChatState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final thread = await _loadChatHistoryUseCase.execute(spaceId);
+      if (!mounted) return;
+      
       final context = await _spaceContextBuilder.build(spaceId);
+      if (!mounted) return;
+      
       state = state.copyWith(
         isLoading: false,
         thread: thread,
@@ -83,6 +87,7 @@ class AiChatController extends StateNotifier<AiChatState> {
         stackTrace: stackTrace,
         context: {'spaceId': spaceId},
       );
+      if (!mounted) return;
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
   }
@@ -140,9 +145,12 @@ class AiChatController extends StateNotifier<AiChatState> {
         messageContent: content,
         attachments: attachmentInputs,
       );
+      if (!mounted) return;
 
       // Refresh thread from repository to reflect new messages/status.
       final refreshed = await _chatThreadRepository.getById(state.thread!.id);
+      if (!mounted) return;
+      
       state = state.copyWith(
         thread: refreshed ?? state.thread,
         attachments: const [],
@@ -155,6 +163,7 @@ class AiChatController extends StateNotifier<AiChatState> {
         stackTrace: stackTrace,
         context: {'threadId': state.thread?.id},
       );
+      if (!mounted) return;
       state = state.copyWith(isSending: false, errorMessage: e.toString());
     }
   }
@@ -167,6 +176,8 @@ class AiChatController extends StateNotifier<AiChatState> {
         content: content,
         attachments: state.attachments,
       );
+      if (!mounted) return;
+      
       state = state.copyWith(
         attachments: const [],
         isSending: false,
@@ -179,6 +190,7 @@ class AiChatController extends StateNotifier<AiChatState> {
         stackTrace: stackTrace,
         context: {'threadId': state.thread?.id},
       );
+      if (!mounted) return;
       state = state.copyWith(isSending: false, errorMessage: e.toString());
     }
   }
@@ -191,6 +203,8 @@ class AiChatController extends StateNotifier<AiChatState> {
         messageId,
         feedback,
       );
+      if (!mounted) return;
+      
       // Reload thread to update UI
       await loadInitial();
     } catch (e, stackTrace) {
@@ -221,6 +235,8 @@ class AiChatController extends StateNotifier<AiChatState> {
         newSpaceId: newSpaceId,
         shouldClearCurrentThread: shouldClearCurrent,
       );
+      if (!mounted) return;
+      
       state = state.copyWith(
         isLoading: false,
         thread: result.newThread,
@@ -233,6 +249,7 @@ class AiChatController extends StateNotifier<AiChatState> {
         stackTrace: stackTrace,
         context: {'currentSpace': spaceId, 'newSpace': newSpaceId},
       );
+      if (!mounted) return;
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
   }
