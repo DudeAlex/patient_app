@@ -691,7 +691,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onCustomInputChanged: _validateCustomDateRange,
             ),
             const SizedBox(height: 16),
-            const ContextMetricsCard(),
+            const riverpod.ProviderScope(
+              child: ContextMetricsCard(),
+            ),
             const SizedBox(height: 16),
             if (!isWeb) _BackupKeyCard(onManageKeys: _showBackupKeyDialog),
             if (!isWeb) const SizedBox(height: 16),
