@@ -16,6 +16,13 @@ import 'package:patient_app/core/diagnostics/app_logger.dart';
 import 'package:patient_app/core/infrastructure/storage/space_preferences.dart';
 import 'package:patient_app/features/records/data/records_service.dart';
 import 'package:patient_app/features/spaces/domain/space_registry.dart';
+import 'package:patient_app/core/ai/chat/domain/services/intent_driven_retriever.dart';
+import 'package:patient_app/core/ai/chat/domain/services/privacy_filter.dart';
+import 'package:patient_app/core/ai/chat/models/intent_retrieval_config.dart';
+import 'package:patient_app/core/ai/chat/domain/services/query_analyzer.dart';
+import 'package:patient_app/core/ai/chat/domain/services/keyword_extractor.dart';
+import 'package:patient_app/core/ai/chat/domain/services/intent_classifier.dart';
+import 'package:patient_app/core/ai/chat/domain/services/relevance_scorer.dart';
 
 /// Riverpod provider that builds [SpaceContext] for a given space.
 final spaceContextProvider =
@@ -64,6 +71,16 @@ final spaceContextBuilderProvider = FutureProvider<SpaceContextBuilder>((ref) as
     tokenBudgetAllocator: tokenAllocator,
     truncationStrategy: const ContextTruncationStrategy(),
     spaceManager: spaceManager,
+    intentDrivenRetriever: IntentDrivenRetriever(
+      relevanceScorer: RelevanceScorer(),
+      privacyFilter: PrivacyFilter(),
+      config: const IntentRetrievalConfig(),
+    ),
+    queryAnalyzer: QueryAnalyzer(
+      keywordExtractor: KeywordExtractor(),
+      intentClassifier: IntentClassifier(),
+    ),
+    intentRetrievalConfig: const IntentRetrievalConfig(),
     formatter: RecordSummaryFormatter(),
     maxRecords: tokenAllocator.context ~/ 100, // rough cap aligned to budget
     dateRange: dateRange, // Pass configured date range

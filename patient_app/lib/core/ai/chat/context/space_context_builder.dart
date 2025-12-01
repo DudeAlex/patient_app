@@ -3,6 +3,9 @@ import 'package:patient_app/core/ai/chat/context/context_filter_engine.dart';
 import 'package:patient_app/core/ai/chat/context/context_truncation_strategy.dart';
 import 'package:patient_app/core/ai/chat/context/record_relevance_scorer.dart';
 import 'package:patient_app/core/ai/chat/context/record_summary_formatter.dart';
+import 'package:patient_app/core/ai/chat/domain/services/intent_driven_retriever.dart';
+import 'package:patient_app/core/ai/chat/domain/services/query_analyzer.dart';
+import 'package:patient_app/core/ai/chat/models/intent_retrieval_config.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/models/context_filters.dart';
 import 'package:patient_app/core/ai/chat/models/context_stats.dart';
@@ -25,6 +28,9 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
     required RecordRelevanceScorer relevanceScorer,
     required TokenBudgetAllocator tokenBudgetAllocator,
     required ContextTruncationStrategy truncationStrategy,
+    required IntentDrivenRetriever intentDrivenRetriever,
+    required QueryAnalyzer queryAnalyzer,
+    required IntentRetrievalConfig intentRetrievalConfig,
     RecordSummaryFormatter? formatter,
     this.maxRecords = 20,
     DateRange? dateRange,
@@ -35,6 +41,9 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
         _relevanceScorer = relevanceScorer,
         _tokenBudgetAllocator = tokenBudgetAllocator,
         _truncationStrategy = truncationStrategy,
+        _intentDrivenRetriever = intentDrivenRetriever,
+        _queryAnalyzer = queryAnalyzer,
+        _intentRetrievalConfig = intentRetrievalConfig,
         _dateRange = dateRange ?? DateRange.last14Days(),
         _formatter = formatter ?? RecordSummaryFormatter();
 
@@ -45,6 +54,9 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
   final RecordRelevanceScorer _relevanceScorer;
   final TokenBudgetAllocator _tokenBudgetAllocator;
   final ContextTruncationStrategy _truncationStrategy;
+  final IntentDrivenRetriever _intentDrivenRetriever;
+  final QueryAnalyzer _queryAnalyzer;
+  final IntentRetrievalConfig _intentRetrievalConfig;
   final DateRange _dateRange;
   final RecordSummaryFormatter _formatter;
 
@@ -55,10 +67,12 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
   Future<SpaceContext> build(
     String spaceId, {
     DateRange? dateRange,
+    String? userQuery,
   }) async {
     final opId = AppLogger.startOperation('space_context_build');
     final stopwatch = Stopwatch()..start();
     final effectiveDateRange = dateRange ?? _dateRange;
+    
     await AppLogger.info(
       'Starting space context assembly',
       context: {
@@ -66,9 +80,12 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
         'maxRecords': maxRecords,
         'dateRangeStart': effectiveDateRange.start.toIso8601String(),
         'dateRangeEnd': effectiveDateRange.end.toIso8601String(),
+        'userQueryProvided': userQuery != null,
+        'stage': userQuery != null ? 'Stage 6 (Intent-Driven)' : 'Stage 4 (Date-Based)',
       },
       correlationId: opId,
     );
+    
     final recordsRepository = _recordsRepositoryOverride ?? (await _recordsServiceFuture).records;
     final space = await _spaceManager.getCurrentSpace();
     if (space.id != spaceId) {
@@ -85,6 +102,7 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
           correlationId: opId,
           stopwatch: stopwatch,
           dateRange: effectiveDateRange,
+          userQuery: userQuery,
         );
         await AppLogger.endOperation(opId);
         return context;
@@ -96,6 +114,7 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
       correlationId: opId,
       stopwatch: stopwatch,
       dateRange: effectiveDateRange,
+      userQuery: userQuery,
     );
     await AppLogger.endOperation(opId);
     return context;
@@ -107,6 +126,7 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
     String? correlationId,
     Stopwatch? stopwatch,
     required DateRange dateRange,
+    String? userQuery,
   }) async {
     final allRecords = await _loadAllRecords(recordsRepository, space.id);
     
@@ -115,9 +135,92 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
       context: {
         'spaceId': space.id,
         'totalRecords': allRecords.length,
+        'userQueryProvided': userQuery != null,
       },
       correlationId: correlationId,
     );
+
+    List<RecordEntity> relevantRecords;
+    List<RecordEntity> filteredRecords;
+    int recordsFilteredCount;
+
+    if (userQuery != null && userQuery.trim().isNotEmpty && _intentRetrievalConfig.enabled) {
+      // Stage 6: Intent-Driven Retrieval
+      await AppLogger.info(
+        'Using intent-driven retrieval (Stage 6)',
+        context: {
+          'userQuery': userQuery,
+          'spaceId': space.id,
+          'intentRetrievalEnabled': _intentRetrievalConfig.enabled,
+        },
+        correlationId: correlationId,
+      );
+
+      // First apply date range filter (Stage 4 behavior)
+      filteredRecords = await _filterEngine.filterRecords(
+        allRecords,
+        spaceId: space.id,
+        dateRange: dateRange,
+      );
+      recordsFilteredCount = filteredRecords.length;
+
+      // Analyze the query
+      final queryAnalysis = await _queryAnalyzer.analyze(userQuery);
+
+      // Use intent-driven retriever to get relevant records
+      final retrievalResult = await _intentDrivenRetriever.retrieve(
+        query: queryAnalysis,
+        candidateRecords: filteredRecords,
+        activeSpaceId: space.id,
+      );
+
+      // Extract the records from the retrieval result
+      relevantRecords = retrievalResult.records.map((scoredRecord) => scoredRecord.record).toList();
+      
+      await AppLogger.info(
+        'Intent-driven retrieval completed',
+        context: {
+          'userQuery': userQuery,
+          'queryIntent': queryAnalysis.intent.name,
+          'queryIntentConfidence': queryAnalysis.intentConfidence,
+          'queryKeywords': queryAnalysis.keywords,
+          'recordsConsidered': retrievalResult.stats.recordsConsidered,
+          'recordsMatched': retrievalResult.stats.recordsMatched,
+          'recordsIncluded': retrievalResult.stats.recordsIncluded,
+          'recordsExcludedPrivacy': retrievalResult.stats.recordsExcludedPrivacy,
+          'recordsExcludedThreshold': retrievalResult.stats.recordsExcludedThreshold,
+          'stage': 'Stage 6',
+        },
+        correlationId: correlationId,
+      );
+    } else {
+      // Stage 4: Date-based filtering with relevance scoring (traditional approach)
+      // Or if intent retrieval is disabled
+      await AppLogger.info(
+        _intentRetrievalConfig.enabled
+          ? 'Using date-based filtering (Stage 4 fallback)'
+          : 'Using date-based filtering (Stage 4 - Intent retrieval disabled)',
+        context: {
+          'spaceId': space.id,
+          'dateRangeStart': dateRange.start.toIso8601String(),
+          'dateRangeEnd': dateRange.end.toIso8601String(),
+          'userQueryProvided': userQuery != null,
+          'intentRetrievalEnabled': _intentRetrievalConfig.enabled,
+          'stage': 'Stage 4',
+        },
+        correlationId: correlationId,
+      );
+
+      filteredRecords = await _filterEngine.filterRecords(
+        allRecords,
+        spaceId: space.id,
+        dateRange: dateRange,
+      );
+      recordsFilteredCount = filteredRecords.length;
+
+      // Sort by relevance using traditional scoring
+      relevantRecords = await _relevanceScorer.sortByRelevance(filteredRecords);
+    }
 
     final filters = ContextFilters(
       dateRange: dateRange,
@@ -125,18 +228,11 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
       maxRecords: maxRecords,
     );
     
-    final filtered = await _filterEngine.filterRecords(
-      allRecords,
-      spaceId: space.id,
-      dateRange: dateRange,
-    );
-
-    final sorted = await _relevanceScorer.sortByRelevance(filtered);
-    
     final tokenAllocation = _tokenBudgetAllocator.allocate();
     
+    // Format the records as summaries
     final summaries = _truncationStrategy.truncateToFit(
-      sorted,
+      relevantRecords,
       availableTokens: tokenAllocation.context,
       formatter: _formatter,
       maxRecords: maxRecords,
@@ -148,23 +244,23 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
     );
     final assemblyTime = stopwatch?.elapsed ?? Duration.zero;
     
-    // Log truncation events, especially with large date ranges
+    // Log truncation events
     final dateRangeDays = dateRange.end.difference(dateRange.start).inDays;
-    final truncatedCount = sorted.length - summaries.length;
+    final truncatedCount = relevantRecords.length - summaries.length;
     if (truncatedCount > 0) {
       await AppLogger.info(
         'Context truncation applied',
         context: {
           'dateRangeDays': dateRangeDays,
-          'recordsAfterDateFilter': filtered.length,
-          'recordsAfterRelevanceSort': sorted.length,
-          'recordsIncluded': summaries.length,
+          'stage': userQuery != null ? 'Stage 6' : 'Stage 4',
+          'recordsAfterFiltering': relevantRecords.length,
+          'recordsAfterTruncation': summaries.length,
           'truncatedCount': truncatedCount,
           'tokenBudget': tokenAllocation.context,
           'tokensUsed': estimatedTokens,
           'maxRecordsLimit': maxRecords,
-          'truncationReason': truncatedCount > 0 
-              ? (sorted.length > maxRecords ? 'maxRecords limit' : 'token budget')
+          'truncationReason': truncatedCount > 0
+              ? (relevantRecords.length > maxRecords ? 'maxRecords limit' : 'token budget')
               : 'none',
         },
         correlationId: correlationId,
@@ -175,7 +271,8 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
         'Large date range processed without truncation',
         context: {
           'dateRangeDays': dateRangeDays,
-          'recordsAfterDateFilter': filtered.length,
+          'stage': userQuery != null ? 'Stage 6' : 'Stage 4',
+          'recordsAfterFiltering': relevantRecords.length,
           'recordsIncluded': summaries.length,
           'tokenBudget': tokenAllocation.context,
           'tokensUsed': estimatedTokens,
@@ -185,11 +282,11 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
     }
 
     final stats = ContextStats(
-      recordsFiltered: filtered.length,
+      recordsFiltered: recordsFilteredCount,
       recordsIncluded: summaries.length,
       tokensEstimated: estimatedTokens,
       tokensAvailable: tokenAllocation.context,
-      compressionRatio: filtered.isEmpty ? 0 : summaries.length / filtered.length,
+      compressionRatio: recordsFilteredCount == 0 ? 0 : summaries.length / recordsFilteredCount,
       assemblyTime: assemblyTime,
     );
 
@@ -206,7 +303,7 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
         },
         'records': {
           'total': allRecords.length,
-          'afterFiltering': filtered.length,
+          'afterFiltering': recordsFilteredCount,
           'included': summaries.length,
           'maxAllowed': maxRecords,
         },

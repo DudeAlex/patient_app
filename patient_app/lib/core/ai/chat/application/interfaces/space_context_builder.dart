@@ -6,5 +6,6 @@ abstract class SpaceContextBuilder {
   Future<SpaceContext> build(
     String spaceId, {
     DateRange? dateRange,
+    String? userQuery,
   });
 }

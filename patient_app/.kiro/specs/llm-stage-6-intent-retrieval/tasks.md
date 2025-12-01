@@ -304,57 +304,141 @@ Main retrieval logic combining all components.
 
 ---
 
-## Task 8: Integrate with SpaceContextBuilder
+## Task 8: Add dependencies to SpaceContextBuilder
 
-Update SpaceContextBuilder to use intent-driven retrieval.
+Add the new dependencies without changing logic yet.
 
-- [ ] 8.1 Update SpaceContextBuilder
-  - File: `lib/core/ai/chat/domain/services/space_context_builder.dart`
-  - Add dependency: IntentDrivenRetriever, QueryAnalyzer
-  - Add parameter to build method: `String? userQuery`
-  - _Requirements: 13.1, 13.2_
+- [x] 8.1 Add IntentDrivenRetriever dependency to SpaceContextBuilder
+  - File: `lib/core/ai/chat/context/space_context_builder.dart`
+  - Add IntentDrivenRetriever as constructor parameter
+  - Store as private field: `final IntentDrivenRetriever _intentRetriever;`
+  - Do NOT change any existing logic yet
+  - _Requirements: 13.1_
 
-- [ ] 8.2 Implement Stage 6 logic in SpaceContextBuilder
-  - If userQuery is null → use Stage 4 behavior (date-based only)
-  - If userQuery provided:
-    - Step 1: Apply date range filter (Stage 4)
-    - Step 2: Analyze query using QueryAnalyzer
-    - Step 3: Retrieve relevant records using IntentDrivenRetriever
-    - Step 4: Use retrieved records for context
-  - Log which stage was used (4 or 6)
-  - _Requirements: 13.1, 13.2, 13.3_
+- [x] 8.2 Add QueryAnalyzer dependency to SpaceContextBuilder
+  - Add QueryAnalyzer as constructor parameter
+  - Store as private field: `final QueryAnalyzer _queryAnalyzer;`
+  - Do NOT change any existing logic yet
+  - _Requirements: 13.1_
 
-- [ ] 8.3 Add configuration support
-  - Check IntentRetrievalConfig.enabled
-  - If disabled → use Stage 4 behavior
-  - If enabled → use Stage 6 behavior
+- [x] 8.3 Update SpaceContextBuilder constructor
+  - Add both new dependencies to constructor
+  - Update all existing tests to provide mock dependencies
+  - Ensure all existing functionality still works
+  - _Requirements: 13.1_
+
+---
+
+## Checkpoint 8: Commit dependency injection
+
+**Action:** Commit with message: "feat(stage6): Add intent retrieval dependencies to SpaceContextBuilder"
+
+---
+
+## Task 9: Add userQuery parameter to SpaceContextBuilder
+
+Modify the interface to accept user query.
+
+- [x] 9.1 Add userQuery parameter to build method
+  - File: `lib/core/ai/chat/context/space_context_builder.dart`
+  - Change method signature: `build({String? userQuery, ...existing params})`
+  - Do NOT use the parameter yet, just accept it
+  - _Requirements: 13.1_
+
+- [x] 9.2 Update all callers of SpaceContextBuilder.build()
+  - Find all places that call `build()` method
+  - Add `userQuery: null` parameter to maintain existing behavior
+  - Ensure no breaking changes
+  - _Requirements: 13.1_
+
+- [x] 9.3 Update SpaceContextBuilder interface
+  - File: `lib/core/ai/chat/domain/interfaces/space_context_builder.dart`
+  - Update interface to match new signature
+  - _Requirements: 13.1_
+
+---
+
+## Checkpoint 9: Commit interface changes
+
+**Action:** Commit with message: "feat(stage6): Add userQuery parameter to SpaceContextBuilder interface"
+
+---
+
+## Task 10: Implement Stage 6 logic in SpaceContextBuilder
+
+Add the actual intent-driven retrieval logic.
+
+- [x] 10.1 Add configuration check
+  - File: `lib/core/ai/chat/context/space_context_builder.dart`
+  - Check if IntentRetrievalConfig.enabled is true
+  - If disabled, use existing Stage 4 logic (no changes)
+  - Log which stage is being used
   - _Requirements: 13.4, 13.5_
 
-- [ ] 8.4 Update logging
-  - Log Stage 4 vs Stage 6 metrics
-  - Log token savings comparison
-  - Log records included comparison
+- [x] 10.2 Add query validation
+  - If userQuery is null or empty, use Stage 4 logic
+  - If userQuery is too short (< 3 words), use Stage 4 logic
+  - Log fallback reason when using Stage 4
+  - _Requirements: 11.1, 13.2_
+
+- [x] 10.3 Implement Stage 6 path - Query Analysis
+  - When using Stage 6:
+    - Step 1: Analyze query using QueryAnalyzer
+    - Log analysis results (keywords, intent)
+    - If analysis fails, fall back to Stage 4
+  - _Requirements: 13.2, 13.3_
+
+---
+
+## Checkpoint 10: Commit Stage 6 logic foundation
+
+**Action:** Commit with message: "feat(stage6): Add Stage 6 logic foundation to SpaceContextBuilder"
+
+---
+
+## Task 11: Complete Stage 6 retrieval in SpaceContextBuilder
+
+Finish the intent-driven retrieval implementation.
+
+- [x] 11.1 Implement Stage 6 path - Record Retrieval
+  - When using Stage 6:
+    - Step 2: Apply existing date range filter (keep Stage 4 logic)
+    - Step 3: Use IntentDrivenRetriever to get relevant records
+    - Step 4: Use retrieved records for context building
+  - _Requirements: 13.1, 13.2_
+
+- [x] 11.2 Add comprehensive logging
+  - Log Stage 4 vs Stage 6 metrics comparison
+  - Log records before and after intent filtering
+  - Log token usage comparison (estimated)
+  - Log retrieval time
   - _Requirements: 9.5, 10.5, 13.3_
 
+- [x] 11.3 Add error handling
+  - If intent retrieval fails, fall back to Stage 4
+  - Log fallback events
+  - Ensure no crashes or exceptions
+  - _Requirements: 11.5_
+
 ---
 
-## Checkpoint 8: Commit SpaceContextBuilder integration
+## Checkpoint 11: Commit complete Stage 6 integration
 
-**Action:** Commit with message: "feat(stage6): Integrate intent retrieval with SpaceContextBuilder"
+**Action:** Commit with message: "feat(stage6): Complete intent-driven retrieval in SpaceContextBuilder"
 
 ---
 
-## Task 9: Update SendChatMessageUseCase
+## Task 12: Update SendChatMessageUseCase
 
 Pass user query to SpaceContextBuilder.
 
-- [ ] 9.1 Update SendChatMessageUseCase
+- [x] 12.1 Update SendChatMessageUseCase
   - File: `lib/core/ai/chat/application/use_cases/send_chat_message_use_case.dart`
   - Pass userMessage to SpaceContextBuilder.build()
   - Ensure query is passed through the chain
   - _Requirements: 13.1, 13.2_
 
-- [ ] 9.2 Update integration tests
+- [ ] 12.2 Update integration tests
   - File: `test/integration/ai_chat_stage6_integration_test.dart`
   - Test end-to-end flow with intent retrieval
   - Verify Stage 6 is used when query provided
@@ -363,31 +447,31 @@ Pass user query to SpaceContextBuilder.
 
 ---
 
-## Checkpoint 9: Commit use case updates
+## Checkpoint 12: Commit use case updates
 
 **Action:** Commit with message: "feat(stage6): Update use case to pass query for intent retrieval"
 
 ---
 
-## Task 10: Write property-based tests
+## Task 13: Write property-based tests
 
 Implement correctness properties as property-based tests.
 
-- [ ] 10.1 Write property test: Keyword extraction is language-agnostic
+- [ ] 13.1 Write property test: Keyword extraction is language-agnostic
   - File: `test/core/ai/chat/domain/services/keyword_extractor_property_test.dart`
   - **Property 1:** For any query in any language, keywords should be extracted
   - Generate random queries in multiple languages
   - Verify extraction succeeds
   - _Validates: Requirements 1.4_
 
-- [ ] 10.2 Write property test: Relevance score is bounded
+- [ ] 13.2 Write property test: Relevance score is bounded
   - File: `test/core/ai/chat/domain/services/relevance_scorer_property_test.dart`
   - **Property 4:** For any record and query, score should be 0.0-1.0
   - Generate random records and queries
   - Verify score is always in range
   - _Validates: Requirements 3.1, 4.1_
 
-- [ ] 10.3 Write property test: Threshold filtering
+- [ ] 13.3 Write property test: Threshold filtering
   - File: `test/core/ai/chat/domain/services/intent_driven_retriever_property_test.dart`
   - **Property 5:** For any scored records, filtered results should all be >= threshold
   - Generate random scored records
@@ -395,37 +479,37 @@ Implement correctness properties as property-based tests.
   - Verify all results meet threshold
   - _Validates: Requirements 3.5_
 
-- [ ] 10.4 Write property test: Case-insensitive matching
+- [ ] 13.4 Write property test: Case-insensitive matching
   - **Property 6:** For any query and record, case should not affect matching
   - Generate random queries in mixed case
   - Verify matching is case-insensitive
   - _Validates: Requirements 3.3_
 
-- [ ] 10.5 Write property test: Top-K limit enforced
+- [ ] 13.5 Write property test: Top-K limit enforced
   - **Property 8:** For any retrieval, results should never exceed maxResults
   - Generate large sets of records
   - Verify result count <= 15
   - _Validates: Requirements 4.4_
 
-- [ ] 10.6 Write property test: Privacy filter excludes private records
+- [ ] 13.6 Write property test: Privacy filter excludes private records
   - **Property 11:** For any record set, private records should be excluded
   - Generate random records (some private)
   - Verify no private records in results
   - _Validates: Requirements 6.1_
 
-- [ ] 10.7 Write property test: Privacy filter excludes deleted records
+- [ ] 13.7 Write property test: Privacy filter excludes deleted records
   - **Property 12:** For any record set, deleted records should be excluded
   - Generate random records (some deleted)
   - Verify no deleted records in results
   - _Validates: Requirements 6.2_
 
-- [ ] 10.8 Write property test: Space isolation
+- [ ] 13.8 Write property test: Space isolation
   - **Property 14:** For any query without Space mention, only active Space records included
   - Generate records from multiple Spaces
   - Verify only active Space in results
   - _Validates: Requirements 5.3_
 
-- [ ] 10.9 Write property test: No crashes on any input
+- [ ] 13.9 Write property test: No crashes on any input
   - **Property 19:** For any query (empty, long, special chars), no exceptions
   - Generate random queries including edge cases
   - Verify no unhandled exceptions
@@ -433,34 +517,34 @@ Implement correctness properties as property-based tests.
 
 ---
 
-## Checkpoint 10: Commit property-based tests
+## Checkpoint 13: Commit property-based tests
 
 **Action:** Commit with message: "test(stage6): Add property-based tests for correctness properties"
 
 ---
 
-## Task 11: Add performance monitoring
+## Task 14: Add performance monitoring
 
 Track and log performance metrics.
 
-- [ ] 11.1 Add performance tracking to QueryAnalyzer
+- [ ] 14.1 Add performance tracking to QueryAnalyzer
   - Track keyword extraction time
   - Track intent classification time
   - Log if > 50ms (keyword) or > 30ms (intent)
   - _Requirements: 14.1, 14.2_
 
-- [ ] 11.2 Add performance tracking to RelevanceScorer
+- [ ] 14.2 Add performance tracking to RelevanceScorer
   - Track scoring time for batch of records
   - Log if > 100ms for 100 records
   - _Requirements: 14.3_
 
-- [ ] 11.3 Add performance tracking to IntentDrivenRetriever
+- [ ] 14.3 Add performance tracking to IntentDrivenRetriever
   - Track end-to-end retrieval time
   - Log if > 200ms
   - Log performance breakdown (extraction, classification, scoring, filtering)
   - _Requirements: 14.4, 14.5_
 
-- [ ] 11.4 Add metrics tracking
+- [ ] 14.4 Add metrics tracking
   - Track average records included per query
   - Track average token usage per query
   - Track retrieval time distribution
@@ -469,23 +553,23 @@ Track and log performance metrics.
 
 ---
 
-## Checkpoint 11: Commit performance monitoring
+## Checkpoint 14: Commit performance monitoring
 
 **Action:** Commit with message: "feat(stage6): Add performance monitoring and metrics tracking"
 
 ---
 
-## Task 12: Update configuration and settings
+## Task 15: Update configuration and settings
 
 Add UI for enabling/disabling Stage 6.
 
-- [ ] 12.1 Add IntentRetrievalConfig to app configuration
+- [ ] 15.1 Add IntentRetrievalConfig to app configuration
   - File: `lib/core/config/app_config.dart`
   - Add intentRetrievalEnabled flag (default: true)
   - Add relevanceThreshold setting (default: 0.3)
   - _Requirements: 13.4_
 
-- [ ] 12.2 Add Settings UI toggle (optional)
+- [ ] 15.2 Add Settings UI toggle (optional)
   - File: `lib/features/settings/ui/screens/settings_screen.dart`
   - Add "Intent-Driven Retrieval" toggle
   - Add description: "Use smart retrieval based on your question"
@@ -493,17 +577,17 @@ Add UI for enabling/disabling Stage 6.
 
 ---
 
-## Checkpoint 12: Commit configuration
+## Checkpoint 15: Commit configuration
 
 **Action:** Commit with message: "feat(stage6): Add configuration and settings for intent retrieval"
 
 ---
 
-## Task 13: Write integration tests
+## Task 16: Write integration tests
 
 Test end-to-end Stage 6 functionality.
 
-- [ ] 13.1 Write integration test: Stage 6 full flow
+- [ ] 16.1 Write integration test: Stage 6 full flow
   - File: `test/integration/ai_chat_stage6_integration_test.dart`
   - Create test Space with 50 records (Health, Finance, Education, Travel)
   - Test queries in multiple languages (English, Russian, Uzbek)
@@ -512,20 +596,20 @@ Test end-to-end Stage 6 functionality.
   - Verify token usage < Stage 4
   - _Requirements: 12.4_
 
-- [ ] 13.2 Write integration test: Fallback to Stage 4
+- [ ] 16.2 Write integration test: Fallback to Stage 4
   - Test very short query → Stage 4 behavior
   - Test config disabled → Stage 4 behavior
   - Test extraction failure → Stage 4 behavior
   - _Requirements: 11.1, 11.2, 11.4, 13.5_
 
-- [ ] 13.3 Write integration test: Multi-language support
+- [ ] 16.3 Write integration test: Multi-language support
   - Test English query on English records
   - Test Russian query on Russian records
   - Test Uzbek query on Uzbek records
   - Test mixed language scenarios
   - _Requirements: 1.4, 3.4_
 
-- [ ] 13.4 Write integration test: Multi-Space support
+- [ ] 16.4 Write integration test: Multi-Space support
   - Test Health Space queries
   - Test Finance Space queries
   - Test Education Space queries
@@ -535,30 +619,30 @@ Test end-to-end Stage 6 functionality.
 
 ---
 
-## Checkpoint 13: Commit integration tests
+## Checkpoint 16: Commit integration tests
 
 **Action:** Commit with message: "test(stage6): Add comprehensive integration tests"
 
 ---
 
-## Task 14: Manual testing and validation
+## Task 17: Manual testing and validation
 
 Prepare for manual testing.
 
-- [ ] 14.1 Create manual test scenarios
+- [ ] 17.1 Create manual test scenarios
   - Document test queries for each Space
   - Document expected results
   - Document token savings targets
   - _Requirements: 12.5, 20.2_
 
-- [ ] 14.2 Test with real data
+- [ ] 17.2 Test with real data
   - Create test Spaces with realistic records
   - Test queries in multiple languages
   - Measure token savings vs Stage 4
   - Collect user feedback
   - _Requirements: 10.1-10.4, 15.1-15.5_
 
-- [ ] 14.3 Validate performance targets
+- [ ] 17.3 Validate performance targets
   - Keyword extraction < 50ms ✓
   - Intent classification < 30ms ✓
   - Relevance scoring < 100ms (100 records) ✓
@@ -569,36 +653,36 @@ Prepare for manual testing.
 
 ---
 
-## Checkpoint 14: Final commit
+## Checkpoint 17: Final commit
 
 **Action:** Commit with message: "feat(stage6): Complete Stage 6 intent-driven retrieval implementation"
 
 ---
 
-## Task 15: Documentation
+## Task 18: Documentation
 
 Update all documentation.
 
-- [ ] 15.1 Update README.md
+- [ ] 18.1 Update README.md
   - Add Stage 6 to features list
   - Document language-agnostic approach
   - Document multi-Space support
   - _Requirements: 20.1_
 
-- [ ] 15.2 Update ARCHITECTURE.md
+- [ ] 18.2 Update ARCHITECTURE.md
   - Document intent retrieval architecture
   - Add component diagrams
   - Document data flow
   - _Requirements: 20.1_
 
-- [ ] 15.3 Create Stage 6 documentation
+- [ ] 18.3 Create Stage 6 documentation
   - File: `docs/modules/ai/STAGE_6_INTENT_RETRIEVAL.md`
   - Document features, usage, configuration
   - Include examples in multiple languages
   - Include examples from multiple Spaces
   - _Requirements: 20.1, 20.2_
 
-- [ ] 15.4 Update testing documentation
+- [ ] 18.4 Update testing documentation
   - Document property-based tests
   - Document integration tests
   - Document manual test procedures
@@ -616,7 +700,7 @@ Update all documentation.
 
 Stage 6 is complete when:
 
-- [x] All 15 tasks completed
+- [x] All 18 tasks completed
 - [x] All unit tests passing
 - [x] All property-based tests passing (9 properties)
 - [x] All integration tests passing

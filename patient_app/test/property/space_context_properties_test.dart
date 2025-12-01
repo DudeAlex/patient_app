@@ -10,6 +10,14 @@ import 'package:patient_app/core/ai/chat/context/record_relevance_scorer.dart';
 import 'package:patient_app/core/ai/chat/context/context_truncation_strategy.dart';
 import 'package:patient_app/core/ai/chat/models/token_allocation.dart';
 import 'package:patient_app/core/ai/chat/models/date_range.dart';
+import 'package:patient_app/core/ai/chat/context/token_budget_allocator.dart';
+import 'package:patient_app/core/ai/chat/models/intent_retrieval_config.dart';
+import 'package:patient_app/core/ai/chat/domain/services/intent_driven_retriever.dart';
+import 'package:patient_app/core/ai/chat/domain/services/query_analyzer.dart';
+import 'package:patient_app/core/ai/chat/domain/services/relevance_scorer.dart';
+import 'package:patient_app/core/ai/chat/domain/services/privacy_filter.dart';
+import 'package:patient_app/core/ai/chat/domain/services/keyword_extractor.dart';
+import 'package:patient_app/core/ai/chat/domain/services/intent_classifier.dart';
 import 'package:patient_app/core/application/services/space_manager.dart';
 import 'package:patient_app/core/application/ports/space_repository.dart';
 import 'package:patient_app/core/domain/entities/space.dart';
@@ -170,14 +178,24 @@ void main() {
         spaceManager: _FakeSpaceManager(space),
         filterEngine: ContextFilterEngine(),
         relevanceScorer: _TestRelevanceScorer(),
-        tokenAllocation: const TokenAllocation(
-          system: 800,
-          context: 2000,
-          history: 1000,
-          response: 1000,
+        tokenBudgetAllocator: const TokenBudgetAllocator(
           total: 4800,
+          system: 800,
+          context: 200,
+          history: 100,
+          response: 1000,
         ),
         truncationStrategy: const ContextTruncationStrategy(),
+        intentDrivenRetriever: IntentDrivenRetriever(
+          relevanceScorer: RelevanceScorer(),
+          privacyFilter: PrivacyFilter(),
+          config: const IntentRetrievalConfig(),
+        ),
+        queryAnalyzer: QueryAnalyzer(
+          keywordExtractor: KeywordExtractor(),
+          intentClassifier: IntentClassifier(),
+        ),
+        intentRetrievalConfig: const IntentRetrievalConfig(),
         formatter: RecordSummaryFormatter(),
         maxRecords: 10,
         dateRange: DateRange(
@@ -210,14 +228,24 @@ void main() {
       spaceManager: _FakeSpaceManager(_space('space')),
       filterEngine: ContextFilterEngine(),
       relevanceScorer: _TestRelevanceScorer(),
-      tokenAllocation: const TokenAllocation(
-        system: 800,
-        context: 2000,
-        history: 1000,
-        response: 1000,
+      tokenBudgetAllocator: const TokenBudgetAllocator(
         total: 4800,
+        system: 800,
+        context: 200,
+        history: 100,
+        response: 1000,
       ),
       truncationStrategy: const ContextTruncationStrategy(),
+      intentDrivenRetriever: IntentDrivenRetriever(
+        relevanceScorer: RelevanceScorer(),
+        privacyFilter: PrivacyFilter(),
+        config: const IntentRetrievalConfig(),
+      ),
+      queryAnalyzer: QueryAnalyzer(
+        keywordExtractor: KeywordExtractor(),
+        intentClassifier: IntentClassifier(),
+      ),
+      intentRetrievalConfig: const IntentRetrievalConfig(),
       formatter: RecordSummaryFormatter(),
       maxRecords: 10,
       dateRange: DateRange(
@@ -240,14 +268,24 @@ void main() {
       spaceManager: _FakeSpaceManager(_space('space')),
       filterEngine: ContextFilterEngine(),
       relevanceScorer: _TestRelevanceScorer(),
-      tokenAllocation: const TokenAllocation(
-        system: 800,
-        context: 2000,
-        history: 1000,
-        response: 1000,
+      tokenBudgetAllocator: const TokenBudgetAllocator(
         total: 4800,
+        system: 800,
+        context: 200,
+        history: 10,
+        response: 1000,
       ),
       truncationStrategy: const ContextTruncationStrategy(),
+      intentDrivenRetriever: IntentDrivenRetriever(
+        relevanceScorer: RelevanceScorer(),
+        privacyFilter: PrivacyFilter(),
+        config: const IntentRetrievalConfig(),
+      ),
+      queryAnalyzer: QueryAnalyzer(
+        keywordExtractor: KeywordExtractor(),
+        intentClassifier: IntentClassifier(),
+      ),
+      intentRetrievalConfig: const IntentRetrievalConfig(),
       formatter: RecordSummaryFormatter(maxNoteLength: 100),
       maxRecords: 10,
       dateRange: DateRange(

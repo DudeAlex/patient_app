@@ -31,6 +31,13 @@ import 'package:patient_app/core/ai/chat/services/connectivity_monitor.dart';
 import 'package:patient_app/core/infrastructure/storage/space_preferences.dart';
 import 'package:patient_app/features/records/data/records_service.dart';
 import 'package:patient_app/features/spaces/domain/space_registry.dart';
+import 'package:patient_app/core/ai/chat/domain/services/intent_driven_retriever.dart';
+import 'package:patient_app/core/ai/chat/domain/services/privacy_filter.dart';
+import 'package:patient_app/core/ai/chat/models/intent_retrieval_config.dart';
+import 'package:patient_app/core/ai/chat/domain/services/query_analyzer.dart';
+import 'package:patient_app/core/ai/chat/domain/services/keyword_extractor.dart';
+import 'package:patient_app/core/ai/chat/domain/services/intent_classifier.dart';
+import 'package:patient_app/core/ai/chat/domain/services/relevance_scorer.dart';
 
 /// Riverpod controller handling AI chat state for a given space.
 class AiChatController extends StateNotifier<AiChatState> {
@@ -333,12 +340,30 @@ final aiChatControllerProvider = StateNotifierProvider.family<AiChatController, 
 /// once the real builder with user settings is available.
 SpaceContextBuilder _createPlaceholderBuilder(AppContainer container) {
   final recordsServiceFuture = container.resolve<Future<RecordsService>>();
+  
+  // Create the required dependencies for Stage 6
+  final intentRetrievalConfig = const IntentRetrievalConfig();
+  
+  final intentDrivenRetriever = IntentDrivenRetriever(
+    relevanceScorer: RelevanceScorer(),
+    privacyFilter: PrivacyFilter(),
+    config: intentRetrievalConfig,
+  );
+  
+  final queryAnalyzer = QueryAnalyzer(
+    keywordExtractor: KeywordExtractor(),
+    intentClassifier: IntentClassifier(),
+  );
+  
   return SpaceContextBuilderImpl(
     recordsServiceFuture: recordsServiceFuture,
     filterEngine: ContextFilterEngine(),
-    relevanceScorer: RecordRelevanceScorer(),
+    relevanceScorer: RecordRelevanceScorer(), // Use the correct RelevanceScorer from context package
     tokenBudgetAllocator: TokenBudgetAllocator(),
     truncationStrategy: const ContextTruncationStrategy(),
+    intentDrivenRetriever: intentDrivenRetriever, // Added for Stage 6
+    queryAnalyzer: queryAnalyzer, // Added for Stage 6
+    intentRetrievalConfig: intentRetrievalConfig, // Added for Stage 6 configuration
     spaceManager: SpaceManager(
       SpacePreferences(),
       SpaceRegistry(),

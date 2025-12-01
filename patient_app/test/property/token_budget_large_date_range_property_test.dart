@@ -9,6 +9,13 @@ import 'package:patient_app/core/ai/chat/context/record_relevance_scorer.dart';
 import 'package:patient_app/core/ai/chat/context/context_truncation_strategy.dart';
 import 'package:patient_app/core/ai/chat/context/token_budget_allocator.dart';
 import 'package:patient_app/core/ai/chat/models/date_range.dart';
+import 'package:patient_app/core/ai/chat/models/intent_retrieval_config.dart';
+import 'package:patient_app/core/ai/chat/domain/services/intent_driven_retriever.dart';
+import 'package:patient_app/core/ai/chat/domain/services/query_analyzer.dart';
+import 'package:patient_app/core/ai/chat/domain/services/relevance_scorer.dart';
+import 'package:patient_app/core/ai/chat/domain/services/privacy_filter.dart';
+import 'package:patient_app/core/ai/chat/domain/services/keyword_extractor.dart';
+import 'package:patient_app/core/ai/chat/domain/services/intent_classifier.dart';
 import 'package:patient_app/core/application/services/space_manager.dart';
 import 'package:patient_app/core/application/ports/space_repository.dart';
 import 'package:patient_app/core/domain/entities/space.dart';
@@ -63,6 +70,16 @@ void main() {
         relevanceScorer: RecordRelevanceScorer(),
         tokenBudgetAllocator: const TokenBudgetAllocator(),
         truncationStrategy: const ContextTruncationStrategy(),
+        intentDrivenRetriever: IntentDrivenRetriever(
+          relevanceScorer: RelevanceScorer(),
+          privacyFilter: PrivacyFilter(),
+          config: const IntentRetrievalConfig(),
+        ),
+        queryAnalyzer: QueryAnalyzer(
+          keywordExtractor: KeywordExtractor(),
+          intentClassifier: IntentClassifier(),
+        ),
+        intentRetrievalConfig: const IntentRetrievalConfig(),
         formatter: RecordSummaryFormatter(),
         maxRecords: 20,
         dateRange: dateRange,
@@ -141,6 +158,16 @@ void main() {
         relevanceScorer: RecordRelevanceScorer(),
         tokenBudgetAllocator: const TokenBudgetAllocator(),
         truncationStrategy: const ContextTruncationStrategy(),
+        intentDrivenRetriever: IntentDrivenRetriever(
+          relevanceScorer: RelevanceScorer(),
+          privacyFilter: PrivacyFilter(),
+          config: const IntentRetrievalConfig(),
+        ),
+        queryAnalyzer: QueryAnalyzer(
+          keywordExtractor: KeywordExtractor(),
+          intentClassifier: IntentClassifier(),
+        ),
+        intentRetrievalConfig: const IntentRetrievalConfig(),
         formatter: RecordSummaryFormatter(),
         maxRecords: 20,
         dateRange: dateRange,
@@ -191,6 +218,16 @@ void main() {
           relevanceScorer: RecordRelevanceScorer(),
           tokenBudgetAllocator: const TokenBudgetAllocator(),
           truncationStrategy: const ContextTruncationStrategy(),
+          intentDrivenRetriever: IntentDrivenRetriever(
+            relevanceScorer: RelevanceScorer(),
+            privacyFilter: PrivacyFilter(),
+            config: const IntentRetrievalConfig(),
+          ),
+          queryAnalyzer: QueryAnalyzer(
+            keywordExtractor: KeywordExtractor(),
+            intentClassifier: IntentClassifier(),
+          ),
+          intentRetrievalConfig: const IntentRetrievalConfig(),
           formatter: RecordSummaryFormatter(),
           maxRecords: 20,
           dateRange: dateRange,
@@ -244,6 +281,16 @@ void main() {
           relevanceScorer: RecordRelevanceScorer(),
           tokenBudgetAllocator: const TokenBudgetAllocator(),
           truncationStrategy: const ContextTruncationStrategy(),
+          intentDrivenRetriever: IntentDrivenRetriever(
+            relevanceScorer: RelevanceScorer(),
+            privacyFilter: PrivacyFilter(),
+            config: const IntentRetrievalConfig(),
+          ),
+          queryAnalyzer: QueryAnalyzer(
+            keywordExtractor: KeywordExtractor(),
+            intentClassifier: IntentClassifier(),
+          ),
+          intentRetrievalConfig: const IntentRetrievalConfig(),
           formatter: RecordSummaryFormatter(),
           maxRecords: 20,
           dateRange: dateRange,
@@ -295,6 +342,16 @@ void main() {
         relevanceScorer: RecordRelevanceScorer(),
         tokenBudgetAllocator: const TokenBudgetAllocator(),
         truncationStrategy: const ContextTruncationStrategy(),
+        intentDrivenRetriever: IntentDrivenRetriever(
+          relevanceScorer: RelevanceScorer(),
+          privacyFilter: PrivacyFilter(),
+          config: const IntentRetrievalConfig(),
+        ),
+        queryAnalyzer: QueryAnalyzer(
+          keywordExtractor: KeywordExtractor(),
+          intentClassifier: IntentClassifier(),
+        ),
+        intentRetrievalConfig: const IntentRetrievalConfig(),
         formatter: RecordSummaryFormatter(),
         maxRecords: 20,
         dateRange: dateRange,
@@ -369,6 +426,16 @@ void main() {
         relevanceScorer: RecordRelevanceScorer(),
         tokenBudgetAllocator: const TokenBudgetAllocator(),
         truncationStrategy: const ContextTruncationStrategy(),
+        intentDrivenRetriever: IntentDrivenRetriever(
+          relevanceScorer: RelevanceScorer(),
+          privacyFilter: PrivacyFilter(),
+          config: const IntentRetrievalConfig(),
+        ),
+        queryAnalyzer: QueryAnalyzer(
+          keywordExtractor: KeywordExtractor(),
+          intentClassifier: IntentClassifier(),
+        ),
+        intentRetrievalConfig: const IntentRetrievalConfig(),
         formatter: RecordSummaryFormatter(),
         maxRecords: 20,
         dateRange: dateRange,

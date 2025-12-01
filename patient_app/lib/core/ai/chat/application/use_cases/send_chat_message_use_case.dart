@@ -96,7 +96,7 @@ class SendChatMessageUseCase {
 
       final Stopwatch contextStopwatch = Stopwatch()..start();
       final spaceContext =
-          spaceContextOverride ?? await _spaceContextBuilder.build(spaceId, dateRange: dateRange);
+          spaceContextOverride ?? await _spaceContextBuilder.build(spaceId, dateRange: dateRange, userQuery: messageContent);
       builtContext = spaceContext;
       contextStopwatch.stop();
       final tokenAllocation = _tokenBudgetAllocator.allocate();
