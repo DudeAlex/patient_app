@@ -252,13 +252,13 @@ Filter out private and deleted records.
 
 Main retrieval logic combining all components.
 
-- [ ] 7.1 Create IntentDrivenRetriever class
+- [x] 7.1 Create IntentDrivenRetriever class
   - File: `lib/core/ai/chat/domain/services/intent_driven_retriever.dart`
   - Dependencies: RelevanceScorer, PrivacyFilter, IntentRetrievalConfig
   - Method: `Future<RetrievalResult> retrieve({required QueryAnalysis query, required List<Record> candidateRecords, required String activeSpaceId})`
   - _Requirements: 3.1-3.5, 4.1-4.5_
 
-- [ ] 7.2 Implement retrieval logic
+- [x] 7.2 Implement retrieval logic
   - Step 1: Apply privacy filter first
   - Step 2: Score all remaining records
   - Step 3: Filter by relevance threshold (0.3)
@@ -269,7 +269,7 @@ Main retrieval logic combining all components.
   - Step 8: Log retrieval results
   - _Requirements: 3.1-3.5, 4.1-4.5, 6.1-6.5, 9.2, 9.4_
 
-- [ ] 7.3 Add comprehensive logging
+- [x] 7.3 Add comprehensive logging
   - Log records considered, matched, included
   - Log top 10 relevance scores
   - Log exclusion reasons (privacy, threshold)
@@ -277,13 +277,13 @@ Main retrieval logic combining all components.
   - Use AppLogger with category 'intent_retrieval'
   - _Requirements: 9.1-9.5_
 
-- [ ] 7.4 Handle edge cases
+- [x] 7.4 Handle edge cases
   - Very short query (< 3 words) → return all candidates (Stage 4 behavior)
   - No keywords extracted → return all candidates
   - No matches above threshold → return empty result
   - _Requirements: 11.1, 11.2, 11.4, 11.5_
 
-- [ ] 7.5 Write unit tests for IntentDrivenRetriever
+- [x] 7.5 Write unit tests for IntentDrivenRetriever
   - File: `test/core/ai/chat/domain/services/intent_driven_retriever_test.dart`
   - Test cases:
     - Normal retrieval works
