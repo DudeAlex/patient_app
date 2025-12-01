@@ -690,11 +690,11 @@ IntentRetrievalConfig already exists and is being used.
   - Already integrated in SpaceContextBuilder
   - _No work needed!_
 
-- [ ] 20.2 (Optional) Add Settings UI toggle
+- [~] 20.2 (Optional) Add Settings UI toggle - SKIPPED
   - File: `lib/features/settings/ui/screens/settings_screen.dart`
   - Add "Intent-Driven Retrieval" toggle
   - Add description: "Use smart retrieval based on your question"
-  - _Optional - can skip for now_
+  - _Optional - SKIPPED (too complex for Kilo Code, not essential)_
 
 ---
 
