@@ -17,38 +17,38 @@ This implementation plan breaks down Stage 6 (Intent-Driven Retrieval) into deta
 
 Create the foundational data models for intent-driven retrieval.
 
-- [ ] 1.1 Create QueryAnalysis model
+- [x] 1.1 Create QueryAnalysis model
   - File: `lib/core/ai/chat/domain/models/query_analysis.dart`
   - Fields: originalQuery, keywords, intent, intentConfidence
   - Add toJson/fromJson methods
   - Add copyWith method
   - _Requirements: 1.1, 2.1_
 
-- [ ] 1.2 Create QueryIntent enum
+- [x] 1.2 Create QueryIntent enum
   - File: `lib/core/ai/chat/domain/models/query_intent.dart`
   - Values: question, command, statement, greeting
   - Add toString method
   - _Requirements: 2.1_
 
-- [ ] 1.3 Create RetrievalResult model
+- [x] 1.3 Create RetrievalResult model
   - File: `lib/core/ai/chat/domain/models/retrieval_result.dart`
   - Fields: records (List<ScoredRecord>), stats (RetrievalStats)
   - Add toJson method
   - _Requirements: 3.1, 4.1_
 
-- [ ] 1.4 Create ScoredRecord model
+- [x] 1.4 Create ScoredRecord model
   - File: `lib/core/ai/chat/domain/models/scored_record.dart`
   - Fields: record, relevanceScore, keywordMatchScore, recencyScore
   - Add comparison operators for sorting
   - _Requirements: 3.1, 4.1_
 
-- [ ] 1.5 Create RetrievalStats model
+- [x] 1.5 Create RetrievalStats model
   - File: `lib/core/ai/chat/domain/models/retrieval_stats.dart`
   - Fields: recordsConsidered, recordsMatched, recordsIncluded, recordsExcludedPrivacy, recordsExcludedThreshold, retrievalTime
   - Add toJson method for logging
   - _Requirements: 9.4, 10.1-10.4_
 
-- [ ] 1.6 Create IntentRetrievalConfig model
+- [x] 1.6 Create IntentRetrievalConfig model
   - File: `lib/core/ai/chat/domain/models/intent_retrieval_config.dart`
   - Fields: enabled, relevanceThreshold (0.3), maxResults (15), minQueryWords (3)
   - Add default constructor with sensible defaults
