@@ -134,7 +134,7 @@ Create a simple intent classifier that works for any language.
 
 Combine keyword extraction and intent classification.
 
-- [ ] 4.1 Create QueryAnalyzer class
+- [x] 4.1 Create QueryAnalyzer class
   - File: `lib/core/ai/chat/domain/services/query_analyzer.dart`
   - Dependencies: KeywordExtractor, IntentClassifier
   - Method: `QueryAnalysis analyze(String query)`
@@ -145,13 +145,13 @@ Combine keyword extraction and intent classification.
     - Log analysis results using AppLogger
   - _Requirements: 1.1, 2.1, 9.1_
 
-- [ ] 4.2 Add logging to QueryAnalyzer
+- [x] 4.2 Add logging to QueryAnalyzer
   - Log extracted keywords, intent, confidence
   - Use AppLogger.info with category 'intent_retrieval'
   - Include analysisTimeMs
   - _Requirements: 1.5, 2.5, 9.1_
 
-- [ ] 4.3 Write unit tests for QueryAnalyzer
+- [x] 4.3 Write unit tests for QueryAnalyzer
   - File: `test/core/ai/chat/domain/services/query_analyzer_test.dart`
   - Test cases:
     - Full analysis flow works
