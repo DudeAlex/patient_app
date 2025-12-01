@@ -216,24 +216,24 @@ Score records based on keyword match and recency.
 
 Filter out private and deleted records.
 
-- [ ] 6.1 Create PrivacyFilter class
+- [x] 6.1 Create PrivacyFilter class
   - File: `lib/core/ai/chat/domain/services/privacy_filter.dart`
   - Method: `List<Record> filter(List<Record> records, String activeSpaceId)`
   - Implementation:
-    - Exclude if record.isDeleted == true
-    - Exclude if record.isPrivate == true
+    - Exclude if record.deletedAt != null (deleted records)
+    - Exclude if record has privacy tags (tag-based privacy detection)
     - Exclude if record.spaceId != activeSpaceId (unless cross-space allowed)
   - _Requirements: 6.1, 6.2, 6.3, 6.5_
 
-- [ ] 6.2 Add helper method
+- [x] 6.2 Add helper method
   - Method: `bool isAllowed(Record record, String activeSpaceId)`
   - Returns false if deleted, private, or wrong space
   - _Requirements: 6.1, 6.2, 6.3_
 
-- [ ] 6.3 Write unit tests for PrivacyFilter
+- [x] 6.3 Write unit tests for PrivacyFilter
   - File: `test/core/ai/chat/domain/services/privacy_filter_test.dart`
   - Test cases:
-    - Private records excluded
+    - Private records excluded (tag-based: private, confidential, sensitive, personal)
     - Deleted records excluded
     - Wrong space records excluded
     - Valid records included
