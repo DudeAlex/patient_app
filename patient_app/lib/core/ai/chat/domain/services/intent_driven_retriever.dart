@@ -39,26 +39,51 @@ class IntentDrivenRetriever {
  final IntentRetrievalConfig _config;
 
   /// Retrieves relevant records based on query analysis.
-  /// 
+  ///
   /// [query] The analyzed query with keywords and intent
- /// [candidateRecords] The list of records to consider for retrieval
+  /// [candidateRecords] The list of records to consider for retrieval
   /// [activeSpaceId] The current active space ID for space isolation
- /// 
+  ///
   /// Returns a RetrievalResult containing scored records and statistics
- /// 
+  ///
   /// Requirements: 3.1-3.5, 4.1-4.5, 6.1-6.5, 9.2, 9.4, 11.1, 11.2, 11.4, 11.5
   Future<RetrievalResult> retrieve({
     required QueryAnalysis query,
     required List<RecordEntity> candidateRecords,
     required String activeSpaceId,
   }) async {
-    final startTime = DateTime.now();
+    final stopwatch = Stopwatch()..start();
     
     // Handle edge cases - very short query or no keywords
     if (query.keywords.length < _config.minQueryWords || query.keywords.isEmpty) {
       // Fallback to Stage 4 behavior (return all candidates)
+      stopwatch.stop();
       await _logFallback('short_query', query.keywords.length);
-      return _createFallbackResult(candidateRecords, activeSpaceId, startTime);
+      // Log retrieval time
+      await AppLogger.info(
+        'Intent-driven retrieval completed',
+        context: {
+          'category': 'intent_retrieval',
+          'event': 'retrieval_complete',
+          'originalQuery': query.originalQuery,
+          'recordsRetrieved': candidateRecords.length,
+          'retrievalTimeMs': stopwatch.elapsedMilliseconds,
+        },
+      );
+      // Log warning if slow
+      if (stopwatch.elapsedMilliseconds > 200) {
+        await AppLogger.warning(
+          'Intent-driven retrieval slow',
+          context: {
+            'category': 'intent_retrieval',
+            'event': 'retrieval_slow',
+            'originalQuery': query.originalQuery,
+            'retrievalTimeMs': stopwatch.elapsedMilliseconds,
+            'thresholdMs': 200,
+          },
+        );
+      }
+      return _createFallbackResult(candidateRecords, activeSpaceId, DateTime.now());
     }
     
     try {
@@ -103,14 +128,13 @@ class IntentDrivenRetriever {
           : thresholdFilteredRecords;
       
       // Step 6: Create RetrievalStats
-      final retrievalTime = DateTime.now().difference(startTime);
       final stats = RetrievalStats(
         recordsConsidered: candidateRecords.length,
         recordsMatched: scoredRecords.length,
         recordsIncluded: finalRecords.length,
         recordsExcludedPrivacy: privacyExclusions,
         recordsExcludedThreshold: thresholdExclusions,
-        retrievalTime: retrievalTime,
+        retrievalTime: Duration(milliseconds: stopwatch.elapsedMilliseconds),
       );
       
       final result = RetrievalResult(
@@ -118,12 +142,41 @@ class IntentDrivenRetriever {
         stats: stats,
       );
       
+      stopwatch.stop();
+      
+      // Log retrieval time
+      await AppLogger.info(
+        'Intent-driven retrieval completed',
+        context: {
+          'category': 'intent_retrieval',
+          'event': 'retrieval_complete',
+          'originalQuery': query.originalQuery,
+          'recordsRetrieved': finalRecords.length,
+          'retrievalTimeMs': stopwatch.elapsedMilliseconds,
+        },
+      );
+      
+      // Log warning if slow
+      if (stopwatch.elapsedMilliseconds > 200) {
+        await AppLogger.warning(
+          'Intent-driven retrieval slow',
+          context: {
+            'category': 'intent_retrieval',
+            'event': 'retrieval_slow',
+            'originalQuery': query.originalQuery,
+            'retrievalTimeMs': stopwatch.elapsedMilliseconds,
+            'thresholdMs': 200,
+          },
+        );
+      }
+      
       // Step 7: Log retrieval results
-      await _logRetrieval(result, query, retrievalTime);
+      await _logRetrieval(result, query, Duration(milliseconds: stopwatch.elapsedMilliseconds));
       
       return result;
     } catch (error, stackTrace) {
       // Handle errors gracefully - fallback to Stage 4 behavior
+      stopwatch.stop();
       await AppLogger.error(
         'Intent-driven retrieval failed, falling back to Stage 4',
         error: error,
@@ -133,11 +186,26 @@ class IntentDrivenRetriever {
           'event': 'retrieval_error',
           'originalQuery': query.originalQuery,
           'candidateCount': candidateRecords.length,
+          'retrievalTimeMs': stopwatch.elapsedMilliseconds,
         },
       );
       
+      // Log warning if slow
+      if (stopwatch.elapsedMilliseconds > 200) {
+        await AppLogger.warning(
+          'Intent-driven retrieval slow',
+          context: {
+            'category': 'intent_retrieval',
+            'event': 'retrieval_slow',
+            'originalQuery': query.originalQuery,
+            'retrievalTimeMs': stopwatch.elapsedMilliseconds,
+            'thresholdMs': 200,
+          },
+        );
+      }
+      
       // Return all candidates as fallback (Stage 4 behavior)
-      return _createFallbackResult(candidateRecords, activeSpaceId, startTime);
+      return _createFallbackResult(candidateRecords, activeSpaceId, DateTime.now());
     }
   }
   
