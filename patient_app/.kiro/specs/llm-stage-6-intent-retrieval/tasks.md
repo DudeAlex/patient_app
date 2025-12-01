@@ -656,25 +656,25 @@ Add simple timing to RelevanceScorer.
 
 Add simple timing to IntentDrivenRetriever.
 
-- [ ] 19.1 Add stopwatch to retrieve() method
+- [x] 19.1 Add stopwatch to retrieve() method
   - File: `lib/core/ai/chat/domain/services/intent_driven_retriever.dart`
   - Add stopwatch at start
   - Stop at end
   - _Just add the stopwatch_
 
-- [ ] 19.2 Log retrieval time
+- [x] 19.2 Log retrieval time
   - Log: 'Intent-driven retrieval completed'
   - Context: {'durationMs': stopwatch.elapsedMilliseconds, 'recordsRetrieved': result.records.length}
   - _One simple log statement_
 
-- [ ] 19.3 Log warning if slow
+- [x] 19.3 Log warning if slow
   - Add: `if (stopwatch.elapsedMilliseconds > 200)`
   - Log warning: 'Intent-driven retrieval slow'
   - _One simple if statement_
 
 ---
 
-## Checkpoint 19: Commit IntentDrivenRetriever performance tracking
+## Checkpoint 19: Commit IntentDrivenRetriever performance tracking ✅
 
 **Action:** Commit with message: "feat(stage6): Add performance tracking to IntentDrivenRetriever"
 
