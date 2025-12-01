@@ -531,25 +531,25 @@ Write ONE simple property test for relevance scoring.
 
 Write ONE simple property test for privacy filtering.
 
-- [ ] 15.1 Create test file
+- [x] 15.1 Create test file
   - File: `test/core/ai/chat/domain/services/privacy_filter_simple_test.dart`
   - Import PrivacyFilter
   - Create test group
   - _Just create the file structure_
 
-- [ ] 15.2 Write test: Private records are excluded
+- [x] 15.2 Write test: Private records are excluded
   - Create 2 records: one normal, one with "private" tag
   - Call filter.filter()
   - Verify result has only 1 record (the normal one)
   - _One simple test_
 
-- [ ] 15.3 Write test: Deleted records are excluded
+- [x] 15.3 Write test: Deleted records are excluded
   - Create 2 records: one normal, one with deletedAt set
   - Call filter.filter()
   - Verify result has only 1 record
   - _One simple test_
 
-- [ ] 15.4 Write test: Normal records pass through
+- [x] 15.4 Write test: Normal records pass through
   - Create 3 normal records
   - Call filter.filter()
   - Verify result has all 3 records
@@ -557,7 +557,7 @@ Write ONE simple property test for privacy filtering.
 
 ---
 
-## Checkpoint 15: Commit privacy filter tests
+## Checkpoint 15: Commit privacy filter tests ✅
 
 **Action:** Commit with message: "test(stage6): Add simple privacy filter tests"
 
