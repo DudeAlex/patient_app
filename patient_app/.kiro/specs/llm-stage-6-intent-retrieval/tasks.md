@@ -101,7 +101,7 @@ Create a simple, universal keyword extractor that works for any language.
 
 Create a simple intent classifier that works for any language.
 
-- [ ] 3.1 Create IntentClassifier class
+- [x] 3.1 Create IntentClassifier class
   - File: `lib/core/ai/chat/domain/services/intent_classifier.dart`
   - Method: `QueryIntent classify(String query, List<String> keywords)`
   - Implementation (language-agnostic):
@@ -111,7 +111,7 @@ Create a simple intent classifier that works for any language.
   - Return intent with confidence (0.8 for '?', 0.6 for length, 0.5 for default)
   - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 3.2 Write unit tests for IntentClassifier
+- [x] 3.2 Write unit tests for IntentClassifier
   - File: `test/core/ai/chat/domain/services/intent_classifier_test.dart`
   - Test cases:
     - English question: "What is my blood pressure?" → question
