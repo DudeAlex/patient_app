@@ -29,7 +29,7 @@ class QueryAnalyzer {
   /// Returns a [QueryAnalysis] object containing the extracted keywords,
   /// classified intent, confidence score, and context.
   Future<QueryAnalysis> analyze(String query, {List<String>? history}) async {
-    final startTime = DateTime.now();
+    final stopwatch = Stopwatch()..start();
 
     // 1. Extract keywords
     final keywords = _keywordExtractor.extract(query);
@@ -41,8 +41,8 @@ class QueryAnalyzer {
     QueryContext? context;
     if (history != null && history.isNotEmpty) {
       // Limit to last 2 messages (requirement 8.5)
-      final recentHistory = history.length > 2 
-          ? history.sublist(history.length - 2) 
+      final recentHistory = history.length > 2
+          ? history.sublist(history.length - 2)
           : history;
           
       // Simple reference resolution for pronouns
@@ -68,10 +68,12 @@ class QueryAnalyzer {
       context: context,
     );
 
+    stopwatch.stop();
+
     // 4. Log results
-    final duration = DateTime.now().difference(startTime);
+    final duration = stopwatch.elapsedMilliseconds;
     await AppLogger.info(
-      'Query analyzed',
+      'Query analysis completed',
       context: {
         'category': 'intent_retrieval',
         'event': 'query_analysis',
@@ -82,9 +84,23 @@ class QueryAnalyzer {
         'intentConfidence': classification.confidence,
         'hasContext': context != null,
         'historyCount': context?.conversationHistory.length ?? 0,
-        'analysisTimeMs': duration.inMilliseconds,
+        'analysisTimeMs': duration,
       },
     );
+
+    // 5. Log warning if slow
+    if (stopwatch.elapsedMilliseconds > 50) {
+      await AppLogger.warning(
+        'Query analysis slow',
+        context: {
+          'category': 'intent_retrieval',
+          'event': 'query_analysis_slow',
+          'originalQuery': query,
+          'analysisTimeMs': stopwatch.elapsedMilliseconds,
+          'thresholdMs': 50,
+        },
+      );
+    }
 
     return analysis;
   }
