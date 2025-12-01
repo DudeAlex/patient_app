@@ -628,25 +628,25 @@ Add simple timing to QueryAnalyzer.
 
 Add simple timing to RelevanceScorer.
 
-- [ ] 18.1 Add stopwatch to score() method
+- [x] 18.1 Add stopwatch to score() method
   - File: `lib/core/ai/chat/domain/services/relevance_scorer.dart`
   - Add stopwatch at start
   - Stop at end
   - _Just add the stopwatch_
 
-- [ ] 18.2 Log scoring time
+- [x] 18.2 Log scoring time
   - Log: 'Relevance scoring completed'
   - Context: {'durationMs': stopwatch.elapsedMilliseconds}
   - _One simple log statement_
 
-- [ ] 18.3 Log warning if slow
+- [x] 18.3 Log warning if slow
   - Add: `if (stopwatch.elapsedMilliseconds > 100)`
   - Log warning: 'Relevance scoring slow'
   - _One simple if statement_
 
 ---
 
-## Checkpoint 18: Commit RelevanceScorer performance tracking
+## Checkpoint 18: Commit RelevanceScorer performance tracking ✅
 
 **Action:** Commit with message: "feat(stage6): Add performance tracking to RelevanceScorer"
 
