@@ -66,7 +66,7 @@ Create the foundational data models for intent-driven retrieval.
 
 Create a simple, universal keyword extractor that works for any language.
 
-- [ ] 2.1 Create KeywordExtractor class
+- [x] 2.1 Create KeywordExtractor class
   - File: `lib/core/ai/chat/domain/services/keyword_extractor.dart`
   - Method: `List<String> extract(String text)`
   - Implementation:
@@ -77,7 +77,7 @@ Create a simple, universal keyword extractor that works for any language.
     - NO stemming (language-agnostic)
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [ ] 2.2 Write unit tests for KeywordExtractor
+- [x] 2.2 Write unit tests for KeywordExtractor
   - File: `test/core/ai/chat/domain/services/keyword_extractor_test.dart`
   - Test cases:
     - English query: "What is my blood pressure?" → ["what", "is", "my", "blood", "pressure"]
