@@ -15,6 +15,8 @@ ChatRequest _request() {
     spaceContext: SpaceContext(
       spaceId: 'health',
       spaceName: 'Health',
+      description: 'Health space',
+      categories: const ['test'],
       persona: SpacePersona.health,
     ),
     messageHistory: const [],
@@ -30,7 +32,7 @@ void main() {
     late HttpRequest captured;
     server.listen((HttpRequest request) async {
       captured = request;
-      expect(request.uri.path, '/api/v1/chat/echo');
+      expect(request.uri.path, '/api/v1/chat/message');
       final body = await utf8.decoder.bind(request).join();
       final jsonBody = jsonDecode(body) as Map<String, dynamic>;
       expect(jsonBody['message'], 'Hello echo');

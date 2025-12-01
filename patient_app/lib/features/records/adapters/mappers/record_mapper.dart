@@ -11,6 +11,7 @@ RecordEntity mapRecordFromStorage(storage.Record record) {
     title: record.title,
     text: record.text,
     tags: List<String>.from(record.tags),
+    viewCount: record.viewCount,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
     deletedAt: record.deletedAt,
@@ -26,6 +27,7 @@ storage.Record mapRecordToStorage(RecordEntity entity) {
     ..title = entity.title
     ..text = entity.text
     ..tags = List<String>.from(entity.tags)
+    ..viewCount = entity.viewCount
     ..createdAt = entity.createdAt
     ..updatedAt = entity.updatedAt
     ..deletedAt = entity.deletedAt;

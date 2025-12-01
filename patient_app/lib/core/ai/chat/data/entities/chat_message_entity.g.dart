@@ -49,40 +49,51 @@ const ChatMessageEntitySchema = Schema(
       name: r'errorRetryable',
       type: IsarType.bool,
     ),
-    r'id': PropertySchema(
+    r'feedback': PropertySchema(
       id: 7,
+      name: r'feedback',
+      type: IsarType.string,
+      enumMap: _ChatMessageEntityfeedbackEnumValueMap,
+    ),
+    r'feedbackTimestamp': PropertySchema(
+      id: 8,
+      name: r'feedbackTimestamp',
+      type: IsarType.dateTime,
+    ),
+    r'id': PropertySchema(
+      id: 9,
       name: r'id',
       type: IsarType.string,
     ),
     r'latencyMs': PropertySchema(
-      id: 8,
+      id: 10,
       name: r'latencyMs',
       type: IsarType.long,
     ),
     r'provider': PropertySchema(
-      id: 9,
+      id: 11,
       name: r'provider',
       type: IsarType.string,
     ),
     r'sender': PropertySchema(
-      id: 10,
+      id: 12,
       name: r'sender',
       type: IsarType.string,
       enumMap: _ChatMessageEntitysenderEnumValueMap,
     ),
     r'status': PropertySchema(
-      id: 11,
+      id: 13,
       name: r'status',
       type: IsarType.string,
       enumMap: _ChatMessageEntitystatusEnumValueMap,
     ),
     r'timestamp': PropertySchema(
-      id: 12,
+      id: 14,
       name: r'timestamp',
       type: IsarType.dateTime,
     ),
     r'tokensUsed': PropertySchema(
-      id: 13,
+      id: 15,
       name: r'tokensUsed',
       type: IsarType.long,
     )
@@ -128,6 +139,12 @@ int _chatMessageEntityEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  {
+    final value = object.feedback;
+    if (value != null) {
+      bytesCount += 3 + value.name.length * 3;
+    }
+  }
   bytesCount += 3 + object.id.length * 3;
   {
     final value = object.provider;
@@ -158,13 +175,15 @@ void _chatMessageEntitySerialize(
   writer.writeString(offsets[4], object.errorCode);
   writer.writeString(offsets[5], object.errorMessage);
   writer.writeBool(offsets[6], object.errorRetryable);
-  writer.writeString(offsets[7], object.id);
-  writer.writeLong(offsets[8], object.latencyMs);
-  writer.writeString(offsets[9], object.provider);
-  writer.writeString(offsets[10], object.sender.name);
-  writer.writeString(offsets[11], object.status.name);
-  writer.writeDateTime(offsets[12], object.timestamp);
-  writer.writeLong(offsets[13], object.tokensUsed);
+  writer.writeString(offsets[7], object.feedback?.name);
+  writer.writeDateTime(offsets[8], object.feedbackTimestamp);
+  writer.writeString(offsets[9], object.id);
+  writer.writeLong(offsets[10], object.latencyMs);
+  writer.writeString(offsets[11], object.provider);
+  writer.writeString(offsets[12], object.sender.name);
+  writer.writeString(offsets[13], object.status.name);
+  writer.writeDateTime(offsets[14], object.timestamp);
+  writer.writeLong(offsets[15], object.tokensUsed);
 }
 
 ChatMessageEntity _chatMessageEntityDeserialize(
@@ -187,17 +206,20 @@ ChatMessageEntity _chatMessageEntityDeserialize(
     errorCode: reader.readStringOrNull(offsets[4]),
     errorMessage: reader.readStringOrNull(offsets[5]),
     errorRetryable: reader.readBoolOrNull(offsets[6]),
-    id: reader.readStringOrNull(offsets[7]) ?? '',
-    latencyMs: reader.readLongOrNull(offsets[8]),
-    provider: reader.readStringOrNull(offsets[9]),
+    feedback: _ChatMessageEntityfeedbackValueEnumMap[
+        reader.readStringOrNull(offsets[7])],
+    feedbackTimestamp: reader.readDateTimeOrNull(offsets[8]),
+    id: reader.readStringOrNull(offsets[9]) ?? '',
+    latencyMs: reader.readLongOrNull(offsets[10]),
+    provider: reader.readStringOrNull(offsets[11]),
     sender: _ChatMessageEntitysenderValueEnumMap[
-            reader.readStringOrNull(offsets[10])] ??
+            reader.readStringOrNull(offsets[12])] ??
         MessageSender.user,
     status: _ChatMessageEntitystatusValueEnumMap[
-            reader.readStringOrNull(offsets[11])] ??
+            reader.readStringOrNull(offsets[13])] ??
         MessageStatus.sending,
-    timestamp: reader.readDateTimeOrNull(offsets[12]),
-    tokensUsed: reader.readLongOrNull(offsets[13]),
+    timestamp: reader.readDateTimeOrNull(offsets[14]),
+    tokensUsed: reader.readLongOrNull(offsets[15]),
   );
   return object;
 }
@@ -230,28 +252,41 @@ P _chatMessageEntityDeserializeProp<P>(
     case 6:
       return (reader.readBoolOrNull(offset)) as P;
     case 7:
-      return (reader.readStringOrNull(offset) ?? '') as P;
+      return (_ChatMessageEntityfeedbackValueEnumMap[
+          reader.readStringOrNull(offset)]) as P;
     case 8:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 9:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset) ?? '') as P;
     case 10:
+      return (reader.readLongOrNull(offset)) as P;
+    case 11:
+      return (reader.readStringOrNull(offset)) as P;
+    case 12:
       return (_ChatMessageEntitysenderValueEnumMap[
               reader.readStringOrNull(offset)] ??
           MessageSender.user) as P;
-    case 11:
+    case 13:
       return (_ChatMessageEntitystatusValueEnumMap[
               reader.readStringOrNull(offset)] ??
           MessageStatus.sending) as P;
-    case 12:
+    case 14:
       return (reader.readDateTimeOrNull(offset)) as P;
-    case 13:
+    case 15:
       return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
 }
 
+const _ChatMessageEntityfeedbackEnumValueMap = {
+  r'positive': r'positive',
+  r'negative': r'negative',
+};
+const _ChatMessageEntityfeedbackValueEnumMap = {
+  r'positive': MessageFeedback.positive,
+  r'negative': MessageFeedback.negative,
+};
 const _ChatMessageEntitysenderEnumValueMap = {
   r'user': r'user',
   r'ai': r'ai',
@@ -1139,6 +1174,234 @@ extension ChatMessageEntityQueryFilter
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'errorRetryable',
         value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'feedback',
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'feedback',
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackEqualTo(
+    MessageFeedback? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'feedback',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackGreaterThan(
+    MessageFeedback? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'feedback',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackLessThan(
+    MessageFeedback? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'feedback',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackBetween(
+    MessageFeedback? lower,
+    MessageFeedback? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'feedback',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'feedback',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'feedback',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'feedback',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'feedback',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'feedback',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'feedback',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackTimestampIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'feedbackTimestamp',
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackTimestampIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'feedbackTimestamp',
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackTimestampEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'feedbackTimestamp',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackTimestampGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'feedbackTimestamp',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackTimestampLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'feedbackTimestamp',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<ChatMessageEntity, ChatMessageEntity, QAfterFilterCondition>
+      feedbackTimestampBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'feedbackTimestamp',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }

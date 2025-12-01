@@ -1,6 +1,6 @@
 import 'package:isar/isar.dart';
 
-import '../../models/chat_message.dart';
+import '../../models/chat_message.dart' show MessageSender, MessageStatus, MessageFeedback;
 import 'message_attachment_entity.dart';
 
 part 'chat_message_entity.g.dart';
@@ -23,6 +23,8 @@ class ChatMessageEntity {
     this.errorMessage,
     this.errorCode,
     this.errorRetryable,
+    this.feedback,
+    this.feedbackTimestamp,
   });
 
   /// Stable message id (matches domain model).
@@ -58,4 +60,11 @@ class ChatMessageEntity {
   String? errorMessage;
   String? errorCode;
   bool? errorRetryable;
+
+  /// User feedback for AI responses (thumbs up/down).
+  @Enumerated(EnumType.name)
+  MessageFeedback? feedback;
+
+  /// Timestamp when feedback was provided.
+  DateTime? feedbackTimestamp;
 }

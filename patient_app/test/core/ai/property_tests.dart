@@ -14,11 +14,13 @@ import 'package:patient_app/core/ai/repositories/ai_consent_repository.dart';
 import 'package:patient_app/core/domain/entities/information_item.dart';
 import 'package:patient_app/features/information_items/application/use_cases/summarize_information_item_use_case.dart';
 import 'package:patient_app/core/ai/chat/application/use_cases/send_chat_message_use_case.dart';
+import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
 import 'package:patient_app/core/ai/chat/fake_ai_chat_service.dart';
 import 'package:patient_app/core/ai/chat/models/chat_message.dart';
 import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
+import 'package:patient_app/core/ai/chat/models/record_summary.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
@@ -28,6 +30,7 @@ import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
 import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
 import 'package:patient_app/core/ai/chat/logging_ai_chat_service.dart';
 import 'package:patient_app/core/ai/repositories/ai_call_log_repository.dart';
+import 'chat/fakes/fake_token_budget_allocator.dart';
 import 'package:uuid/uuid.dart';
 
 class _StubConsentRepo implements AiConsentRepository {
@@ -39,6 +42,14 @@ class _StubConsentRepo implements AiConsentRepository {
   Future<void> grantConsent() async => consent = true;
   @override
   Future<void> revokeConsent() async => consent = false;
+}
+
+class _StubSpaceContextBuilder implements SpaceContextBuilder {
+  _StubSpaceContextBuilder(this._context);
+  final SpaceContext _context;
+
+  @override
+  Future<SpaceContext> build(String spaceId) async => _context;
 }
 
 
@@ -122,6 +133,8 @@ void main() {
     final spaceContext = SpaceContext(
       spaceId: 'health',
       spaceName: 'Health',
+      description: 'Health space',
+      categories: const ['test'],
       persona: SpacePersona.health,
     );
 
@@ -152,6 +165,8 @@ void main() {
           chatThreadRepository: _InMemoryThreadRepo(),
           consentRepository: consentRepo,
           attachmentHandler: _NoopAttachmentHandler(),
+          tokenBudgetAllocator: const FakeTokenBudgetAllocator(),
+          spaceContextBuilder: _StubSpaceContextBuilder(spaceContext),
           uuid: const Uuid(),
         );
 
@@ -159,7 +174,8 @@ void main() {
           expect(
             () => useCase.execute(
               threadId: threadId,
-              spaceContext: spaceContext,
+              spaceId: spaceContext.spaceId,
+              spaceContextOverride: spaceContext,
               messageContent: 'hello',
             ),
             throwsA(isA<AiConsentRequiredException>()),
@@ -167,7 +183,8 @@ void main() {
         } else {
           final response = await useCase.execute(
             threadId: threadId,
-            spaceContext: spaceContext,
+            spaceId: spaceContext.spaceId,
+            spaceContextOverride: spaceContext,
             messageContent: 'hello',
           );
           expect(response.content, 'hello');
@@ -181,6 +198,8 @@ void main() {
     SpaceContext buildSpace(int i) => SpaceContext(
           spaceId: 'space_$i',
           spaceName: 'Space $i',
+          description: 'Test space',
+          categories: const ['test'],
           persona: SpacePersona.values[i % SpacePersona.values.length],
         );
 
@@ -213,13 +232,13 @@ void main() {
         final item = buildItem(i);
         final summary = RecordSummary(
           title: item.data['title'] as String,
-          category: 'category_$i',
+          type: 'category_$i',
           tags: ['t$i'],
-          createdAt: item.createdAt,
+          date: item.createdAt,
         );
 
         expect(summary.title, contains(item.data['title'] as String));
-        expect(summary.category, 'category_$i');
+        expect(summary.type, 'category_$i');
         expect(summary.tags, contains('t$i'));
       }
     });
@@ -233,6 +252,8 @@ void main() {
         spaceContext: SpaceContext(
           spaceId: 'space_safety',
           spaceName: 'Space Safety',
+          description: 'Test space',
+          categories: const ['test'],
           persona: SpacePersona.general,
         ),
         attachments: [
@@ -269,6 +290,8 @@ void main() {
         spaceContext: SpaceContext(
           spaceId: 's',
           spaceName: 'S',
+          description: 'Test space',
+          categories: const ['test'],
           persona: SpacePersona.general,
         ),
         messageHistory: history,
@@ -302,6 +325,16 @@ void main() {
           chatThreadRepository: repo,
           consentRepository: _StubConsentRepo(true),
           attachmentHandler: _NoopAttachmentHandler(),
+          tokenBudgetAllocator: const FakeTokenBudgetAllocator(),
+          spaceContextBuilder: _StubSpaceContextBuilder(
+            SpaceContext(
+              spaceId: 'space_${i % 3}',
+              spaceName: 'Space',
+              description: 'Test space',
+              categories: const ['test'],
+              persona: SpacePersona.general,
+            ),
+          ),
           uuid: const Uuid(),
         );
 
@@ -311,6 +344,8 @@ void main() {
           spaceContext: SpaceContext(
             spaceId: 'space_${i % 3}',
             spaceName: 'Space',
+            description: 'Test space',
+            categories: const ['test'],
             persona: SpacePersona.general,
           ),
           messageContent: content,
@@ -339,6 +374,8 @@ void main() {
           spaceContext: SpaceContext(
             spaceId: 'health',
             spaceName: 'Health',
+            description: 'Health space',
+            categories: const ['test'],
             persona: SpacePersona.health,
           ),
           messageHistory: const [],
@@ -372,6 +409,16 @@ void main() {
         chatThreadRepository: repo,
         consentRepository: _StubConsentRepo(true),
         attachmentHandler: _NoopAttachmentHandler(),
+        tokenBudgetAllocator: const FakeTokenBudgetAllocator(),
+        spaceContextBuilder: _StubSpaceContextBuilder(
+          SpaceContext(
+            spaceId: 'space',
+            spaceName: 'Space',
+            description: 'Test space',
+            categories: const ['test'],
+            persona: SpacePersona.general,
+          ),
+        ),
         uuid: const Uuid(),
       );
 
@@ -385,6 +432,8 @@ void main() {
         spaceContext: SpaceContext(
           spaceId: 'space',
           spaceName: 'Space',
+          description: 'Test space',
+          categories: const ['test'],
           persona: SpacePersona.general,
         ),
         content: 'queued',
@@ -425,6 +474,8 @@ void main() {
         spaceContext: SpaceContext(
           spaceId: 'health',
           spaceName: 'Health',
+          description: 'Health space',
+          categories: const ['test'],
           persona: SpacePersona.health,
         ),
         messageHistory: const [],
@@ -447,6 +498,8 @@ void main() {
         spaceContext: SpaceContext(
           spaceId: 'health',
           spaceName: 'Health',
+          description: 'Health space',
+          categories: const ['test'],
           persona: SpacePersona.health,
         ),
         attachments: [

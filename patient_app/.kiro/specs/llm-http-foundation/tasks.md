@@ -178,7 +178,7 @@
 
 ## Stage 2: Basic LLM Integration
 
-- [ ] 21. Set up LLM provider integration (Backend)
+ - [x] 21. Set up LLM provider integration (Backend)
   - Choose LLM provider (Together AI recommended)
   - Create provider account and get API key
   - Store API key securely (environment variable)
@@ -187,7 +187,7 @@
   - Implement error classification
   - _Requirements: 2.1, 2.5_
 
-- [ ] 22. Create system prompt template (Backend)
+- [x] 22. Create system prompt template (Backend)
   - Create prompt template file
   - Define base system instructions
   - Add guidelines for AI behavior
@@ -196,7 +196,7 @@
   - Version the template (v1.0)
   - _Requirements: 2.1_
 
-- [ ] 23. Implement message history manager (Backend)
+- [x] 23. Implement message history manager (Backend)
   - Create history formatting function
   - Limit to last 3 conversation turns
   - Format as alternating user/assistant messages
@@ -204,7 +204,7 @@
   - Handle empty history gracefully
   - _Requirements: 2.2, 3.1, 3.2, 3.3, 3.4, 3.5_
 
-- [ ] 24. Implement token counter (Backend)
+- [x] 24. Implement token counter (Backend)
   - Integrate provider's tokenizer (tiktoken or custom)
   - Count tokens in system prompt
   - Count tokens in history
@@ -213,7 +213,7 @@
   - Log token usage
   - _Requirements: 2.4, 4.2, 4.3_
 
-- [ ] 25. Create LLM chat endpoint (Backend)
+- [x] 25. Create LLM chat endpoint (Backend)
   - Create POST /api/v1/chat/message endpoint
   - Validate request format
   - Extract message and history
@@ -224,7 +224,7 @@
   - Add error handling
   - _Requirements: 2.1, 2.2, 2.3_
 
-- [ ] 26. Implement rate limiting (Backend)
+- [x] 26. Implement rate limiting (Backend)
   - Set up Redis or in-memory cache
   - Implement sliding window algorithm
   - Enforce 10 requests/minute per user
@@ -234,7 +234,7 @@
   - Log rate limit violations
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 27. Add LLM-specific logging (Backend)
+- [x] 27. Add LLM-specific logging (Backend)
   - Log LLM request sent (provider, model, prompt tokens)
   - Log LLM response received (completion tokens, latency)
   - Log token usage per request
@@ -242,7 +242,7 @@
   - Redact message content
   - _Requirements: 2.4, 4.2, 4.3, 4.4_
 
-- [ ] 28. Update HttpAiChatService for Stage 2
+- [x] 28. Update HttpAiChatService for Stage 2
   - Update endpoint to /api/v1/chat/message
   - Include message history in request
   - Increase timeout to 60 seconds
@@ -250,14 +250,14 @@
   - Log token usage
   - _Requirements: 2.3, 2.4_
 
-- [ ] 29. Update ChatRequest model
+- [x] 29. Update ChatRequest model
   - Add messageHistory field
   - Add maxHistoryMessages field (default 3)
   - Update toJson() to include history
   - Format history as role/content pairs
   - _Requirements: 3.1, 3.3_
 
-- [ ] 30. Update ChatResponse model
+- [x] 30. Update ChatResponse model
   - Add tokenUsage field to AiMetadata
   - Add llmProvider field to AiMetadata
   - Add modelVersion field to AiMetadata
@@ -265,13 +265,13 @@
   - Update fromJson() to parse new fields
   - _Requirements: 2.3, 2.4_
 
-- [ ] 31. Update SendChatMessageUseCase
+- [x] 31. Update SendChatMessageUseCase
   - Load last 3 messages from thread
   - Include history in ChatRequest
   - Log token usage from response
   - _Requirements: 3.1, 3.2_
 
-- [ ] 32. Write unit tests for LLM integration (Backend)
+- [x] 32. Write unit tests for LLM integration (Backend)
   - Test prompt construction with history
   - Test token counting
   - Test LLM API call
@@ -280,7 +280,7 @@
   - Mock LLM API for isolation
   - _Requirements: 10.2_
 
-- [ ] 33. Write unit tests for rate limiting (Backend)
+- [x] 33. Write unit tests for rate limiting (Backend)
   - Test 10 requests/minute limit
   - Test 100 requests/hour limit
   - Test 500 requests/day limit
@@ -288,7 +288,7 @@
   - Test Retry-After header
   - _Requirements: 10.2_
 
-- [ ] 34. Write integration test for LLM flow
+- [x] 34. Write integration test for LLM flow
   - Start with chat thread containing 2 messages
   - Send new message via HttpAiChatService
   - Verify backend receives request with history
@@ -299,7 +299,7 @@
   - Verify UI displays message
   - _Requirements: 10.2_
 
-- [ ] 35. Write property-based test for LLM response validity
+- [x] 35. Write property-based test for LLM response validity
   - **Property 5: LLM Response Validity**
   - **Validates: Requirements 2.3**
   - Generate random messages
@@ -307,20 +307,20 @@
   - Assert response contains non-empty message
   - Assert response contains valid token usage
 
-- [ ] 36. Write property-based test for history limit
+- [x] 36. Write property-based test for history limit
   - **Property 7: History Limit Enforcement**
   - **Validates: Requirements 3.3**
   - Generate chat threads with varying message counts (0-10)
   - Build ChatRequest
   - Assert history contains at most 3 messages
 
-- [ ] 37. Write property-based test for rate limiting
+- [x] 37. Write property-based test for rate limiting
   - **Property 10: Rate Limit Enforcement**
   - **Validates: Requirements 5.1**
   - Send 11 requests in rapid succession
   - Assert 11th request returns HTTP 429
 
-- [ ] 38. Manual testing and documentation
+- [x] 38. Manual testing and documentation
   - Test LLM response generation
   - Test conversation continuity
   - Test history truncation
@@ -330,7 +330,7 @@
   - Verify performance benchmarks met
   - _Requirements: 10.5_
 
-- [ ] 39. Stage 2 checkpoint - Ensure all tests pass
+- [x] 39. Stage 2 checkpoint - Ensure all tests pass
   - Run all unit tests
   - Run all integration tests
   - Run all property-based tests
@@ -340,7 +340,7 @@
   - Verify user feedback positive (>80%)
   - Ask user if questions arise
 
-- [ ] 40. Update documentation
+- [x] 40. Update documentation
   - Update README.md with LLM integration details
   - Update ARCHITECTURE.md with HTTP/LLM layers
   - Update SPEC.md with Stage 1 and 2 requirements
@@ -349,7 +349,7 @@
   - Document LLM provider configuration
   - _Requirements: All_
 
-- [ ] 41. Final checkpoint - Production readiness
+- [x] 41. Final checkpoint - Production readiness
   - All tests passing
   - Performance benchmarks met
   - Security review complete

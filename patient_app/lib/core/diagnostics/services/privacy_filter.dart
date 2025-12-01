@@ -2,8 +2,20 @@
 /// 
 /// Ensures logs don't contain personal health information, emails,
 /// tokens, or other sensitive data.
+/// 
+/// In development mode (debug/dev), redaction is disabled to allow
+/// full visibility of logs for debugging. In production, all sensitive
+/// data is redacted for privacy compliance.
 class PrivacyFilter {
-  /// Fields that should be redacted from logs
+  final bool enableRedaction;
+
+  /// Create a privacy filter
+  /// 
+  /// [enableRedaction] - If true, sensitive data will be redacted.
+  /// If false (development mode), all data is visible.
+  PrivacyFilter({required this.enableRedaction});
+
+  /// Fields that should be redacted from logs (only in production)
   static const List<String> sensitiveFields = [
     'email',
     'password',
@@ -25,6 +37,11 @@ class PrivacyFilter {
 
   /// Redact sensitive fields from a map
   Map<String, dynamic> redact(Map<String, dynamic> data) {
+    // Skip redaction in development mode
+    if (!enableRedaction) {
+      return data;
+    }
+
     final redacted = <String, dynamic>{};
 
     for (final entry in data.entries) {
@@ -58,6 +75,11 @@ class PrivacyFilter {
 
   /// Redact sensitive patterns from a string
   String redactString(String text) {
+    // Skip redaction in development mode
+    if (!enableRedaction) {
+      return text;
+    }
+
     var redacted = text;
 
     // Redact email addresses

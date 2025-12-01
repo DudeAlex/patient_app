@@ -1,0 +1,184 @@
+{
+  "records": [
+    {
+      "title": "Morning Blood Pressure Reading",
+      "type": "vital_signs",
+      "date": "2025-09-15T08:00:00Z",
+      "content": "Blood pressure: 118/76 mmHg, Pulse: 70 bpm - morning reading",
+      "spaceId": "health",
+      "viewCount": 5,
+      "tags": ["cardiovascular", "monitoring", "daily"]
+    },
+    {
+      "title": "Cardiology Follow-up Appointment",
+      "type": "doctor_visit",
+      "date": "2025-10-12T14:30:0Z",
+      "content": "Follow-up visit after medication adjustment. Blood pressure improved. Discussing dietary changes for better management.",
+      "spaceId": "health",
+      "viewCount": 3,
+      "tags": ["cardiology", "appointment", "medication"]
+    },
+    {
+      "title": "Lab Results: Complete Blood Count",
+      "type": "lab_result",
+      "date": "2025-10-05T09:15:00Z",
+      "content": "Complete blood count shows improvement in iron levels. Vitamin B12 slightly low, supplement recommended.",
+      "spaceId": "health",
+      "viewCount": 8,
+      "tags": ["lab", "bloodwork", "normal"]
+    },
+    {
+      "title": "Team Meeting - Q4 Budget Planning",
+      "type": "meeting",
+      "date": "2025-11-18T10:00:0Z",
+      "content": "Strategic planning session for Q1 initiatives. Focus on customer acquisition and product development roadmap.",
+      "spaceId": "business",
+      "viewCount": 12,
+      "tags": ["budget", "planning", "team"]
+    },
+    {
+      "title": "Client Proposal - ABC Corporation",
+      "type": "proposal",
+      "date": "2025-11-10T16:45:00Z",
+      "content": "Proposal presentation to potential client. Demonstrated product capabilities and discussed custom requirements. Next meeting scheduled for contract negotiation.",
+      "spaceId": "business",
+      "viewCount": 7,
+      "tags": ["proposal", "client", "software"]
+    },
+    {
+      "title": "Project Status Update - Mobile App",
+      "type": "project_update",
+      "date": "2025-11-22T11:30:00Z",
+      "content": "Weekly project sync meeting. Identified critical path dependencies. Resource allocation updated for final sprint.",
+      "spaceId": "business",
+      "viewCount": 15,
+      "tags": ["mobile", "project", "status"]
+    },
+    {
+      "title": "Research Paper: Quantum Computing",
+      "type": "research",
+      "date": "2025-10-20T13:20:00Z",
+      "content": "Literature review on neural network architectures. Focusing on transformer models and attention mechanisms for the research paper.",
+      "spaceId": "education",
+      "viewCount": 6,
+      "tags": ["quantum", "research", "algorithms"]
+    },
+    {
+      "title": "Midterm Exam Results - Advanced Calculus",
+      "type": "exam",
+      "date": "2025-09-28T15:00:0Z",
+      "content": "Calculus exam results. Focus on improving complex analysis section for retake. Tutoring session scheduled for next week.",
+      "spaceId": "education",
+      "viewCount": 4,
+      "tags": ["exam", "calculus", "math"]
+    },
+    {
+      "title": "Lecture Notes: Machine Learning",
+      "type": "lecture",
+      "date": "2025-10-15T09:00:00Z",
+      "content": "Today's lecture covered neural networks and deep learning concepts. Hands-on implementation of a simple perceptron model.",
+      "spaceId": "education",
+      "viewCount": 9,
+      "tags": ["ml", "notes", "algorithms"]
+    },
+    {
+      "title": "Exercise Log - Cardio Training",
+      "type": "exercise",
+      "date": "2025-11-05T07:00:00Z",
+      "content": "Morning workout: 45-minute run with intervals, core strengthening exercises. Heart rate variability indicates good recovery.",
+      "spaceId": "health",
+      "viewCount": 2,
+      "tags": ["cardio", "fitness", "training"]
+    },
+    {
+      "title": "Contract Review - Vendor Agreement",
+      "type": "contract",
+      "date": "2025-10-25T13:45:00Z",
+      "content": "Contract negotiations concluded. Finalized terms with legal review. Implementation timeline adjusted to account for onboarding process.",
+      "spaceId": "business",
+      "viewCount": 10,
+      "tags": ["legal", "vendor", "contract"]
+    },
+    {
+      "title": "Assignment: Data Structures Implementation",
+      "type": "assignment",
+      "date": "2025-09-18T18:30:00Z",
+      "content": "Completed assignment on graph algorithms. Implemented Dijkstra's shortest path algorithm with optimization for sparse graphs.",
+      "spaceId": "education",
+      "viewCount": 3,
+      "tags": ["programming", "data-structures", "c++"]
+    },
+    {
+      "title": "Medication Schedule Update",
+      "type": "medication",
+      "date": "2025-11-12T10:15:00Z",
+      "content": "Medication review and adjustment. Added supplement regimen to support overall health. Follow-up appointment in 3 weeks.",
+      "spaceId": "health",
+      "viewCount": 11,
+      "tags": ["medication", "prescription", "schedule"]
+    },
+    {
+      "title": "Client Meeting Notes - New Project",
+      "type": "client_note",
+      "date": "2025-11-20T14:00:00Z",
+      "content": "Client requirements gathering session. Identified key pain points and success metrics. Project timeline and deliverables confirmed.",
+      "spaceId": "business",
+      "viewCount": 8,
+      "tags": ["client", "meeting", "requirements"]
+    },
+    {
+      "title": "Course Syllabus - Organic Chemistry",
+      "type": "course",
+      "date": "2025-09-10T08:00:00Z",
+      "content": "Organic chemistry syllabus overview. Laboratory safety protocols and experimental procedures review. First lab session scheduled for next week.",
+      "spaceId": "education",
+      "viewCount": 1,
+      "tags": ["syllabus", "chemistry", "organic"]
+    },
+    {
+      "title": "Annual Physical Examination",
+      "type": "doctor_visit",
+      "date": "2025-10-08T09:30:00Z",
+      "content": "Annual physical examination. Weight: 168 lbs, Blood pressure optimal. Recommended cholesterol screening and dietary consultation.",
+      "spaceId": "health",
+      "viewCount": 14,
+      "tags": ["annual", "checkup", "screening"]
+    },
+    {
+      "title": "Sales Report - November",
+      "type": "project_update",
+      "date": "2025-11-28T09:00:0Z",
+      "content": "November sales performance review. Achievement of 112% of target. Regional analysis shows strong performance in East and South territories.",
+      "spaceId": "business",
+      "viewCount": 18,
+      "tags": ["sales", "report", "forecast"]
+    },
+    {
+      "title": "Study Group Meeting - Physics",
+      "type": "study_note",
+      "date": "2025-10-18T16:00:00Z",
+      "content": "Study group session for upcoming finals. Focus on quantum mechanics problems and statistical thermodynamics. Group presentation scheduled.",
+      "spaceId": "education",
+      "viewCount": 5,
+      "tags": ["study", "physics", "thermodynamics"]
+    },
+    {
+      "title": "Symptom Tracker - Allergy Episode",
+      "type": "symptom",
+      "date": "2025-09-22T12:30:00Z",
+      "content": "Allergy symptom tracking during high pollen season. Noted correlation with weather changes. Adjusted medication timing for better prevention.",
+      "spaceId": "health",
+      "viewCount": 7,
+      "tags": ["allergy", "symptoms", "tracking"]
+    },
+    {
+      "title": "Board Meeting Minutes",
+      "type": "meeting",
+      "date": "2025-11-08T15:00:00Z",
+      "content": "Board meeting minutes - approved environmental sustainability program. Green energy initiative funding confirmed. Next review scheduled for quarterly assessment.",
+      "spaceId": "business",
+      "viewCount": 20,
+      "tags": ["board", "minutes", "sustainability"]
+    }
+  ]
+}

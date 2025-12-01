@@ -42,6 +42,15 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     final state = context.read<RecordsHomeState>();
     _record = state.recordById(widget.recordId);
     _loadAttachments();
+
+    // Increment view count
+    if (_record != null) {
+      Future.microtask(() {
+        if (mounted) {
+          context.read<RecordsHomeState>().incrementViewCount(_record!);
+        }
+      });
+    }
   }
 
   Future<void> _loadAttachments() async {

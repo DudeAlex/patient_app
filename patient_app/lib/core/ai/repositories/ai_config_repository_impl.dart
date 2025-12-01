@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../ai/ai_config.dart';
@@ -11,7 +13,7 @@ class AiConfigRepositoryImpl implements AiConfigRepository {
   static const _enabledKey = 'ai_enabled';
   static const _modeKey = 'ai_mode';
   static const _remoteUrlKey = 'ai_remote_url';
-  static const _defaultRemoteUrl = 'https://api.example.com';
+  static final String _defaultRemoteUrl = _detectDefaultRemoteUrl();
 
   final SharedPreferences _preferences;
   final StreamController<AiConfig> _controller =
@@ -53,5 +55,22 @@ class AiConfigRepositoryImpl implements AiConfigRepository {
 
   void dispose() {
     _controller.close();
+  }
+
+  /// Picks a sensible dev default so emulator traffic reaches the local server.
+  static String _detectDefaultRemoteUrl() {
+    if (kIsWeb) {
+      return 'http://localhost:3030';
+    }
+    try {
+      if (Platform.isAndroid) {
+        return 'http://10.0.2.2:3030';
+      }
+      // Desktop/iOS simulators can talk to localhost directly.
+      return 'http://localhost:3030';
+    } catch (_) {
+      // Fallback if platform detection fails.
+      return 'http://localhost:3030';
+    }
   }
 }

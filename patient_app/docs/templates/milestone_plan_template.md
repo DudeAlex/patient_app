@@ -1,3 +1,5 @@
+Status: ACTIVE
+
 # <Milestone Name> Plan
 
 > Duplicate this file when drafting a new roadmap or feature plan. Keep the
@@ -5,9 +7,9 @@
 > before proposing changes.
 
 ## Must-Read References
-- [AI Agent Start Here](../../AI_AGENT_START_HERE.md)
-- [Clean Architecture Guide](../../CLEAN_ARCHITECTURE_GUIDE.md)
-- [Clean Architecture Refactor Plan](../../CLEAN_ARCHITECTURE_REFACTOR_PLAN.md)
+- [AI Agent Start Here](../core/AI_AGENT_START_HERE.md)
+- [Clean Architecture Guide](../core/CLEAN_ARCHITECTURE_GUIDE.md)
+- [Clean Architecture Refactor Plan](../core/CLEAN_ARCHITECTURE_REFACTOR_PLAN.md)
 - (Add any feature-specific docs here)
 
 ## Summary
@@ -33,3 +35,4 @@
 
 ## Follow-Ups
 - TODO entries or future iterations to capture once this plan lands
+

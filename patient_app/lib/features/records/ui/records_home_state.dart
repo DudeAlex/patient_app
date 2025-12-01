@@ -116,6 +116,30 @@ class RecordsHomeState extends ChangeNotifier {
     await load(query: _searchQuery, force: true);
   }
 
+  Future<void> incrementViewCount(RecordEntity record) async {
+    final updated = record.copyWith(viewCount: record.viewCount + 1);
+    
+    // Optimistic update
+    final index = _records.indexWhere((r) => r.id == record.id);
+    if (index != -1) {
+      final newRecords = List<RecordEntity>.from(_records);
+      newRecords[index] = updated;
+      _records = newRecords;
+      notifyListeners();
+    }
+    
+    // Save to DB (fire and forget, or await if needed)
+    try {
+      await _saveRecordCase.execute(SaveRecordInput(record: updated));
+      await _dirtyTracker.recordRecordSave(updated);
+    } catch (e) {
+      // Revert optimistic update on failure? 
+      // For view count, it's probably fine to ignore or just reload.
+      // We'll log it.
+      debugPrint('Failed to increment view count: $e');
+    }
+  }
+
   /// Saves attachments linked to a record.
   /// This is a temporary direct repository access until we create a proper
   /// use case for attachment management.

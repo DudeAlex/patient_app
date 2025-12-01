@@ -29,6 +29,9 @@ class Record {
 
   List<String> tags = <String>[];
 
+  @Index()
+  int viewCount = 0;
+
   late DateTime createdAt;
 
   late DateTime updatedAt;

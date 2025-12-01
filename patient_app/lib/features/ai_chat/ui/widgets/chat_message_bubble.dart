@@ -13,12 +13,14 @@ class ChatMessageBubble extends StatelessWidget {
     this.onRetry,
     this.onCopy,
     this.onActionHintTap,
+    this.onFeedback,
   });
 
   final ChatMessage message;
   final VoidCallback? onRetry;
   final ValueChanged<String>? onCopy;
   final ValueChanged<String>? onActionHintTap;
+  final ValueChanged<MessageFeedback>? onFeedback;
 
   bool get _isUser => message.sender == MessageSender.user;
 
@@ -116,6 +118,45 @@ class ChatMessageBubble extends StatelessWidget {
                             TextButton(
                               onPressed: onRetry,
                               child: const Text('Retry'),
+                            ),
+                          ],
+                          // Feedback buttons for AI messages
+                          if (!_isUser &&
+                              message.status == MessageStatus.sent &&
+                              onFeedback != null) ...[
+                            const SizedBox(width: 8),
+                            IconButton(
+                              icon: Icon(
+                                Icons.thumb_up,
+                                size: 16,
+                                color: message.feedback == MessageFeedback.positive
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.5),
+                              ),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onPressed: () => onFeedback!(MessageFeedback.positive),
+                              tooltip: 'Helpful response',
+                            ),
+                            const SizedBox(width: 4),
+                            IconButton(
+                              icon: Icon(
+                                Icons.thumb_down,
+                                size: 16,
+                                color: message.feedback == MessageFeedback.negative
+                                    ? Theme.of(context).colorScheme.error
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.5),
+                              ),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onPressed: () => onFeedback!(MessageFeedback.negative),
+                              tooltip: 'Not helpful',
                             ),
                           ],
                         ],

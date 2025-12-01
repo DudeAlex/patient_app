@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:patient_app/core/ai/chat/application/use_cases/send_chat_message_use_case.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/models/record_summary.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
 
@@ -102,7 +103,8 @@ class MessageQueueService {
         try {
           await _sendChatMessageUseCase.execute(
             threadId: queued.threadId,
-            spaceContext: queued.spaceContext,
+            spaceId: queued.spaceContext.spaceId,
+            spaceContextOverride: queued.spaceContext,
             messageContent: queued.content,
             attachments: queued.attachments,
           );
@@ -216,16 +218,18 @@ class _QueuedMessage {
       'spaceContext': {
         'spaceId': spaceContext.spaceId,
         'spaceName': spaceContext.spaceName,
+        'description': spaceContext.description,
+        'categories': spaceContext.categories,
         'persona': spaceContext.persona.name,
         'maxContextRecords': spaceContext.maxContextRecords,
         'recentRecords': spaceContext.limitedRecords
             .map(
               (record) => {
                 'title': record.title,
-                'category': record.category,
+                'type': record.type,
                 'tags': record.tags,
-                'summaryText': record.summaryText,
-                'createdAt': record.createdAt.toIso8601String(),
+                'summary': record.summary,
+                'date': record.date.toIso8601String(),
               },
             )
             .toList(),
@@ -250,10 +254,13 @@ class _QueuedMessage {
         .map(
           (record) => RecordSummary(
             title: record['title'] as String? ?? '',
-            category: record['category'] as String? ?? '',
-            tags: (record['tags'] as List<dynamic>? ?? []).cast<String>(),
-            summaryText: record['summaryText'] as String?,
-            createdAt: DateTime.tryParse(record['createdAt'] as String? ?? '') ??
+            type: record['type'] as String? ?? '',
+            tags: (record['tags'] as List<dynamic>?)
+                    ?.map((t) => t.toString())
+                    .toList() ??
+                const [],
+            summary: record['summary'] as String?,
+            date: DateTime.tryParse(record['date'] as String? ?? record['createdAt'] as String? ?? '') ??
                 DateTime.fromMillisecondsSinceEpoch(0),
           ),
         )
@@ -279,9 +286,14 @@ class _QueuedMessage {
       spaceContext: SpaceContext(
         spaceId: space['spaceId'] as String? ?? '',
         spaceName: space['spaceName'] as String? ?? '',
+        description: space['description'] as String? ?? '',
+        categories: (space['categories'] as List<dynamic>?)
+                ?.map((c) => c.toString())
+                .toList() ??
+            const [],
         persona: _parsePersona(space['persona'] as String?),
         recentRecords: recent,
-        maxContextRecords: space['maxContextRecords'] as int? ?? 5,
+        maxContextRecords: space['maxContextRecords'] as int? ?? 10,
       ),
       content: json['content'] as String? ?? '',
       attachments: attachmentInputs,

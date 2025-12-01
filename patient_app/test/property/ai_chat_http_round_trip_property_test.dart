@@ -21,7 +21,7 @@ void main() {
     addTearDown(() => server.close(force: true));
 
     server.listen((HttpRequest request) async {
-      expect(request.uri.path, '/api/v1/chat/echo');
+      expect(request.uri.path, '/api/v1/chat/message');
       final body = await utf8.decoder.bind(request).join();
       final jsonBody = jsonDecode(body) as Map<String, dynamic>;
       final message = jsonBody['message'] as String?;
@@ -59,6 +59,8 @@ void main() {
         spaceContext: SpaceContext(
           spaceId: 'health',
           spaceName: 'Health',
+          description: 'Health space',
+          categories: const ['test'],
           persona: SpacePersona.health,
         ),
       );

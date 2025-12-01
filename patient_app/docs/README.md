@@ -1,69 +1,48 @@
-# Documentation Index
+Status: ACTIVE
 
-## Vision & Strategy
-- **[Vision](../VISION.md)** - Long-term vision: Universal personal information system
-- **[Universalization Roadmap](./UNIVERSALIZATION_ROADMAP.md)** - Detailed roadmap for evolution to universal system
-- [AI Assisted Plan](../AI_ASSISTED_LIFE_COMPANION_PLAN.md) - AI strategy and compassionate roadmap
+# Non-.kiro Documentation
 
-## Quick Start
-- [Main README](../README.md) - Project overview, setup, and running instructions
-- [AI Agent Start Here](../AI_AGENT_START_HERE.md) - Essential reading for AI agents and contributors
+- `.kiro/` holds the authoritative Kiro IDE specifications and steering docs; do not edit anything inside that directory.
+- `docs/core/` contains high-level, human-facing references (vision, architecture, process, ops).
+- `docs/modules/` groups feature- or module-specific docs (AI, capture, diagnostics, etc.).
+- `docs/templates/` stores shared templates (e.g., milestone plans).
+- `docs/legacy/` keeps historical or superseded materials for reference only.
+- `docs/scratch/` holds temporary notes or logs that are noisy but retained.
 
-## Design System
-- **[Design System](./DESIGN_SYSTEM.md)** - Complete design system documentation (colors, typography, components)
-- [Figma Design Analysis](./FIGMA_DESIGN_ANALYSIS.md) - Detailed analysis and adaptation strategy
-- [Figma Implementation Guide](./FIGMA_DESIGN_IMPLEMENTATION_GUIDE.md) - Code examples and patterns
+## Index of active non-.kiro docs
 
-## Architecture & Planning
-- [Architecture](../ARCHITECTURE.md) - System architecture and module organization
-- [Clean Architecture Guide](../CLEAN_ARCHITECTURE_GUIDE.md) - Clean architecture principles and patterns
-- [Clean Architecture Refactor Plan](../CLEAN_ARCHITECTURE_REFACTOR_PLAN.md) - Refactoring strategy
-- [Specification](../SPEC.md) - Detailed product requirements
-- [Glossary](../GLOSSARY.md) - Canonical terminology
+**Core**
+- [README](core/README.md)
+- [AI_AGENT_START_HERE](core/AI_AGENT_START_HERE.md)
+- [AGENTS](core/AGENTS.md)
+- [GLOSSARY](core/GLOSSARY.md)
+- [VISION](core/VISION.md)
+- [AI_ASSISTED_LIFE_COMPANION_PLAN](core/AI_ASSISTED_LIFE_COMPANION_PLAN.md)
+- [ARCHITECTURE](core/ARCHITECTURE.md)
+- [CLEAN_ARCHITECTURE_GUIDE](core/CLEAN_ARCHITECTURE_GUIDE.md)
+- [CLEAN_ARCHITECTURE_REFACTOR_PLAN](core/CLEAN_ARCHITECTURE_REFACTOR_PLAN.md)
+- [RUNNING](core/RUNNING.md)
+- [SPEC](core/SPEC.md)
+- [TODO](core/TODO.md)
+- [TESTING](core/TESTING.md)
+- [SYNC](core/SYNC.md)
+- [TROUBLESHOOTING](core/TROUBLESHOOTING.md)
+- [DATABASE_STRUCTURE](core/DATABASE_STRUCTURE.md)
+- [Health_Tracker_Advisor_UX_Documentation](core/Health_Tracker_Advisor_UX_Documentation.md)
+- [UNIVERSALIZATION_ROADMAP](core/UNIVERSALIZATION_ROADMAP.md)
+- [KNOWN_ISSUES_AND_FIXES](core/KNOWN_ISSUES_AND_FIXES.md)
 
-## Milestone Plans
-- [M2: Records CRUD Plan](../M2_RECORDS_CRUD_PLAN.md)
-- [M3: Retrieval & Search Plan](../M3_RETRIEVAL_SEARCH_PLAN.md)
-- [M4: Auto Sync Plan](../M4_AUTO_SYNC_PLAN.md)
-- [M5: Multi-Modal Plan](../M5_MULTI_MODAL_PLAN.md)
+**Modules**
+- AI: [README](modules/ai/README.md), [LLM_CONTEXT_OPTIMIZATION](modules/ai/LLM_CONTEXT_OPTIMIZATION.md), [STAGE_4_TESTING_COMPLETE](modules/ai/STAGE_4_TESTING_COMPLETE.md), [ai_integration_plan](modules/ai/ai_integration_plan.md), [ai_quality_journal](modules/ai/ai_quality_journal.md), [fixtures](modules/ai/fixtures.md)
+- Backup: [google_drive_backup](modules/backup/google_drive_backup.md)
+- Backend: [server_README](modules/backend/server_README.md)
+- Capture: [FILE_UPLOAD_FEATURE](modules/capture/FILE_UPLOAD_FEATURE.md), [test_file_upload_persistence](modules/capture/test_file_upload_persistence.md), [ATTACHMENT_PERSISTENCE_VERIFICATION](modules/capture/ATTACHMENT_PERSISTENCE_VERIFICATION.md), [capture_core](modules/capture/capture_core.md), [photo_mode](modules/capture/photo_mode.md), [voice_mode](modules/capture/voice_mode.md), [document_scan_mode](modules/capture/document_scan_mode.md)
+- Design: [DESIGN_SYSTEM](modules/design/DESIGN_SYSTEM.md)
+- Diagnostics: [DIAGNOSTIC_SYSTEM_INTEGRATION](modules/diagnostics/DIAGNOSTIC_SYSTEM_INTEGRATION.md), [CRASH_DETECTION_SUMMARY](modules/diagnostics/CRASH_DETECTION_SUMMARY.md), [LOG_STRUCTURE_GUIDE](modules/diagnostics/LOG_STRUCTURE_GUIDE.md), [GLOBAL_ERROR_HANDLING_SUMMARY](modules/diagnostics/GLOBAL_ERROR_HANDLING_SUMMARY.md), [PERFORMANCE_TRACKING_SUMMARY](modules/diagnostics/PERFORMANCE_TRACKING_SUMMARY.md), [PERFORMANCE_TEST_GUIDE](modules/diagnostics/PERFORMANCE_TEST_GUIDE.md)
+- Milestones: [M5_MULTI_MODAL_PLAN](modules/milestones/M5_MULTI_MODAL_PLAN.md)
+- Spaces: [SPACES_SYSTEM_USAGE](modules/spaces/SPACES_SYSTEM_USAGE.md)
 
-## Operations
-- [Running](../RUNNING.md) - How to run the app on different platforms
-- [Testing](../TESTING.md) - Manual test scenarios and results
-- [Troubleshooting](../TROUBLESHOOTING.md) - Common issues and solutions
-- [Sync](../SYNC.md) - Backup and sync documentation
-- [TODO](../TODO.md) - Roadmap and next steps
+**Templates**
+- [milestone_plan_template](templates/milestone_plan_template.md)
 
-## Guidelines
-- [Agents](../AGENTS.md) - Guidelines for AI agents working on this repo
-
-## Feature Documentation
-- [File Upload Feature](./FILE_UPLOAD_FEATURE.md) - File upload implementation details
-
-## Templates
-- [Milestone Plan Template](./templates/milestone_plan_template.md) - Template for new milestone plans
-
-## Quick Links
-
-### For New Contributors
-1. Start with [AI Agent Start Here](../AI_AGENT_START_HERE.md)
-2. Read [Agents Guidelines](../AGENTS.md)
-3. Review [Architecture](../ARCHITECTURE.md)
-4. Check [Clean Architecture Guide](../CLEAN_ARCHITECTURE_GUIDE.md)
-
-### For UI/UX Work
-1. Read [Design System](./DESIGN_SYSTEM.md)
-2. Review [Figma Implementation Guide](./FIGMA_DESIGN_IMPLEMENTATION_GUIDE.md)
-3. Check existing components in `lib/ui/widgets/common/`
-4. View Design Showcase in app (Settings → View Design Showcase)
-
-### For Feature Development
-1. Check relevant milestone plan (M2-M5)
-2. Review [Specification](../SPEC.md)
-3. Follow [Clean Architecture Guide](../CLEAN_ARCHITECTURE_GUIDE.md)
-4. Update [Testing](../TESTING.md) with manual test scenarios
-
-### For Troubleshooting
-1. Check [Troubleshooting](../TROUBLESHOOTING.md)
-2. Review [Running](../RUNNING.md) for platform-specific issues
-3. Check [Main README](../README.md) for common issues section
+.kiro contains the authoritative Kiro IDE specifications (specs and steering docs). These files are not part of this cleanup and must not be edited by other agents.

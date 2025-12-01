@@ -6,6 +6,11 @@ import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/models/context_filters.dart';
+import 'package:patient_app/core/ai/chat/models/date_range.dart';
+import 'package:patient_app/core/ai/chat/models/token_allocation.dart';
+import 'package:patient_app/core/ai/chat/context/token_budget_allocator.dart';
+import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
@@ -22,17 +27,23 @@ class SendChatMessageUseCase {
     required ChatThreadRepository chatThreadRepository,
     required AiConsentRepository consentRepository,
     required MessageAttachmentHandler attachmentHandler,
+    required SpaceContextBuilder spaceContextBuilder,
+    TokenBudgetAllocator? tokenBudgetAllocator,
     Uuid? uuid,
   })  : _aiChatService = aiChatService,
         _chatThreadRepository = chatThreadRepository,
         _consentRepository = consentRepository,
         _attachmentHandler = attachmentHandler,
+        _spaceContextBuilder = spaceContextBuilder,
+        _tokenBudgetAllocator = tokenBudgetAllocator ?? const TokenBudgetAllocator(),
         _uuid = uuid ?? const Uuid();
 
   final AiChatService _aiChatService;
   final ChatThreadRepository _chatThreadRepository;
   final AiConsentRepository _consentRepository;
   final MessageAttachmentHandler _attachmentHandler;
+  final SpaceContextBuilder _spaceContextBuilder;
+  final TokenBudgetAllocator _tokenBudgetAllocator;
   final Uuid _uuid;
 
   /// Sends a message and returns the AI-generated response message.
@@ -41,10 +52,11 @@ class SendChatMessageUseCase {
   /// AI provider failures after marking the user message as failed.
   Future<ChatMessage> execute({
     required String threadId,
-    required SpaceContext spaceContext,
+    required String spaceId,
     required String messageContent,
+    SpaceContext? spaceContextOverride,
     List<ChatAttachmentInput> attachments = const [],
-    int maxHistoryMessages = 10,
+    int maxHistoryMessages = 3,
   }) async {
     if (messageContent.trim().isEmpty && attachments.isEmpty) {
       throw ArgumentError('Message must include text or at least one attachment.');
@@ -56,13 +68,15 @@ class SendChatMessageUseCase {
     }
 
     final opId = AppLogger.startOperation('send_chat_message');
+    final dateRange = DateRange.last14Days();
+    SpaceContext? builtContext;
     try {
       // Ensure thread exists.
       final existingThread = await _chatThreadRepository.getById(threadId);
       final thread = existingThread ??
           ChatThread(
             id: threadId,
-            spaceId: spaceContext.spaceId,
+            spaceId: spaceId,
             messages: const [],
           );
       if (existingThread == null) {
@@ -79,6 +93,29 @@ class SendChatMessageUseCase {
         );
         processedAttachments.add(processed);
       }
+
+      final Stopwatch contextStopwatch = Stopwatch()..start();
+      final spaceContext =
+          spaceContextOverride ?? await _spaceContextBuilder.build(spaceId, dateRange: dateRange);
+      builtContext = spaceContext;
+      contextStopwatch.stop();
+      final tokenAllocation = _tokenBudgetAllocator.allocate();
+      final filters = ContextFilters(
+        dateRange: dateRange,
+        maxRecords: spaceContext.maxContextRecords,
+        spaceId: spaceContext.spaceId,
+      );
+      await AppLogger.info(
+        'Built space context for chat',
+        context: {
+          'threadId': threadId,
+          'spaceId': spaceContext.spaceId,
+          'recordsIncluded': spaceContext.recentRecords.length,
+          'maxContextRecords': spaceContext.maxContextRecords,
+          'assemblyMs': contextStopwatch.elapsedMilliseconds,
+        },
+        correlationId: opId,
+      );
 
       // Persist user message as sending.
       final userMessage = ChatMessage(
@@ -104,6 +141,8 @@ class SendChatMessageUseCase {
         spaceContext: spaceContext,
         messageHistory: history,
         maxHistoryMessages: maxHistoryMessages,
+        filters: filters,
+        tokenBudget: tokenAllocation,
       );
 
       final ChatResponse response;
@@ -172,6 +211,18 @@ class SendChatMessageUseCase {
           'spaceId': spaceContext.spaceId,
           'attachmentCount': processedAttachments.length,
           'provider': response.metadata.provider,
+          'tokensUsed': response.metadata.tokensUsed,
+          'latencyMs': response.metadata.latencyMs,
+          'finishReason': response.metadata.finishReason,
+          'modelVersion': response.metadata.modelVersion,
+          if (response.metadata.contextStats != null) 'contextStats': {
+            'recordsFiltered': response.metadata.contextStats!.recordsFiltered,
+            'recordsIncluded': response.metadata.contextStats!.recordsIncluded,
+            'tokensEstimated': response.metadata.contextStats!.tokensEstimated,
+            'tokensAvailable': response.metadata.contextStats!.tokensAvailable,
+            'compressionRatio': response.metadata.contextStats!.compressionRatio,
+            'assemblyTimeMs': response.metadata.contextStats!.assemblyTime.inMilliseconds,
+          },
         },
         correlationId: opId,
       );
@@ -182,7 +233,10 @@ class SendChatMessageUseCase {
         'Chat message send failed',
         error: e,
         stackTrace: stackTrace,
-        context: {'threadId': threadId, 'spaceId': spaceContext.spaceId},
+        context: {
+          'threadId': threadId,
+          'spaceId': builtContext?.spaceId ?? spaceId,
+        },
         correlationId: opId,
       );
       rethrow;

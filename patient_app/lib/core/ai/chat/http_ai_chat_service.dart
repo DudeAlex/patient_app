@@ -24,7 +24,7 @@ class HttpAiChatService implements AiChatService {
   HttpAiChatService({
     required this.client,
     required this.baseUrl,
-    this.timeout = const Duration(seconds: 30),
+    this.timeout = const Duration(seconds: 60),
     this.maxRetries = 3,
     Connectivity? connectivity,
     Future<List<ConnectivityResult>> Function()? connectivityCheck,
@@ -64,6 +64,7 @@ class HttpAiChatService implements AiChatService {
               'threadId': request.threadId,
               'endpoint': uri.toString(),
               'attempt': attempt,
+              'userMessage': request.messageContent, // Log user message in dev
               'messageLength': request.messageContent.length,
               'attachments': request.attachments.length,
               'stage': 1,
@@ -97,6 +98,9 @@ class HttpAiChatService implements AiChatService {
                 'provider': chatResponse.metadata.provider,
                 'latencyMs': latency,
                 'tokensUsed': chatResponse.metadata.tokensUsed,
+                'responseContent': chatResponse.messageContent, // Log actual response in dev
+                'responseLength': chatResponse.messageContent.length,
+                'actionHints': chatResponse.actionHints,
               },
               correlationId: correlationId,
             );
@@ -218,7 +222,7 @@ class HttpAiChatService implements AiChatService {
 
   Uri _buildEchoUri() {
     final base = Uri.parse(baseUrl);
-    return base.resolve('/api/v1/chat/echo');
+    return base.resolve('/api/v1/chat/message');
   }
 
   ChatResponse _responseFromJson(Map<String, dynamic> map) {
@@ -238,6 +242,8 @@ class HttpAiChatService implements AiChatService {
     }
 
     final metadata = map['metadata'] as Map<String, dynamic>? ?? const {};
+    
+    // Parse metadata with backward compatibility for different field names
     final tokenUsage = metadata['tokenUsage'] as Map<String, dynamic>?;
     final tokensUsed =
         tokenUsage?['total'] as int? ?? metadata['tokensUsed'] as int? ?? 0;
@@ -246,16 +252,24 @@ class HttpAiChatService implements AiChatService {
     final provider =
         metadata['llmProvider'] as String? ?? metadata['provider'] as String? ?? 'remote';
     final confidence = (metadata['confidence'] as num?)?.toDouble() ?? 0.0;
+    final finishReason = metadata['finishReason'] as String?;
+    final modelVersion = metadata['modelVersion'] as String?;
+    
+    // Build normalized metadata map for fromJson
+    final normalizedMetadata = {
+      'tokensUsed': tokensUsed,
+      'latencyMs': latencyMs,
+      'provider': provider,
+      'confidence': confidence,
+      if (finishReason != null) 'finishReason': finishReason,
+      if (modelVersion != null) 'modelVersion': modelVersion,
+      if (metadata['contextStats'] != null) 'contextStats': metadata['contextStats'],
+    };
 
     return ChatResponse(
       messageContent: map['message'] as String? ?? '',
       actionHints: (map['actionHints'] as List?)?.cast<String>() ?? const [],
-      metadata: AiMessageMetadata(
-        tokensUsed: tokensUsed,
-        latencyMs: latencyMs,
-        provider: provider,
-        confidence: confidence,
-      ),
+      metadata: AiMessageMetadata.fromJson(normalizedMetadata),
     );
   }
 

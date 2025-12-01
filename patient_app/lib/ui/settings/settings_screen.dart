@@ -9,7 +9,9 @@ import 'package:intl/intl.dart';
 import '../../core/ai/ai_config.dart';
 import '../../core/ai/repositories/ai_config_repository.dart';
 import '../../core/ai/repositories/ai_consent_repository.dart';
+import '../../core/ai/chat/repositories/context_config_repository.dart';
 import '../../core/di/app_container.dart';
+import '../../core/diagnostics/app_logger.dart';
 import '../../features/information_items/ui/widgets/ai_consent_dialog.dart';
 import '../../features/records/data/records_service.dart';
 import '../../features/sync/application/use_cases/mark_auto_sync_success_use_case.dart';
@@ -20,6 +22,7 @@ import '../../features/sync/domain/entities/auto_sync_cadence.dart';
 import '../../features/sync/domain/entities/auto_sync_status.dart';
 import '../screens/ai_diagnostics_screen.dart';
 import '../screens/design_showcase_screen.dart';
+import 'widgets/context_metrics_card.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -35,6 +38,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       AppContainer.instance.resolve<AiConfigRepository>();
   late final AiConsentRepository _aiConsentRepository =
       AppContainer.instance.resolve<AiConsentRepository>();
+  late final ContextConfigRepository _contextConfigRepository =
+      AppContainer.instance.resolve<ContextConfigRepository>();
 
   String? _email;
   bool _busy = false;
@@ -53,6 +58,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _aiConfigBusy = false;
   bool _aiConsentEnabled = false;
   bool _aiConsentBusy = false;
+  int _dateRangeDays = 14;
+  bool _dateRangeBusy = false;
+  bool _isCustomDateRange = false;
+  final TextEditingController _customDaysController = TextEditingController();
+  String? _customDaysError;
 
   @override
   void initState() {
@@ -63,11 +73,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     _loadAiConfig();
     _loadAiConsent();
+    _loadContextConfig();
   }
 
   @override
   void dispose() {
     _autoSyncSubscription?.cancel();
+    _customDaysController.dispose();
     super.dispose();
   }
 
@@ -107,6 +119,130 @@ class _SettingsScreenState extends State<SettingsScreen> {
       setState(() => _aiConsentEnabled = granted);
     } catch (e) {
       debugPrint('[Settings] Failed to load AI consent: $e');
+    }
+  }
+
+  Future<void> _loadContextConfig() async {
+    try {
+      final days = await _contextConfigRepository.getDateRangeDays();
+      if (!mounted) return;
+      setState(() {
+        _dateRangeDays = days;
+        // Detect if the value is custom (not one of the presets)
+        _isCustomDateRange = ![7, 14, 30].contains(days);
+        if (_isCustomDateRange) {
+          _customDaysController.text = days.toString();
+        }
+      });
+    } catch (e) {
+      debugPrint('[Settings] Failed to load context config: $e');
+    }
+  }
+
+  Future<void> _updateDateRange(int days) async {
+    setState(() => _dateRangeBusy = true);
+    try {
+      final previousValue = _dateRangeDays;
+      await _contextConfigRepository.setDateRangeDays(days);
+      if (!mounted) return;
+      setState(() {
+        _dateRangeDays = days;
+        _isCustomDateRange = false;
+        _customDaysError = null;
+      });
+      
+      // Log preset date range change
+      await AppLogger.info(
+        'User updated date range (preset)',
+        context: {
+          'dateRangeDays': days,
+          'previousValue': previousValue,
+          'isCustom': false,
+        },
+      );
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Context date range set to $days days'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update date range: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _dateRangeBusy = false);
+      }
+    }
+  }
+
+  void _validateCustomDateRange(String text) {
+    // Clear error when user starts typing
+    if (_customDaysError != null) {
+      setState(() => _customDaysError = null);
+    }
+  }
+
+  Future<void> _applyCustomDateRange() async {
+    final text = _customDaysController.text.trim();
+    
+    // Validate input is not empty
+    if (text.isEmpty) {
+      setState(() => _customDaysError = 'Please enter a number');
+      return;
+    }
+    
+    // Validate input is a valid integer
+    final days = int.tryParse(text);
+    if (days == null) {
+      setState(() => _customDaysError = 'Please enter a valid number');
+      return;
+    }
+
+    // Validate input is between 1 and 1095
+    if (days < 1 || days > 1095) {
+      setState(() => _customDaysError = 'Must be between 1 and 1095 (up to 3 years)');
+      return;
+    }
+
+    // Clear error and set busy state
+    setState(() {
+      _customDaysError = null;
+      _dateRangeBusy = true;
+    });
+
+    try {
+      final previousValue = _dateRangeDays;
+      await _contextConfigRepository.setDateRangeDays(days);
+      if (!mounted) return;
+      setState(() => _dateRangeDays = days);
+      
+      // Log custom date range change
+      await AppLogger.info(
+        'User set custom date range',
+        context: {
+          'dateRangeDays': days,
+          'previousValue': previousValue,
+          'isCustom': true,
+        },
+      );
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Context date range set to $days days (custom)'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update date range: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _dateRangeBusy = false);
+      }
     }
   }
 
@@ -537,6 +673,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onChanged: _toggleAiConsent,
             ),
             const SizedBox(height: 16),
+            _ContextSettingsCard(
+              dateRangeDays: _dateRangeDays,
+              busy: _dateRangeBusy,
+              isCustomDateRange: _isCustomDateRange,
+              customDaysController: _customDaysController,
+              customDaysError: _customDaysError,
+              onDateRangeChanged: _updateDateRange,
+              onCustomModeToggled: () {
+                setState(() {
+                  _isCustomDateRange = true;
+                  _customDaysError = null;
+                  _customDaysController.text = _dateRangeDays.toString();
+                });
+              },
+              onApplyCustomDateRange: _applyCustomDateRange,
+              onCustomInputChanged: _validateCustomDateRange,
+            ),
+            const SizedBox(height: 16),
+            const riverpod.ProviderScope(
+              child: ContextMetricsCard(),
+            ),
+            const SizedBox(height: 16),
             if (!isWeb) _BackupKeyCard(onManageKeys: _showBackupKeyDialog),
             if (!isWeb) const SizedBox(height: 16),
             _DiagnosticsCard(
@@ -866,6 +1024,118 @@ class _AiConsentCard extends StatelessWidget {
               child: LinearProgressIndicator(),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class _ContextSettingsCard extends StatelessWidget {
+  const _ContextSettingsCard({
+    required this.dateRangeDays,
+    required this.onDateRangeChanged,
+    required this.isCustomDateRange,
+    required this.customDaysController,
+    required this.onCustomModeToggled,
+    required this.onApplyCustomDateRange,
+    this.customDaysError,
+    this.onCustomInputChanged,
+    this.busy = false,
+  });
+
+  final int dateRangeDays;
+  final bool busy;
+  final bool isCustomDateRange;
+  final TextEditingController customDaysController;
+  final String? customDaysError;
+  final ValueChanged<int> onDateRangeChanged;
+  final VoidCallback onCustomModeToggled;
+  final VoidCallback onApplyCustomDateRange;
+  final ValueChanged<String>? onCustomInputChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Context Settings',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Controls how much historical data the AI companion can access when generating responses.',
+              style: TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Date range',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              children: [
+                ...[7, 14, 30].map((days) {
+                  final selected = dateRangeDays == days && !isCustomDateRange;
+                  return ChoiceChip(
+                    label: Text('$days days'),
+                    selected: selected,
+                    onSelected: busy
+                        ? null
+                        : (_) => onDateRangeChanged(days),
+                  );
+                }),
+                ChoiceChip(
+                  label: const Text('Custom'),
+                  selected: isCustomDateRange,
+                  onSelected: busy ? null : (_) => onCustomModeToggled(),
+                ),
+              ],
+            ),
+            if (isCustomDateRange) ...[
+              const SizedBox(height: 12),
+              TextField(
+                controller: customDaysController,
+                keyboardType: TextInputType.number,
+                enabled: !busy,
+                decoration: InputDecoration(
+                  labelText: 'Number of days (1-1095)',
+                  helperText: 'Up to 3 years',
+                  errorText: customDaysError,
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.check),
+                    onPressed: busy ? null : onApplyCustomDateRange,
+                  ),
+                  border: const OutlineInputBorder(),
+                ),
+                onChanged: onCustomInputChanged,
+                onSubmitted: busy ? null : (_) => onApplyCustomDateRange(),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Larger date ranges allow the AI to access older records, but the system '
+                'will prioritize the most recent and relevant information to fit within '
+                'token limits. Typically 10-20 records are included regardless of range.',
+                style: TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+            ],
+            if (!isCustomDateRange) ...[
+              const SizedBox(height: 4),
+              const Text(
+                'Only records within the selected time range will be included in AI context. Default: 14 days.',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
+            if (busy)
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: LinearProgressIndicator(),
+              ),
+          ],
+        ),
       ),
     );
   }

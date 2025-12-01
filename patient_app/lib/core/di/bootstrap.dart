@@ -23,6 +23,8 @@ import '../ai/chat/http_ai_chat_service.dart';
 import '../ai/chat/logging_ai_chat_service.dart';
 import '../ai/chat/repositories/chat_thread_repository.dart';
 import '../ai/chat/repositories/chat_thread_repository_impl.dart';
+import '../ai/chat/repositories/context_config_repository.dart';
+import '../ai/chat/repositories/context_config_repository_impl.dart';
 import '../ai/chat/services/message_attachment_handler.dart';
 import '../ai/chat/services/message_attachment_handler_impl.dart';
 import '../diagnostics/app_logger.dart';
@@ -84,6 +86,16 @@ Future<void> bootstrapAppContainer() async {
     container.registerSingleton<AiCallLogRepository>(aiCallLogRepository);
     container.registerLazySingleton<AiConsentRepository>(
       (c) => AiConsentRepositoryImpl(c.resolve<SharedPreferences>()),
+    );
+    container.registerLazySingleton<ContextConfigRepository>(
+      (c) => ContextConfigRepositoryImpl(c.resolve<SharedPreferences>()),
+    );
+    await AppLogger.info(
+      'ContextConfigRepository registered in container',
+      context: {
+        'registrationType': 'lazySingleton',
+        'stage': 'bootstrap',
+      },
     );
     container.registerLazySingleton<AiService>(
       (_) => LoggingAiService(

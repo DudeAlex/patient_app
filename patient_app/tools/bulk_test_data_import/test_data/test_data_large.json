@@ -1,0 +1,805 @@
+{
+  "records": [
+    {
+      "title": "Morning Blood Pressure Reading",
+      "type": "vital_signs",
+      "date": "2025-09-10T08:00:00Z",
+      "content": "Morning blood pressure reading: 118/76 mmHg, resting heart rate 68 bpm. Consistent with medication adjustment from last month.",
+      "spaceId": "health",
+      "viewCount": 5,
+      "tags": ["cardiovascular", "monitoring", "daily"]
+    },
+    {
+      "title": "Cardiology Follow-up Appointment",
+      "type": "doctor_visit",
+      "date": "2025-10-18T14:30:00Z",
+      "content": "Cardiology follow-up appointment after stress test. ECG shows improvement in exercise tolerance. Medication dosage adjusted for better efficacy.",
+      "spaceId": "health",
+      "viewCount": 3,
+      "tags": ["cardiology", "appointment", "medication"]
+    },
+    {
+      "title": "Lab Results: Complete Blood Count",
+      "type": "lab_result",
+      "date": "2025-11-02T09:15:00Z",
+      "content": "Complete blood count results: Hemoglobin 14.5 g/dL, Hematocrit 43.2%, White blood cells 6.2 K/uL. All values within reference ranges.",
+      "spaceId": "health",
+      "viewCount": 8,
+      "tags": ["lab", "bloodwork", "normal"]
+    },
+    {
+      "title": "Team Meeting - Q4 Budget Planning",
+      "type": "meeting",
+      "date": "2025-11-20T10:00:00Z",
+      "content": "Q4 budget review meeting with department heads. Marketing budget increased by 12%, R&D allocation expanded for innovation initiatives.",
+      "spaceId": "business",
+      "viewCount": 12,
+      "tags": ["budget", "planning", "team"]
+    },
+    {
+      "title": "Client Proposal - ABC Corporation",
+      "type": "proposal",
+      "date": "2025-10-22T16:45:00Z",
+      "content": "Proposal for enterprise resource planning system presented. Timeline adjusted to 8 months with phased implementation. Budget approved at $320k.",
+      "spaceId": "business",
+      "viewCount": 7,
+      "tags": ["proposal", "client", "software"]
+    },
+    {
+      "title": "Project Status Update - Mobile App",
+      "type": "project_update",
+      "date": "2025-11-14T11:30:00Z",
+      "content": "Mobile application development status: iOS 85% complete, Android 82% complete. Cross-platform compatibility issues resolved. UAT scheduled for next week.",
+      "spaceId": "business",
+      "viewCount": 15,
+      "tags": ["mobile", "project", "status"]
+    },
+    {
+      "title": "Research Paper: Quantum Computing",
+      "type": "research",
+      "date": "2025-09-22T13:20:00Z",
+      "content": "Research on neural network optimization techniques. Comparative analysis of different activation functions and their impact on model convergence.",
+      "spaceId": "education",
+      "viewCount": 6,
+      "tags": ["quantum", "research", "algorithms"]
+    },
+    {
+      "title": "Midterm Exam Results - Advanced Calculus",
+      "type": "exam",
+      "date": "2025-10-05T15:00:00Z",
+      "content": "Advanced calculus exam results: 94/100. Excellent grasp of multivariable integration. Minor errors in series convergence calculations noted.",
+      "spaceId": "education",
+      "viewCount": 4,
+      "tags": ["exam", "calculus", "math"]
+    },
+    {
+      "title": "Lecture Notes: Machine Learning",
+      "type": "lecture",
+      "date": "2025-11-08T09:00:00Z",
+      "content": "Machine learning lecture: ensemble methods and boosting algorithms. Practical implementation of XGBoost for classification problems demonstrated.",
+      "spaceId": "education",
+      "viewCount": 9,
+      "tags": ["ml", "notes", "algorithms"]
+    },
+    {
+      "title": "Exercise Log - Cardio Training",
+      "type": "exercise",
+      "date": "2025-11-25T07:00:00Z",
+      "content": "Morning workout routine: 45-minute combined cardio session with HIIT intervals. Average heart rate 145 bpm, recovery time improved to 3 minutes.",
+      "spaceId": "health",
+      "viewCount": 2,
+      "tags": ["cardio", "fitness", "training"]
+    },
+    {
+      "title": "Contract Review - Vendor Agreement",
+      "type": "contract",
+      "date": "2025-10-28T13:45:00Z",
+      "content": "Vendor contract review for facility management services. Terms negotiated for 3-year agreement with performance incentives. Legal approval obtained.",
+      "spaceId": "business",
+      "viewCount": 10,
+      "tags": ["legal", "vendor", "contract"]
+    },
+    {
+      "title": "Assignment: Data Structures Implementation",
+      "type": "assignment",
+      "date": "2025-09-15T18:30:00Z",
+      "content": "Implemented graph traversal algorithms in Python. Performance comparison between DFS and BFS for different graph densities. Results documented.",
+      "spaceId": "education",
+      "viewCount": 3,
+      "tags": ["programming", "data-structures", "c++"]
+    },
+    {
+      "title": "Medication Schedule Update",
+      "type": "medication",
+      "date": "2025-11-12T10:15:00Z",
+      "content": "Medication adjustment: Added vitamin B12 supplement, reduced statin dosage based on liver function tests. Side effect monitoring scheduled.",
+      "spaceId": "health",
+      "viewCount": 11,
+      "tags": ["medication", "prescription", "schedule"]
+    },
+    {
+      "title": "Client Meeting Notes - New Project",
+      "type": "client_note",
+      "date": "2025-11-22T14:00:00Z",
+      "content": "Client requirements meeting for e-commerce platform redesign. Focus on user experience and mobile optimization. New timeline adjusted for holiday season.",
+      "spaceId": "business",
+      "viewCount": 8,
+      "tags": ["client", "meeting", "requirements"]
+    },
+    {
+      "title": "Course Syllabus - Organic Chemistry",
+      "type": "course",
+      "date": "2025-09-05T08:00:00Z",
+      "content": "Organic chemistry course syllabus: molecular orbital theory and stereochemistry. Laboratory session on purification techniques scheduled for next week.",
+      "spaceId": "education",
+      "viewCount": 1,
+      "tags": ["syllabus", "chemistry", "organic"]
+    },
+    {
+      "title": "Annual Physical Examination",
+      "type": "doctor_visit",
+      "date": "2025-10-12T09:30:00Z",
+      "content": "Annual physical examination: Height 5'10\", Weight 168 lbs, BMI 24.1. Blood pressure optimal, cholesterol slightly elevated. Follow-up recommended.",
+      "spaceId": "health",
+      "viewCount": 14,
+      "tags": ["annual", "checkup", "screening"]
+    },
+    {
+      "title": "Sales Report - November",
+      "type": "project_update",
+      "date": "2025-11-28T09:00:00Z",
+      "content": "November sales report: $1.28M (18% above target). West region led with 38% of total sales. Q4 forecast adjusted to $3.9M based on trend.",
+      "spaceId": "business",
+      "viewCount": 18,
+      "tags": ["sales", "report", "forecast"]
+    },
+    {
+      "title": "Study Group Meeting - Physics",
+      "type": "study_note",
+      "date": "2025-10-18T16:00:00Z",
+      "content": "Physics study group: quantum mechanics problem solving. Focus on wave functions and probability distributions. Group presentation on tunneling effect.",
+      "spaceId": "education",
+      "viewCount": 5,
+      "tags": ["study", "physics", "thermodynamics"]
+    },
+    {
+      "title": "Symptom Tracker - Allergy Episode",
+      "type": "symptom",
+      "date": "2025-09-20T12:30:00Z",
+      "content": "Seasonal allergy tracking during high pollen period. Symptoms correlate with ragweed exposure. Preventive medication timing optimized for better control.",
+      "spaceId": "health",
+      "viewCount": 7,
+      "tags": ["allergy", "symptoms", "tracking"]
+    },
+    {
+      "title": "Board Meeting Minutes",
+      "type": "meeting",
+      "date": "2025-11-06T15:00:00Z",
+      "content": "Board meeting: sustainability initiative approved with $2.5M budget allocation. Solar panel installation and energy efficiency measures scheduled for Q1.",
+      "spaceId": "business",
+      "viewCount": 20,
+      "tags": ["board", "minutes", "sustainability"]
+    },
+    {
+      "title": "Dental Checkup and Cleaning",
+      "type": "doctor_visit",
+      "date": "2025-10-08T11:00:00Z",
+      "content": "Dental checkup: minor tartar buildup, no new cavities. Gum health improved with new brushing technique. Whitening treatment completed successfully.",
+      "spaceId": "health",
+      "viewCount": 6,
+      "tags": ["dental", "cleaning", "routine"]
+    },
+    {
+      "title": "Marketing Campaign Performance",
+      "type": "project_update",
+      "date": "2025-11-16T10:30:00Z",
+      "content": "Q4 marketing campaign performance: social media engagement increased 24% from previous quarter. Email conversion rate at 4.5%. Budget reallocated.",
+      "spaceId": "business",
+      "viewCount": 16,
+      "tags": ["marketing", "performance", "roi"]
+    },
+    {
+      "title": "Thesis Proposal Defense",
+      "type": "exam",
+      "date": "2025-10-03T13:00:00Z",
+      "content": "Thesis proposal defense on computer vision algorithms. Committee approved with suggestions for additional validation experiments. Next milestone: data collection.",
+      "spaceId": "education",
+      "viewCount": 9,
+      "tags": ["thesis", "defense", "proposal"]
+    },
+    {
+      "title": "Cholesterol Panel Results",
+      "type": "lab_result",
+      "date": "2025-11-02T08:45:00Z",
+      "content": "Lipid panel results: Total cholesterol 178 mg/dL, LDL 98 mg/dL, HDL 62 mg/dL. Cholesterol ratio improved significantly with diet changes.",
+      "spaceId": "health",
+      "viewCount": 7,
+      "tags": ["cholesterol", "lipid", "lab"]
+    },
+    {
+      "title": "Quarterly Financial Review",
+      "type": "meeting",
+      "date": "2025-10-25T14:00:00Z",
+      "content": "Q3 financial review meeting. Revenue growth 14% YoY, operational expenses 3% under budget. European market expansion approved with $5M allocation.",
+      "spaceId": "business",
+      "viewCount": 19,
+      "tags": ["finance", "review", "revenue"]
+    },
+    {
+      "title": "Graduate Seminar: Advanced Algorithms",
+      "type": "lecture",
+      "date": "2025-09-18T10:00:00Z",
+      "content": "Advanced algorithms seminar: dynamic programming applications. Explored optimal substructure in resource allocation problems and caching strategies.",
+      "spaceId": "education",
+      "viewCount": 4,
+      "tags": ["seminar", "algorithms", "graph"]
+    },
+    {
+      "title": "Physical Therapy Session",
+      "type": "doctor_visit",
+      "date": "2025-11-08T16:00:00Z",
+      "content": "Physical therapy session 5 of 12: ankle rehabilitation progress. Range of motion at 90% of baseline. Balance exercises introduced for next phase.",
+      "spaceId": "health",
+      "viewCount": 3,
+      "tags": ["therapy", "rehabilitation", "injury"]
+    },
+    {
+      "title": "Product Launch Strategy Meeting",
+      "type": "meeting",
+      "date": "2025-11-20T09:00:00Z",
+      "content": "Product launch strategy finalization meeting. Go-to-market plan approved with $500K marketing budget. Sales team equipped with new demo materials.",
+      "spaceId": "business",
+      "viewCount": 17,
+      "tags": ["launch", "strategy", "product"]
+    },
+    {
+      "title": "Research Paper: Blockchain Applications",
+      "type": "research",
+      "date": "2025-11-19T14:30:0Z",
+      "content": "Investigated blockchain use cases in supply chain management. Identified efficiency gains of 20-30% in documentation processes.",
+      "spaceId": "education",
+      "viewCount": 8,
+      "tags": ["blockchain", "research", "supply-chain"]
+    },
+    {
+      "title": "Vitamin D Level Test",
+      "type": "lab_result",
+      "date": "2025-09-25T09:20:00Z",
+      "content": "Vitamin D3 level: 34 ng/mL. Within acceptable range but below optimal. Recommended 1500 IU daily supplement during winter months.",
+      "spaceId": "health",
+      "viewCount": 5,
+      "tags": ["vitamin", "supplement", "lab"]
+    },
+    {
+      "title": "Investor Presentation - Series B Funding",
+      "type": "meeting",
+      "date": "2025-10-30T15:30:00Z",
+      "content": "Series B funding presentation to investors. Demonstrated 40% quarterly growth and 25% profit margin. Investor due diligence scheduled for next week.",
+      "spaceId": "business",
+      "viewCount": 22,
+      "tags": ["investor", "funding", "presentation"]
+    },
+    {
+      "title": "Final Project Submission - Software Engineering",
+      "type": "assignment",
+      "date": "2025-11-15T23:59:00Z",
+      "content": "Final project submission: distributed file storage system with encryption. Implemented using Go and PostgreSQL. Performance testing exceeded requirements.",
+      "spaceId": "education",
+      "viewCount": 6,
+      "tags": ["project", "software", "react"]
+    },
+    {
+      "title": "Eye Exam Results",
+      "type": "doctor_visit",
+      "date": "2025-09-30T10:15:00Z",
+      "content": "Eye examination results: 20/15 vision in right eye, 20/20 in left. No signs of glaucoma or macular degeneration. New progressive lenses prescribed.",
+      "spaceId": "health",
+      "viewCount": 4,
+      "tags": ["eye", "vision", "exam"]
+    },
+    {
+      "title": "Competitor Analysis Report",
+      "type": "project_update",
+      "date": "2025-11-12T13:45:00Z",
+      "content": "Competitive analysis report completed. Identified 3 emerging competitors in market. Pricing strategy recommendations for premium tier development.",
+      "spaceId": "business",
+      "viewCount": 13,
+      "tags": ["competitor", "analysis", "pricing"]
+    },
+    {
+      "title": "Dissertation Chapter 3 Review",
+      "type": "study_note",
+      "date": "2025-10-20T11:30:00Z",
+      "content": "Dissertation methodology chapter completed. Statistical analysis approach validated by advisor. Data collection phase begins next week.",
+      "spaceId": "education",
+      "viewCount": 7,
+      "tags": ["dissertation", "chapter", "methodology"]
+    },
+    {
+      "title": "Blood Glucose Monitoring",
+      "type": "vital_signs",
+      "date": "2025-11-18T07:30:00Z",
+      "content": "Morning glucose monitoring: 92 mg/dL fasting, 130 mg/dL post-breakfast. Consistent readings indicate effective diabetes management plan.",
+      "spaceId": "health",
+      "viewCount": 8,
+      "tags": ["glucose", "diabetes", "monitoring"]
+    },
+    {
+      "title": "Partnership Agreement Negotiation",
+      "type": "contract",
+      "date": "2025-10-08T16:00:00Z",
+      "content": "Strategic partnership agreement with InnovateTech finalized. Joint development initiative for AI solutions. Revenue sharing 70/30 based on investment.",
+      "spaceId": "business",
+      "viewCount": 14,
+      "tags": ["partnership", "negotiation", "contract"]
+    },
+    {
+      "title": "Group Project: Environmental Science",
+      "type": "assignment",
+      "date": "2025-09-14T17:00:00Z",
+      "content": "Environmental science project: microplastic analysis in local waterways. Found 0.8 particles per liter in urban areas. Results presentation next week.",
+      "spaceId": "education",
+      "viewCount": 5,
+      "tags": ["environmental", "water", "project"]
+    },
+    {
+      "title": "MRI Results: Knee Injury",
+      "type": "lab_result",
+      "date": "2025-11-04T14:10:00Z",
+      "content": "Knee MRI results: minor meniscus tear, no ACL damage. Rehabilitation plan prescribed with 6-week recovery timeline. Avoid high-impact activities.",
+      "spaceId": "health",
+      "viewCount": 9,
+      "tags": ["mri", "knee", "injury"]
+    },
+    {
+      "title": "Remote Work Policy Update",
+      "type": "meeting",
+      "date": "2025-11-17T11:00:00Z",
+      "content": "Remote work policy implementation meeting. Approved flexible schedule: 2 days office, 3 days remote. New collaboration tools training scheduled.",
+      "spaceId": "business",
+      "viewCount": 11,
+      "tags": ["remote", "policy", "work"]
+    },
+    {
+      "title": "Lab Report: Organic Synthesis",
+      "type": "assignment",
+      "date": "2025-10-16T15:30:00Z",
+      "content": "Organic synthesis lab: ibuprofen synthesis achieved 82% yield. Spectroscopic analysis confirmed structure. Purification process improved for better results.",
+      "spaceId": "education",
+      "viewCount": 6,
+      "tags": ["organic", "synthesis", "lab"]
+    },
+    {
+      "title": "Annual Flu Vaccination",
+      "type": "medication",
+      "date": "2025-11-01T10:45:0Z",
+      "content": "Received flu vaccine (quadrivalent). No adverse reactions. Protection effective for 6 months. Next vaccination in fall 2025.",
+      "spaceId": "health",
+      "viewCount": 2,
+      "tags": ["vaccination", "flu", "prevention"]
+    },
+    {
+      "title": "Customer Satisfaction Survey Results",
+      "type": "project_update",
+      "date": "2025-11-24T10:15:00Z",
+      "content": "Customer satisfaction survey Q4 results: 4.4/5.0 average. Positive feedback on product reliability. Action items: reduce support response time by 25%.",
+      "spaceId": "business",
+      "viewCount": 15,
+      "tags": ["satisfaction", "survey", "feedback"]
+    },
+    {
+      "title": "Conference Paper: AI Ethics",
+      "type": "research",
+      "date": "2025-10-22T12:00:00Z",
+      "content": "AI ethics research paper on algorithmic fairness completed. Framework for bias detection in recommendation systems accepted for conference presentation.",
+      "spaceId": "education",
+      "viewCount": 10,
+      "tags": ["ai", "ethics", "research"]
+    },
+    {
+      "title": "X-ray Results: Chest",
+      "type": "lab_result",
+      "date": "2025-11-01T09:30:00Z",
+      "content": "Chest X-ray results: clear lung fields, no acute abnormalities. Cardiac silhouette within normal limits. Age-related calcification noted in costochondral junctions.",
+      "spaceId": "health",
+      "viewCount": 3,
+      "tags": ["x-ray", "chest", "lung"]
+    },
+    {
+      "title": "Sales Team Training Session",
+      "type": "meeting",
+      "date": "2025-11-19T13:00:00Z",
+      "content": "Sales team training: new CRM implementation and consultative selling methodologies. Practice sessions on handling complex customer requirements.",
+      "spaceId": "business",
+      "viewCount": 8,
+      "tags": ["sales", "training", "crm"]
+    },
+    {
+      "title": "Course Project: Database Design",
+      "type": "assignment",
+      "date": "2025-10-12T20:00:00Z",
+      "content": "Database design project completed: student information system with academic records. Implemented referential integrity and optimized query performance.",
+      "spaceId": "education",
+      "viewCount": 4,
+      "tags": ["database", "design", "sql"]
+    },
+    {
+      "title": "Sleep Study Results",
+      "type": "lab_result",
+      "date": "2025-11-06T08:15:00Z",
+      "content": "Sleep study results: sleep efficiency 82%, REM 25%, mild obstructive sleep apnea with 8 events per hour. CPAP therapy initiated with pressure titration.",
+      "spaceId": "health",
+      "viewCount": 12,
+      "tags": ["sleep", "study", "apnea"]
+    },
+    {
+      "title": "Board of Directors Strategy Session",
+      "type": "meeting",
+      "date": "2025-10-28T09:00:00Z",
+      "content": "Board strategic planning session: 5-year roadmap with focus on sustainable growth and technology innovation. Budget allocation approved for digital transformation.",
+      "spaceId": "business",
+      "viewCount": 25,
+      "tags": ["board", "strategy", "expansion"]
+    },
+    {
+      "title": "Final Exam Study Schedule",
+      "type": "study_note",
+      "date": "2025-11-22T18:00:00Z",
+      "content": "Finals study schedule: 4 hours daily for Advanced Calculus, 2.5 hours for Linear Algebra. Practice exams scheduled for weekend review.",
+      "spaceId": "education",
+      "viewCount": 3,
+      "tags": ["study", "schedule", "finals"]
+    },
+    {
+      "title": "Allergy Test Results",
+      "type": "lab_result",
+      "date": "2025-09-20T10:00:00Z",
+      "content": "Allergy test results: sensitivity to dust mites, ragweed, and dog dander. Immunotherapy protocol recommended with sublingual drops. Follow-up in 6 months.",
+      "spaceId": "health",
+      "viewCount": 6,
+      "tags": ["allergy", "test", "immunotherapy"]
+    },
+    {
+      "title": "Quarterly Business Review",
+      "type": "meeting",
+      "date": "2025-11-14T14:00:0Z",
+      "content": "Q4 business review: KPIs exceeded targets. Customer acquisition 2% above plan. Churn rate reduced to 1.8%. Feature roadmap approved for next release.",
+      "spaceId": "business",
+      "viewCount": 17,
+      "tags": ["qbr", "kpi", "roadmap"]
+    },
+    {
+      "title": "Thesis Research: Machine Learning Models",
+      "type": "research",
+      "date": "2025-10-08T15:30:0Z",
+      "content": "Machine learning model comparison: ResNet achieved 96.2% accuracy for image classification. Performance metrics documented for thesis research.",
+      "spaceId": "education",
+      "viewCount": 9,
+      "tags": ["thesis", "ml", "research"]
+    },
+    {
+      "title": "Medication Reconciliation",
+      "type": "medication",
+      "date": "2025-09-28T11:45:00Z",
+      "content": "Medication reconciliation: discontinued antacid, added calcium and vitamin D supplements. Drug interaction screening completed with no concerns.",
+      "spaceId": "health",
+      "viewCount": 7,
+      "tags": ["medication", "reconciliation", "supplement"]
+    },
+    {
+      "title": "Client Onboarding Process Review",
+      "type": "project_update",
+      "date": "2025-11-16T16:20:00Z",
+      "content": "Client onboarding process optimization: automated document collection reduced time from 5 to 2 days. Staff training completed for new workflow.",
+      "spaceId": "business",
+      "viewCount": 14,
+      "tags": ["onboarding", "process", "automation"]
+    },
+    {
+      "title": "Seminar: Advanced Data Structures",
+      "type": "lecture",
+      "date": "2025-10-10T13:00:00Z",
+      "content": "Advanced data structures lecture: AVL trees and splay trees. Performance analysis of self-balancing mechanisms. Practical applications in database indexing.",
+      "spaceId": "education",
+      "viewCount": 5,
+      "tags": ["seminar", "data-structures", "trees"]
+    },
+    {
+      "title": "Physical Exam - Sports Clearance",
+      "type": "doctor_visit",
+      "date": "2025-09-16T09:30:00Z",
+      "content": "Sports physical examination for soccer season. Cardiovascular and musculoskeletal systems normal. Cleared for full participation with injury prevention plan.",
+      "spaceId": "health",
+      "viewCount": 4,
+      "tags": ["sports", "clearance", "physical"]
+    },
+    {
+      "title": "Product Requirements Document",
+      "type": "contract",
+      "date": "2025-11-11T10:00:00Z",
+      "content": "Product requirements document for customer analytics platform finalized. Core features: predictive analytics, real-time dashboards, API integration. 5-month development cycle.",
+      "spaceId": "business",
+      "viewCount": 16,
+      "tags": ["prd", "requirements", "analytics"]
+    },
+    {
+      "title": "Term Paper: Climate Change Impact",
+      "type": "assignment",
+      "date": "2025-11-27T2:00:00Z",
+      "content": "Analyzed impact of climate change on coastal communities. Predicted sea level rise of 0.5m by 2050. Mitigation strategies proposed.",
+      "spaceId": "education",
+      "viewCount": 8,
+      "tags": ["climate", "paper", "impact"]
+    },
+    {
+      "title": "Hemoglobin A1C Test",
+      "type": "lab_result",
+      "date": "2025-11-03T08:15:00Z",
+      "content": "Hemoglobin A1C: 6.0%. Excellent glucose control over 3-month period. Maintaining current diet and exercise plan with quarterly monitoring.",
+      "spaceId": "health",
+      "viewCount": 10,
+      "tags": ["diabetes", "a1c", "glucose"]
+    },
+    {
+      "title": "Strategic Planning Session",
+      "type": "meeting",
+      "date": "2025-10-18T13:30:00Z",
+      "content": "Strategic planning session for FY26. Priorities: market expansion into Asia-Pacific, product line extension, and operational efficiency improvements. Budget allocation confirmed.",
+      "spaceId": "business",
+      "viewCount": 21,
+      "tags": ["strategy", "planning", "priorities"]
+    },
+    {
+      "title": "Lab Session: Molecular Biology",
+      "type": "lecture",
+      "date": "2025-09-26T14:00:00Z",
+      "content": "Molecular biology lab: CRISPR gene editing experiment. Successfully edited target sequence with 92% efficiency. Results documented for research publication.",
+      "spaceId": "education",
+      "viewCount": 6,
+      "tags": ["molecular", "biology", "pcr"]
+    },
+    {
+      "title": "Weight Management Consultation",
+      "type": "doctor_visit",
+      "date": "2025-11-05T15:45:00Z",
+      "content": "Nutrition consultation for metabolic health. Personalized meal plan created with 1,800 calorie target. Follow-up scheduled in 3 weeks for progress assessment.",
+      "spaceId": "health",
+      "viewCount": 5,
+      "tags": ["weight", "nutrition", "consultation"]
+    },
+    {
+      "title": "Sales Forecast Update",
+      "type": "project_update",
+      "date": "2025-11-20T11:15:00Z",
+      "content": "Sales forecast updated: Q4 projection at $3.4M based on strong pipeline. 4 deals in negotiation, 3 pending contract execution. Market expansion contributing.",
+      "spaceId": "business",
+      "viewCount": 13,
+      "tags": ["forecast", "sales", "pipeline"]
+    },
+    {
+      "title": "Research Methodology Course",
+      "type": "course",
+      "date": "2025-10-06T09:00:00Z",
+      "content": "Research methodology course: qualitative data analysis techniques. Focus on thematic analysis and coding strategies for interview data interpretation.",
+      "spaceId": "education",
+      "viewCount": 4,
+      "tags": ["research", "methodology", "quantitative"]
+    },
+    {
+      "title": "Thyroid Function Test",
+      "type": "lab_result",
+      "date": "2025-11-08T07:30:00Z",
+      "content": "Thyroid function panel: TSH 1.8 mIU/L, Free T4 1.2 ng/dL. Results within optimal range. Continue current levothyroxine dosage with annual monitoring.",
+      "spaceId": "health",
+      "viewCount": 7,
+      "tags": ["thyroid", "tsh", "hormone"]
+    },
+    {
+      "title": "Partnership Meeting - Joint Venture",
+      "type": "meeting",
+      "date": "2025-10-26T16:00:00Z",
+      "content": "Joint venture discussions with Pacific Innovations. Market entry strategy for Southeast Asia. Due diligence scheduled to begin in December.",
+      "spaceId": "business",
+      "viewCount": 18,
+      "tags": ["partnership", "venture", "investment"]
+    },
+    {
+      "title": "Dissertation: Chapter 4 Draft",
+      "type": "study_note",
+      "date": "2025-09-24T19:30:00Z",
+      "content": "Dissertation analysis chapter completed. Statistical correlation analysis shows p-value < 0.001 for primary hypothesis. Advisor meeting scheduled for feedback.",
+      "spaceId": "education",
+      "viewCount": 9,
+      "tags": ["dissertation", "chapter", "analysis"]
+    },
+    {
+      "title": "Stress Test Results",
+      "type": "lab_result",
+      "date": "2025-11-01T14:20:0Z",
+      "content": "Cardiovascular stress test results: exercise capacity 9.5 METs, no ST changes. Heart rate recovery 28 bpm at 1 minute. Above average fitness level.",
+      "spaceId": "health",
+      "viewCount": 8,
+      "tags": ["stress", "test", "cardiovascular"]
+    },
+    {
+      "title": "Product Launch Post-Mortem",
+      "type": "project_update",
+      "date": "2025-11-18T10:45:00Z",
+      "content": "Product launch post-mortem: delivered 10 days early. Sales exceeded projections by 18%. Customer onboarding process needs refinement for next release.",
+      "spaceId": "business",
+      "viewCount": 15,
+      "tags": ["post-mortem", "launch", "sales"]
+    },
+    {
+      "title": "Advanced Calculus Lecture",
+      "type": "lecture",
+      "date": "2025-10-14T11:00:00Z",
+      "content": "Advanced calculus lecture: line integrals and Green's theorem. Applications in electromagnetic field calculations and fluid dynamics problems.",
+      "spaceId": "education",
+      "viewCount": 5,
+      "tags": ["calculus", "integration", "vector"]
+    },
+    {
+      "title": "Mental Health Counseling Session",
+      "type": "doctor_visit",
+      "date": "2025-11-03T13:00:00Z",
+      "content": "Mental health counseling: cognitive behavioral techniques for anxiety management. Breathing exercises and thought restructuring strategies practiced. Follow-up in 5 days.",
+      "spaceId": "health",
+      "viewCount": 6,
+      "tags": ["mental", "health", "counseling"]
+    },
+    {
+      "title": "Quarterly Budget Review",
+      "type": "meeting",
+      "date": "2025-10-30T09:30:00Z",
+      "content": "Q1 2026 budget review: Marketing budget increased 12%, R&D maintained at 18% of revenue. Cost reduction initiatives identified for administrative expenses.",
+      "spaceId": "business",
+      "viewCount": 19,
+      "tags": ["budget", "review", "allocation"]
+    },
+    {
+      "title": "Thesis Research: Literature Review",
+      "type": "research",
+      "date": "2025-09-18T16:45:00Z",
+      "content": "Literature review: 52 papers on transformer architectures in NLP. Identified research gap in multilingual model efficiency. Reference list compiled for thesis.",
+      "spaceId": "education",
+      "viewCount": 11,
+      "tags": ["thesis", "literature", "review"]
+    },
+    {
+      "title": "Bone Density Scan",
+      "type": "lab_result",
+      "date": "2025-11-02T10:10:00Z",
+      "content": "DEXA scan results: T-score -0.8 (normal range). Bone density appropriate for age. Recommended weight-bearing exercises and continued supplements.",
+      "spaceId": "health",
+      "viewCount": 5,
+      "tags": ["bone", "density", "scan"]
+    },
+    {
+      "title": "Client Contract Negotiation",
+      "type": "contract",
+      "date": "2025-11-13T14:30:00Z",
+      "content": "Service contract negotiations completed for 3-year term. Final value: $1.95M with performance bonuses. SLA includes 99.9% uptime guarantee.",
+      "spaceId": "business",
+      "viewCount": 16,
+      "tags": ["contract", "negotiation", "sla"]
+    },
+    {
+      "title": "Computer Science Capstone Project",
+      "type": "assignment",
+      "date": "2025-10-09T21:00:00Z",
+      "content": "Capstone project completion: predictive maintenance system for manufacturing. Achieved 94% accuracy in failure prediction. Presentation scheduled for next week.",
+      "spaceId": "education",
+      "viewCount": 7,
+      "tags": ["capstone", "ml", "fraud"]
+    },
+    {
+      "title": "Annual Mammogram Results",
+      "type": "lab_result",
+      "date": "2025-09-12T08:45:00Z",
+      "content": "Mammography results: no abnormalities detected. Breast density classified as heterogeneously dense. Continue annual screening with tomosynthesis.",
+      "spaceId": "health",
+      "viewCount": 4,
+      "tags": ["mammogram", "screening", "breast"]
+    },
+    {
+      "title": "Executive Team Offsite Meeting",
+      "type": "meeting",
+      "date": "2025-11-22T09:00:00Z",
+      "content": "Executive team offsite: strategic initiatives review. Confirmed new headquarters location in downtown district. Team building activities completed successfully.",
+      "spaceId": "business",
+      "viewCount": 22,
+      "tags": ["executive", "offsite", "planning"]
+    },
+    {
+      "title": "Graduate Course: Advanced Statistics",
+      "type": "course",
+      "date": "2025-10-04T15:00:00Z",
+      "content": "Advanced statistics course: Bayesian inference methods. Practical applications using Python and Stan. Homework assignment on hierarchical modeling due.",
+      "spaceId": "education",
+      "viewCount": 6,
+      "tags": ["statistics", "multivariate", "regression"]
+    },
+    {
+      "title": "Cardiac Echo Results",
+      "type": "lab_result",
+      "date": "2025-11-09T13:15:00Z",
+      "content": "Echocardiogram results: normal cardiac structure, ejection fraction 60%. Mild mitral regurgitation, no intervention required. Annual follow-up recommended.",
+      "spaceId": "health",
+      "viewCount": 9,
+      "tags": ["echo", "cardiac", "function"]
+    },
+    {
+      "title": "Performance Review Meeting",
+      "type": "meeting",
+      "date": "2025-11-17T10:00:00Z",
+      "content": "Performance review: exceeded goals in sales (115% of target) and customer satisfaction (4.7/5.0). Promoted to Senior Account Executive.",
+      "spaceId": "business",
+      "viewCount": 12,
+      "tags": ["performance", "review", "promotion"]
+    },
+    {
+      "title": "PhD Comprehensive Exam",
+      "type": "exam",
+      "date": "2025-10-16T09:00:00Z",
+      "content": "PhD comprehensive exam completed: covered research methodology, statistical analysis, and domain expertise. Committee approved advancement to dissertation phase.",
+      "spaceId": "education",
+      "viewCount": 14,
+      "tags": ["phd", "comprehensive", "exam"]
+    },
+    {
+      "title": "Annual Wellness Visit",
+      "type": "doctor_visit",
+      "date": "2025-11-04T11:30:00Z",
+      "content": "Annual wellness visit: vital signs stable, BMI improved to 23.2. Immunizations updated including Tdap booster. Nutrition counseling focused on Mediterranean diet.",
+      "spaceId": "health",
+      "viewCount": 8,
+      "tags": ["wellness", "checkup", "immunization"]
+    },
+    {
+      "title": "Market Research Analysis",
+      "type": "project_update",
+      "date": "2025-10-20T12:45:0Z",
+      "content": "Market research analysis: healthcare technology trends show 28% growth in remote monitoring solutions. Recommendations presented for product development team.",
+      "spaceId": "business",
+      "viewCount": 17,
+      "tags": ["market", "research", "healthcare"]
+    },
+    {
+      "title": "Lecture: Digital Marketing Strategy",
+      "type": "lecture",
+      "date": "2025-09-28T10:30:00Z",
+      "content": "Digital marketing lecture: influencer partnerships and brand authenticity. Analysis of successful campaigns in consumer electronics sector. Assignment on ROI calculation.",
+      "spaceId": "education",
+      "viewCount": 5,
+      "tags": ["marketing", "digital", "strategy"]
+    },
+    {
+      "title": "Colonoscopy Results",
+      "type": "lab_result",
+      "date": "2025-11-06T15:20:0Z",
+      "content": "Colonoscopy results: no polyps or abnormalities detected. Excellent preparation quality. Next screening scheduled in 10 years, earlier if symptoms develop.",
+      "spaceId": "health",
+      "viewCount": 6,
+      "tags": ["colonoscopy", "screening", "normal"]
+    },
+    {
+      "title": "Board Meeting - Investment Decision",
+      "type": "meeting",
+      "date": "2025-10-24T14:00:00Z",
+      "content": "Board approved $8.5M investment in automation technology. Projected ROI 22% over 4 years. Implementation begins Q1 2026 with phased rollout.",
+      "spaceId": "business",
+      "viewCount": 24,
+      "tags": ["board", "investment", "manufacturing"]
+    },
+    {
+      "title": "Research Paper: Sustainable Energy",
+      "type": "research",
+      "date": "2025-09-16T13:45:00Z",
+      "content": "Research on wind energy optimization completed. New blade design shows 18% efficiency improvement in low-wind conditions. Manuscript submitted for review.",
+      "spaceId": "education",
+      "viewCount": 10,
+      "tags": ["sustainable", "energy", "solar"]
+    }
+  ]
+}

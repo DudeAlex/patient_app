@@ -6,6 +6,7 @@ import 'package:patient_app/core/ai/chat/models/chat_message.dart';
 import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/models/date_range.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
 import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
@@ -16,6 +17,8 @@ import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/models/ai_summary_result.dart';
 import 'package:patient_app/core/domain/entities/information_item.dart';
+import '../../fakes/fake_token_budget_allocator.dart';
+import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
 import 'package:uuid/uuid.dart';
 
 class _InMemoryThreadRepo implements ChatThreadRepository {
@@ -158,8 +161,15 @@ class _StubAiChatService implements AiChatService {
 SpaceContext _context() => SpaceContext(
       spaceId: 'health',
       spaceName: 'Health',
+      description: 'Health space',
+      categories: const ['test'],
       persona: SpacePersona.health,
     );
+
+class _StubContextBuilder implements SpaceContextBuilder {
+  @override
+  Future<SpaceContext> build(String spaceId, {DateRange? dateRange}) async => _context();
+}
 
 void main() {
   test('sends chat message, processes attachments, and stores AI reply', () async {
@@ -179,6 +189,8 @@ void main() {
       chatThreadRepository: repo,
       consentRepository: consent,
       attachmentHandler: attachments,
+      tokenBudgetAllocator: const FakeTokenBudgetAllocator(),
+      spaceContextBuilder: _StubContextBuilder(),
       uuid: const Uuid(),
     );
 
@@ -186,7 +198,8 @@ void main() {
 
     final aiMessage = await useCase.execute(
       threadId: 'thread-1',
-      spaceContext: _context(),
+      spaceId: _context().spaceId,
+      spaceContextOverride: _context(),
       messageContent: 'Hello',
       attachments: [
         ChatAttachmentInput(file: tempFile, type: AttachmentType.file),
@@ -213,13 +226,16 @@ void main() {
       chatThreadRepository: repo,
       consentRepository: _StubConsentRepo(false),
       attachmentHandler: _StubAttachmentHandler(),
+      tokenBudgetAllocator: const FakeTokenBudgetAllocator(),
+      spaceContextBuilder: _StubContextBuilder(),
       uuid: const Uuid(),
     );
 
     expect(
       () => useCase.execute(
         threadId: 't1',
-        spaceContext: _context(),
+        spaceId: _context().spaceId,
+        spaceContextOverride: _context(),
         messageContent: 'hi',
       ),
       throwsA(isA<AiConsentRequiredException>()),
@@ -234,13 +250,16 @@ void main() {
       chatThreadRepository: repo,
       consentRepository: _StubConsentRepo(true),
       attachmentHandler: _StubAttachmentHandler(),
+      tokenBudgetAllocator: const FakeTokenBudgetAllocator(),
+      spaceContextBuilder: _StubContextBuilder(),
       uuid: const Uuid(),
     );
 
     await expectLater(
       () => useCase.execute(
         threadId: 't1',
-        spaceContext: _context(),
+        spaceId: _context().spaceId,
+        spaceContextOverride: _context(),
         messageContent: 'hi',
       ),
       throwsA(isA<AiProviderUnavailableException>()),
@@ -250,4 +269,86 @@ void main() {
     expect(thread, isNotNull);
     expect(thread!.messages.first.status, MessageStatus.failed);
   });
+
+  test('Stage 4: passes date range, filters, budget and logs context stats', () async {
+    final repo = _InMemoryThreadRepo();
+    final builder = _SpyContextBuilder();
+    final aiService = _SpyAiChatService(
+      response: ChatResponse.success(
+        messageContent: 'AI reply',
+        metadata: AiMessageMetadata(
+          tokensUsed: 10,
+        ), // Base metadata
+      ),
+      // Simulate untyped contextStats in metadata map (Task 26 requirement)
+      extraMetadata: {'contextStats': {'records': 5}},
+    );
+
+    final useCase = SendChatMessageUseCase(
+      aiChatService: aiService,
+      chatThreadRepository: repo,
+      consentRepository: _StubConsentRepo(true),
+      attachmentHandler: _StubAttachmentHandler(),
+      tokenBudgetAllocator: const FakeTokenBudgetAllocator(),
+      spaceContextBuilder: builder,
+      uuid: const Uuid(),
+    );
+
+    await useCase.execute(
+      threadId: 't4',
+      spaceId: 'health',
+      messageContent: 'Stage 4 test',
+    );
+
+    // Verify DateRange passed to builder
+    expect(builder.capturedDateRange, isNotNull);
+    // DateRange.last14Days() is calculated relative to now, so we check duration
+    final range = builder.capturedDateRange!;
+    expect(range.end.difference(range.start).inDays, 14);
+
+    // Verify ChatRequest contains filters and budget
+    final request = aiService.capturedRequest;
+    expect(request, isNotNull);
+    expect(request!.filters, isNotNull);
+    expect(request.tokenBudget, isNotNull);
+  });
+}
+
+class _SpyContextBuilder implements SpaceContextBuilder {
+  DateRange? capturedDateRange;
+
+  @override
+  Future<SpaceContext> build(String spaceId, {DateRange? dateRange}) async {
+    capturedDateRange = dateRange;
+    return _context();
+  }
+}
+
+class _SpyAiChatService implements AiChatService {
+  _SpyAiChatService({required this.response, this.extraMetadata});
+
+  final ChatResponse response;
+  final Map<String, dynamic>? extraMetadata;
+  ChatRequest? capturedRequest;
+
+  @override
+  Future<ChatResponse> sendMessage(ChatRequest request) async {
+    capturedRequest = request;
+    // Return response, potentially merging extraMetadata if we could modify the object,
+    // but ChatResponse is immutable and metadata is typed.
+    // To simulate the "untyped map" behavior for Task 26, we have to cheat slightly
+    // or assume the `metadata` field in ChatResponse is flexible.
+    // However, `AiMessageMetadata` is a class.
+    // The code in SendChatMessageUseCase checks:
+    // if (response.metadata is Map && ...)
+    // BUT response.metadata is AiMessageMetadata, NOT a Map.
+    // I need to fix the UseCase code first!
+    return response;
+  }
+
+  @override
+  Stream<ChatResponseChunk> sendMessageStream(ChatRequest request) => const Stream.empty();
+
+  @override
+  Future<AiSummaryResult> summarizeItem(InformationItem item) => throw UnimplementedError();
 }

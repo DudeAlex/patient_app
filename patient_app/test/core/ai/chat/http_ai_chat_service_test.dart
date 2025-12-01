@@ -18,6 +18,8 @@ ChatRequest _request() {
     spaceContext: SpaceContext(
       spaceId: 'health',
       spaceName: 'Health',
+      description: 'Health space',
+      categories: const ['test'],
       persona: SpacePersona.health,
     ),
     attachments: [
@@ -75,7 +77,7 @@ void main() {
 
     final response = await service.sendMessage(_request());
 
-    expect(captured.url.toString(), 'https://api.example.com/api/v1/chat/echo');
+    expect(captured.url.toString(), 'https://api.example.com/api/v1/chat/message');
     expect(captured.headers.containsKey('X-Correlation-ID'), isTrue);
     expect(response.messageContent, 'Hi back');
     expect(response.actionHints, contains('Do next thing'));

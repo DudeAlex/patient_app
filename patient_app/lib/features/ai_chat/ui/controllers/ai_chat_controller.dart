@@ -5,20 +5,32 @@ import 'package:patient_app/core/ai/chat/application/use_cases/clear_chat_thread
 import 'package:patient_app/core/ai/chat/application/use_cases/load_chat_history_use_case.dart';
 import 'package:patient_app/core/ai/chat/application/use_cases/send_chat_message_use_case.dart';
 import 'package:patient_app/core/ai/chat/application/use_cases/switch_space_context_use_case.dart';
+import 'package:patient_app/core/ai/chat/models/chat_message.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
+import 'package:patient_app/core/ai/chat/models/date_range.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
+import 'package:patient_app/core/ai/chat/context/context_filter_engine.dart';
+import 'package:patient_app/core/ai/chat/context/context_truncation_strategy.dart';
+import 'package:patient_app/core/ai/chat/context/record_relevance_scorer.dart';
+import 'package:patient_app/core/ai/chat/context/record_summary_formatter.dart';
+import 'package:patient_app/core/ai/chat/context/space_context_builder.dart';
+import 'package:patient_app/core/ai/chat/context/token_budget_allocator.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
 import 'package:patient_app/core/ai/chat/providers/space_context_provider.dart';
 import 'package:patient_app/core/ai/chat/application/use_cases/send_chat_message_use_case.dart'
     as chat_use_cases;
 import 'package:patient_app/core/ai/repositories/ai_consent_repository.dart';
+import 'package:patient_app/core/application/services/space_manager.dart';
 import 'package:patient_app/core/di/app_container.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
 import 'package:patient_app/core/ai/chat/services/message_queue_service.dart';
 import 'package:patient_app/core/ai/chat/services/connectivity_monitor.dart';
+import 'package:patient_app/core/infrastructure/storage/space_preferences.dart';
+import 'package:patient_app/features/records/data/records_service.dart';
+import 'package:patient_app/features/spaces/domain/space_registry.dart';
 
 /// Riverpod controller handling AI chat state for a given space.
 class AiChatController extends StateNotifier<AiChatState> {
@@ -58,7 +70,11 @@ class AiChatController extends StateNotifier<AiChatState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final thread = await _loadChatHistoryUseCase.execute(spaceId);
+      if (!mounted) return;
+      
       final context = await _spaceContextBuilder.build(spaceId);
+      if (!mounted) return;
+      
       state = state.copyWith(
         isLoading: false,
         thread: thread,
@@ -71,6 +87,7 @@ class AiChatController extends StateNotifier<AiChatState> {
         stackTrace: stackTrace,
         context: {'spaceId': spaceId},
       );
+      if (!mounted) return;
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
   }
@@ -123,13 +140,17 @@ class AiChatController extends StateNotifier<AiChatState> {
 
       await _sendChatMessageUseCase.execute(
         threadId: state.thread!.id,
-        spaceContext: state.spaceContext!,
+        spaceId: state.spaceContext!.spaceId,
+        spaceContextOverride: state.spaceContext,
         messageContent: content,
         attachments: attachmentInputs,
       );
+      if (!mounted) return;
 
       // Refresh thread from repository to reflect new messages/status.
       final refreshed = await _chatThreadRepository.getById(state.thread!.id);
+      if (!mounted) return;
+      
       state = state.copyWith(
         thread: refreshed ?? state.thread,
         attachments: const [],
@@ -142,6 +163,7 @@ class AiChatController extends StateNotifier<AiChatState> {
         stackTrace: stackTrace,
         context: {'threadId': state.thread?.id},
       );
+      if (!mounted) return;
       state = state.copyWith(isSending: false, errorMessage: e.toString());
     }
   }
@@ -154,6 +176,8 @@ class AiChatController extends StateNotifier<AiChatState> {
         content: content,
         attachments: state.attachments,
       );
+      if (!mounted) return;
+      
       state = state.copyWith(
         attachments: const [],
         isSending: false,
@@ -166,7 +190,34 @@ class AiChatController extends StateNotifier<AiChatState> {
         stackTrace: stackTrace,
         context: {'threadId': state.thread?.id},
       );
+      if (!mounted) return;
       state = state.copyWith(isSending: false, errorMessage: e.toString());
+    }
+  }
+
+  Future<void> provideFeedback(String messageId, MessageFeedback feedback) async {
+    if (state.thread == null) return;
+    try {
+      await _chatThreadRepository.updateMessageFeedback(
+        state.thread!.id,
+        messageId,
+        feedback,
+      );
+      if (!mounted) return;
+      
+      // Reload thread to update UI
+      await loadInitial();
+    } catch (e, stackTrace) {
+      await AppLogger.error(
+        'Failed to provide message feedback',
+        error: e,
+        stackTrace: stackTrace,
+        context: {
+          'threadId': state.thread?.id,
+          'messageId': messageId,
+          'feedback': feedback.name,
+        },
+      );
     }
   }
 
@@ -184,6 +235,8 @@ class AiChatController extends StateNotifier<AiChatState> {
         newSpaceId: newSpaceId,
         shouldClearCurrentThread: shouldClearCurrent,
       );
+      if (!mounted) return;
+      
       state = state.copyWith(
         isLoading: false,
         thread: result.newThread,
@@ -196,17 +249,41 @@ class AiChatController extends StateNotifier<AiChatState> {
         stackTrace: stackTrace,
         context: {'currentSpace': spaceId, 'newSpace': newSpaceId},
       );
+      if (!mounted) return;
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
   }
 }
 
 /// Provider for AiChatController scoped by space id.
+/// 
+/// This provider watches the async SpaceContextBuilder and handles its loading state.
+/// The controller will be recreated when the builder becomes available with the
+/// user's configured date range setting.
 final aiChatControllerProvider = StateNotifierProvider.family<AiChatController, AiChatState, String>(
   (ref, spaceId) {
     final container = AppContainer.instance;
     final chatRepo = container.resolve<ChatThreadRepository>();
     final attachmentHandler = container.resolve<MessageAttachmentHandler>();
+    
+    // Watch the async provider - the controller will be recreated when the builder is ready
+    final spaceBuilderAsync = ref.watch(spaceContextBuilderProvider);
+    
+    // Handle the async state - throw if error, use placeholder if loading
+    final spaceBuilder = spaceBuilderAsync.when(
+      data: (builder) => builder,
+      loading: () => _createPlaceholderBuilder(container),
+      error: (error, stack) {
+        AppLogger.error(
+          'Failed to initialize SpaceContextBuilder',
+          error: error,
+          stackTrace: stack,
+        );
+        // Use placeholder builder on error to allow app to continue
+        return _createPlaceholderBuilder(container);
+      },
+    );
+    
     final loadUseCase = LoadChatHistoryUseCase(chatThreadRepository: chatRepo);
     final clearUseCase = ClearChatThreadUseCase(
       chatThreadRepository: chatRepo,
@@ -217,6 +294,7 @@ final aiChatControllerProvider = StateNotifierProvider.family<AiChatController, 
       chatThreadRepository: chatRepo,
       consentRepository: container.resolve<AiConsentRepository>(),
       attachmentHandler: attachmentHandler,
+      spaceContextBuilder: spaceBuilder,
     );
     final queueService = MessageQueueService(
       sendChatMessageUseCase: sendUseCase,
@@ -228,7 +306,6 @@ final aiChatControllerProvider = StateNotifierProvider.family<AiChatController, 
       messageQueueService: queueService,
       onStatusChanged: (isOffline) => controller.setOffline(isOffline),
     );
-    final spaceBuilder = ref.read(spaceContextBuilderProvider);
     final switchUseCase = SwitchSpaceContextUseCase(
       loadChatHistoryUseCase: loadUseCase,
       clearChatThreadUseCase: clearUseCase,
@@ -250,6 +327,28 @@ final aiChatControllerProvider = StateNotifierProvider.family<AiChatController, 
     return controller;
   },
 );
+
+/// Creates a placeholder SpaceContextBuilder for use during initialization.
+/// This builder uses default settings (14-day range) and will be replaced
+/// once the real builder with user settings is available.
+SpaceContextBuilder _createPlaceholderBuilder(AppContainer container) {
+  final recordsServiceFuture = container.resolve<Future<RecordsService>>();
+  return SpaceContextBuilderImpl(
+    recordsServiceFuture: recordsServiceFuture,
+    filterEngine: ContextFilterEngine(),
+    relevanceScorer: RecordRelevanceScorer(),
+    tokenBudgetAllocator: TokenBudgetAllocator(),
+    truncationStrategy: const ContextTruncationStrategy(),
+    spaceManager: SpaceManager(
+      SpacePreferences(),
+      SpaceRegistry(),
+    ),
+    formatter: RecordSummaryFormatter(),
+    maxRecords: 20,
+    // Use default 14-day range for placeholder
+    dateRange: DateRange.last14Days(),
+  );
+}
 
 /// Immutable UI state for the AI chat surface.
 class AiChatState {

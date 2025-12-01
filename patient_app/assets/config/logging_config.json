@@ -6,5 +6,6 @@
   "maxFiles": 5,
   "moduleFilters": ["*"],
   "moduleExcludes": [],
-  "performanceThreshold": 1000
+  "performanceThreshold": 1000,
+  "enableRedaction": false
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../models/ai_error.dart';
+import 'context_stats.dart';
 
 /// Structured AI response for chat interactions.
 @immutable
@@ -61,6 +62,9 @@ class AiMessageMetadata {
     this.latencyMs = 0,
     this.provider = 'unknown',
     this.confidence = 0.0,
+    this.finishReason,
+    this.modelVersion,
+    this.contextStats,
   });
 
   /// Token usage reported by the provider.
@@ -75,17 +79,32 @@ class AiMessageMetadata {
   /// Confidence score between 0.0 and 1.0.
   final double confidence;
 
+  /// Provider finish reason (stop, length, etc.) when available.
+  final String? finishReason;
+
+  /// Model version identifier when provided by the backend.
+  final String? modelVersion;
+
+  /// Context assembly statistics (Stage 4).
+  final ContextStats? contextStats;
+
   AiMessageMetadata copyWith({
     int? tokensUsed,
     int? latencyMs,
     String? provider,
     double? confidence,
+    String? finishReason,
+    String? modelVersion,
+    ContextStats? contextStats,
   }) {
     return AiMessageMetadata(
       tokensUsed: tokensUsed ?? this.tokensUsed,
       latencyMs: latencyMs ?? this.latencyMs,
       provider: provider ?? this.provider,
       confidence: confidence ?? this.confidence,
+      finishReason: finishReason ?? this.finishReason,
+      modelVersion: modelVersion ?? this.modelVersion,
+      contextStats: contextStats ?? this.contextStats,
     );
   }
 
@@ -94,12 +113,43 @@ class AiMessageMetadata {
     int latencyMs = 0,
     String provider = 'unknown',
     double confidence = 0.0,
+    String? finishReason,
+    String? modelVersion,
+    ContextStats? contextStats,
   }) {
     return AiMessageMetadata._raw(
       tokensUsed: tokensUsed,
       latencyMs: latencyMs,
       provider: provider,
       confidence: _clampConfidence(confidence),
+      finishReason: finishReason,
+      modelVersion: modelVersion,
+      contextStats: contextStats,
+    );
+  }
+
+  factory AiMessageMetadata.fromJson(Map<String, dynamic> json) {
+    ContextStats? stats;
+    if (json['contextStats'] != null) {
+      final statsJson = json['contextStats'] as Map<String, dynamic>;
+      stats = ContextStats(
+        recordsFiltered: statsJson['recordsFiltered'] as int? ?? 0,
+        recordsIncluded: statsJson['recordsIncluded'] as int? ?? 0,
+        tokensEstimated: statsJson['tokensEstimated'] as int? ?? 0,
+        tokensAvailable: statsJson['tokensAvailable'] as int? ?? 0,
+        compressionRatio: (statsJson['compressionRatio'] as num?)?.toDouble() ?? 0.0,
+        assemblyTime: Duration(milliseconds: statsJson['assemblyTimeMs'] as int? ?? 0),
+      );
+    }
+
+    return AiMessageMetadata(
+      tokensUsed: json['tokensUsed'] as int? ?? 0,
+      latencyMs: json['latencyMs'] as int? ?? 0,
+      provider: json['provider'] as String? ?? 'unknown',
+      confidence: (json['confidence'] as num?)?.toDouble() ?? 0.0,
+      finishReason: json['finishReason'] as String?,
+      modelVersion: json['modelVersion'] as String?,
+      contextStats: stats,
     );
   }
 

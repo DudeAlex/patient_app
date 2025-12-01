@@ -20,8 +20,9 @@ class _FakeSendUseCase implements SendChatMessageUseCase {
   @override
   Future<ChatMessage> execute({
     required String threadId,
-    required SpaceContext spaceContext,
+    required String spaceId,
     required String messageContent,
+    SpaceContext? spaceContextOverride,
     List<ChatAttachmentInput> attachments = const [],
     int maxHistoryMessages = 10,
   }) async {
@@ -107,6 +108,8 @@ void main() {
       spaceContext: SpaceContext(
         spaceId: 'health',
         spaceName: 'Health',
+        description: 'Health space',
+        categories: const ['test'],
         persona: SpacePersona.health,
       ),
       content: 'hi',
@@ -147,6 +150,8 @@ void main() {
       spaceContext: SpaceContext(
         spaceId: 'health',
         spaceName: 'Health',
+        description: 'Health space',
+        categories: const ['test'],
         persona: SpacePersona.health,
       ),
       content: 'hi',
@@ -169,6 +174,8 @@ void main() {
       spaceContext: SpaceContext(
         spaceId: 'health',
         spaceName: 'Health',
+        description: 'Health space',
+        categories: const ['test'],
         persona: SpacePersona.health,
       ),
       content: 'hi again',

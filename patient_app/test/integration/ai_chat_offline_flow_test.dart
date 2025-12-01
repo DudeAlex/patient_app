@@ -22,6 +22,7 @@ import 'package:patient_app/core/ai/repositories/ai_consent_repository.dart';
 import 'package:patient_app/features/ai_chat/ui/controllers/ai_chat_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import '../core/ai/chat/fakes/fake_token_budget_allocator.dart';
 
 class _FakeConnectivityPlatform extends ConnectivityPlatform {
   _FakeConnectivityPlatform(List<ConnectivityResult> initial)
@@ -149,6 +150,8 @@ class _FakeSpaceContextBuilder implements SpaceContextBuilder {
     return SpaceContext(
       spaceId: spaceId,
       spaceName: 'Health',
+      description: 'Health space',
+      categories: const ['test'],
       persona: SpacePersona.health,
     );
   }
@@ -184,6 +187,8 @@ void main() {
         chatThreadRepository: repo,
         consentRepository: consentRepo,
         attachmentHandler: attachmentHandler,
+        spaceContextBuilder: _FakeSpaceContextBuilder(),
+        tokenBudgetAllocator: const FakeTokenBudgetAllocator(),
         uuid: const Uuid(),
       );
       final queueService = MessageQueueService(
