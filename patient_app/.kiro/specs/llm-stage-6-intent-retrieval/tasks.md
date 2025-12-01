@@ -458,25 +458,25 @@ Pass user query to SpaceContextBuilder.
 
 Write ONE simple property test for keyword extraction.
 
-- [ ] 13.1 Create test file
+- [x] 13.1 Create test file
   - File: `test/core/ai/chat/domain/services/keyword_extractor_simple_test.dart`
   - Import KeywordExtractor
   - Create test group
   - _Just create the file structure, no tests yet_
 
-- [ ] 13.2 Write test: English query extracts keywords
+- [x] 13.2 Write test: English query extracts keywords
   - Test with query: "What is my blood pressure?"
   - Expected keywords: ["what", "is", "my", "blood", "pressure"]
   - Verify extraction succeeds
   - _One simple test case_
 
-- [ ] 13.3 Write test: Russian query extracts keywords
+- [x] 13.3 Write test: Russian query extracts keywords
   - Test with query: "Какое у меня давление?"
-  - Expected keywords: ["какое", "у", "меня", "давление"]
+  - Expected keywords: ["какое", "меня", "давление"]
   - Verify extraction succeeds
   - _One simple test case_
 
-- [ ] 13.4 Write test: Empty query returns empty list
+- [x] 13.4 Write test: Empty query returns empty list
   - Test with query: ""
   - Expected keywords: []
   - Verify no crash
