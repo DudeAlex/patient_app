@@ -494,26 +494,26 @@ Write ONE simple property test for keyword extraction.
 
 Write ONE simple property test for relevance scoring.
 
-- [ ] 14.1 Create test file
+- [x] 14.1 Create test file
   - File: `test/core/ai/chat/domain/services/relevance_scorer_simple_test.dart`
   - Import RelevanceScorer
   - Create test group
   - _Just create the file structure_
 
-- [ ] 14.2 Write test: Score is between 0.0 and 1.0
+- [x] 14.2 Write test: Score is between 0.0 and 1.0
   - Create one test record
   - Create one query with keywords
   - Call scorer.score()
   - Verify: score >= 0.0 && score <= 1.0
   - _One simple assertion_
 
-- [ ] 14.3 Write test: Perfect match gives high score
+- [x] 14.3 Write test: Perfect match gives high score
   - Create record with title "Blood Pressure"
   - Query keywords: ["blood", "pressure"]
   - Verify score > 0.5
   - _One simple test_
 
-- [ ] 14.4 Write test: No match gives low score
+- [x] 14.4 Write test: No match gives low score
   - Create record with title "Grocery Shopping"
   - Query keywords: ["blood", "pressure"]
   - Verify score < 0.3
@@ -521,7 +521,7 @@ Write ONE simple property test for relevance scoring.
 
 ---
 
-## Checkpoint 14: Commit relevance scoring tests
+## Checkpoint 14: Commit relevance scoring tests ✅
 
 **Action:** Commit with message: "test(stage6): Add simple relevance scoring tests"
 
