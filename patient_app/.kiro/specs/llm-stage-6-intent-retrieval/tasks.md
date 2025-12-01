@@ -599,26 +599,26 @@ Write ONE simple property test for result limiting.
 
 Add simple timing to QueryAnalyzer.
 
-- [ ] 17.1 Add stopwatch to analyze() method
+- [x] 17.1 Add stopwatch to analyze() method
   - File: `lib/core/ai/chat/domain/services/query_analyzer.dart`
   - Add: `final stopwatch = Stopwatch()..start();` at start of analyze()
   - Add: `stopwatch.stop();` at end
   - _Just add the stopwatch, no logging yet_
 
-- [ ] 17.2 Log analysis time
+- [x] 17.2 Log analysis time
   - After stopwatch.stop(), add AppLogger.info()
   - Log: 'Query analysis completed'
   - Context: {'durationMs': stopwatch.elapsedMilliseconds}
   - _One simple log statement_
 
-- [ ] 17.3 Log warning if slow
+- [x] 17.3 Log warning if slow
   - Add: `if (stopwatch.elapsedMilliseconds > 50)`
   - Log warning: 'Query analysis slow'
   - _One simple if statement_
 
 ---
 
-## Checkpoint 17: Commit QueryAnalyzer performance tracking
+## Checkpoint 17: Commit QueryAnalyzer performance tracking ✅
 
 **Action:** Commit with message: "feat(stage6): Add performance tracking to QueryAnalyzer"
 
