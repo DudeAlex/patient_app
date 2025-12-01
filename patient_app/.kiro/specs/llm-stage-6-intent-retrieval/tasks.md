@@ -567,20 +567,20 @@ Write ONE simple property test for privacy filtering.
 
 Write ONE simple property test for result limiting.
 
-- [ ] 16.1 Create test file
+- [x] 16.1 Create test file
   - File: `test/core/ai/chat/domain/services/intent_driven_retriever_limit_test.dart`
   - Import IntentDrivenRetriever
   - Create test group
   - _Just create the file structure_
 
-- [ ] 16.2 Write test: Results never exceed maxResults
+- [x] 16.2 Write test: Results never exceed maxResults
   - Create 20 test records
   - Set maxResults = 10
   - Call retriever.retrieve()
   - Verify result.records.length <= 10
   - _One simple assertion_
 
-- [ ] 16.3 Write test: Fewer records returns all
+- [x] 16.3 Write test: Fewer records returns all
   - Create 5 test records
   - Set maxResults = 10
   - Call retriever.retrieve()
@@ -589,7 +589,7 @@ Write ONE simple property test for result limiting.
 
 ---
 
-## Checkpoint 16: Commit top-K limit tests
+## Checkpoint 16: Commit top-K limit tests ✅
 
 **Action:** Commit with message: "test(stage6): Add simple top-K limit tests"
 
