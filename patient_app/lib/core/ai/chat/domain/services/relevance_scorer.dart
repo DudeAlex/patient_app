@@ -12,20 +12,52 @@ import 'package:patient_app/core/ai/chat/models/scored_record.dart';
 /// - Supports case-insensitive matching for multiple languages
 class RelevanceScorer {
   /// Scores a record based on keyword match and recency.
-  /// 
+  ///
   /// [record] The record to score
-  /// [keywords] The keywords to match against the record
+ /// [keywords] The keywords to match against the record
   /// [now] The current time for recency calculation (defaults to DateTime.now())
-  /// 
+  ///
   /// Returns a relevance score between 0.0 and 1.0
-  /// 
-  /// Requirements: 3.1, 3.2, 3.3, 4.1
+  ///
+ /// Requirements: 3.1, 3.2, 3.3, 4.1
   double score({
     required RecordEntity record,
     required List<String> keywords,
     DateTime? now,
   }) {
+    final stopwatch = Stopwatch()..start();
+    
     if (keywords.isEmpty) {
+      stopwatch.stop();
+      // Log scoring time
+      AppLogger.info(
+        'Relevance scoring completed',
+        context: {
+          'category': 'intent_retrieval',
+          'event': 'relevance_scoring',
+          'recordId': record.id,
+          'recordTitle': record.title,
+          'keywordCount': keywords.length,
+          'scoringTimeMs': stopwatch.elapsedMilliseconds,
+        },
+      );
+      
+      // Log warning if slow
+      if (stopwatch.elapsedMilliseconds > 100) {
+        AppLogger.warning(
+          'Relevance scoring slow',
+          context: {
+            'category': 'intent_retrieval',
+            'event': 'relevance_scoring_slow',
+            'recordId': record.id,
+            'recordTitle': record.title,
+            'keywordCount': keywords.length,
+            'scoringTimeMs': stopwatch.elapsedMilliseconds,
+            'thresholdMs': 100,
+          },
+        );
+      }
+      
       return 0.0;
     }
 
@@ -36,6 +68,39 @@ class RelevanceScorer {
     
     // Combine scores with 60% keyword match + 40% recency weighting
     final relevanceScore = (keywordScore * 0.6) + (recencyScoreValue * 0.4);
+    
+    stopwatch.stop();
+    
+    // Log scoring time
+    AppLogger.info(
+      'Relevance scoring completed',
+      context: {
+        'category': 'intent_retrieval',
+        'event': 'relevance_scoring',
+        'recordId': record.id,
+        'recordTitle': record.title,
+        'keywordCount': keywords.length,
+        'scoringTimeMs': stopwatch.elapsedMilliseconds,
+        'relevanceScore': relevanceScore,
+      },
+    );
+    
+    // Log warning if slow
+    if (stopwatch.elapsedMilliseconds > 100) {
+      AppLogger.warning(
+        'Relevance scoring slow',
+        context: {
+          'category': 'intent_retrieval',
+          'event': 'relevance_scoring_slow',
+          'recordId': record.id,
+          'recordTitle': record.title,
+          'keywordCount': keywords.length,
+          'scoringTimeMs': stopwatch.elapsedMilliseconds,
+          'thresholdMs': 100,
+          'relevanceScore': relevanceScore,
+        },
+      );
+    }
     
     return relevanceScore;
   }
@@ -121,13 +186,15 @@ class RelevanceScorer {
   }
 
   /// Scores multiple records and returns them as ScoredRecord objects sorted by relevance.
-  /// 
+  ///
   /// Requirements: 4.1, 4.2, 4.3
   Future<List<ScoredRecord>> scoreRecords({
     required List<RecordEntity> records,
     required List<String> keywords,
     DateTime? now,
   }) async {
+    final stopwatch = Stopwatch()..start();
+    
     now ??= DateTime.now();
     
     final scoredRecords = <ScoredRecord>[];
@@ -164,6 +231,35 @@ class RelevanceScorer {
       // Tertiary sort: view count (descending) - higher view count first
       return b.record.viewCount.compareTo(a.record.viewCount);
     });
+    
+    stopwatch.stop();
+    
+    // Log scoring time
+    await AppLogger.info(
+      'Relevance scoring completed',
+      context: {
+        'category': 'intent_retrieval',
+        'event': 'relevance_scoring',
+        'recordsScored': records.length,
+        'keywordCount': keywords.length,
+        'scoringTimeMs': stopwatch.elapsedMilliseconds,
+      },
+    );
+    
+    // Log warning if slow
+    if (stopwatch.elapsedMilliseconds > 100) {
+      await AppLogger.warning(
+        'Relevance scoring slow',
+        context: {
+          'category': 'intent_retrieval',
+          'event': 'relevance_scoring_slow',
+          'recordsScored': records.length,
+          'keywordCount': keywords.length,
+          'scoringTimeMs': stopwatch.elapsedMilliseconds,
+          'thresholdMs': 100,
+        },
+      );
+    }
     
     // Log scoring results for debugging
     await _logScoringResults(scoredRecords, keywords);
