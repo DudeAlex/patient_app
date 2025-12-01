@@ -172,7 +172,7 @@ Combine keyword extraction and intent classification.
 
 Score records based on keyword match and recency.
 
-- [ ] 5.1 Create RelevanceScorer class
+- [x] 5.1 Create RelevanceScorer class
   - File: `lib/core/ai/chat/domain/services/relevance_scorer.dart`
   - Method: `double score(Record record, List<String> keywords, DateTime now)`
   - Implementation:
@@ -186,13 +186,13 @@ Score records based on keyword match and recency.
     - Combine: relevanceScore = (keywordMatchScore * 0.6) + (recencyScore * 0.4)
   - _Requirements: 3.1, 3.2, 3.3, 4.1_
 
-- [ ] 5.2 Add helper methods to RelevanceScorer
+- [x] 5.2 Add helper methods to RelevanceScorer
   - Method: `double keywordMatchScore(Record record, List<String> keywords)`
   - Method: `double recencyScore(Record record, DateTime now)`
   - Method: `bool containsKeyword(String text, String keyword)` (case-insensitive)
   - _Requirements: 3.1, 3.2, 3.3_
 
-- [ ] 5.3 Write unit tests for RelevanceScorer
+- [x] 5.3 Write unit tests for RelevanceScorer
   - File: `test/core/ai/chat/domain/services/relevance_scorer_test.dart`
   - Test cases:
     - Perfect match (all keywords) → high score
