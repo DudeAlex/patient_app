@@ -206,13 +206,13 @@ Create the error recovery infrastructure.
 
 Implement error classification system.
 
-- [ ] 5.1 Create ErrorClassifier class
+- [x] 5.1 Create ErrorClassifier class
   - File: `lib/core/ai/chat/services/error_classifier.dart`
   - Method: `classify(AiServiceException)` → ErrorType enum
   - Classify: rate-limit, network, server, validation, timeout, unknown
   - _Requirements: 6.1-6.5_
 
-- [ ] 5.2 Write unit tests for ErrorClassifier
+- [x] 5.2 Write unit tests for ErrorClassifier
   - File: `test/core/ai/chat/services/error_classifier_test.dart`
   - Test each error type classification
   - Test classification consistency
