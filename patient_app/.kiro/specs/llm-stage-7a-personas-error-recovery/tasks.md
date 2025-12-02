@@ -368,7 +368,7 @@ Implement server error and timeout recovery strategies.
 
 Create the basic fallback service structure.
 
-- [ ] 7.1 Create FallbackService class skeleton
+- [x] 7.1 Create FallbackService class skeleton
   - File: `lib/core/ai/chat/services/fallback_service.dart`
   - Create class with constructor
   - Add empty generateFallbackResponse() method
@@ -397,23 +397,23 @@ Create the basic fallback service structure.
 
 Implement error-specific fallback messages.
 
-- [ ] 7b.1 Implement network error fallback
+- [x] 7b.1 Implement network error fallback
   - Detect network errors
   - Generate user-friendly message: "Can't connect right now. Check your internet."
   - No technical jargon
   - _Requirements: 5.2, 7.2_
 
-- [ ] 7b.2 Implement rate limit fallback
+- [x] 7b.2 Implement rate limit fallback
   - Detect rate limit errors
   - Generate message: "Too many requests. Please wait a moment."
   - _Requirements: 5.2, 7.2_
 
-- [ ] 7b.3 Implement timeout fallback
+- [x] 7b.3 Implement timeout fallback
   - Detect timeout errors
   - Generate message: "Request took too long. Please try again."
   - _Requirements: 5.2, 7.2_
 
-- [ ] 7b.4 Implement server error fallback
+- [x] 7b.4 Implement server error fallback
   - Detect server errors
   - Generate message: "Service temporarily unavailable. Try again soon."
   - _Requirements: 5.2, 7.2_
@@ -506,20 +506,20 @@ Write comprehensive tests for fallback service.
 
 Create the basic structure of the resilient service.
 
-- [ ] 8.1 Create ResilientAiChatService class skeleton
+- [x] 8.1 Create ResilientAiChatService class skeleton
   - File: `lib/core/ai/chat/services/resilient_ai_chat_service.dart`
-  - Create class with constructor
+ - Create class with constructor
   - Accept primaryService, errorClassifier, fallbackService as dependencies
   - Add empty sendMessage() method
   - _Requirements: 3.1_
 
-- [ ] 8.2 Implement basic sendMessage() flow
+- [x] 8.2 Implement basic sendMessage() flow
   - Try calling primary service
   - Return response if successful
   - Catch exceptions and rethrow for now (we'll add recovery next)
   - _Requirements: 3.1_
 
-- [ ] 8.3 Add basic logging
+- [x] 8.3 Add basic logging
   - Log when request starts
   - Log when request succeeds
   - Log when request fails
@@ -541,14 +541,14 @@ Create the basic structure of the resilient service.
 
 Add error classification to the resilient service.
 
-- [ ] 8b.1 Add error classification on failure
+- [x] 8b.1 Add error classification on failure
   - When exception caught, classify using ErrorClassifier
   - Log the error type
   - Still rethrow for now
   - _Requirements: 6.1_
 
-- [ ] 8b.2 Add strategy selection logic
-  - Based on error type, select appropriate recovery strategy
+- [x] 8b.2 Add strategy selection logic
+ - Based on error type, select appropriate recovery strategy
   - Log which strategy was selected
   - Don't execute yet, just select
   - _Requirements: 4.1, 6.2-6.4_
@@ -568,26 +568,26 @@ Add error classification to the resilient service.
 
 Implement single recovery attempt.
 
-- [ ] 8c.1 Create _attemptRecovery() method
-  - Accept request, error, attemptNumber
-  - Call selected strategy's recover() method
+- [x] 8c.1 Create _attemptRecovery() method
+ - Accept request, error, attemptNumber
+ - Call selected strategy's recover() method
   - Return response if successful
   - Rethrow if recovery fails
   - _Requirements: 3.1, 4.1_
 
-- [ ] 8c.2 Integrate single recovery into sendMessage()
+- [x] 8c.2 Integrate single recovery into sendMessage()
   - On error, attempt recovery once
   - Log recovery attempt
   - Return response if recovery succeeds
   - Rethrow if recovery fails
-  - _Requirements: 3.1, 3.2_
+ - _Requirements: 3.1, 3.2_
 
-- [ ] 8c.3 Add recovery attempt logging
+- [x] 8c.3 Add recovery attempt logging
   - Log attempt number
   - Log strategy used
   - Log duration
   - Log success/failure
-  - _Requirements: 3.4_
+ - _Requirements: 3.4_
 
 ---
 
@@ -604,16 +604,16 @@ Implement single recovery attempt.
 
 Add support for multiple recovery attempts.
 
-- [ ] 8d.1 Implement recovery loop
+- [x] 8d.1 Implement recovery loop
   - Try up to 2 recovery attempts
   - Use different strategies if first fails
   - Track all attempts
   - _Requirements: 3.1, 3.2_
 
-- [ ] 8d.2 Add recovery metrics tracking
-  - Count total attempts
+- [x] 8d.2 Add recovery metrics tracking
+ - Count total attempts
   - Count successes vs failures
-  - Track which strategies were used
+ - Track which strategies were used
   - _Requirements: 10.1-10.3_
 
 ---
@@ -631,13 +631,13 @@ Add support for multiple recovery attempts.
 
 Add fallback behavior when all recoveries fail.
 
-- [ ] 8e.1 Create _fallback() method
+- [x] 8e.1 Create _fallback() method
   - Call FallbackService.generateFallbackResponse()
   - Log fallback event
   - Return fallback response
   - _Requirements: 5.1-5.5_
 
-- [ ] 8e.2 Integrate fallback into sendMessage()
+- [x] 8e.2 Integrate fallback into sendMessage()
   - After all recovery attempts fail, call _fallback()
   - Never throw exception (always return response)
   - Log that fallback was used
@@ -658,25 +658,25 @@ Add fallback behavior when all recoveries fail.
 
 Add timeout enforcement.
 
-- [ ] 8f.1 Add total recovery timeout
+- [x] 8f.1 Add total recovery timeout
   - Track total time spent on recovery
   - If > 10s, stop and use fallback
   - Log timeout events
   - _Requirements: 9.1-9.3_
 
-- [ ] 8f.2 Add individual attempt timeout
+- [x] 8f.2 Add individual attempt timeout
   - Each recovery attempt has 30s timeout
   - Use Future.timeout()
   - Log timeout events
   - _Requirements: 9.4, 9.5_
 
-- [ ] 8f.3 Write unit tests for ResilientAiChatService
+- [x] 8f.3 Write unit tests for ResilientAiChatService
   - File: `test/core/ai/chat/services/resilient_ai_chat_service_test.dart`
   - Test successful request (no errors)
   - Test single recovery succeeds
-  - Test multiple recoveries
+ - Test multiple recoveries
   - Test fallback after failures
-  - Test timeout enforcement
+ - Test timeout enforcement
   - _Requirements: 3.1-3.5, 9.1-9.5_
 
 ---
@@ -694,23 +694,23 @@ Add timeout enforcement.
 
 Set up dependency injection for resilient service.
 
-- [ ] 9.1 Register ErrorClassifier in DI
-  - File: `lib/core/di/app_container.dart` (or equivalent)
+- [x] 9.1 Register ErrorClassifier in DI
+  - File: `lib/core/di/bootstrap.dart`
   - Create singleton ErrorClassifier
-  - _Requirements: 3.1_
+ - _Requirements: 3.1_
 
-- [ ] 9.2 Register recovery strategies in DI
+- [x] 9.2 Register recovery strategies in DI
   - Register RateLimitRecoveryStrategy
   - Register NetworkRecoveryStrategy
   - Register ServerErrorRecoveryStrategy
   - Register TimeoutRecoveryStrategy
   - _Requirements: 3.1_
 
-- [ ] 9.3 Register FallbackService in DI
+- [x] 9.3 Register FallbackService in DI
   - Create singleton FallbackService
   - _Requirements: 3.1_
 
-- [ ] 9.4 Register ResilientAiChatService in DI
+- [x] 9.4 Register ResilientAiChatService in DI
   - Inject all dependencies (classifier, strategies, fallback)
   - Inject HttpAiChatService as primary service
   - _Requirements: 3.1_
@@ -730,23 +730,23 @@ Set up dependency injection for resilient service.
 
 Update AiChatController to use resilient service.
 
-- [ ] 9b.1 Update AiChatController constructor
-  - File: `lib/features/ai_chat/ui/controllers/ai_chat_controller.dart`
+- [x] 9b.1 Update AiChatController constructor
+ - File: `lib/features/ai_chat/ui/controllers/ai_chat_controller.dart`
   - Replace HttpAiChatService with ResilientAiChatService
   - Update constructor parameters
   - _Requirements: 3.1_
 
-- [ ] 9b.2 Verify no breaking changes
+- [x] 9b.2 Verify no breaking changes
   - Check all sendMessage() calls still work
   - Check error handling still works
   - Check UI updates correctly
-  - _Requirements: 3.1_
+ - _Requirements: 3.1_
 
-- [ ] 9b.3 Add logging for resilient service usage
-  - Log when resilient service is used
+- [x] 9b.3 Add logging for resilient service usage
+ - Log when resilient service is used
   - Log recovery attempts
   - Log fallback usage
-  - _Requirements: 3.4_
+ - _Requirements: 3.4_
 
 ---
 
@@ -763,25 +763,25 @@ Update AiChatController to use resilient service.
 
 Write integration tests for the complete system.
 
-- [ ] 9c.1 Create integration test file
+- [x] 9c.1 Create integration test file
   - File: `test/integration/resilient_chat_integration_test.dart`
   - Set up test environment
   - Create mock backend
   - _Requirements: 3.1-3.5_
 
-- [ ] 9c.2 Write end-to-end recovery test
+- [x] 9c.2 Write end-to-end recovery test
   - Simulate network error
-  - Verify recovery attempts
+ - Verify recovery attempts
   - Verify eventual success
   - _Requirements: 3.1-3.5_
 
-- [ ] 9c.3 Write end-to-end fallback test
+- [x] 9c.3 Write end-to-end fallback test
   - Simulate server down
-  - Verify fallback response
-  - Verify no crash
+ - Verify fallback response
+ - Verify no crash
   - _Requirements: 5.1-5.5_
 
-- [ ] 9c.4 Write persona integration test (if backend available)
+- [x] 9c.4 Write persona integration test (if backend available)
   - Switch Spaces
   - Send messages
   - Verify persona changes

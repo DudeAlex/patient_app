@@ -27,6 +27,14 @@ import '../ai/chat/repositories/context_config_repository.dart';
 import '../ai/chat/repositories/context_config_repository_impl.dart';
 import '../ai/chat/services/message_attachment_handler.dart';
 import '../ai/chat/services/message_attachment_handler_impl.dart';
+import '../ai/chat/services/error_classifier.dart';
+import '../ai/chat/services/fallback_service.dart';
+import '../ai/chat/services/error_recovery_strategy.dart';
+import '../ai/chat/services/rate_limit_recovery_strategy.dart';
+import '../ai/chat/services/network_recovery_strategy.dart';
+import '../ai/chat/services/server_error_recovery_strategy.dart';
+import '../ai/chat/services/timeout_recovery_strategy.dart';
+import '../ai/chat/services/resilient_ai_chat_service.dart';
 import '../diagnostics/app_logger.dart';
 import '../infrastructure/storage/migration_service.dart';
 import '../infrastructure/storage/space_preferences.dart';
@@ -115,17 +123,49 @@ Future<void> bootstrapAppContainer() async {
     container.registerLazySingleton<MessageAttachmentHandler>(
       (_) => MessageAttachmentHandlerImpl(),
     );
+    
+    // Register error recovery components
+    container.registerLazySingleton<ErrorClassifier>(
+      (_) => ErrorClassifier(),
+    );
+    container.registerLazySingleton<FallbackService>(
+      (_) => FallbackService(),
+    );
+    container.registerLazySingleton<RateLimitRecoveryStrategy>(
+      (_) => RateLimitRecoveryStrategy(),
+    );
+    container.registerLazySingleton<NetworkRecoveryStrategy>(
+      (_) => NetworkRecoveryStrategy(),
+    );
+    container.registerLazySingleton<ServerErrorRecoveryStrategy>(
+      (_) => ServerErrorRecoveryStrategy(),
+    );
+    container.registerLazySingleton<TimeoutRecoveryStrategy>(
+      (_) => TimeoutRecoveryStrategy(),
+    );
+    
+    // Register resilient AI chat service with all dependencies
     container.registerLazySingleton<AiChatService>(
-      (c) => LoggingAiChatService(
-        ConfigurableAiChatService(
-          configRepository: aiConfigRepository,
-          fakeService: FakeAiChatService(),
-          httpService: HttpAiChatService(
-            client: httpClient,
-            baseUrl: aiConfigRepository.current.remoteUrl,
+      (c) => ResilientAiChatService(
+        primaryService: LoggingAiChatService(
+          ConfigurableAiChatService(
+            configRepository: aiConfigRepository,
+            fakeService: FakeAiChatService(),
+            httpService: HttpAiChatService(
+              client: httpClient,
+              baseUrl: aiConfigRepository.current.remoteUrl,
+            ),
           ),
+          callLogRepository: aiCallLogRepository,
         ),
-        callLogRepository: aiCallLogRepository,
+        errorClassifier: c.resolve<ErrorClassifier>(),
+        fallbackService: c.resolve<FallbackService>(),
+        recoveryStrategies: [
+          c.resolve<RateLimitRecoveryStrategy>(),
+          c.resolve<NetworkRecoveryStrategy>(),
+          c.resolve<ServerErrorRecoveryStrategy>(),
+          c.resolve<TimeoutRecoveryStrategy>(),
+        ],
       ),
     );
 
