@@ -43,33 +43,33 @@ This implementation plan breaks down Stage 7b (Telemetry & Analytics) into detai
 
 Create the foundational data models and interfaces for telemetry.
 
-- [ ] 1.1 Create MetricType enum
+- [x] 1.1 Create MetricType enum
   - File: `lib/core/ai/chat/telemetry/models/metric_type.dart`
   - Values: requestRate, totalLatency, contextLatency, llmLatency, promptTokens, completionTokens, totalTokens, errorRate, cacheHitRate
   - _Requirements: All_
 
-- [ ] 1.2 Create TimeWindow enum
+- [x] 1.2 Create TimeWindow enum
   - File: `lib/core/ai/chat/telemetry/models/time_window.dart`
   - Values: minute, hour, day, week, month
   - _Requirements: 1.1-1.3, 2.5_
 
-- [ ] 1.3 Create MetricDataPoint model
+- [x] 1.3 Create MetricDataPoint model
   - File: `lib/core/ai/chat/telemetry/models/metric_data_point.dart`
   - Fields: timestamp, value, metadata
   - _Requirements: All_
 
-- [ ] 1.4 Create TokenUsageStats model
+- [x] 1.4 Create TokenUsageStats model
   - File: `lib/core/ai/chat/telemetry/models/token_usage_stats.dart`
   - Fields: totalTokens, promptTokens, completionTokens, byUser, bySpace, averagePerRequest
   - _Requirements: 3.1-3.5_
 
-- [ ] 1.5 Create LatencyStats model
+- [x] 1.5 Create LatencyStats model
   - File: `lib/core/ai/chat/telemetry/models/latency_stats.dart`
   - Fields: average, median, p95, p99, min, max
   - _Requirements: 2.1-2.5_
 
 
-- [ ] 1.6 Create ErrorStats model
+- [x] 1.6 Create ErrorStats model
   - File: `lib/core/ai/chat/telemetry/models/error_stats.dart`
   - Fields: totalErrorRate, errorRateByType, errorCountByType, totalErrors, totalRequests
   - _Requirements: 4.1-4.5_
@@ -89,25 +89,25 @@ Create the foundational data models and interfaces for telemetry.
 
 Create efficient in-memory storage for time-series metrics.
 
-- [ ] 2.1 Create TimeSeriesBuffer class
+- [x] 2.1 Create TimeSeriesBuffer class
   - File: `lib/core/ai/chat/telemetry/storage/time_series_buffer.dart`
   - Implement circular buffer with fixed size
   - Methods: add(), getRange(), cleanup()
   - _Requirements: 7.1-7.5, 9.3_
 
-- [ ] 2.2 Create MetricsStore class
+- [x] 2.2 Create MetricsStore class
   - File: `lib/core/ai/chat/telemetry/storage/metrics_store.dart`
   - Initialize buffers for all metric types
   - Implement memory management (50MB limit)
   - _Requirements: 9.3_
 
-- [ ] 2.3 Write TimeSeriesBuffer tests
+- [x] 2.3 Write TimeSeriesBuffer tests
   - File: `test/core/ai/chat/telemetry/storage/time_series_buffer_test.dart`
   - Test add, getRange, cleanup
   - Test memory limits
   - _Requirements: 7.1-7.5_
 
-- [ ] 2.4 Write MetricsStore tests
+- [x] 2.4 Write MetricsStore tests
   - File: `test/core/ai/chat/telemetry/storage/metrics_store_test.dart`
   - Test buffer initialization
   - Test memory management
