@@ -135,28 +135,28 @@ Integrate personas into the prompt building system.
 
 Create detailed persona configurations for each Space.
 
-- [ ] 3.1 Define Health persona
+- [x] 3.1 Define Health persona
   - Empathetic, cautious tone
   - Medical disclaimers
-  - Encourage consulting professionals
+ - Encourage consulting professionals
   - _Requirements: 2.1_
 
-- [ ] 3.2 Define Finance persona
+- [x] 3.2 Define Finance persona
   - Practical, budget-conscious tone
   - Focus on saving and budgeting
   - Clear financial guidance
   - _Requirements: 2.2_
 
-- [ ] 3.3 Define Education persona
+- [x] 3.3 Define Education persona
   - Study-focused, constructive tone
   - Learning encouragement
   - Study tips and guidance
-  - _Requirements: 2.3_
+ - _Requirements: 2.3_
 
-- [ ] 3.4 Define Travel persona
+- [x] 3.4 Define Travel persona
   - Exploratory, enthusiastic tone
   - Planning-focused
-  - Adventure and discovery
+ - Adventure and discovery
   - _Requirements: 2.4_
 
 ---
