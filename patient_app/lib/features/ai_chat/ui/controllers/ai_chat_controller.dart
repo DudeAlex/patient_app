@@ -148,7 +148,7 @@ class AiChatController extends StateNotifier<AiChatState> {
       await _sendChatMessageUseCase.execute(
         threadId: state.thread!.id,
         spaceId: state.spaceContext!.spaceId,
-        spaceContextOverride: state.spaceContext,
+        // Don't override context - let Stage 6 build fresh context with user query
         messageContent: content,
         attachments: attachmentInputs,
       );
