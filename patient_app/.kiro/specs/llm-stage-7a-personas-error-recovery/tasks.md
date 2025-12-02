@@ -63,26 +63,26 @@ git commit -m "feat(stage7a): Add persona configuration system"
 
 Create the persona configuration system on the backend.
 
-- [ ] 1.1 Create persona configuration file
+- [x] 1.1 Create persona configuration file
   - File: `server/config/personas.json`
   - Define structure for health, finance, education, travel personas
   - Include default persona
   - _Requirements: 1.1-1.4, 2.1-2.4, 8.1-8.3_
 
-- [ ] 1.2 Create PersonaManager class
+- [x] 1.2 Create PersonaManager class
   - File: `server/src/llm/persona_manager.js`
   - Method: `loadPersonas()` - Load from config file
-  - Method: `getPersona(spaceName)` - Get persona by Space
+ - Method: `getPersona(spaceName)` - Get persona by Space
   - Method: `validatePersona(persona)` - Validate configuration
   - _Requirements: 8.1-8.3_
 
-- [ ] 1.3 Write unit tests for PersonaManager
+- [x] 1.3 Write unit tests for PersonaManager
   - File: `server/test/persona_manager.test.mjs`
   - Test loading personas from file
   - Test getting persona for each Space
   - Test default persona fallback
-  - Test validation
-  - _Requirements: 8.1-8.5_
+ - Test validation
+ - _Requirements: 8.1-8.5_
 
 ---
 
