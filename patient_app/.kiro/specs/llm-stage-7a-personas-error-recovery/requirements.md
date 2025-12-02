@@ -139,5 +139,14 @@ Stage 7a enhances the AI Chat Companion with intelligent personas and robust err
 
 ---
 
+## References
+
+- **LLM Stages Overview:** `docs/modules/ai/LLM_STAGES_OVERVIEW.md` - Complete overview of all LLM integration stages
+- **Stage 6 Documentation:** `docs/modules/ai/STAGE_6_INTENT_RETRIEVAL.md` - Previous stage (Intent-Driven Retrieval)
+- **Stage 4 Documentation:** `docs/modules/ai/STAGE_4_TESTING_COMPLETE.md` - Context Optimization stage
+- **Original Stage 3-7 Reference:** `.kiro/specs/llm-stages-3-7-reference-incomplete/requirements.md` - Original vision document
+
+---
+
 **Created:** December 1, 2025  
 **Status:** Ready for design phase
