@@ -85,7 +85,7 @@ class FallbackService {
       case 'health':
         return "I can't access your health records right now. Please check your internet connection and try again.";
       case 'finance':
-        return "I can't access your financial records right now. Please check your internet connection and try again.";
+        return "I can't access your finance information right now. Please check your internet connection and try again.";
       case 'education':
         return "I can't access your study materials right now. Please check your internet connection and try again.";
       case 'travel':

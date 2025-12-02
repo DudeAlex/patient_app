@@ -375,7 +375,7 @@ Create the basic fallback service structure.
   - Add error type detection helper
   - _Requirements: 5.1-5.5_
 
-- [ ] 7.2 Implement basic fallback response structure
+- [x] 7.2 Implement basic fallback response structure
   - Create ChatResponse with fallback flag
   - Set isFallback = true
   - Add timestamp
@@ -418,7 +418,7 @@ Implement error-specific fallback messages.
   - Generate message: "Service temporarily unavailable. Try again soon."
   - _Requirements: 5.2, 7.2_
 
-- [ ] 7b.5 Implement generic fallback
+- [x] 7b.5 Implement generic fallback
   - For unknown errors
   - Generate message: "Something went wrong. Please try again."
   - _Requirements: 5.2, 7.2_
@@ -438,18 +438,18 @@ Implement error-specific fallback messages.
 
 Add context-aware fallback messages.
 
-- [ ] 7c.1 Add Space context to fallback messages
+- [x] 7c.1 Add Space context to fallback messages
   - Extract Space name from request
   - Customize message based on Space (Health, Finance, etc.)
   - Example: "Can't access your health records right now."
   - _Requirements: 5.4_
 
-- [ ] 7c.2 Add retry suggestions
+- [x] 7c.2 Add retry suggestions
   - Include actionable suggestions in messages
   - Example: "Check your connection and try again."
   - _Requirements: 5.5, 7.3_
 
-- [ ] 7c.3 Add error prevention tips
+- [x] 7c.3 Add error prevention tips
   - For repeated errors, suggest preventive actions
   - Example: "Make sure you're connected to the internet."
   - _Requirements: 7.5_
@@ -469,14 +469,14 @@ Add context-aware fallback messages.
 
 Write comprehensive tests for fallback service.
 
-- [ ] 7d.1 Write basic fallback tests
+- [x] 7d.1 Write basic fallback tests
   - File: `test/core/ai/chat/services/fallback_service_test.dart`
   - Test never throws exceptions
   - Test always returns valid ChatResponse
   - Test isFallback flag is set
   - _Requirements: 5.1, 7.1_
 
-- [ ] 7d.2 Write error-specific message tests
+- [x] 7d.2 Write error-specific message tests
   - Test network error message
   - Test rate limit error message
   - Test timeout error message
@@ -485,7 +485,7 @@ Write comprehensive tests for fallback service.
   - Verify no technical jargon in any message
   - _Requirements: 5.2, 7.2, 7.4_
 
-- [ ] 7d.3 Write context-aware tests
+- [x] 7d.3 Write context-aware tests
   - Test Space-specific messages
   - Test retry suggestions included
   - Test error prevention tips
@@ -802,19 +802,19 @@ Write integration tests for the complete system.
 
 Write property tests for persona system.
 
-- [ ] 10.1 Create persona properties test file
+- [x] 10.1 Create persona properties test file
   - File: `server/test/persona_properties.test.mjs`
   - Set up test framework
   - Import PersonaManager
   - _Property 1, 2_
 
-- [ ] 10.2 Property 1: Persona selection consistency
+- [x] 10.2 Property 1: Persona selection consistency
   - Generate random Space names (health, finance, education, travel)
   - Call getPersona() multiple times for same Space
   - Verify returns same persona each time
   - _Property 1_
 
-- [ ] 10.3 Property 2: Persona prompt inclusion
+- [x] 10.3 Property 2: Persona prompt inclusion
   - Generate random Spaces
   - Build prompt with persona
   - Verify prompt includes persona systemPromptAddition
@@ -835,19 +835,19 @@ Write property tests for persona system.
 
 Write property tests for error classification.
 
-- [ ] 10b.1 Create error classification properties test file
+- [x] 10b.1 Create error classification properties test file
   - File: `test/core/ai/chat/services/error_classification_properties_test.dart`
   - Set up test framework
   - Import ErrorClassifier
   - _Property 3, 4_
 
-- [ ] 10b.2 Property 3: Error classification determinism
+- [x] 10b.2 Property 3: Error classification determinism
   - Generate random errors (network, timeout, rate-limit, server)
   - Classify same error multiple times
   - Verify classification is consistent
   - _Property 3_
 
-- [ ] 10b.3 Property 4: Recovery strategy selection
+- [x] 10b.3 Property 4: Recovery strategy selection
   - Generate random error types
   - Select strategy for each error
   - Verify appropriate strategy selected (rate-limit → RateLimitStrategy, etc.)
@@ -868,26 +868,26 @@ Write property tests for error classification.
 
 Write property tests for recovery behavior.
 
-- [ ] 10c.1 Create recovery properties test file
+- [x] 10c.1 Create recovery properties test file
   - File: `test/core/ai/chat/services/recovery_properties_test.dart`
   - Set up test framework
   - Import ResilientAiChatService
   - _Property 5, 6, 7_
 
-- [ ] 10c.2 Property 5: Recovery attempt limit
+- [x] 10c.2 Property 5: Recovery attempt limit
   - Simulate continuous failures
   - Count recovery attempts
   - Verify max 2 attempts before fallback
   - _Property 5_
 
-- [ ] 10c.3 Property 6: Fallback always succeeds
+- [x] 10c.3 Property 6: Fallback always succeeds
   - Generate random requests
   - Force all recoveries to fail
   - Verify fallback never throws exception
   - Verify always returns valid ChatResponse
   - _Property 6_
 
-- [ ] 10c.4 Property 7: Recovery time bounds
+- [x] 10c.4 Property 7: Recovery time bounds
   - Simulate recovery attempts
   - Measure total time
   - Verify time < 10 seconds
@@ -908,13 +908,13 @@ Write property tests for recovery behavior.
 
 Write property tests for persona switching and user experience.
 
-- [ ] 10d.1 Property 8: Persona switch consistency
+- [x] 10d.1 Property 8: Persona switch consistency
   - Generate sequence of Space switches
   - Send message after each switch
   - Verify persona changes with Space
   - _Property 8_
 
-- [ ] 10d.2 Property 9: User message friendliness
+- [x] 10d.2 Property 9: User message friendliness
   - Generate random errors
   - Get user-facing error messages
   - Verify no technical jargon (no "stack trace", "exception", "null pointer")
@@ -936,7 +936,7 @@ Write property tests for persona switching and user experience.
 
 Write property tests for metrics accuracy.
 
-- [ ] 10e.1 Property 10: Metrics accuracy
+- [x] 10e.1 Property 10: Metrics accuracy
   - Generate random sequence of recovery attempts
   - Track successes and failures manually
   - Compare with RecoveryMetrics calculations
@@ -959,14 +959,14 @@ Write property tests for metrics accuracy.
 
 Create manual test scenarios document.
 
-- [ ] 11.1 Create manual test scenarios document
+- [x] 11.1 Create manual test scenarios document
   - File: `docs/modules/ai/STAGE_7A_MANUAL_TEST_SCENARIOS.md`
   - Add document structure
   - Add "How to Test" section
   - Add "Success Criteria" section
   - _Requirements: All_
 
-- [ ] 11.2 Document persona test scenarios
+- [x] 11.2 Document persona test scenarios
   - Add Health persona test scenario
   - Add Finance persona test scenario
   - Add Education persona test scenario
@@ -974,7 +974,7 @@ Create manual test scenarios document.
   - Add persona switching scenario
   - _Requirements: 1.1-1.5, 2.1-2.4_
 
-- [ ] 11.3 Document error recovery test scenarios
+- [x] 11.3 Document error recovery test scenarios
   - Add network error recovery scenario
   - Add rate limit recovery scenario
   - Add timeout recovery scenario
@@ -996,7 +996,7 @@ Create manual test scenarios document.
 
 Execute persona tests manually.
 
-- [ ] 11b.1 Test Health persona
+- [x] 11b.1 Test Health persona
   - Create 5 health records (blood pressure, medications, etc.)
   - Ask: "What is my blood pressure?"
   - Ask: "Should I be worried about my health?"
@@ -1004,7 +1004,7 @@ Execute persona tests manually.
   - Verify medical disclaimers present
   - _Requirements: 1.1, 2.1_
 
-- [ ] 11b.2 Test Finance persona
+- [x] 11b.2 Test Finance persona
   - Create 5 finance records (expenses, income, etc.)
   - Ask: "How much did I spend this month?"
   - Ask: "Should I save more money?"
@@ -1012,7 +1012,7 @@ Execute persona tests manually.
   - Verify focus on saving and budgeting
   - _Requirements: 1.2, 2.2_
 
-- [ ] 11b.3 Test Education persona
+- [x] 11b.3 Test Education persona
   - Create 5 education records (study sessions, notes, etc.)
   - Ask: "How are my studies going?"
   - Ask: "What should I study next?"
@@ -1020,7 +1020,7 @@ Execute persona tests manually.
   - Verify study tips and encouragement
   - _Requirements: 1.3, 2.3_
 
-- [ ] 11b.4 Test Travel persona
+- [x] 11b.4 Test Travel persona
   - Create 5 travel records (trips, plans, etc.)
   - Ask: "Where should I travel next?"
   - Ask: "What did I do on my last trip?"
@@ -1043,7 +1043,7 @@ Execute persona tests manually.
 
 Test persona switching behavior.
 
-- [ ] 11c.1 Test persona switching
+- [x] 11c.1 Test persona switching
   - Start in Health Space
   - Ask health question, note tone
   - Switch to Finance Space
@@ -1068,7 +1068,7 @@ Test persona switching behavior.
 
 Test error recovery behavior.
 
-- [ ] 11d.1 Test network error recovery
+- [x] 11d.1 Test network error recovery
   - Send a message
   - Disconnect network mid-request (or before)
   - Observe "Retrying..." indicator
@@ -1077,7 +1077,7 @@ Test error recovery behavior.
   - Check logs for retry attempts
   - _Requirements: 3.1-3.5, 4.4_
 
-- [ ] 11d.2 Test rate limit recovery (if possible)
+- [x] 11d.2 Test rate limit recovery (if possible)
   - Send many messages quickly
   - Trigger rate limit (if backend supports)
   - Verify system waits and retries
@@ -1099,7 +1099,7 @@ Test error recovery behavior.
 
 Test fallback behavior.
 
-- [ ] 11e.1 Test fallback with server down
+- [x] 11e.1 Test fallback with server down
   - Stop backend server
   - Send a message
   - Verify fallback response appears
@@ -1107,7 +1107,7 @@ Test fallback behavior.
   - Verify no crash or hang
   - _Requirements: 5.1-5.5, 7.1-7.5_
 
-- [ ] 11e.2 Test fallback recovery
+- [x] 11e.2 Test fallback recovery
   - With server still down, note fallback behavior
   - Restart backend server
   - Send another message
