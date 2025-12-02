@@ -218,36 +218,36 @@ Create the service that aggregates raw metrics into statistics.
 
 Create the service that monitors metrics and triggers alerts.
 
-- [ ] 5.1 Create AlertCondition model
+- [x] 5.1 Create AlertCondition model
   - File: `lib/core/ai/chat/telemetry/models/alert_condition.dart`
   - Fields: operator, evaluationWindow, consecutiveViolations
   - _Requirements: 8.1-8.5_
 
-- [ ] 5.2 Create Alert model
+- [x] 5.2 Create Alert model
   - File: `lib/core/ai/chat/telemetry/models/alert.dart`
   - Fields: alertId, triggeredAt, metric, actualValue, threshold, message
   - _Requirements: 8.1-8.5_
 
-- [ ] 5.3 Create AlertMonitoringService interface
+- [x] 5.3 Create AlertMonitoringService interface
   - File: `lib/core/ai/chat/telemetry/interfaces/alert_monitoring_service.dart`
   - Methods: registerAlert(), checkAlerts(), getTriggeredAlerts()
   - _Requirements: 8.1-8.5_
 
-- [ ] 5.4 Implement AlertMonitoringServiceImpl
+- [x] 5.4 Implement AlertMonitoringServiceImpl
   - File: `lib/core/ai/chat/telemetry/services/alert_monitoring_service_impl.dart`
   - Check alerts every 30 seconds
   - Require consecutive violations
   - Log triggered alerts
   - _Requirements: 8.1-8.5_
 
-- [ ] 5.5 Register default alerts
+- [x] 5.5 Register default alerts
   - Error rate > 10%
   - Latency > 5 seconds
   - Token usage > budget + 20%
   - Request rate > capacity + 50%
   - _Requirements: 8.1-8.4_
 
-- [ ] 5.6 Write AlertMonitoringService tests
+- [x] 5.6 Write AlertMonitoringService tests
   - File: `test/core/ai/chat/telemetry/services/alert_monitoring_service_test.dart`
   - Test threshold checking
   - Test alert triggering
