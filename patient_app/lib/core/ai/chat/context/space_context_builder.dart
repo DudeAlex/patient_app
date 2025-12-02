@@ -87,29 +87,68 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
     );
     
     final recordsRepository = _recordsRepositoryOverride ?? (await _recordsServiceFuture).records;
-    final space = await _spaceManager.getCurrentSpace();
-    if (space.id != spaceId) {
-      // Try to resolve the requested space explicitly.
-      final activeSpaces = await _spaceManager.getActiveSpaces();
-      final match = activeSpaces.firstWhere(
-        (s) => s.id == spaceId,
-        orElse: () => space,
+    final activeSpaces = await _spaceManager.getActiveSpaces();
+    
+    await AppLogger.info(
+      'Resolving space for context',
+      context: {
+        'requestedSpaceId': spaceId,
+        'activeSpacesCount': activeSpaces.length,
+        'activeSpaceIds': activeSpaces.map((s) => s.id).toList(),
+      },
+      correlationId: opId,
+    );
+    
+    Space? explicitSpace;
+    try {
+      explicitSpace = activeSpaces.firstWhere((s) => s.id == spaceId);
+      await AppLogger.info(
+        'Found requested space in active spaces',
+        context: {
+          'requestedSpaceId': spaceId,
+          'foundSpaceId': explicitSpace.id,
+          'foundSpaceName': explicitSpace.name,
+        },
+        correlationId: opId,
       );
-      if (match.id == spaceId) {
-        final context = await _buildFromSpace(
-          match,
-          recordsRepository,
-          correlationId: opId,
-          stopwatch: stopwatch,
-          dateRange: effectiveDateRange,
-          userQuery: userQuery,
-        );
-        await AppLogger.endOperation(opId);
-        return context;
-      }
+    } catch (_) {
+      explicitSpace = null;
+      await AppLogger.warning(
+        'Requested space not found in active spaces - will use fallback',
+        context: {
+          'requestedSpaceId': spaceId,
+          'activeSpaceIds': activeSpaces.map((s) => s.id).toList(),
+        },
+        correlationId: opId,
+      );
     }
+
+    if (explicitSpace != null) {
+      final context = await _buildFromSpace(
+        explicitSpace,
+        recordsRepository,
+        correlationId: opId,
+        stopwatch: stopwatch,
+        dateRange: effectiveDateRange,
+        userQuery: userQuery,
+      );
+      await AppLogger.endOperation(opId);
+      return context;
+    }
+
+    // Fallback to current space if requested space is not active.
+    final fallbackSpace = await _spaceManager.getCurrentSpace();
+    await AppLogger.warning(
+      'Using fallback space',
+      context: {
+        'requestedSpaceId': spaceId,
+        'fallbackSpaceId': fallbackSpace.id,
+        'fallbackSpaceName': fallbackSpace.name,
+      },
+      correlationId: opId,
+    );
     final context = await _buildFromSpace(
-      space,
+      fallbackSpace,
       recordsRepository,
       correlationId: opId,
       stopwatch: stopwatch,

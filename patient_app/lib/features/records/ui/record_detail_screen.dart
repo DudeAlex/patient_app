@@ -120,7 +120,7 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     final aiConfigRepository =
         AppContainer.instance.resolve<AiConfigRepository>();
     final spaceProvider = context.watch<SpaceProvider>();
-    final spaceId = spaceProvider.currentSpace?.id ?? 'health';
+    final spaceId = record.spaceId;
 
     return Scaffold(
       appBar: AppBar(

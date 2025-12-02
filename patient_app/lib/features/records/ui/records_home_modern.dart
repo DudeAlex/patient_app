@@ -206,16 +206,23 @@ class _RecordsHomeBodyState extends State<_RecordsHomeBody> {
                   builder: (context, snapshot) {
                     final aiEnabled = snapshot.data?.enabled ?? false;
                     if (!aiEnabled) return const SizedBox.shrink();
-                    final spaceId =
-                        (currentSpace ?? spaceProvider.activeSpaces.first).id;
+                    final space = currentSpace ?? spaceProvider.currentSpace;
+                    if (space == null) return const SizedBox.shrink();
+                    final spaceId = space.id;
                     return GradientHeaderActionButton(
                       icon: Icons.smart_toy_outlined,
                       tooltip: 'AI chat',
-                      onPressed: () {
-                        AppLogger.logNavigation(
+                      onPressed: () async {
+                        await AppLogger.info('AI chat button tapped', context: {
+                          'spaceId': spaceId,
+                          'spaceName': space.name,
+                          'currentSpace': currentSpace?.id,
+                          'providerCurrentSpace': spaceProvider.currentSpace?.id,
+                        });
+                        await AppLogger.logNavigation(
                           'RecordsHomeModern',
                           'AiChatScreen',
-                          context: {'spaceId': spaceId},
+                          context: {'spaceId': spaceId, 'spaceName': space.name},
                         );
                         Navigator.of(context).push(
                           MaterialPageRoute(

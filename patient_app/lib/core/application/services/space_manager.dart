@@ -29,12 +29,15 @@ class SpaceManager {
   /// 2. Maps each ID to a Space object (checking custom spaces first, then defaults)
   /// 3. Returns the list of resolved spaces
   Future<List<Space>> getActiveSpaces() async {
-    final activeIds = await _repository.getActiveSpaceIds();
+    var activeIds = await _repository.getActiveSpaceIds();
     
-    // Default to Health space if none selected
-    if (activeIds.isEmpty) {
-      final healthSpace = _registry.getDefaultSpace('health');
-      return healthSpace != null ? [healthSpace] : [];
+    // Default to all built-in spaces if none selected or only the legacy default is present.
+    final defaultIds = _registry.getAllDefaultSpaceIds();
+    if (activeIds.isEmpty ||
+        (activeIds.length == 1 &&
+            activeIds.first == 'health' &&
+            defaultIds.length > 1)) {
+      activeIds = defaultIds;
     }
 
     // Map IDs to Space objects

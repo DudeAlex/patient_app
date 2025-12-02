@@ -74,13 +74,27 @@ class AiChatController extends StateNotifier<AiChatState> {
   final ConnectivityMonitor _connectivityMonitor;
 
   Future<void> loadInitial() async {
+    await AppLogger.info('AiChatController.loadInitial called', context: {
+      'spaceId': spaceId,
+    });
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final thread = await _loadChatHistoryUseCase.execute(spaceId);
       if (!mounted) return;
       
+      await AppLogger.info('Loading space context', context: {
+        'spaceId': spaceId,
+        'threadId': thread.id,
+      });
+      
       final context = await _spaceContextBuilder.build(spaceId);
       if (!mounted) return;
+      
+      await AppLogger.info('Space context loaded', context: {
+        'spaceId': context.spaceId,
+        'spaceName': context.spaceName,
+        'persona': context.persona.toString(),
+      });
       
       state = state.copyWith(
         isLoading: false,
