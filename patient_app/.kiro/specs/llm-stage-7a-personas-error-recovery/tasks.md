@@ -4,11 +4,58 @@
 
 This implementation plan breaks down Stage 7a (AI Personas & Error Recovery) into detailed, actionable tasks. The plan follows an incremental approach: implement personas first, then add error recovery, then testing and documentation.
 
+**Task Breakdown:**
+- **Original:** 12 main tasks
+- **Expanded:** 30+ subtask groups (6a-6d, 7a-7d, 8a-8f, 9a-9c, 10a-10e, 11a-11e, 12)
+- **Total Subtasks:** 100+ individual coding tasks
+
 **Important Notes:**
 - Each task builds on previous tasks
+- Tasks are broken down to minimize complexity
+- Each subtask is focused and manageable (< 100 lines of code typically)
 - Test as you go (unit tests after each component)
 - Commit after each checkpoint
 - Backend changes (personas) are independent of Flutter changes (error recovery)
+
+---
+
+## Agent Instructions
+
+**CRITICAL: After completing EACH task or checkpoint, you MUST:**
+
+1. **Mark the task as complete** by checking the checkbox in this file
+2. **Commit your changes** with the exact commit message specified in the checkpoint
+3. **Stop and wait** for user confirmation before proceeding to the next task
+
+**Workflow for each task:**
+```
+1. Read the task requirements
+2. Implement the code
+3. Test the implementation
+4. Mark task checkbox as [x] in tasks.md
+5. Git add and commit with specified message
+6. STOP - Ask user if you should continue to next task
+```
+
+**Example:**
+```bash
+# After completing task 1.1
+git add .
+git commit -m "feat(stage7a): Add persona configuration system"
+# Then STOP and ask user before continuing
+```
+
+**Never skip ahead to the next task without:**
+- Marking the current task complete
+- Committing the changes
+- Getting user approval to continue
+
+**Checkpoint Instructions:**
+- Every checkpoint section shows the required commit message
+- At each checkpoint, mark ALL tasks in that section as [x]
+- Run `git add .` and `git commit -m "<message>"` with the exact message shown
+- STOP after each checkpoint and ask user: "Checkpoint complete. Should I continue to the next task?"
+- Wait for user confirmation before proceeding
 
 ---
 
@@ -41,7 +88,11 @@ Create the persona configuration system on the backend.
 
 ## Checkpoint 1: Commit persona foundation
 
-**Action:** Commit with message: "feat(stage7a): Add persona configuration system"
+**Actions Required:**
+1. Mark tasks 1.1, 1.2, 1.3 as complete [x] in this file
+2. Run: `git add .`
+3. Run: `git commit -m "feat(stage7a): Add persona configuration system"`
+4. STOP and ask user before continuing to Task 2
 
 ---
 
@@ -73,7 +124,10 @@ Integrate personas into the prompt building system.
 
 ## Checkpoint 2: Commit persona integration
 
-**Action:** Commit with message: "feat(stage7a): Integrate personas into prompt building"
+**Actions Required:**
+1. Mark tasks 2.1, 2.2, 2.3 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Integrate personas into prompt building"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -109,7 +163,10 @@ Create detailed persona configurations for each Space.
 
 ## Checkpoint 3: Commit all personas
 
-**Action:** Commit with message: "feat(stage7a): Define all Space personas"
+**Actions Required:**
+1. Mark tasks 3.1-3.4 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Define all Space personas"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -138,7 +195,10 @@ Create the error recovery infrastructure.
 
 ## Checkpoint 4: Commit recovery models
 
-**Action:** Commit with message: "feat(stage7a): Add error recovery models and config"
+**Actions Required:**
+1. Mark tasks 4.1-4.3 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Add error recovery models and config"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -162,76 +222,283 @@ Implement error classification system.
 
 ## Checkpoint 5: Commit error classification
 
-**Action:** Commit with message: "feat(stage7a): Add error classification system"
+**Actions Required:**
+1. Mark tasks 5.1-5.2 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Add error classification system"`
+3. STOP and ask user before continuing
 
 ---
 
-## Task 6: Flutter - Recovery Strategies
+## Task 6: Flutter - Recovery Strategies (Part 1: Base Class)
 
-Implement recovery strategy classes.
+Create the base recovery strategy class.
 
 - [ ] 6.1 Create ErrorRecoveryStrategy base class
   - File: `lib/core/ai/chat/services/error_recovery_strategy.dart`
   - Abstract methods: recover(), canRecover(), getRetryDelay()
+  - Add documentation for each method
   - _Requirements: 4.1-4.5_
 
-- [ ] 6.2 Implement RateLimitRecoveryStrategy
-  - Wait for rate limit delay (max 5s)
-  - Retry after delay
+---
+
+## Checkpoint 6a: Commit base strategy
+
+**Actions Required:**
+1. Mark task 6.1 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Add error recovery strategy base class"`
+3. STOP and ask user before continuing
+
+---
+
+## Task 6b: Flutter - Recovery Strategies (Part 2: Rate Limit Strategy)
+
+Implement rate limit recovery strategy.
+
+- [ ] 6b.1 Implement RateLimitRecoveryStrategy
+  - File: `lib/core/ai/chat/services/rate_limit_recovery_strategy.dart`
+  - Extend ErrorRecoveryStrategy
+  - Implement canRecover() - check if error is rate limit
+  - Implement getRetryDelay() - return delay from error (max 5s)
   - _Requirements: 4.1, 6.2_
 
-- [ ] 6.3 Implement NetworkRecoveryStrategy
-  - Exponential backoff (1s, 2s)
-  - Max 2 attempts
+- [ ] 6b.2 Implement recover() method
+  - Wait for rate limit delay
+  - Retry the request
+  - Return response if successful
+  - _Requirements: 4.1, 6.2_
+
+- [ ] 6b.3 Write unit tests for RateLimitRecoveryStrategy
+  - File: `test/core/ai/chat/services/rate_limit_recovery_strategy_test.dart`
+  - Test canRecover() returns true for rate limit errors
+  - Test getRetryDelay() respects max 5s
+  - Test recover() waits and retries
+  - _Requirements: 4.1, 6.2_
+
+---
+
+## Checkpoint 6b: Commit rate limit strategy
+
+**Actions Required:**
+1. Mark tasks 6b.1-6b.3 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Implement rate limit recovery strategy"`
+3. STOP and ask user before continuing
+
+---
+
+## Task 6c: Flutter - Recovery Strategies (Part 3: Network Strategy)
+
+Implement network error recovery strategy.
+
+- [ ] 6c.1 Implement NetworkRecoveryStrategy
+  - File: `lib/core/ai/chat/services/network_recovery_strategy.dart`
+  - Extend ErrorRecoveryStrategy
+  - Implement canRecover() - check if error is network
+  - Implement getRetryDelay() - exponential backoff (1s, 2s)
   - _Requirements: 4.4, 6.3_
 
-- [ ] 6.4 Implement ServerErrorRecoveryStrategy
+- [ ] 6c.2 Implement recover() method
+  - Track attempt number
+  - Use exponential backoff (1s first, 2s second)
+  - Max 2 attempts
+  - Return response if successful
+  - _Requirements: 4.4, 6.3_
+
+- [ ] 6c.3 Write unit tests for NetworkRecoveryStrategy
+  - File: `test/core/ai/chat/services/network_recovery_strategy_test.dart`
+  - Test canRecover() returns true for network errors
+  - Test exponential backoff delays (1s, 2s)
+  - Test max 2 attempts
+  - Test recover() retries with backoff
+  - _Requirements: 4.4, 6.3_
+
+---
+
+## Checkpoint 6c: Commit network strategy
+
+**Actions Required:**
+1. Mark tasks 6c.1-6c.3 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Implement network recovery strategy"`
+3. STOP and ask user before continuing
+
+---
+
+## Task 6d: Flutter - Recovery Strategies (Part 4: Server & Timeout Strategies)
+
+Implement server error and timeout recovery strategies.
+
+- [ ] 6d.1 Implement ServerErrorRecoveryStrategy
+  - File: `lib/core/ai/chat/services/server_error_recovery_strategy.dart`
+  - Extend ErrorRecoveryStrategy
+  - Implement canRecover() - always return false (no retry)
   - Immediate fallback (no retry)
   - _Requirements: 4.3, 6.4_
 
-- [ ] 6.5 Implement TimeoutRecoveryStrategy
+- [ ] 6d.2 Implement TimeoutRecoveryStrategy
+  - File: `lib/core/ai/chat/services/timeout_recovery_strategy.dart`
+  - Extend ErrorRecoveryStrategy
+  - Implement canRecover() - check if error is timeout
   - Retry once with shorter timeout
   - _Requirements: 4.2_
 
-- [ ] 6.6 Write unit tests for all strategies
-  - File: `test/core/ai/chat/services/error_recovery_strategy_test.dart`
-  - Test each strategy's behavior
-  - Test retry delays
-  - Test max attempts
-  - _Requirements: 4.1-4.5_
+- [ ] 6d.3 Write unit tests for ServerErrorRecoveryStrategy
+  - File: `test/core/ai/chat/services/server_error_recovery_strategy_test.dart`
+  - Test canRecover() returns false
+  - Test no retry attempts
+  - _Requirements: 4.3, 6.4_
+
+- [ ] 6d.4 Write unit tests for TimeoutRecoveryStrategy
+  - File: `test/core/ai/chat/services/timeout_recovery_strategy_test.dart`
+  - Test canRecover() returns true for timeout errors
+  - Test retry with shorter timeout
+  - Test max 1 retry
+  - _Requirements: 4.2_
 
 ---
 
-## Checkpoint 6: Commit recovery strategies
+## Checkpoint 6d: Commit server and timeout strategies
 
-**Action:** Commit with message: "feat(stage7a): Implement error recovery strategies"
+**Actions Required:**
+1. Mark tasks 6d.1-6d.4 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Implement server and timeout recovery strategies"`
+3. STOP and ask user before continuing
 
 ---
 
-## Task 7: Flutter - Fallback Service
+## Task 7: Flutter - Fallback Service (Part 1: Foundation)
 
-Create the fallback service that always succeeds.
+Create the basic fallback service structure.
 
-- [ ] 7.1 Create FallbackService class
+- [ ] 7.1 Create FallbackService class skeleton
   - File: `lib/core/ai/chat/services/fallback_service.dart`
-  - Method: `generateFallbackResponse(ChatRequest, AiServiceException)`
-  - Generate helpful, context-aware messages
-  - Never throw exceptions
-  - _Requirements: 5.1-5.5, 7.1-7.5_
+  - Create class with constructor
+  - Add empty generateFallbackResponse() method
+  - Add error type detection helper
+  - _Requirements: 5.1-5.5_
 
-- [ ] 7.2 Write unit tests for FallbackService
-  - File: `test/core/ai/chat/services/fallback_service_test.dart`
-  - Test fallback for each error type
-  - Test never throws
-  - Test returns valid ChatResponse
-  - Test user-friendly messages (no jargon)
-  - _Requirements: 5.1-5.5, 7.4_
+- [ ] 7.2 Implement basic fallback response structure
+  - Create ChatResponse with fallback flag
+  - Set isFallback = true
+  - Add timestamp
+  - Add basic message structure
+  - _Requirements: 5.1, 7.1_
 
 ---
 
-## Checkpoint 7: Commit fallback service
+## Checkpoint 7a: Commit fallback foundation
 
-**Action:** Commit with message: "feat(stage7a): Add fallback service"
+**Actions Required:**
+1. Mark tasks 7.1-7.2 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Add fallback service foundation"`
+3. STOP and ask user before continuing
+
+---
+
+## Task 7b: Flutter - Fallback Service (Part 2: Error-Specific Messages)
+
+Implement error-specific fallback messages.
+
+- [ ] 7b.1 Implement network error fallback
+  - Detect network errors
+  - Generate user-friendly message: "Can't connect right now. Check your internet."
+  - No technical jargon
+  - _Requirements: 5.2, 7.2_
+
+- [ ] 7b.2 Implement rate limit fallback
+  - Detect rate limit errors
+  - Generate message: "Too many requests. Please wait a moment."
+  - _Requirements: 5.2, 7.2_
+
+- [ ] 7b.3 Implement timeout fallback
+  - Detect timeout errors
+  - Generate message: "Request took too long. Please try again."
+  - _Requirements: 5.2, 7.2_
+
+- [ ] 7b.4 Implement server error fallback
+  - Detect server errors
+  - Generate message: "Service temporarily unavailable. Try again soon."
+  - _Requirements: 5.2, 7.2_
+
+- [ ] 7b.5 Implement generic fallback
+  - For unknown errors
+  - Generate message: "Something went wrong. Please try again."
+  - _Requirements: 5.2, 7.2_
+
+---
+
+## Checkpoint 7b: Commit error-specific messages
+
+**Actions Required:**
+1. Mark tasks 7b.1-7b.5 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Add error-specific fallback messages"`
+3. STOP and ask user before continuing
+
+---
+
+## Task 7c: Flutter - Fallback Service (Part 3: Context Awareness)
+
+Add context-aware fallback messages.
+
+- [ ] 7c.1 Add Space context to fallback messages
+  - Extract Space name from request
+  - Customize message based on Space (Health, Finance, etc.)
+  - Example: "Can't access your health records right now."
+  - _Requirements: 5.4_
+
+- [ ] 7c.2 Add retry suggestions
+  - Include actionable suggestions in messages
+  - Example: "Check your connection and try again."
+  - _Requirements: 5.5, 7.3_
+
+- [ ] 7c.3 Add error prevention tips
+  - For repeated errors, suggest preventive actions
+  - Example: "Make sure you're connected to the internet."
+  - _Requirements: 7.5_
+
+---
+
+## Checkpoint 7c: Commit context-aware messages
+
+**Actions Required:**
+1. Mark tasks 7c.1-7c.3 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Add context-aware fallback messages"`
+3. STOP and ask user before continuing
+
+---
+
+## Task 7d: Flutter - Fallback Service (Part 4: Testing)
+
+Write comprehensive tests for fallback service.
+
+- [ ] 7d.1 Write basic fallback tests
+  - File: `test/core/ai/chat/services/fallback_service_test.dart`
+  - Test never throws exceptions
+  - Test always returns valid ChatResponse
+  - Test isFallback flag is set
+  - _Requirements: 5.1, 7.1_
+
+- [ ] 7d.2 Write error-specific message tests
+  - Test network error message
+  - Test rate limit error message
+  - Test timeout error message
+  - Test server error message
+  - Test generic error message
+  - Verify no technical jargon in any message
+  - _Requirements: 5.2, 7.2, 7.4_
+
+- [ ] 7d.3 Write context-aware tests
+  - Test Space-specific messages
+  - Test retry suggestions included
+  - Test error prevention tips
+  - _Requirements: 5.4, 5.5, 7.3, 7.5_
+
+---
+
+## Checkpoint 7d: Commit fallback tests
+
+**Actions Required:**
+1. Mark tasks 7d.1-7d.3 as complete [x]
+2. Commit: `git commit -m "test(stage7a): Add fallback service tests"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -263,7 +530,10 @@ Create the basic structure of the resilient service.
 
 ## Checkpoint 8a: Commit resilient service foundation
 
-**Action:** Commit with message: "feat(stage7a): Add resilient service foundation"
+**Actions Required:**
+1. Mark tasks 8.1-8.3 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Add resilient service foundation"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -287,7 +557,10 @@ Add error classification to the resilient service.
 
 ## Checkpoint 8b: Commit error classification
 
-**Action:** Commit with message: "feat(stage7a): Add error classification to resilient service"
+**Actions Required:**
+1. Mark tasks 8b.1-8b.2 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Add error classification to resilient service"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -320,7 +593,10 @@ Implement single recovery attempt.
 
 ## Checkpoint 8c: Commit single recovery
 
-**Action:** Commit with message: "feat(stage7a): Implement single recovery attempt"
+**Actions Required:**
+1. Mark tasks 8c.1-8c.3 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Implement single recovery attempt"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -344,7 +620,10 @@ Add support for multiple recovery attempts.
 
 ## Checkpoint 8d: Commit multiple recoveries
 
-**Action:** Commit with message: "feat(stage7a): Add multiple recovery attempts"
+**Actions Required:**
+1. Mark tasks 8d.1-8d.2 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Add multiple recovery attempts"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -368,7 +647,10 @@ Add fallback behavior when all recoveries fail.
 
 ## Checkpoint 8e: Commit fallback integration
 
-**Action:** Commit with message: "feat(stage7a): Add fallback behavior to resilient service"
+**Actions Required:**
+1. Mark tasks 8e.1-8e.2 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Add fallback behavior to resilient service"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -401,43 +683,118 @@ Add timeout enforcement.
 
 ## Checkpoint 8f: Commit timeout enforcement
 
-**Action:** Commit with message: "feat(stage7a): Add timeout enforcement to resilient service"
+**Actions Required:**
+1. Mark tasks 8f.1-8f.3 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Add timeout enforcement to resilient service"`
+3. STOP and ask user before continuing
 
 ---
 
-## Checkpoint 8: Commit resilient service
+## Task 9: Flutter - Integration and Wiring (Part 1: Dependency Injection)
 
-**Action:** Commit with message: "feat(stage7a): Implement resilient AI chat service"
+Set up dependency injection for resilient service.
 
----
-
-## Task 9: Flutter - Integration and Wiring
-
-Wire up the resilient service in the app.
-
-- [ ] 9.1 Update dependency injection
+- [ ] 9.1 Register ErrorClassifier in DI
   - File: `lib/core/di/app_container.dart` (or equivalent)
-  - Register ResilientAiChatService
-  - Inject ErrorClassifier, strategies, FallbackService
+  - Create singleton ErrorClassifier
   - _Requirements: 3.1_
 
-- [ ] 9.2 Update AiChatController to use resilient service
-  - Replace HttpAiChatService with ResilientAiChatService
-  - Ensure no breaking changes
+- [ ] 9.2 Register recovery strategies in DI
+  - Register RateLimitRecoveryStrategy
+  - Register NetworkRecoveryStrategy
+  - Register ServerErrorRecoveryStrategy
+  - Register TimeoutRecoveryStrategy
   - _Requirements: 3.1_
 
-- [ ] 9.3 Write integration tests
-  - File: `test/integration/resilient_chat_integration_test.dart`
-  - Test end-to-end recovery flow
-  - Test fallback integration
-  - Test persona integration (if backend available)
-  - _Requirements: 3.1-3.5, 5.1-5.5_
+- [ ] 9.3 Register FallbackService in DI
+  - Create singleton FallbackService
+  - _Requirements: 3.1_
+
+- [ ] 9.4 Register ResilientAiChatService in DI
+  - Inject all dependencies (classifier, strategies, fallback)
+  - Inject HttpAiChatService as primary service
+  - _Requirements: 3.1_
 
 ---
 
-## Checkpoint 9: Commit integration
+## Checkpoint 9a: Commit dependency injection
 
-**Action:** Commit with message: "feat(stage7a): Integrate resilient service into app"
+**Actions Required:**
+1. Mark tasks 9.1-9.4 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Set up dependency injection for resilient service"`
+3. STOP and ask user before continuing
+
+---
+
+## Task 9b: Flutter - Integration and Wiring (Part 2: Controller Update)
+
+Update AiChatController to use resilient service.
+
+- [ ] 9b.1 Update AiChatController constructor
+  - File: `lib/features/ai_chat/ui/controllers/ai_chat_controller.dart`
+  - Replace HttpAiChatService with ResilientAiChatService
+  - Update constructor parameters
+  - _Requirements: 3.1_
+
+- [ ] 9b.2 Verify no breaking changes
+  - Check all sendMessage() calls still work
+  - Check error handling still works
+  - Check UI updates correctly
+  - _Requirements: 3.1_
+
+- [ ] 9b.3 Add logging for resilient service usage
+  - Log when resilient service is used
+  - Log recovery attempts
+  - Log fallback usage
+  - _Requirements: 3.4_
+
+---
+
+## Checkpoint 9b: Commit controller update
+
+**Actions Required:**
+1. Mark tasks 9b.1-9b.3 as complete [x]
+2. Commit: `git commit -m "feat(stage7a): Update AiChatController to use resilient service"`
+3. STOP and ask user before continuing
+
+---
+
+## Task 9c: Flutter - Integration and Wiring (Part 3: Integration Tests)
+
+Write integration tests for the complete system.
+
+- [ ] 9c.1 Create integration test file
+  - File: `test/integration/resilient_chat_integration_test.dart`
+  - Set up test environment
+  - Create mock backend
+  - _Requirements: 3.1-3.5_
+
+- [ ] 9c.2 Write end-to-end recovery test
+  - Simulate network error
+  - Verify recovery attempts
+  - Verify eventual success
+  - _Requirements: 3.1-3.5_
+
+- [ ] 9c.3 Write end-to-end fallback test
+  - Simulate server down
+  - Verify fallback response
+  - Verify no crash
+  - _Requirements: 5.1-5.5_
+
+- [ ] 9c.4 Write persona integration test (if backend available)
+  - Switch Spaces
+  - Send messages
+  - Verify persona changes
+  - _Requirements: 1.1-1.5_
+
+---
+
+## Checkpoint 9c: Commit integration tests
+
+**Actions Required:**
+1. Mark tasks 9c.1-9c.4 as complete [x]
+2. Commit: `git commit -m "test(stage7a): Add resilient service integration tests"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -467,7 +824,10 @@ Write property tests for persona system.
 
 ## Checkpoint 10a: Commit persona properties
 
-**Action:** Commit with message: "test(stage7a): Add persona property tests"
+**Actions Required:**
+1. Mark tasks 10.1-10.3 as complete [x]
+2. Commit: `git commit -m "test(stage7a): Add persona property tests"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -497,7 +857,10 @@ Write property tests for error classification.
 
 ## Checkpoint 10b: Commit error classification properties
 
-**Action:** Commit with message: "test(stage7a): Add error classification property tests"
+**Actions Required:**
+1. Mark tasks 10b.1-10b.3 as complete [x]
+2. Commit: `git commit -m "test(stage7a): Add error classification property tests"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -534,7 +897,10 @@ Write property tests for recovery behavior.
 
 ## Checkpoint 10c: Commit recovery properties
 
-**Action:** Commit with message: "test(stage7a): Add recovery property tests"
+**Actions Required:**
+1. Mark tasks 10c.1-10c.4 as complete [x]
+2. Commit: `git commit -m "test(stage7a): Add recovery property tests"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -559,7 +925,10 @@ Write property tests for persona switching and user experience.
 
 ## Checkpoint 10d: Commit UX properties
 
-**Action:** Commit with message: "test(stage7a): Add persona switching and UX property tests"
+**Actions Required:**
+1. Mark tasks 10d.1-10d.2 as complete [x]
+2. Commit: `git commit -m "test(stage7a): Add persona switching and UX property tests"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -579,7 +948,10 @@ Write property tests for metrics accuracy.
 
 ## Checkpoint 10e: Commit metrics properties
 
-**Action:** Commit with message: "test(stage7a): Add metrics property tests"
+**Actions Required:**
+1. Mark task 10e.1 as complete [x]
+2. Commit: `git commit -m "test(stage7a): Add metrics property tests"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -613,7 +985,10 @@ Create manual test scenarios document.
 
 ## Checkpoint 11a: Commit test documentation
 
-**Action:** Commit with message: "docs(stage7a): Create manual test scenarios document"
+**Actions Required:**
+1. Mark tasks 11.1-11.3 as complete [x]
+2. Commit: `git commit -m "docs(stage7a): Create manual test scenarios document"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -657,7 +1032,10 @@ Execute persona tests manually.
 
 ## Checkpoint 11b: Commit persona testing results
 
-**Action:** Commit with message: "test(stage7a): Complete persona manual testing"
+**Actions Required:**
+1. Mark tasks 11b.1-11b.4 as complete [x]
+2. Commit: `git commit -m "test(stage7a): Complete persona manual testing"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -679,7 +1057,10 @@ Test persona switching behavior.
 
 ## Checkpoint 11c: Commit persona switching test
 
-**Action:** Commit with message: "test(stage7a): Complete persona switching testing"
+**Actions Required:**
+1. Mark task 11c.1 as complete [x]
+2. Commit: `git commit -m "test(stage7a): Complete persona switching testing"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -707,7 +1088,10 @@ Test error recovery behavior.
 
 ## Checkpoint 11d: Commit error recovery testing
 
-**Action:** Commit with message: "test(stage7a): Complete error recovery testing"
+**Actions Required:**
+1. Mark tasks 11d.1-11d.2 as complete [x]
+2. Commit: `git commit -m "test(stage7a): Complete error recovery testing"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -734,7 +1118,10 @@ Test fallback behavior.
 
 ## Checkpoint 11e: Commit fallback testing
 
-**Action:** Commit with message: "test(stage7a): Complete fallback testing"
+**Actions Required:**
+1. Mark tasks 11e.1-11e.2 as complete [x]
+2. Commit: `git commit -m "test(stage7a): Complete fallback testing"`
+3. STOP and ask user before continuing
 
 ---
 
@@ -766,7 +1153,10 @@ Create comprehensive documentation for Stage 7a.
 
 ## Checkpoint 12: Commit documentation
 
-**Action:** Commit with message: "docs(stage7a): Complete Stage 7a documentation"
+**Actions Required:**
+1. Mark tasks 12.1-12.3 as complete [x]
+2. Commit: `git commit -m "docs(stage7a): Complete Stage 7a documentation"`
+3. STOP - Stage 7a implementation complete!
 
 ---
 
@@ -774,7 +1164,8 @@ Create comprehensive documentation for Stage 7a.
 
 Stage 7a is complete when:
 
-- [ ] All 21 tasks completed (1-9, 10a-10e, 11a-11e, 12)
+- [ ] All main task groups completed (1-5, 6a-6d, 7a-7d, 8a-8f, 9a-9c, 10a-10e, 11a-11e, 12)
+- [ ] All 100+ subtasks completed
 - [ ] All unit tests passing
 - [ ] All property-based tests passing (10 properties)
 - [ ] All integration tests passing
@@ -786,5 +1177,6 @@ Stage 7a is complete when:
 ---
 
 **Created:** December 1, 2025  
+**Updated:** December 2, 2025 (Task breakdown refinement)  
 **Status:** Ready for implementation  
-**Estimated Time:** 2-3 days for full implementation
+**Estimated Time:** 3-4 days for full implementation (increased due to more granular tasks)
