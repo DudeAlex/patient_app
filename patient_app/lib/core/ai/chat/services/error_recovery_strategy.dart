@@ -1,7 +1,7 @@
 import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
-import 'package:patient_app/core/ai/chat/exceptions/chat_exceptions.dart';
 import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
+import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
 
 /// Abstract base class for error recovery strategies.
 ///

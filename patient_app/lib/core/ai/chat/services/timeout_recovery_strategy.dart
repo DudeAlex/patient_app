@@ -6,6 +6,7 @@ import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/services/error_recovery_strategy.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
+import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
 
 /// Recovery strategy for timeout errors - retry once with shorter timeout.
 class TimeoutRecoveryStrategy implements ErrorRecoveryStrategy {

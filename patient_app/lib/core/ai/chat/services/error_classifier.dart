@@ -1,4 +1,5 @@
 import 'package:patient_app/core/ai/chat/exceptions/chat_exceptions.dart';
+import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
 
 /// Classifies AI service errors by type for appropriate recovery strategies.
 class ErrorClassifier {

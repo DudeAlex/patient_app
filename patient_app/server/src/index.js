@@ -41,6 +41,9 @@ app.use(
   }),
 );
 
+// Apply rate limiting to chat endpoints
+app.use(['/api/v1/chat/echo', '/api/v1/chat/message'], rateLimiter);
+
 app.post('/api/v1/chat/echo', (req, res) => {
   const { threadId, message, timestamp, userId } = req.body ?? {};
 
@@ -101,7 +104,16 @@ app.post('/api/v1/chat/message', async (req, res) => {
 
     // Get persona based on space context
     const spaceId = spaceContext?.spaceId || 'general';
+    await personaManager.ensureLatestPersonas();
     const persona = personaManager.getPersona(spaceId);
+    console.info(
+      JSON.stringify({
+        event: 'persona_selected',
+        correlationId: req.correlationId,
+        spaceId,
+        persona: persona?.name,
+      }),
+    );
 
     const systemPrompt = buildPrompt({
       spaceName: spaceContext?.spaceName,
@@ -150,9 +162,6 @@ app.post('/api/v1/chat/message', async (req, res) => {
     });
   }
 });
-
-// Apply rate limiting to chat endpoints
-app.use(['/api/v1/chat/echo', '/api/v1/chat/message'], rateLimiter);
 
 app.use((req, res) => {
   res.status(404).json({

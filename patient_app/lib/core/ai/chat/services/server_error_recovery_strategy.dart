@@ -6,6 +6,7 @@ import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/services/error_recovery_strategy.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
+import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
 
 /// Recovery strategy for server errors - no retry, immediate fallback.
 class ServerErrorRecoveryStrategy implements ErrorRecoveryStrategy {
@@ -38,10 +39,8 @@ class ServerErrorRecoveryStrategy implements ErrorRecoveryStrategy {
 
   @override
   bool canRecover(AiServiceException error) {
-    // We recognize server errors but don't actually recover from them
-    // Instead, we return false to indicate that other strategies should handle this
-    // Or it should go straight to fallback
-    return error is ServerException;
+    // Allow fallback to be handled by the resilient service instead of retrying.
+    return false;
   }
 
   @override

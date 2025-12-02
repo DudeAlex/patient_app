@@ -11,6 +11,10 @@ import 'package:patient_app/core/ai/chat/services/rate_limit_recovery_strategy.d
 import 'package:patient_app/core/ai/chat/services/resilient_ai_chat_service.dart';
 import 'package:patient_app/core/ai/chat/services/server_error_recovery_strategy.dart';
 import 'package:patient_app/core/ai/chat/services/timeout_recovery_strategy.dart';
+import 'package:patient_app/core/ai/chat/models/space_context.dart' as models;
+import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
+import 'package:patient_app/core/ai/models/ai_summary_result.dart';
+import 'package:patient_app/core/domain/entities/information_item.dart';
 
 class MockAiChatService implements AiChatService {
   bool shouldThrow = false;
@@ -70,9 +74,10 @@ void main() {
       final request = ChatRequest(
         threadId: 'test-thread',
         messageContent: 'Hello',
-        spaceContext: SpaceContext(
+        spaceContext: models.SpaceContext(
           spaceId: 'health',
           spaceName: 'Health',
+          persona: models.SpacePersona.health,
           description: 'Health space',
           categories: ['medical'],
         ),
@@ -80,14 +85,14 @@ void main() {
       
       // Make primary service throw a network error
       mockPrimaryService.shouldThrow = true;
-      mockPrimaryService.exceptionToThrow = NetworkException('Network error');
+      mockPrimaryService.exceptionToThrow = NetworkException(message: 'Network error');
       
       // Set up recovery response
       final recoveryResponse = ChatResponse.success(messageContent: 'Recovered response');
       resilientService = ResilientAiChatService(
         primaryService: MockAiChatService()
           ..shouldThrow = true
-          ..exceptionToThrow = NetworkException('Network error'),
+          ..exceptionToThrow = NetworkException(message: 'Network error'),
         errorClassifier: errorClassifier,
         fallbackService: fallbackService,
         recoveryStrategies: [
@@ -108,9 +113,10 @@ void main() {
       final request = ChatRequest(
         threadId: 'test-thread',
         messageContent: 'Hello',
-        spaceContext: SpaceContext(
+        spaceContext: models.SpaceContext(
           spaceId: 'health',
           spaceName: 'Health',
+          persona: models.SpacePersona.health,
           description: 'Health space',
           categories: ['medical'],
         ),
@@ -118,7 +124,7 @@ void main() {
       
       // Make primary service throw an error
       mockPrimaryService.shouldThrow = true;
-      mockPrimaryService.exceptionToThrow = ServerException('Server error');
+      mockPrimaryService.exceptionToThrow = ServerException(message: 'Server error');
       
       // Make all recovery strategies fail by not finding a suitable strategy or having them fail
       final result = await resilientService.sendMessage(request);
@@ -133,9 +139,10 @@ void main() {
       final request = ChatRequest(
         threadId: 'test-thread',
         messageContent: 'Hello',
-        spaceContext: SpaceContext(
+        spaceContext: models.SpaceContext(
           spaceId: 'health',
           spaceName: 'Health',
+          persona: models.SpacePersona.health,
           description: 'Health space',
           categories: ['medical'],
         ),
@@ -149,51 +156,6 @@ void main() {
       // Assert
       expect(result.messageContent, 'Success response');
     });
-  });
-}
-
-// Mock SpaceContext class for testing
-class SpaceContext {
-  final String spaceId;
-  final String spaceName;
-  final String description;
-  final List<String> categories;
-  final String? recentRecords;
-  final int maxContextRecords;
-  final Map<String, dynamic>? filters;
-  final Map<String, dynamic>? tokenAllocation;
-  final Map<String, dynamic>? stats;
-  final Persona persona;
-
-  SpaceContext({
-    required this.spaceId,
-    required this.spaceName,
-    required this.description,
-    required this.categories,
-    this.recentRecords,
-    this.maxContextRecords = 10,
-    this.filters,
-    this.tokenAllocation,
-    this.stats,
-  }) : persona = Persona(
-          name: 'Test Persona',
-          tone: 'friendly',
-          guidelines: [],
-          systemPromptAddition: '',
-        );
-}
-
-class Persona {
-  final String name;
-  final String tone;
-  final List<String> guidelines;
-  final String systemPromptAddition;
-
-  Persona({
-    required this.name,
-    required this.tone,
-    required this.guidelines,
-    required this.systemPromptAddition,
   });
 }
 

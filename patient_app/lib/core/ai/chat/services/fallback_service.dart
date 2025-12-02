@@ -1,7 +1,8 @@
 import 'package:patient_app/core/ai/chat/exceptions/chat_exceptions.dart';
 import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
-import 'package:patient_app/core/ai/models/ai_message_metadata.dart';
+import 'package:patient_app/core/ai/chat/services/error_classifier.dart';
+import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
 
 /// Service that provides fallback responses when primary AI services fail.
 class FallbackService {
@@ -19,7 +20,6 @@ class FallbackService {
         tokensUsed: errorMessage.length ~/ 4, // Rough estimation
         latencyMs: 0,
         provider: 'fallback',
-        isFallback: true,
       ),
     );
   }
@@ -39,7 +39,6 @@ class FallbackService {
         return _getServerErrorMessage(spaceId);
       case ErrorType.validation:
       case ErrorType.unknown:
-      default:
         return _getGenericErrorMessage(spaceId);
     }
   }
@@ -76,7 +75,6 @@ class FallbackService {
         return ['Try again in a few minutes', 'Your message is saved'];
       case ErrorType.validation:
       case ErrorType.unknown:
-      default:
         return ['Try rephrasing your message', 'Try again later'];
     }
   }
@@ -130,15 +128,15 @@ class FallbackService {
   String _getServerErrorMessage(String spaceId) {
     switch (spaceId.toLowerCase()) {
       case 'health':
-        return "The health service is temporarily unavailable. Your health-related message is saved and I'll respond when the service is back.";
+        return "The health service is temporarily unavailable. I can't reach it right now, but you can try again in a few minutes.";
       case 'finance':
-        return "The finance service is temporarily unavailable. Your finance-related message is saved and I'll respond when the service is back.";
+        return "The finance service is temporarily unavailable. I can't reach it right now, but you can try again in a few minutes.";
       case 'education':
-        return "The study service is temporarily unavailable. Your education-related message is saved and I'll respond when the service is back.";
+        return "The study service is temporarily unavailable. I can't reach it right now, but you can try again in a few minutes.";
       case 'travel':
-        return "The travel service is temporarily unavailable. Your travel-related message is saved and I'll respond when the service is back.";
+        return "The travel service is temporarily unavailable. I can't reach it right now, but you can try again in a few minutes.";
       default:
-        return "The service is temporarily unavailable. Try again soon.";
+        return "The service is temporarily unavailable. I'm in a limited mode right now—please try again soon.";
     }
   }
 
@@ -158,12 +156,3 @@ class FallbackService {
   }
 }
 
-/// Enum representing different types of errors for fallback handling.
-enum ErrorType {
-  network,
-  rateLimit,
-  server,
-  validation,
-  timeout,
-  unknown,
-}

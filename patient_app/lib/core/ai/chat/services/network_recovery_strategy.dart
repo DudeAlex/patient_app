@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
 import 'package:patient_app/core/ai/chat/config/recovery_config.dart';
@@ -7,9 +8,12 @@ import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/services/error_recovery_strategy.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
+import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
 
 /// Recovery strategy for network errors using exponential backoff.
 class NetworkRecoveryStrategy implements ErrorRecoveryStrategy {
+  final Random _random = Random();
+
   @override
   String get strategyName => 'NetworkRecoveryStrategy';
 
@@ -51,12 +55,18 @@ class NetworkRecoveryStrategy implements ErrorRecoveryStrategy {
     // Exponential backoff: 1s, 2s for first and second attempts
     // For subsequent attempts, use maxRateLimitWait as cap
     if (attemptNumber == 1) {
-      return RecoveryConfig.firstRetryDelay; // 1 second
+      return _withJitter(RecoveryConfig.firstRetryDelay); // 1 second
     } else if (attemptNumber == 2) {
-      return RecoveryConfig.secondRetryDelay; // 2 seconds
+      return _withJitter(RecoveryConfig.secondRetryDelay); // 2 seconds
     } else {
       // For subsequent attempts, return the max rate limit wait
-      return RecoveryConfig.maxRateLimitWait; // 5 seconds
+      return _withJitter(RecoveryConfig.maxRateLimitWait); // 5 seconds
     }
+  }
+
+  Duration _withJitter(Duration base) {
+    // +/-20% jitter to avoid thundering herd effects
+    final jitterFactor = 0.8 + _random.nextDouble() * 0.4;
+    return Duration(milliseconds: (base.inMilliseconds * jitterFactor).round());
   }
 }

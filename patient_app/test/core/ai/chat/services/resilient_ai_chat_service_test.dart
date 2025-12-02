@@ -7,7 +7,9 @@ import 'package:patient_app/core/ai/chat/services/error_classifier.dart';
 import 'package:patient_app/core/ai/chat/services/error_recovery_strategy.dart';
 import 'package:patient_app/core/ai/chat/services/fallback_service.dart';
 import 'package:patient_app/core/ai/chat/services/resilient_ai_chat_service.dart';
+import 'package:patient_app/core/ai/chat/models/space_context.dart' as models;
 import 'package:patient_app/core/ai/models/ai_summary_result.dart';
+import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
 import 'package:patient_app/core/domain/entities/information_item.dart';
 
 class MockAiChatService implements AiChatService {
@@ -100,9 +102,10 @@ void main() {
         final request = ChatRequest(
           threadId: 'test-thread',
           messageContent: 'Hello',
-          spaceContext: SpaceContext(
+          spaceContext: models.SpaceContext(
             spaceId: 'health',
             spaceName: 'Health',
+            persona: models.SpacePersona.health,
             description: 'Health space',
             categories: ['medical'],
           ),
@@ -121,15 +124,16 @@ void main() {
         final request = ChatRequest(
           threadId: 'test-thread',
           messageContent: 'Hello',
-          spaceContext: SpaceContext(
+          spaceContext: models.SpaceContext(
             spaceId: 'health',
             spaceName: 'Health',
+            persona: models.SpacePersona.health,
             description: 'Health space',
             categories: ['medical'],
           ),
         );
         mockPrimaryService.shouldThrow = true;
-        mockPrimaryService.exceptionToThrow = NetworkException('Network error');
+        mockPrimaryService.exceptionToThrow = NetworkException(message: 'Network error');
         mockRecoveryStrategy.recoveryResponse = ChatResponse.success(messageContent: 'Recovered response');
 
         // Act
@@ -144,17 +148,18 @@ void main() {
         final request = ChatRequest(
           threadId: 'test-thread',
           messageContent: 'Hello',
-          spaceContext: SpaceContext(
+          spaceContext: models.SpaceContext(
             spaceId: 'health',
             spaceName: 'Health',
+            persona: models.SpacePersona.health,
             description: 'Health space',
             categories: ['medical'],
           ),
         );
         mockPrimaryService.shouldThrow = true;
-        mockPrimaryService.exceptionToThrow = NetworkException('Network error');
+        mockPrimaryService.exceptionToThrow = NetworkException(message: 'Network error');
         mockRecoveryStrategy.shouldThrow = true;
-        mockRecoveryStrategy.exceptionToThrow = NetworkException('Recovery failed');
+        mockRecoveryStrategy.exceptionToThrow = NetworkException(message: 'Recovery failed');
 
         // Act
         final result = await resilientService.sendMessage(request);
@@ -168,15 +173,16 @@ void main() {
         final request = ChatRequest(
           threadId: 'test-thread',
           messageContent: 'Hello',
-          spaceContext: SpaceContext(
+          spaceContext: models.SpaceContext(
             spaceId: 'health',
             spaceName: 'Health',
+            persona: models.SpacePersona.health,
             description: 'Health space',
             categories: ['medical'],
           ),
         );
         mockPrimaryService.shouldThrow = true;
-        mockPrimaryService.exceptionToThrow = ValidationException('Validation error');
+        mockPrimaryService.exceptionToThrow = ValidationException(message: 'Validation error');
         // Use a recovery strategy that can't handle validation errors
         mockRecoveryStrategy.canRecoverResult = false;
 
@@ -210,47 +216,3 @@ void main() {
   });
 }
 
-// Mock SpaceContext class since it's not available in test scope
-class SpaceContext {
-  final String spaceId;
-  final String spaceName;
-  final String description;
-  final List<String> categories;
-  final String? recentRecords;
-  final int maxContextRecords;
-  final Map<String, dynamic>? filters;
-  final Map<String, dynamic>? tokenAllocation;
- final Map<String, dynamic>? stats;
-  final Persona persona;
-
-  SpaceContext({
-    required this.spaceId,
-    required this.spaceName,
-    required this.description,
-    required this.categories,
-    this.recentRecords,
-    this.maxContextRecords = 10,
-    this.filters,
-    this.tokenAllocation,
-    this.stats,
-  }) : persona = Persona(
-          name: 'Test Persona',
-          tone: 'friendly',
-          guidelines: [],
-          systemPromptAddition: '',
-        );
-}
-
-class Persona {
-  final String name;
-  final String tone;
-  final List<String> guidelines;
- final String systemPromptAddition;
-
-  Persona({
-    required this.name,
-    required this.tone,
-    required this.guidelines,
-    required this.systemPromptAddition,
-  });
-}

@@ -1,5 +1,4 @@
 import { promises as fs } from 'fs';
-import path from 'path';
 
 class Persona {
   constructor(name, tone, guidelines, systemPromptAddition) {
@@ -10,7 +9,12 @@ class Persona {
   }
 
   buildSystemPrompt(basePrompt) {
-    return `${basePrompt}\n\n${this.systemPromptAddition}`;
+    const guidelinesText =
+      Array.isArray(this.guidelines) && this.guidelines.length > 0
+        ? `\nGuidelines:\n- ${this.guidelines.join('\n- ')}`
+        : '';
+
+    return `${basePrompt}\n\nPersona: ${this.name} (tone: ${this.tone})${guidelinesText}\n\n${this.systemPromptAddition}`.trim();
   }
 }
 
@@ -19,7 +23,9 @@ class PersonaManager {
     // For ES modules, __dirname is not available, so we need to handle path differently
     this.configPath = configPath || new URL('../../config/personas.json', import.meta.url);
     this.personas = null;
- }
+    this.lastLoadedAt = null;
+    this.lastConfigMtime = null;
+  }
 
   async loadPersonas() {
     try {
@@ -37,21 +43,33 @@ class PersonaManager {
       const normalizedPath = process.platform === 'win32' && filePath.startsWith('/')
         ? filePath.substring(1)
         : filePath;
-        
+
+      const stat = await fs.stat(normalizedPath);
       const configContent = await fs.readFile(normalizedPath, 'utf8');
       const config = JSON.parse(configContent);
-      
+
       this.personas = {};
-      
+
       for (const [key, personaConfig] of Object.entries(config)) {
-        this.personas[key] = new Persona(
+        if (!this.validatePersona(personaConfig)) {
+          console.warn(`Skipping invalid persona config for key "${key}"`);
+          continue;
+        }
+
+        this.personas[key.toLowerCase()] = new Persona(
           personaConfig.name,
           personaConfig.tone,
           personaConfig.guidelines,
           personaConfig.systemPromptAddition
         );
       }
-      
+
+      if (!this.personas.default) {
+        throw new Error('Default persona is required but was not found in personas.json');
+      }
+
+      this.lastLoadedAt = new Date();
+      this.lastConfigMtime = stat.mtimeMs;
       return this.personas;
     } catch (error) {
       console.error(`Error loading personas from ${this.configPath}:`, error.message);
@@ -111,6 +129,39 @@ class PersonaManager {
     }
     
     return true;
+  }
+
+  /**
+   * Reload personas if the config file has changed on disk.
+   */
+  async ensureLatestPersonas() {
+    try {
+      if (!this.personas) {
+        await this.loadPersonas();
+        return;
+      }
+
+      let filePath;
+      if (this.configPath instanceof URL) {
+        filePath = this.configPath.pathname;
+      } else {
+        filePath = this.configPath.startsWith('file://')
+          ? new URL(this.configPath).pathname
+          : this.configPath;
+      }
+
+      const normalizedPath = process.platform === 'win32' && filePath.startsWith('/')
+        ? filePath.substring(1)
+        : filePath;
+
+      const stat = await fs.stat(normalizedPath);
+      if (!this.lastConfigMtime || stat.mtimeMs > this.lastConfigMtime) {
+        console.info('Persona configuration changed on disk. Reloading personas...');
+        await this.loadPersonas();
+      }
+    } catch (error) {
+      console.error('Failed to refresh personas, continuing with cached copy:', error.message);
+    }
   }
 }
 
