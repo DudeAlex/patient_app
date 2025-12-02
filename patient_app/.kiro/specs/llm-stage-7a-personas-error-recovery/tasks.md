@@ -235,34 +235,173 @@ Create the fallback service that always succeeds.
 
 ---
 
-## Task 8: Flutter - Resilient Service Wrapper
+## Task 8: Flutter - Resilient Service Wrapper (Part 1: Foundation)
 
-Create the main resilient service that orchestrates recovery.
+Create the basic structure of the resilient service.
 
-- [ ] 8.1 Create ResilientAiChatService class
+- [ ] 8.1 Create ResilientAiChatService class skeleton
   - File: `lib/core/ai/chat/services/resilient_ai_chat_service.dart`
-  - Wrap HttpAiChatService
-  - Implement sendMessage() with recovery logic
-  - _Requirements: 3.1-3.5_
+  - Create class with constructor
+  - Accept primaryService, errorClassifier, fallbackService as dependencies
+  - Add empty sendMessage() method
+  - _Requirements: 3.1_
 
-- [ ] 8.2 Implement recovery orchestration
-  - Try primary service
-  - On error: classify → select strategy → attempt recovery
-  - Max 2 recovery attempts
-  - Fallback if all attempts fail
-  - _Requirements: 3.1-3.5, 4.1-4.5_
+- [ ] 8.2 Implement basic sendMessage() flow
+  - Try calling primary service
+  - Return response if successful
+  - Catch exceptions and rethrow for now (we'll add recovery next)
+  - _Requirements: 3.1_
 
-- [ ] 8.3 Add comprehensive logging
-  - Log all recovery attempts
-  - Log strategy selection
-  - Log fallback events
-  - Use correlation IDs
-  - _Requirements: 3.4, 5.4_
+- [ ] 8.3 Add basic logging
+  - Log when request starts
+  - Log when request succeeds
+  - Log when request fails
+  - Use AppLogger with correlation IDs
+  - _Requirements: 3.4_
 
-- [ ] 8.4 Implement timeout enforcement
-  - Total recovery time < 10s
-  - Individual attempt timeout: 30s
-  - _Requirements: 9.1-9.5_
+---
+
+## Checkpoint 8a: Commit resilient service foundation
+
+**Action:** Commit with message: "feat(stage7a): Add resilient service foundation"
+
+---
+
+## Task 8b: Flutter - Resilient Service Wrapper (Part 2: Error Classification)
+
+Add error classification to the resilient service.
+
+- [ ] 8b.1 Add error classification on failure
+  - When exception caught, classify using ErrorClassifier
+  - Log the error type
+  - Still rethrow for now
+  - _Requirements: 6.1_
+
+- [ ] 8b.2 Add strategy selection logic
+  - Based on error type, select appropriate recovery strategy
+  - Log which strategy was selected
+  - Don't execute yet, just select
+  - _Requirements: 4.1, 6.2-6.4_
+
+---
+
+## Checkpoint 8b: Commit error classification
+
+**Action:** Commit with message: "feat(stage7a): Add error classification to resilient service"
+
+---
+
+## Task 8c: Flutter - Resilient Service Wrapper (Part 3: Single Recovery)
+
+Implement single recovery attempt.
+
+- [ ] 8c.1 Create _attemptRecovery() method
+  - Accept request, error, attemptNumber
+  - Call selected strategy's recover() method
+  - Return response if successful
+  - Rethrow if recovery fails
+  - _Requirements: 3.1, 4.1_
+
+- [ ] 8c.2 Integrate single recovery into sendMessage()
+  - On error, attempt recovery once
+  - Log recovery attempt
+  - Return response if recovery succeeds
+  - Rethrow if recovery fails
+  - _Requirements: 3.1, 3.2_
+
+- [ ] 8c.3 Add recovery attempt logging
+  - Log attempt number
+  - Log strategy used
+  - Log duration
+  - Log success/failure
+  - _Requirements: 3.4_
+
+---
+
+## Checkpoint 8c: Commit single recovery
+
+**Action:** Commit with message: "feat(stage7a): Implement single recovery attempt"
+
+---
+
+## Task 8d: Flutter - Resilient Service Wrapper (Part 4: Multiple Recoveries)
+
+Add support for multiple recovery attempts.
+
+- [ ] 8d.1 Implement recovery loop
+  - Try up to 2 recovery attempts
+  - Use different strategies if first fails
+  - Track all attempts
+  - _Requirements: 3.1, 3.2_
+
+- [ ] 8d.2 Add recovery metrics tracking
+  - Count total attempts
+  - Count successes vs failures
+  - Track which strategies were used
+  - _Requirements: 10.1-10.3_
+
+---
+
+## Checkpoint 8d: Commit multiple recoveries
+
+**Action:** Commit with message: "feat(stage7a): Add multiple recovery attempts"
+
+---
+
+## Task 8e: Flutter - Resilient Service Wrapper (Part 5: Fallback)
+
+Add fallback behavior when all recoveries fail.
+
+- [ ] 8e.1 Create _fallback() method
+  - Call FallbackService.generateFallbackResponse()
+  - Log fallback event
+  - Return fallback response
+  - _Requirements: 5.1-5.5_
+
+- [ ] 8e.2 Integrate fallback into sendMessage()
+  - After all recovery attempts fail, call _fallback()
+  - Never throw exception (always return response)
+  - Log that fallback was used
+  - _Requirements: 5.1-5.5_
+
+---
+
+## Checkpoint 8e: Commit fallback integration
+
+**Action:** Commit with message: "feat(stage7a): Add fallback behavior to resilient service"
+
+---
+
+## Task 8f: Flutter - Resilient Service Wrapper (Part 6: Timeouts)
+
+Add timeout enforcement.
+
+- [ ] 8f.1 Add total recovery timeout
+  - Track total time spent on recovery
+  - If > 10s, stop and use fallback
+  - Log timeout events
+  - _Requirements: 9.1-9.3_
+
+- [ ] 8f.2 Add individual attempt timeout
+  - Each recovery attempt has 30s timeout
+  - Use Future.timeout()
+  - Log timeout events
+  - _Requirements: 9.4, 9.5_
+
+- [ ] 8f.3 Write unit tests for ResilientAiChatService
+  - File: `test/core/ai/chat/services/resilient_ai_chat_service_test.dart`
+  - Test successful request (no errors)
+  - Test single recovery succeeds
+  - Test multiple recoveries
+  - Test fallback after failures
+  - Test timeout enforcement
+  - _Requirements: 3.1-3.5, 9.1-9.5_
+
+---
+
+## Checkpoint 8f: Commit timeout enforcement
+
+**Action:** Commit with message: "feat(stage7a): Add timeout enforcement to resilient service"
 
 ---
 
@@ -302,130 +441,300 @@ Wire up the resilient service in the app.
 
 ---
 
-## Task 10: Property-Based Tests
+## Task 10: Property-Based Tests (Part 1: Persona Properties)
 
-Write property-based tests for correctness properties.
+Write property tests for persona system.
 
-- [ ] 10.1 Property 1: Persona selection consistency
+- [ ] 10.1 Create persona properties test file
   - File: `server/test/persona_properties.test.mjs`
-  - Generate random Space names
-  - Verify getPersona() returns same result
+  - Set up test framework
+  - Import PersonaManager
+  - _Property 1, 2_
+
+- [ ] 10.2 Property 1: Persona selection consistency
+  - Generate random Space names (health, finance, education, travel)
+  - Call getPersona() multiple times for same Space
+  - Verify returns same persona each time
   - _Property 1_
 
-- [ ] 10.2 Property 2: Persona prompt inclusion
+- [ ] 10.3 Property 2: Persona prompt inclusion
   - Generate random Spaces
-  - Verify prompt includes persona text
+  - Build prompt with persona
+  - Verify prompt includes persona systemPromptAddition
   - _Property 2_
 
-- [ ] 10.3 Property 3: Error classification determinism
+---
+
+## Checkpoint 10a: Commit persona properties
+
+**Action:** Commit with message: "test(stage7a): Add persona property tests"
+
+---
+
+## Task 10b: Property-Based Tests (Part 2: Error Classification Properties)
+
+Write property tests for error classification.
+
+- [ ] 10b.1 Create error classification properties test file
   - File: `test/core/ai/chat/services/error_classification_properties_test.dart`
-  - Generate random errors
-  - Verify classification consistency
+  - Set up test framework
+  - Import ErrorClassifier
+  - _Property 3, 4_
+
+- [ ] 10b.2 Property 3: Error classification determinism
+  - Generate random errors (network, timeout, rate-limit, server)
+  - Classify same error multiple times
+  - Verify classification is consistent
   - _Property 3_
 
-- [ ] 10.4 Property 4: Recovery strategy selection
+- [ ] 10b.3 Property 4: Recovery strategy selection
   - Generate random error types
-  - Verify appropriate strategy selected
+  - Select strategy for each error
+  - Verify appropriate strategy selected (rate-limit → RateLimitStrategy, etc.)
   - _Property 4_
 
-- [ ] 10.5 Property 5: Recovery attempt limit
-  - File: `test/core/ai/chat/services/recovery_limit_properties_test.dart`
-  - Simulate failures
-  - Verify max 2 attempts
+---
+
+## Checkpoint 10b: Commit error classification properties
+
+**Action:** Commit with message: "test(stage7a): Add error classification property tests"
+
+---
+
+## Task 10c: Property-Based Tests (Part 3: Recovery Properties)
+
+Write property tests for recovery behavior.
+
+- [ ] 10c.1 Create recovery properties test file
+  - File: `test/core/ai/chat/services/recovery_properties_test.dart`
+  - Set up test framework
+  - Import ResilientAiChatService
+  - _Property 5, 6, 7_
+
+- [ ] 10c.2 Property 5: Recovery attempt limit
+  - Simulate continuous failures
+  - Count recovery attempts
+  - Verify max 2 attempts before fallback
   - _Property 5_
 
-- [ ] 10.6 Property 6: Fallback always succeeds
+- [ ] 10c.3 Property 6: Fallback always succeeds
   - Generate random requests
-  - Verify fallback never throws
+  - Force all recoveries to fail
+  - Verify fallback never throws exception
+  - Verify always returns valid ChatResponse
   - _Property 6_
 
-- [ ] 10.7 Property 7: Recovery time bounds
-  - Simulate recoveries
-  - Verify time < 10s
+- [ ] 10c.4 Property 7: Recovery time bounds
+  - Simulate recovery attempts
+  - Measure total time
+  - Verify time < 10 seconds
   - _Property 7_
 
-- [ ] 10.8 Property 8: Persona switch consistency
-  - Generate Space switches
-  - Verify persona changes
+---
+
+## Checkpoint 10c: Commit recovery properties
+
+**Action:** Commit with message: "test(stage7a): Add recovery property tests"
+
+---
+
+## Task 10d: Property-Based Tests (Part 4: Persona Switching & UX Properties)
+
+Write property tests for persona switching and user experience.
+
+- [ ] 10d.1 Property 8: Persona switch consistency
+  - Generate sequence of Space switches
+  - Send message after each switch
+  - Verify persona changes with Space
   - _Property 8_
 
-- [ ] 10.9 Property 9: User message friendliness
-  - Generate errors
-  - Verify no jargon in messages
+- [ ] 10d.2 Property 9: User message friendliness
+  - Generate random errors
+  - Get user-facing error messages
+  - Verify no technical jargon (no "stack trace", "exception", "null pointer")
+  - Verify messages are helpful
   - _Property 9_
 
-- [ ] 10.10 Property 10: Metrics accuracy
-  - Generate recovery sequences
-  - Verify metrics calculations
+---
+
+## Checkpoint 10d: Commit UX properties
+
+**Action:** Commit with message: "test(stage7a): Add persona switching and UX property tests"
+
+---
+
+## Task 10e: Property-Based Tests (Part 5: Metrics Properties)
+
+Write property tests for metrics accuracy.
+
+- [ ] 10e.1 Property 10: Metrics accuracy
+  - Generate random sequence of recovery attempts
+  - Track successes and failures manually
+  - Compare with RecoveryMetrics calculations
+  - Verify success rate = successes / total
+  - Verify fallback rate = fallbacks / total
   - _Property 10_
 
 ---
 
-## Checkpoint 10: Commit property tests
+## Checkpoint 10e: Commit metrics properties
 
-**Action:** Commit with message: "test(stage7a): Add property-based tests"
+**Action:** Commit with message: "test(stage7a): Add metrics property tests"
 
 ---
 
-## Task 11: Manual Testing
+## Task 11: Manual Testing (Part 1: Documentation) (Part 1: Documentation)
 
-Create manual test scenarios and documentation.
+Create manual test scenarios document.
 
 - [ ] 11.1 Create manual test scenarios document
   - File: `docs/modules/ai/STAGE_7A_MANUAL_TEST_SCENARIOS.md`
-  - Persona testing scenarios
-  - Error recovery scenarios
-  - Fallback testing scenarios
+  - Add document structure
+  - Add "How to Test" section
+  - Add "Success Criteria" section
   - _Requirements: All_
 
-- [ ] 11.2 Test Health persona
-  - Create health records
-  - Ask health questions
-  - Verify empathetic tone and disclaimers
-  - _Requirements: 1.1, 2.1_
+- [ ] 11.2 Document persona test scenarios
+  - Add Health persona test scenario
+  - Add Finance persona test scenario
+  - Add Education persona test scenario
+  - Add Travel persona test scenario
+  - Add persona switching scenario
+  - _Requirements: 1.1-1.5, 2.1-2.4_
 
-- [ ] 11.3 Test Finance persona
-  - Create finance records
-  - Ask finance questions
-  - Verify practical, budget-focused tone
-  - _Requirements: 1.2, 2.2_
-
-- [ ] 11.4 Test Education persona
-  - Create education records
-  - Ask study questions
-  - Verify constructive, learning-focused tone
-  - _Requirements: 1.3, 2.3_
-
-- [ ] 11.5 Test Travel persona
-  - Create travel records
-  - Ask travel questions
-  - Verify exploratory, planning tone
-  - _Requirements: 1.4, 2.4_
-
-- [ ] 11.6 Test persona switching
-  - Start in Health Space
-  - Switch to Finance Space mid-conversation
-  - Verify persona changes
-  - _Requirements: 1.5_
-
-- [ ] 11.7 Test network error recovery
-  - Disconnect network
-  - Send message
-  - Verify retry and recovery
-  - _Requirements: 3.1-3.5, 4.4_
-
-- [ ] 11.8 Test fallback behavior
-  - Stop backend server
-  - Send message
-  - Verify fallback response
-  - Verify helpful error message
-  - _Requirements: 5.1-5.5, 7.1-7.5_
+- [ ] 11.3 Document error recovery test scenarios
+  - Add network error recovery scenario
+  - Add rate limit recovery scenario
+  - Add timeout recovery scenario
+  - Add fallback scenario
+  - _Requirements: 3.1-3.5, 4.1-4.5, 5.1-5.5_
 
 ---
 
-## Checkpoint 11: Commit manual testing
+## Checkpoint 11a: Commit test documentation
 
-**Action:** Commit with message: "docs(stage7a): Add manual test scenarios and complete testing"
+**Action:** Commit with message: "docs(stage7a): Create manual test scenarios document"
+
+---
+
+## Task 11b: Manual Testing (Part 2: Persona Testing)
+
+Execute persona tests manually.
+
+- [ ] 11b.1 Test Health persona
+  - Create 5 health records (blood pressure, medications, etc.)
+  - Ask: "What is my blood pressure?"
+  - Ask: "Should I be worried about my health?"
+  - Verify empathetic tone
+  - Verify medical disclaimers present
+  - _Requirements: 1.1, 2.1_
+
+- [ ] 11b.2 Test Finance persona
+  - Create 5 finance records (expenses, income, etc.)
+  - Ask: "How much did I spend this month?"
+  - Ask: "Should I save more money?"
+  - Verify practical, budget-conscious tone
+  - Verify focus on saving and budgeting
+  - _Requirements: 1.2, 2.2_
+
+- [ ] 11b.3 Test Education persona
+  - Create 5 education records (study sessions, notes, etc.)
+  - Ask: "How are my studies going?"
+  - Ask: "What should I study next?"
+  - Verify constructive, learning-focused tone
+  - Verify study tips and encouragement
+  - _Requirements: 1.3, 2.3_
+
+- [ ] 11b.4 Test Travel persona
+  - Create 5 travel records (trips, plans, etc.)
+  - Ask: "Where should I travel next?"
+  - Ask: "What did I do on my last trip?"
+  - Verify exploratory, enthusiastic tone
+  - Verify planning-focused guidance
+  - _Requirements: 1.4, 2.4_
+
+---
+
+## Checkpoint 11b: Commit persona testing results
+
+**Action:** Commit with message: "test(stage7a): Complete persona manual testing"
+
+---
+
+## Task 11c: Manual Testing (Part 3: Persona Switching)
+
+Test persona switching behavior.
+
+- [ ] 11c.1 Test persona switching
+  - Start in Health Space
+  - Ask health question, note tone
+  - Switch to Finance Space
+  - Ask finance question, note tone
+  - Verify tone changed appropriately
+  - Switch back to Health
+  - Verify tone changed back
+  - _Requirements: 1.5_
+
+---
+
+## Checkpoint 11c: Commit persona switching test
+
+**Action:** Commit with message: "test(stage7a): Complete persona switching testing"
+
+---
+
+## Task 11d: Manual Testing (Part 4: Error Recovery)
+
+Test error recovery behavior.
+
+- [ ] 11d.1 Test network error recovery
+  - Send a message
+  - Disconnect network mid-request (or before)
+  - Observe "Retrying..." indicator
+  - Reconnect network
+  - Verify message eventually succeeds
+  - Check logs for retry attempts
+  - _Requirements: 3.1-3.5, 4.4_
+
+- [ ] 11d.2 Test rate limit recovery (if possible)
+  - Send many messages quickly
+  - Trigger rate limit (if backend supports)
+  - Verify system waits and retries
+  - Verify eventual success
+  - _Requirements: 4.1, 6.2_
+
+---
+
+## Checkpoint 11d: Commit error recovery testing
+
+**Action:** Commit with message: "test(stage7a): Complete error recovery testing"
+
+---
+
+## Task 11e: Manual Testing (Part 5: Fallback)
+
+Test fallback behavior.
+
+- [ ] 11e.1 Test fallback with server down
+  - Stop backend server
+  - Send a message
+  - Verify fallback response appears
+  - Verify message is helpful (not technical)
+  - Verify no crash or hang
+  - _Requirements: 5.1-5.5, 7.1-7.5_
+
+- [ ] 11e.2 Test fallback recovery
+  - With server still down, note fallback behavior
+  - Restart backend server
+  - Send another message
+  - Verify normal operation resumes
+  - _Requirements: 5.3_
+
+---
+
+## Checkpoint 11e: Commit fallback testing
+
+**Action:** Commit with message: "test(stage7a): Complete fallback testing"
 
 ---
 
@@ -465,7 +774,7 @@ Create comprehensive documentation for Stage 7a.
 
 Stage 7a is complete when:
 
-- [ ] All 12 tasks completed
+- [ ] All 21 tasks completed (1-9, 10a-10e, 11a-11e, 12)
 - [ ] All unit tests passing
 - [ ] All property-based tests passing (10 properties)
 - [ ] All integration tests passing
