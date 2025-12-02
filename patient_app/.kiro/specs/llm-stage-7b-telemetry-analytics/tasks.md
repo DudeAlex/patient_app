@@ -128,19 +128,19 @@ Create efficient in-memory storage for time-series metrics.
 
 Create the component that intercepts requests and collects metrics.
 
-- [ ] 3.1 Create TelemetryCollector interface
+- [x] 3.1 Create TelemetryCollector interface
   - File: `lib/core/ai/chat/telemetry/interfaces/telemetry_collector.dart`
   - Methods: startRequest(), completeRequest(), recordError()
   - _Requirements: All_
 
-- [ ] 3.2 Implement TelemetryCollectorImpl
+- [x] 3.2 Implement TelemetryCollectorImpl
   - File: `lib/core/ai/chat/telemetry/services/telemetry_collector_impl.dart`
   - Generate unique request IDs
   - Timestamp all events
   - Emit events asynchronously
   - _Requirements: 9.1, 9.4_
 
-- [ ] 3.3 Write TelemetryCollector tests
+- [x] 3.3 Write TelemetryCollector tests
   - File: `test/core/ai/chat/telemetry/services/telemetry_collector_test.dart`
   - Test request ID generation
   - Test event emission
