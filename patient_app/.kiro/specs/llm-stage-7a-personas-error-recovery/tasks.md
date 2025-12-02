@@ -233,7 +233,7 @@ Implement error classification system.
 
 Create the base recovery strategy class.
 
-- [ ] 6.1 Create ErrorRecoveryStrategy base class
+- [x] 6.1 Create ErrorRecoveryStrategy base class
   - File: `lib/core/ai/chat/services/error_recovery_strategy.dart`
   - Abstract methods: recover(), canRecover(), getRetryDelay()
   - Add documentation for each method
@@ -254,20 +254,20 @@ Create the base recovery strategy class.
 
 Implement rate limit recovery strategy.
 
-- [ ] 6b.1 Implement RateLimitRecoveryStrategy
+- [x] 6b.1 Implement RateLimitRecoveryStrategy
   - File: `lib/core/ai/chat/services/rate_limit_recovery_strategy.dart`
   - Extend ErrorRecoveryStrategy
   - Implement canRecover() - check if error is rate limit
   - Implement getRetryDelay() - return delay from error (max 5s)
   - _Requirements: 4.1, 6.2_
 
-- [ ] 6b.2 Implement recover() method
+- [x] 6b.2 Implement recover() method
   - Wait for rate limit delay
   - Retry the request
   - Return response if successful
   - _Requirements: 4.1, 6.2_
 
-- [ ] 6b.3 Write unit tests for RateLimitRecoveryStrategy
+- [x] 6b.3 Write unit tests for RateLimitRecoveryStrategy
   - File: `test/core/ai/chat/services/rate_limit_recovery_strategy_test.dart`
   - Test canRecover() returns true for rate limit errors
   - Test getRetryDelay() respects max 5s
@@ -289,21 +289,21 @@ Implement rate limit recovery strategy.
 
 Implement network error recovery strategy.
 
-- [ ] 6c.1 Implement NetworkRecoveryStrategy
+- [x] 6c.1 Implement NetworkRecoveryStrategy
   - File: `lib/core/ai/chat/services/network_recovery_strategy.dart`
   - Extend ErrorRecoveryStrategy
   - Implement canRecover() - check if error is network
   - Implement getRetryDelay() - exponential backoff (1s, 2s)
   - _Requirements: 4.4, 6.3_
 
-- [ ] 6c.2 Implement recover() method
+- [x] 6c.2 Implement recover() method
   - Track attempt number
   - Use exponential backoff (1s first, 2s second)
   - Max 2 attempts
   - Return response if successful
   - _Requirements: 4.4, 6.3_
 
-- [ ] 6c.3 Write unit tests for NetworkRecoveryStrategy
+- [x] 6c.3 Write unit tests for NetworkRecoveryStrategy
   - File: `test/core/ai/chat/services/network_recovery_strategy_test.dart`
   - Test canRecover() returns true for network errors
   - Test exponential backoff delays (1s, 2s)
@@ -326,27 +326,27 @@ Implement network error recovery strategy.
 
 Implement server error and timeout recovery strategies.
 
-- [ ] 6d.1 Implement ServerErrorRecoveryStrategy
+- [x] 6d.1 Implement ServerErrorRecoveryStrategy
   - File: `lib/core/ai/chat/services/server_error_recovery_strategy.dart`
   - Extend ErrorRecoveryStrategy
   - Implement canRecover() - always return false (no retry)
   - Immediate fallback (no retry)
   - _Requirements: 4.3, 6.4_
 
-- [ ] 6d.2 Implement TimeoutRecoveryStrategy
+- [x] 6d.2 Implement TimeoutRecoveryStrategy
   - File: `lib/core/ai/chat/services/timeout_recovery_strategy.dart`
   - Extend ErrorRecoveryStrategy
   - Implement canRecover() - check if error is timeout
   - Retry once with shorter timeout
   - _Requirements: 4.2_
 
-- [ ] 6d.3 Write unit tests for ServerErrorRecoveryStrategy
+- [x] 6d.3 Write unit tests for ServerErrorRecoveryStrategy
   - File: `test/core/ai/chat/services/server_error_recovery_strategy_test.dart`
   - Test canRecover() returns false
   - Test no retry attempts
   - _Requirements: 4.3, 6.4_
 
-- [ ] 6d.4 Write unit tests for TimeoutRecoveryStrategy
+- [x] 6d.4 Write unit tests for TimeoutRecoveryStrategy
   - File: `test/core/ai/chat/services/timeout_recovery_strategy_test.dart`
   - Test canRecover() returns true for timeout errors
   - Test retry with shorter timeout
