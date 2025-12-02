@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { PersonaManager } from '../src/llm/persona_manager.js';
-import { PromptTemplate } from '../src/llm/prompt_template.js';
+import { PersonaManager, Persona } from '../src/llm/persona_manager.js';
+import { buildPrompt } from '../src/llm/prompt_template.js';
 
 // Mock configuration for testing
 const mockConfig = {
@@ -64,8 +64,13 @@ const mockConfig = {
 
 test('Property 1: Persona selection consistency - getPersona returns same persona for same Space', async (t) => {
   const personaManager = new PersonaManager();
-  // Mock the loadPersonas method to use our test config
-  personaManager.personas = mockConfig;
+  // Mock personas using Persona objects to mirror runtime behavior
+  personaManager.personas = Object.fromEntries(
+    Object.entries(mockConfig).map(([key, cfg]) => [
+      key,
+      new Persona(cfg.name, cfg.tone, cfg.guidelines, cfg.systemPromptAddition),
+    ]),
+  );
   
   await t.test('health persona is consistent', () => {
     const firstCall = personaManager.getPersona('health');
@@ -118,15 +123,23 @@ test('Property 1: Persona selection consistency - getPersona returns same person
 
 test('Property 2: Persona prompt inclusion - generated prompts include persona additions', async (t) => {
   const personaManager = new PersonaManager();
-  // Mock the loadPersonas method to use our test config
-  personaManager.personas = mockConfig;
-  
-  const promptTemplate = new PromptTemplate();
+  // Mock personas using Persona objects to mirror runtime behavior
+  personaManager.personas = Object.fromEntries(
+    Object.entries(mockConfig).map(([key, cfg]) => [
+      key,
+      new Persona(cfg.name, cfg.tone, cfg.guidelines, cfg.systemPromptAddition),
+    ]),
+  );
   
   await t.test('health prompt includes health addition', () => {
     const healthPersona = personaManager.getPersona('health');
-    const basePrompt = "You are an AI assistant.";
-    const fullPrompt = promptTemplate.buildPrompt(basePrompt, healthPersona.systemPromptAddition);
+    const fullPrompt = buildPrompt({
+      spaceName: 'Health',
+      spaceDescription: 'Health space description',
+      historyText: 'History text',
+      userMessage: 'Hello',
+      persona: healthPersona,
+    });
     
     assert.ok(fullPrompt.includes('health companion'), 'Prompt should include health persona addition');
     assert.ok(fullPrompt.includes('medical professional'), 'Prompt should include medical disclaimer');
@@ -135,8 +148,13 @@ test('Property 2: Persona prompt inclusion - generated prompts include persona a
   
   await t.test('finance prompt includes finance addition', () => {
     const financePersona = personaManager.getPersona('finance');
-    const basePrompt = "You are an AI assistant.";
-    const fullPrompt = promptTemplate.buildPrompt(basePrompt, financePersona.systemPromptAddition);
+    const fullPrompt = buildPrompt({
+      spaceName: 'Finance',
+      spaceDescription: 'Finance space description',
+      historyText: 'History text',
+      userMessage: 'Hello',
+      persona: financePersona,
+    });
     
     assert.ok(fullPrompt.includes('finance advisor'), 'Prompt should include finance persona addition');
     assert.ok(fullPrompt.includes('budgeting'), 'Prompt should include finance-specific guidance');
@@ -145,8 +163,13 @@ test('Property 2: Persona prompt inclusion - generated prompts include persona a
   
   await t.test('education prompt includes education addition', () => {
     const educationPersona = personaManager.getPersona('education');
-    const basePrompt = "You are an AI assistant.";
-    const fullPrompt = promptTemplate.buildPrompt(basePrompt, educationPersona.systemPromptAddition);
+    const fullPrompt = buildPrompt({
+      spaceName: 'Education',
+      spaceDescription: 'Education space description',
+      historyText: 'History text',
+      userMessage: 'Hello',
+      persona: educationPersona,
+    });
     
     assert.ok(fullPrompt.includes('study mentor'), 'Prompt should include education persona addition');
     assert.ok(fullPrompt.includes('learning'), 'Prompt should include education-specific guidance');
@@ -155,8 +178,13 @@ test('Property 2: Persona prompt inclusion - generated prompts include persona a
   
   await t.test('travel prompt includes travel addition', () => {
     const travelPersona = personaManager.getPersona('travel');
-    const basePrompt = "You are an AI assistant.";
-    const fullPrompt = promptTemplate.buildPrompt(basePrompt, travelPersona.systemPromptAddition);
+    const fullPrompt = buildPrompt({
+      spaceName: 'Travel',
+      spaceDescription: 'Travel space description',
+      historyText: 'History text',
+      userMessage: 'Hello',
+      persona: travelPersona,
+    });
     
     assert.ok(fullPrompt.includes('travel planner'), 'Prompt should include travel persona addition');
     assert.ok(fullPrompt.includes('exploration'), 'Prompt should include travel-specific guidance');
@@ -165,8 +193,13 @@ test('Property 2: Persona prompt inclusion - generated prompts include persona a
   
   await t.test('default prompt includes default addition', () => {
     const defaultPersona = personaManager.getPersona('unknown');
-    const basePrompt = "You are an AI assistant.";
-    const fullPrompt = promptTemplate.buildPrompt(basePrompt, defaultPersona.systemPromptAddition);
+    const fullPrompt = buildPrompt({
+      spaceName: 'Default',
+      spaceDescription: 'Default space description',
+      historyText: 'History text',
+      userMessage: 'Hello',
+      persona: defaultPersona,
+    });
     
     assert.ok(fullPrompt.includes('General Assistant'), 'Prompt should include default persona addition');
     assert.ok(fullPrompt.includes(defaultPersona.systemPromptAddition), 'Prompt should include the full default addition');
@@ -175,10 +208,13 @@ test('Property 2: Persona prompt inclusion - generated prompts include persona a
 
 test('Property 1 & 2 combined: Random space names maintain consistency and inclusion', async (t) => {
   const personaManager = new PersonaManager();
-  // Mock the loadPersonas method to use our test config
-  personaManager.personas = mockConfig;
-  
-  const promptTemplate = new PromptTemplate();
+  // Mock personas using Persona objects to mirror runtime behavior
+  personaManager.personas = Object.fromEntries(
+    Object.entries(mockConfig).map(([key, cfg]) => [
+      key,
+      new Persona(cfg.name, cfg.tone, cfg.guidelines, cfg.systemPromptAddition),
+    ]),
+  );
   
   // Test with various space names
   const testSpaces = ['health', 'finance', 'education', 'travel', 'HEALTH', 'Finance', 'EDUCATION', 'Travel'];
@@ -192,8 +228,13 @@ test('Property 1 & 2 combined: Random space names maintain consistency and inclu
       assert.deepStrictEqual(persona1, persona2, `getPersona for "${space}" should be consistent`);
       
       // Test inclusion
-      const basePrompt = "You are an AI assistant.";
-      const fullPrompt = promptTemplate.buildPrompt(basePrompt, persona1.systemPromptAddition);
+      const fullPrompt = buildPrompt({
+        spaceName: space,
+        spaceDescription: `${space} space description`,
+        historyText: 'History text',
+        userMessage: 'Hello',
+        persona: persona1,
+      });
       
       assert.ok(
         fullPrompt.includes(persona1.systemPromptAddition), 

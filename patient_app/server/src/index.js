@@ -6,6 +6,7 @@ import { buildPrompt } from './llm/prompt_template.js';
 import { formatHistory } from './llm/history_manager.js';
 import { TogetherClient } from './llm/together_client.js';
 import { rateLimiter } from './middleware/rate_limiter.js';
+import { metricsRouter } from './telemetry/metrics_controller.js';
 import { PersonaManager } from './llm/persona_manager.js';
 
 dotenv.config();
@@ -43,6 +44,8 @@ app.use(
 
 // Apply rate limiting to chat endpoints
 app.use(['/api/v1/chat/echo', '/api/v1/chat/message'], rateLimiter);
+// Telemetry metrics endpoints (admin-only in future)
+app.use('/api/metrics', metricsRouter);
 
 app.post('/api/v1/chat/echo', (req, res) => {
   const { threadId, message, timestamp, userId } = req.body ?? {};

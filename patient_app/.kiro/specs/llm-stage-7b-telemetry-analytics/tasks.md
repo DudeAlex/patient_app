@@ -269,29 +269,29 @@ Create the service that monitors metrics and triggers alerts.
 
 Create REST API endpoints for dashboard.
 
-- [ ] 6.1 Create metrics controller
+- [x] 6.1 Create metrics controller
   - File: `server/src/telemetry/metrics_controller.js`
   - Endpoint: GET /api/metrics/current
   - Return current metrics snapshot
   - _Requirements: 6.1-6.5_
 
-- [ ] 6.2 Create historical metrics endpoint
+- [x] 6.2 Create historical metrics endpoint
   - Endpoint: GET /api/metrics/historical
   - Query params: type, start, end, aggregation
   - Return time-series data
   - _Requirements: 7.1-7.5_
 
-- [ ] 6.3 Create alerts endpoint
+- [x] 6.3 Create alerts endpoint
   - Endpoint: GET /api/metrics/alerts
   - Return triggered alerts
   - _Requirements: 8.5_
 
-- [ ] 6.4 Add authentication middleware
+- [x] 6.4 Add authentication middleware
   - Require admin authentication
   - Rate limit dashboard API
   - _Requirements: 10.4_
 
-- [ ] 6.5 Write API tests
+- [x] 6.5 Write API tests
   - File: `server/test/telemetry/metrics_controller.test.js`
   - Test all endpoints
   - Test authentication
