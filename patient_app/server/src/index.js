@@ -6,6 +6,7 @@ import { buildPrompt } from './llm/prompt_template.js';
 import { formatHistory } from './llm/history_manager.js';
 import { TogetherClient } from './llm/together_client.js';
 import { rateLimiter } from './middleware/rate_limiter.js';
+import { PersonaManager } from './llm/persona_manager.js';
 
 dotenv.config();
 
@@ -13,6 +14,10 @@ const app = express();
 const port = process.env.PORT || 3030;
 
 app.use(express.json());
+
+// Initialize PersonaManager
+const personaManager = new PersonaManager();
+await personaManager.loadPersonas();
 
 // Structured logging with correlation id support.
 app.use((req, res, next) => {
@@ -94,6 +99,10 @@ app.post('/api/v1/chat/message', async (req, res) => {
         ? 'None'
         : formattedHistory.map((m) => `${m.role}: ${m.content}`).join('\n');
 
+    // Get persona based on space context
+    const spaceId = spaceContext?.spaceId || 'general';
+    const persona = personaManager.getPersona(spaceId);
+
     const systemPrompt = buildPrompt({
       spaceName: spaceContext?.spaceName,
       spaceDescription: spaceContext?.description,
@@ -105,6 +114,7 @@ app.post('/api/v1/chat/message', async (req, res) => {
       userMessage: message,
       contextStats: spaceContext?.stats || null,
       filters: spaceContext?.filters || null,
+      persona: persona, // Pass the persona to the prompt builder
     });
 
     const client = new TogetherClient();

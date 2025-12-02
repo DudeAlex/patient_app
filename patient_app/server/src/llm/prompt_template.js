@@ -10,14 +10,14 @@ export function buildPrompt({
   userMessage,
   contextStats = null,
   filters = null,
+  persona = null, // Added persona parameter
 }) {
   const formattedCategories =
     categories.length === 0 ? 'None' : categories.join(', ');
   const formattedRecords = formatRecordSummaries(recordSummaries);
   const contextNotes = buildContextNotes(recordSummaries, contextStats, filters);
 
-  return `
-You are the Universal Life Companion: a concise, compassionate assistant that helps users organize and reflect on their personal information. You are safety-first, privacy-conscious, and honest about uncertainty.
+  return `${persona ? persona.buildSystemPrompt('') : `You are the Universal Life Companion: a concise, compassionate assistant that helps users organize and reflect on their personal information. You are safety-first, privacy-conscious, and honest about uncertainty.`}
 
 Active Space: ${spaceName || 'Unknown'} (${spaceDescription || 'No description provided.'})
 Categories: ${formattedCategories}

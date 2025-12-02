@@ -15,14 +15,30 @@ class Persona {
 }
 
 class PersonaManager {
-  constructor(configPath = path.join(__dirname, '../../config/personas.json')) {
-    this.configPath = configPath;
+  constructor(configPath = null) {
+    // For ES modules, __dirname is not available, so we need to handle path differently
+    this.configPath = configPath || new URL('../../config/personas.json', import.meta.url);
     this.personas = null;
-  }
+ }
 
   async loadPersonas() {
     try {
-      const configContent = await fs.readFile(this.configPath, 'utf8');
+      // If configPath is a URL object, get its pathname; otherwise use as-is
+      let filePath;
+      if (this.configPath instanceof URL) {
+        filePath = this.configPath.pathname;
+      } else {
+        filePath = this.configPath.startsWith('file://')
+          ? new URL(this.configPath).pathname
+          : this.configPath;
+      }
+      
+      // On Windows, URL pathname starts with a slash that needs to be removed for file paths
+      const normalizedPath = process.platform === 'win32' && filePath.startsWith('/')
+        ? filePath.substring(1)
+        : filePath;
+        
+      const configContent = await fs.readFile(normalizedPath, 'utf8');
       const config = JSON.parse(configContent);
       
       this.personas = {};

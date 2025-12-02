@@ -100,20 +100,20 @@ Create the persona configuration system on the backend.
 
 Integrate personas into the prompt building system.
 
-- [ ] 2.1 Update PromptTemplate to accept persona
+- [x] 2.1 Update PromptTemplate to accept persona
   - File: `server/src/llm/prompt_template.js`
   - Add `persona` parameter to `buildPrompt()`
   - Append persona system prompt addition
   - _Requirements: 1.1-1.4, 2.1-2.4_
 
-- [ ] 2.2 Update chat endpoint to use personas
+- [x] 2.2 Update chat endpoint to use personas
   - File: `server/src/index.js` (or chat route file)
   - Extract Space name from request
   - Get persona using PersonaManager
   - Pass persona to prompt builder
   - _Requirements: 1.1-1.4_
 
-- [ ] 2.3 Write integration tests for persona prompts
+- [x] 2.3 Write integration tests for persona prompts
   - File: `server/test/persona_integration.test.mjs`
   - Test Health Space gets health persona
   - Test Finance Space gets finance persona
