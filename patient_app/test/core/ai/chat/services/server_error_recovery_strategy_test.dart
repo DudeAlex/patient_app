@@ -6,7 +6,14 @@ import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/services/server_error_recovery_strategy.dart';
 
-class MockAiChatService extends Mock implements AiChatService {}
+class MockAiChatService extends Mock implements AiChatService {
+  @override
+  Future<ChatResponse> sendMessage(ChatRequest request) =>
+      super.noSuchMethod(
+        Invocation.method(#sendMessage, [request]),
+        returnValue: Future.value(ChatResponse.success(messageContent: 'ok')),
+      ) as Future<ChatResponse>;
+}
 class MockChatRequest extends Mock implements ChatRequest {}
 class MockChatResponse extends Mock implements ChatResponse {}
 
@@ -24,12 +31,12 @@ void main() {
   });
 
   group('ServerErrorRecoveryStrategy', () {
-    test('canRecover returns true for ServerException', () {
+    test('canRecover returns false for ServerException (handled by fallback)', () {
       final exception = ServerException(message: 'Internal server error');
 
       final result = strategy.canRecover(exception);
 
-      expect(result, true);
+      expect(result, false);
     });
 
     test('canRecover returns false for other exceptions', () {

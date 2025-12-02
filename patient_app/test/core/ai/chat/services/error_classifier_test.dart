@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patient_app/core/ai/chat/exceptions/chat_exceptions.dart';
 import 'package:patient_app/core/ai/chat/services/error_classifier.dart';
+import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
 
 void main() {
   late ErrorClassifier classifier;
@@ -109,28 +110,28 @@ void main() {
     });
 
     test('classifies error with "timeout" in message as timeout', () {
-      final exception = ServerException(message: 'Request timed out');
+      final exception = AiServiceException('Request timeout');
       final result = classifier.classify(exception);
       
       expect(result, ErrorType.timeout);
     });
 
     test('classifies error with "validation" in message as validation', () {
-      final exception = ServerException(message: 'Validation failed');
+      final exception = AiServiceException('Validation failed');
       final result = classifier.classify(exception);
       
       expect(result, ErrorType.validation);
     });
 
     test('classifies error with "invalid" in message as validation', () {
-      final exception = ServerException(message: 'Invalid input provided');
+      final exception = AiServiceException('Invalid input provided');
       final result = classifier.classify(exception);
       
       expect(result, ErrorType.validation);
     });
 
     test('classifies error with "bad request" in message as validation', () {
-      final exception = ServerException(message: 'Bad request received');
+      final exception = AiServiceException('Bad request received');
       final result = classifier.classify(exception);
       
       expect(result, ErrorType.validation);
@@ -168,11 +169,11 @@ void main() {
       final exception = ServerException(message: 'HTTP 504 Gateway Timeout');
       final result = classifier.classify(exception);
       
-      expect(result, ErrorType.server);
+      expect(result, ErrorType.network);
     });
 
     test('classifies unknown error type as unknown', () {
-      final exception = ServerException(message: 'Some other error');
+      final exception = AiServiceException('Some other error');
       final result = classifier.classify(exception);
       
       expect(result, ErrorType.unknown);

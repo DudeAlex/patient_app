@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:patient_app/core/ai/chat/exceptions/chat_exceptions.dart';
 import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/services/fallback_service.dart';
+import 'package:patient_app/core/ai/chat/models/space_context.dart' as models;
+import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
 
 void main() {
   group('UX Properties', () {
@@ -16,9 +18,10 @@ void main() {
       final request = ChatRequest(
         threadId: 'test-thread',
         messageContent: 'Hello',
-        spaceContext: SpaceContext(
+        spaceContext: models.SpaceContext(
           spaceId: 'health',
           spaceName: 'Health',
+          persona: models.SpacePersona.health,
           description: 'Health space',
           categories: ['medical'],
         ),
@@ -26,11 +29,11 @@ void main() {
 
       // Test different error types
       final errorTypes = [
-        NetworkException('Network connection failed'),
-        RateLimitException('Rate limit exceeded'),
-        ChatTimeoutException('Request timed out'),
-        ServerException('Internal server error'),
-        ValidationException('Invalid request'),
+        NetworkException(message: 'Network connection failed'),
+        RateLimitException(message: 'Rate limit exceeded'),
+        ChatTimeoutException(),
+        ServerException(message: 'Internal server error'),
+        ValidationException(message: 'Invalid request'),
         AiServiceException('Generic error'),
       ];
 
@@ -56,9 +59,10 @@ void main() {
       final healthRequest = ChatRequest(
         threadId: 'test-thread',
         messageContent: 'Hello',
-        spaceContext: SpaceContext(
+        spaceContext: models.SpaceContext(
           spaceId: 'health',
           spaceName: 'Health',
+          persona: models.SpacePersona.health,
           description: 'Health space',
           categories: ['medical'],
         ),
@@ -67,15 +71,16 @@ void main() {
       final financeRequest = ChatRequest(
         threadId: 'test-thread',
         messageContent: 'Hello',
-        spaceContext: SpaceContext(
+        spaceContext: models.SpaceContext(
           spaceId: 'finance',
           spaceName: 'Finance',
+          persona: models.SpacePersona.finance,
           description: 'Finance space',
           categories: ['budget'],
         ),
       );
 
-      final error = NetworkException('Network error');
+      final error = NetworkException(message: 'Network error');
 
       final healthResponse = fallbackService.generateFallbackResponse(healthRequest, error);
       final financeResponse = fallbackService.generateFallbackResponse(financeRequest, error);
@@ -87,47 +92,3 @@ void main() {
   });
 }
 
-// Mock SpaceContext class for testing
-class SpaceContext {
-  final String spaceId;
-  final String spaceName;
-  final String description;
-  final List<String> categories;
-  final String? recentRecords;
- final int maxContextRecords;
-  final Map<String, dynamic>? filters;
-  final Map<String, dynamic>? tokenAllocation;
-  final Map<String, dynamic>? stats;
-  final Persona persona;
-
-  SpaceContext({
-    required this.spaceId,
-    required this.spaceName,
-    required this.description,
-    required this.categories,
-    this.recentRecords,
-    this.maxContextRecords = 10,
-    this.filters,
-    this.tokenAllocation,
-    this.stats,
-  }) : persona = Persona(
-          name: 'Test Persona',
-          tone: 'friendly',
-          guidelines: [],
-          systemPromptAddition: '',
-        );
-}
-
-class Persona {
-  final String name;
-  final String tone;
-  final List<String> guidelines;
-  final String systemPromptAddition;
-
-  Persona({
-    required this.name,
-    required this.tone,
-    required this.guidelines,
-    required this.systemPromptAddition,
-  });
-}

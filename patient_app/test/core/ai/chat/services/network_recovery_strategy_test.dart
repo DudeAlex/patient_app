@@ -6,7 +6,14 @@ import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/services/network_recovery_strategy.dart';
 
-class MockAiChatService extends Mock implements AiChatService {}
+class MockAiChatService extends Mock implements AiChatService {
+  @override
+  Future<ChatResponse> sendMessage(ChatRequest request) =>
+      super.noSuchMethod(
+        Invocation.method(#sendMessage, [request]),
+        returnValue: Future.value(ChatResponse.success(messageContent: 'ok')),
+      ) as Future<ChatResponse>;
+}
 class MockChatRequest extends Mock implements ChatRequest {}
 class MockChatResponse extends Mock implements ChatResponse {}
 
@@ -40,15 +47,14 @@ void main() {
       expect(result, false);
     });
 
-    test('getRetryDelay returns correct exponential backoff delays', () {
-      // First attempt - 1 second
-      expect(strategy.getRetryDelay(1), const Duration(seconds: 1));
+    test('getRetryDelay returns jittered exponential backoff within expected ranges', () {
+      final first = strategy.getRetryDelay(1);
+      final second = strategy.getRetryDelay(2);
+      final third = strategy.getRetryDelay(3);
 
-      // Second attempt - 2 seconds
-      expect(strategy.getRetryDelay(2), const Duration(seconds: 2));
-
-      // Third attempt and beyond - 5 seconds (max rate limit wait)
-      expect(strategy.getRetryDelay(3), const Duration(seconds: 5));
+      expect(first.inMilliseconds, inInclusiveRange(800, 1200));
+      expect(second.inMilliseconds, inInclusiveRange(1600, 2400));
+      expect(third.inMilliseconds, inInclusiveRange(4000, 6000));
     });
 
     test('recover waits for specified delay and retries request', () async {

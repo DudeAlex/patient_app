@@ -83,6 +83,13 @@ class _FakeChatThreadRepository extends ChatThreadRepository {
     int? latencyMs,
     int? tokensUsed,
   }) async {}
+
+  @override
+  Future<void> updateMessageFeedback(
+    String threadId,
+    String messageId,
+    MessageFeedback feedback,
+  ) async {}
 }
 
 void main() {

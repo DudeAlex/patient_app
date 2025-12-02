@@ -6,7 +6,14 @@ import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/services/timeout_recovery_strategy.dart';
 
-class MockAiChatService extends Mock implements AiChatService {}
+class MockAiChatService extends Mock implements AiChatService {
+  @override
+  Future<ChatResponse> sendMessage(ChatRequest request) =>
+      super.noSuchMethod(
+        Invocation.method(#sendMessage, [request]),
+        returnValue: Future.value(ChatResponse.success(messageContent: 'ok')),
+      ) as Future<ChatResponse>;
+}
 class MockChatRequest extends Mock implements ChatRequest {}
 class MockChatResponse extends Mock implements ChatResponse {}
 
