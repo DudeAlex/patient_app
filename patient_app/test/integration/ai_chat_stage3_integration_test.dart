@@ -5,7 +5,7 @@ import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/context/context_filter_engine.dart';
 import 'package:patient_app/core/ai/chat/context/record_relevance_scorer.dart';
 import 'package:patient_app/core/ai/chat/context/context_truncation_strategy.dart';
-import 'package:patient_app/core/ai/chat/models/token_allocation.dart';
+import 'package:patient_app/core/ai/chat/context/token_budget_allocator.dart';
 import 'package:patient_app/core/ai/chat/models/date_range.dart';
 import 'package:patient_app/core/application/services/space_manager.dart';
 import 'package:patient_app/core/application/ports/space_repository.dart';
@@ -135,12 +135,12 @@ void main() {
       spaceManager: _FakeSpaceManager(_space()),
       filterEngine: ContextFilterEngine(),
       relevanceScorer: _TestRelevanceScorer(),
-      tokenAllocation: const TokenAllocation(
+      tokenBudgetAllocator: const TokenBudgetAllocator(
+        total: 4800,
         system: 800,
         context: 2000,
         history: 1000,
         response: 1000,
-        total: 4800,
       ),
       truncationStrategy: const ContextTruncationStrategy(),
       formatter: RecordSummaryFormatter(maxNoteLength: 100),

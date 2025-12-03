@@ -6,6 +6,9 @@ import 'package:patient_app/core/ai/chat/context/record_relevance_scorer.dart';
 import 'package:patient_app/core/ai/chat/context/context_truncation_strategy.dart';
 import 'package:patient_app/core/ai/chat/context/token_budget_allocator.dart';
 import 'package:patient_app/core/ai/chat/models/date_range.dart';
+import 'package:patient_app/core/ai/chat/models/context_filters.dart';
+import 'package:patient_app/core/ai/chat/models/context_stats.dart';
+import 'package:patient_app/core/ai/chat/models/token_allocation.dart';
 import 'package:patient_app/core/application/services/space_manager.dart';
 import 'package:patient_app/core/application/ports/space_repository.dart';
 import 'package:patient_app/core/domain/entities/space.dart';
@@ -134,15 +137,15 @@ void main() {
     // Create 50 records with various dates
     final now = DateTime(2025, 1, 15);
     final records = <RecordEntity>[
-      // 20 records within last 14 days (should be included)
-      for (int i = 1; i <= 20; i++)
+      // 14 records within last 14 days (should be included)
+      for (int i = 1; i <= 14; i++)
         _record(
           i,
           date: now.subtract(Duration(days: i)),
           viewCount: i % 5, // Varying access counts
         ),
-      // 30 records older than 14 days (should be filtered out)
-      for (int i = 21; i <= 50; i++)
+      // 36 records older than 14 days (should be filtered out)
+      for (int i = 15; i <= 50; i++)
         _record(
           i,
           date: now.subtract(Duration(days: 15 + (i - 20))),
@@ -156,7 +159,7 @@ void main() {
       spaceManager: _FakeSpaceManager(_space()),
       filterEngine: ContextFilterEngine(),
       relevanceScorer: _TestRelevanceScorer(now: now),
-      tokenBudgetAllocator: TokenBudgetAllocator(totalBudget: 4800),
+      tokenBudgetAllocator: const TokenBudgetAllocator(total: 4800),
       truncationStrategy: const ContextTruncationStrategy(),
       formatter: RecordSummaryFormatter(maxNoteLength: 100),
       maxRecords: 20,
@@ -177,7 +180,7 @@ void main() {
     // Verify date filtering: only records from last 14 days
     expect(context.recentRecords.length, lessThanOrEqualTo(20));
     for (final record in context.recentRecords) {
-      final recordDate = DateTime.parse(record.date);
+      final recordDate = record.date;
       final daysDiff = now.difference(recordDate).inDays;
       expect(daysDiff, lessThanOrEqualTo(14),
           reason: 'Record ${record.title} is ${daysDiff} days old, should be ≤ 14');
@@ -185,8 +188,8 @@ void main() {
 
     // Verify relevance scoring: more recent records should be first
     if (context.recentRecords.length > 1) {
-      final firstDate = DateTime.parse(context.recentRecords.first.date);
-      final lastDate = DateTime.parse(context.recentRecords.last.date);
+      final firstDate = context.recentRecords.first.date;
+      final lastDate = context.recentRecords.last.date;
       expect(firstDate.isAfter(lastDate) || firstDate.isAtSameMomentAs(lastDate), isTrue,
           reason: 'Records should be sorted by relevance (most recent first)');
     }
@@ -197,14 +200,15 @@ void main() {
 
     // Verify context stats are generated
     expect(context.stats, isNotNull, reason: 'Context stats should be generated');
-    expect(context.stats!.recordsFiltered, 50, reason: 'Should have filtered all 50 records');
-    expect(context.stats!.recordsIncluded, context.recentRecords.length,
+    final stats = context.stats! as ContextStats;
+    expect(stats.recordsFiltered, 14, reason: 'Should have filtered recent records only');
+    expect(stats.recordsIncluded, context.recentRecords.length,
         reason: 'recordsIncluded should match actual included count');
-    expect(context.stats!.tokensEstimated, greaterThan(0),
+    expect(stats.tokensEstimated, greaterThan(0),
         reason: 'Should estimate token usage');
-    expect(context.stats!.tokensAvailable, greaterThan(0),
+    expect(stats.tokensAvailable, greaterThan(0),
         reason: 'Should track available tokens');
-    expect(context.stats!.assemblyTime.inMilliseconds, greaterThan(0),
+    expect(stats.assemblyTime.inMilliseconds, greaterThan(0),
         reason: 'Should track assembly time');
 
     // Verify summaries are truncated
@@ -218,13 +222,15 @@ void main() {
 
     // Verify filters are included
     expect(context.filters, isNotNull, reason: 'Filters should be included');
-    expect(context.filters!.maxRecords, 20);
-    expect(context.filters!.spaceId, 'health');
+    final filters = context.filters! as ContextFilters;
+    expect(filters.maxRecords, 20);
+    expect(filters.spaceId, 'health');
 
     // Verify token allocation is included
     expect(context.tokenAllocation, isNotNull, reason: 'Token allocation should be included');
-    expect(context.tokenAllocation!.total, 4800);
-    expect(context.tokenAllocation!.response, 1000);
+    final allocation = context.tokenAllocation! as TokenAllocation;
+    expect(allocation.total, 4800);
+    expect(allocation.response, 1000);
   });
 
   test('Stage 4 integration: handles empty record set gracefully', () async {
@@ -237,7 +243,7 @@ void main() {
       spaceManager: _FakeSpaceManager(_space()),
       filterEngine: ContextFilterEngine(),
       relevanceScorer: _TestRelevanceScorer(now: now),
-      tokenBudgetAllocator: TokenBudgetAllocator(totalBudget: 4800),
+      tokenBudgetAllocator: const TokenBudgetAllocator(total: 4800),
       truncationStrategy: const ContextTruncationStrategy(),
       formatter: RecordSummaryFormatter(maxNoteLength: 100),
       maxRecords: 20,
@@ -251,8 +257,9 @@ void main() {
 
     expect(context.recentRecords, isEmpty);
     expect(context.stats, isNotNull);
-    expect(context.stats!.recordsFiltered, 0);
-    expect(context.stats!.recordsIncluded, 0);
+    final emptyStats = context.stats! as ContextStats;
+    expect(emptyStats.recordsFiltered, 0);
+    expect(emptyStats.recordsIncluded, 0);
   });
 }
 

@@ -14,6 +14,7 @@ import 'package:patient_app/core/ai/chat/models/chat_message.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/models/date_range.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/connectivity_monitor.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
@@ -100,6 +101,9 @@ class _InMemoryChatThreadRepository extends ChatThreadRepository {
   @override
   Future<void> updateMessageMetrics(String threadId, String messageId,
       {int? tokensUsed, int? latencyMs}) async {}
+
+  @override
+  Future<void> updateMessageFeedback(String threadId, String messageId, MessageFeedback feedback) async {}
 }
 
 class _AlwaysConsentedRepository implements AiConsentRepository {
@@ -135,7 +139,7 @@ class _FakeMessageAttachmentHandler implements MessageAttachmentHandler {
 
 class _FakeSpaceContextBuilder implements SpaceContextBuilder {
   @override
-  Future<SpaceContext> build(String spaceId) async {
+  Future<SpaceContext> build(String spaceId, {DateRange? dateRange, String? userQuery}) async {
     return SpaceContext(
       spaceId: spaceId,
       spaceName: 'Health',

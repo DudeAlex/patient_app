@@ -49,7 +49,7 @@ class _StubSpaceContextBuilder implements SpaceContextBuilder {
   final SpaceContext _context;
 
   @override
-  Future<SpaceContext> build(String spaceId) async => _context;
+  Future<SpaceContext> build(String spaceId, {DateRange? dateRange, String? userQuery}) async => _context;
 }
 
 
@@ -576,6 +576,9 @@ class _InMemoryThreadRepo implements ChatThreadRepository {
   @override
   Future<void> updateMessageStatus(String threadId, String messageId, MessageStatus status,
       {String? errorMessage, String? errorCode, bool? errorRetryable}) async {}
+
+  @override
+  Future<void> updateMessageFeedback(String threadId, String messageId, MessageFeedback feedback) async {}
 }
 
 class _NoopAttachmentHandler implements MessageAttachmentHandler {

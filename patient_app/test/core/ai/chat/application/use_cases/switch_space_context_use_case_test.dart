@@ -52,6 +52,9 @@ class _InMemoryThreadRepo implements ChatThreadRepository {
   @override
   Future<void> updateMessageStatus(String threadId, String messageId, MessageStatus status,
       {String? errorMessage, String? errorCode, bool? errorRetryable}) async {}
+
+  @override
+  Future<void> updateMessageFeedback(String threadId, String messageId, MessageFeedback feedback) async {}
 }
 
 class _StubAttachmentHandler implements MessageAttachmentHandler {
@@ -74,7 +77,7 @@ class _StubAttachmentHandler implements MessageAttachmentHandler {
 
 class _StubSpaceContextBuilder implements SpaceContextBuilder {
   @override
-  Future<SpaceContext> build(String spaceId, {DateRange? dateRange}) async {
+  Future<SpaceContext> build(String spaceId, {DateRange? dateRange, String? userQuery}) async {
     return SpaceContext(
       spaceId: spaceId,
       spaceName: 'Space $spaceId',

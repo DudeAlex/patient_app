@@ -109,6 +109,9 @@ class _StubThreadRepo implements ChatThreadRepository {
   @override
   Future<void> updateMessageStatus(String threadId, String messageId, MessageStatus status,
       {String? errorMessage, String? errorCode, bool? errorRetryable}) async {}
+
+  @override
+  Future<void> updateMessageFeedback(String threadId, String messageId, MessageFeedback feedback) async {}
 }
 
 class _StubSpaceRepo implements SpaceRepository {
@@ -194,8 +197,8 @@ void main() {
   test('builds persona and recent records summaries for space', () async {
     final container = ProviderContainer(
       overrides: [
-        spaceContextBuilderProvider.overrideWithValue(
-          SpaceContextBuilderImpl(
+        spaceContextBuilderProvider.overrideWith(
+          (ref) async => SpaceContextBuilderImpl(
             recordsServiceFuture: Future.value(
               _StubRecordsService([
                 RecordEntity(

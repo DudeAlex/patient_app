@@ -48,6 +48,9 @@ class _InMemoryThreadRepo implements ChatThreadRepository {
   @override
   Future<void> updateMessageStatus(String threadId, String messageId, MessageStatus status,
       {String? errorMessage, String? errorCode, bool? errorRetryable}) async {}
+
+  @override
+  Future<void> updateMessageFeedback(String threadId, String messageId, MessageFeedback feedback) async {}
 }
 
 class _StubAttachmentHandler implements MessageAttachmentHandler {

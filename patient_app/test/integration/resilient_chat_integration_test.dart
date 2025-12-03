@@ -131,7 +131,7 @@ void main() {
 
       // Since we're using real recovery strategies that might not be able to recover from the error,
       // we should get a fallback response
-      expect(result.messageContent, contains('fallback')); // The fallback message will contain this
+      expect(result.messageContent, contains('temporarily unavailable'));
     });
 
     test('successful request without errors', () async {

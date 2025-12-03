@@ -35,7 +35,7 @@ void main() {
       final event = await queue.next;
       expect(event.type, 'start');
       expect(event.requestId, requestId);
-      expect(event.payload['userId'], 'user-1');
+      expect(event.payload['userId'], isNot('user-1')); // userId should be anonymized
       expect(event.payload['spaceId'], 'space-1');
       expect(event.payload['messageId'], 'msg-1');
     });

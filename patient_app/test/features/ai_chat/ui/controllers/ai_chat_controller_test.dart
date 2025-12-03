@@ -11,6 +11,7 @@ import 'package:patient_app/core/ai/chat/models/chat_message.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
+import 'package:patient_app/core/ai/chat/models/date_range.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
 import 'package:patient_app/core/ai/chat/services/message_queue_service.dart';
@@ -64,6 +65,9 @@ class _InMemoryThreadRepo implements ChatThreadRepository {
     final updated = thread.messages.map((m) => m.id == messageId ? m.copyWith(status: status) : m).toList();
     _store[threadId] = thread.copyWith(messages: updated);
   }
+
+  @override
+  Future<void> updateMessageFeedback(String threadId, String messageId, MessageFeedback feedback) async {}
 }
 
 class _StubConsentRepo implements AiConsentRepository {
@@ -101,7 +105,7 @@ class _StubAttachmentHandler implements MessageAttachmentHandler {
 
 class _StubSpaceContextBuilder implements SpaceContextBuilder {
   @override
-  Future<SpaceContext> build(String spaceId) async {
+  Future<SpaceContext> build(String spaceId, {DateRange? dateRange, String? userQuery}) async {
     return SpaceContext(
       spaceId: spaceId,
       spaceName: 'Space $spaceId',

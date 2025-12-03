@@ -80,6 +80,9 @@ class _InMemoryThreadRepo implements ChatThreadRepository {
     }).toList();
     _store[threadId] = thread.copyWith(messages: updated);
   }
+
+  @override
+  Future<void> updateMessageFeedback(String threadId, String messageId, MessageFeedback feedback) async {}
 }
 
 class _StubConsentRepo implements AiConsentRepository {
@@ -168,7 +171,7 @@ SpaceContext _context() => SpaceContext(
 
 class _StubContextBuilder implements SpaceContextBuilder {
   @override
-  Future<SpaceContext> build(String spaceId, {DateRange? dateRange}) async => _context();
+  Future<SpaceContext> build(String spaceId, {DateRange? dateRange, String? userQuery}) async => _context();
 }
 
 void main() {
@@ -318,7 +321,7 @@ class _SpyContextBuilder implements SpaceContextBuilder {
   DateRange? capturedDateRange;
 
   @override
-  Future<SpaceContext> build(String spaceId, {DateRange? dateRange}) async {
+  Future<SpaceContext> build(String spaceId, {DateRange? dateRange, String? userQuery}) async {
     capturedDateRange = dateRange;
     return _context();
   }

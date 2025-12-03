@@ -5,11 +5,16 @@ import 'package:patient_app/core/ai/chat/context/record_relevance_scorer.dart';
 import 'package:patient_app/core/ai/chat/context/record_summary_formatter.dart';
 import 'package:patient_app/core/ai/chat/domain/services/intent_driven_retriever.dart';
 import 'package:patient_app/core/ai/chat/domain/services/query_analyzer.dart';
-import 'package:patient_app/core/ai/chat/models/intent_retrieval_config.dart';
+import 'package:patient_app/core/ai/chat/domain/services/relevance_scorer.dart';
+import 'package:patient_app/core/ai/chat/domain/services/privacy_filter.dart';
+import 'package:patient_app/core/ai/chat/domain/services/keyword_extractor.dart';
+import 'package:patient_app/core/ai/chat/domain/services/intent_classifier.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/models/context_filters.dart';
 import 'package:patient_app/core/ai/chat/models/context_stats.dart';
 import 'package:patient_app/core/ai/chat/models/date_range.dart';
+import 'package:patient_app/core/ai/chat/models/intent_retrieval_config.dart';
+import 'package:patient_app/core/ai/chat/models/token_allocation.dart';
 import 'package:patient_app/core/ai/chat/context/token_budget_allocator.dart';
 import 'package:patient_app/core/application/services/space_manager.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
@@ -24,25 +29,44 @@ class SpaceContextBuilderImpl implements SpaceContextBuilder {
     required Future<RecordsService> recordsServiceFuture,
     RecordsRepository? recordsRepositoryOverride,
     required SpaceManager spaceManager,
-    required ContextFilterEngine filterEngine,
-    required RecordRelevanceScorer relevanceScorer,
-    required TokenBudgetAllocator tokenBudgetAllocator,
-    required ContextTruncationStrategy truncationStrategy,
-    required IntentDrivenRetriever intentDrivenRetriever,
-    required QueryAnalyzer queryAnalyzer,
-    required IntentRetrievalConfig intentRetrievalConfig,
+    ContextFilterEngine? filterEngine,
+    RecordRelevanceScorer? relevanceScorer,
+    TokenBudgetAllocator? tokenBudgetAllocator,
+    TokenAllocation? tokenAllocation,
+    ContextTruncationStrategy? truncationStrategy,
+    IntentDrivenRetriever? intentDrivenRetriever,
+    QueryAnalyzer? queryAnalyzer,
+    IntentRetrievalConfig intentRetrievalConfig = const IntentRetrievalConfig(),
     RecordSummaryFormatter? formatter,
     this.maxRecords = 20,
     DateRange? dateRange,
   })  : _recordsServiceFuture = recordsServiceFuture,
         _recordsRepositoryOverride = recordsRepositoryOverride,
         _spaceManager = spaceManager,
-        _filterEngine = filterEngine,
-        _relevanceScorer = relevanceScorer,
-        _tokenBudgetAllocator = tokenBudgetAllocator,
-        _truncationStrategy = truncationStrategy,
-        _intentDrivenRetriever = intentDrivenRetriever,
-        _queryAnalyzer = queryAnalyzer,
+        _filterEngine = filterEngine ?? ContextFilterEngine(),
+        _relevanceScorer = relevanceScorer ?? RecordRelevanceScorer(),
+        _tokenBudgetAllocator = tokenBudgetAllocator ??
+            (tokenAllocation != null
+                ? TokenBudgetAllocator(
+                    total: tokenAllocation.total,
+                    system: tokenAllocation.system,
+                    context: tokenAllocation.context,
+                    history: tokenAllocation.history,
+                    response: tokenAllocation.response,
+                  )
+                : const TokenBudgetAllocator()),
+        _truncationStrategy = truncationStrategy ?? const ContextTruncationStrategy(),
+        _intentDrivenRetriever = intentDrivenRetriever ??
+            IntentDrivenRetriever(
+              relevanceScorer: RelevanceScorer(),
+              privacyFilter: PrivacyFilter(),
+              config: intentRetrievalConfig,
+            ),
+        _queryAnalyzer = queryAnalyzer ??
+            QueryAnalyzer(
+              keywordExtractor: KeywordExtractor(),
+              intentClassifier: IntentClassifier(),
+            ),
         _intentRetrievalConfig = intentRetrievalConfig,
         _dateRange = dateRange ?? DateRange.last14Days(),
         _formatter = formatter ?? RecordSummaryFormatter();
