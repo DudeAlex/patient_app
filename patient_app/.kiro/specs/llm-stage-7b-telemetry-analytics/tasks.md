@@ -478,7 +478,10 @@ Create manual test scenarios and documentation.
 
 Ensure all tests pass and system is production-ready.
 
-- **Status note (in progress):** Telemetry/unit/property suites remain green and server telemetry API tests pass. Broad Flutter test run was partially repaired (Stage 4/6 integration assertions and token allocator defaults fixed), but we had to stop the full run. Remaining known issues before the next run: (1) some non-telemetry chat tests still fail to compile because test doubles in `test/integration/ai_chat_offline_flow_test.dart` (and possibly `ai_chat_offline_queue_property_test.dart`) don’t implement `updateMessageFeedback`; add no-op overrides. (2) Re-run full `flutter test` to confirm Stage 3/4/6 integration suites now pass after recent fixes and to surface any remaining regressions. Performance (10.4) and manual dashboard validation (10.5) have not been started. See latest `flutter_test.log` / `flutter_test_run2.log` for context.
+- **Status note (in progress):** Telemetry/unit/property suites remain green and server telemetry API tests pass. Broad Flutter test run was partially repaired (Stage 4/6 integration assertions and token allocator defaults fixed), but we had to stop the full run. Known TODOs before the next run:
+  1) Fix compilation in offline chat tests by adding no-op `updateMessageFeedback` to doubles in `test/integration/ai_chat_offline_flow_test.dart` and `test/property/ai_chat_offline_queue_property_test.dart`.
+  2) Re-run full `flutter test` (see `flutter_test.log` / `flutter_test_run2.log`) to validate Stage 3/4/6 integrations and surface any remaining failures.
+  3) After green tests, proceed to performance validation (10.4) and manual dashboard validation (10.5).
 
 - [ ] 10.1 Run all unit tests
   - Verify all tests pass
