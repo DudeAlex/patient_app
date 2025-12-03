@@ -247,6 +247,8 @@ class HttpAiChatService implements AiChatService {
     final tokenUsage = metadata['tokenUsage'] as Map<String, dynamic>?;
     final tokensUsed =
         tokenUsage?['total'] as int? ?? metadata['tokensUsed'] as int? ?? 0;
+    final promptTokens = tokenUsage?['prompt'] as int? ?? 0;
+    final completionTokens = tokenUsage?['completion'] as int? ?? 0;
     final latencyMs =
         metadata['processingTimeMs'] as int? ?? metadata['latencyMs'] as int? ?? 0;
     final provider =
@@ -258,6 +260,9 @@ class HttpAiChatService implements AiChatService {
     // Build normalized metadata map for fromJson
     final normalizedMetadata = {
       'tokensUsed': tokensUsed,
+      'promptTokens': promptTokens,
+      'completionTokens': completionTokens,
+      if (tokenUsage != null) 'tokenUsage': tokenUsage,
       'latencyMs': latencyMs,
       'provider': provider,
       'confidence': confidence,

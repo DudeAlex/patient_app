@@ -312,31 +312,31 @@ Create REST API endpoints for dashboard.
 
 Wire up telemetry collection in the existing AI chat service.
 
-- [ ] 7.1 Add telemetry to ResilientAiChatService
+- [x] 7.1 Add telemetry to ResilientAiChatService
   - File: `lib/core/ai/chat/services/resilient_ai_chat_service.dart`
   - Call startRequest() at beginning
   - Call completeRequest() on success
   - Call recordError() on failure
   - _Requirements: All_
 
-- [ ] 7.2 Add telemetry to context assembly
+- [x] 7.2 Add telemetry to context assembly
   - Measure context assembly time
   - Record in telemetry
   - _Requirements: 2.2_
 
-- [ ] 7.3 Add telemetry to LLM calls
+- [x] 7.3 Add telemetry to LLM calls
   - Measure LLM call time
   - Record token usage
   - Record cache hits/misses
   - _Requirements: 2.3, 3.1-3.2, 5.1-5.2_
 
-- [ ] 7.4 Update dependency injection
+- [x] 7.4 Update dependency injection
   - File: `lib/core/di/bootstrap.dart`
   - Register telemetry services
   - Wire up dependencies
   - _Requirements: All_
 
-- [ ] 7.5 Write integration tests
+- [x] 7.5 Write integration tests
   - File: `test/integration/telemetry_integration_test.dart`
   - Send requests, verify metrics collected
   - Verify all metric types tracked

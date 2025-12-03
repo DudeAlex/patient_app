@@ -59,6 +59,8 @@ class ChatResponse {
 class AiMessageMetadata {
   const AiMessageMetadata._raw({
     this.tokensUsed = 0,
+    this.promptTokens = 0,
+    this.completionTokens = 0,
     this.latencyMs = 0,
     this.provider = 'unknown',
     this.confidence = 0.0,
@@ -69,6 +71,12 @@ class AiMessageMetadata {
 
   /// Token usage reported by the provider.
   final int tokensUsed;
+
+  /// Prompt-side tokens reported by the provider.
+  final int promptTokens;
+
+  /// Completion-side tokens reported by the provider.
+  final int completionTokens;
 
   /// End-to-end latency in milliseconds.
   final int latencyMs;
@@ -90,6 +98,8 @@ class AiMessageMetadata {
 
   AiMessageMetadata copyWith({
     int? tokensUsed,
+    int? promptTokens,
+    int? completionTokens,
     int? latencyMs,
     String? provider,
     double? confidence,
@@ -99,6 +109,8 @@ class AiMessageMetadata {
   }) {
     return AiMessageMetadata(
       tokensUsed: tokensUsed ?? this.tokensUsed,
+      promptTokens: promptTokens ?? this.promptTokens,
+      completionTokens: completionTokens ?? this.completionTokens,
       latencyMs: latencyMs ?? this.latencyMs,
       provider: provider ?? this.provider,
       confidence: confidence ?? this.confidence,
@@ -110,6 +122,8 @@ class AiMessageMetadata {
 
   factory AiMessageMetadata({
     int tokensUsed = 0,
+    int promptTokens = 0,
+    int completionTokens = 0,
     int latencyMs = 0,
     String provider = 'unknown',
     double confidence = 0.0,
@@ -119,6 +133,8 @@ class AiMessageMetadata {
   }) {
     return AiMessageMetadata._raw(
       tokensUsed: tokensUsed,
+      promptTokens: promptTokens,
+      completionTokens: completionTokens,
       latencyMs: latencyMs,
       provider: provider,
       confidence: _clampConfidence(confidence),
@@ -142,8 +158,18 @@ class AiMessageMetadata {
       );
     }
 
+    int promptTokens = 0;
+    int completionTokens = 0;
+    final tokenUsage = json['tokenUsage'] as Map<String, dynamic>?;
+    if (tokenUsage != null) {
+      promptTokens = tokenUsage['prompt'] as int? ?? 0;
+      completionTokens = tokenUsage['completion'] as int? ?? 0;
+    }
+
     return AiMessageMetadata(
-      tokensUsed: json['tokensUsed'] as int? ?? 0,
+      tokensUsed: json['tokensUsed'] as int? ?? (tokenUsage?['total'] as int? ?? 0),
+      promptTokens: json['promptTokens'] as int? ?? promptTokens,
+      completionTokens: json['completionTokens'] as int? ?? completionTokens,
       latencyMs: json['latencyMs'] as int? ?? 0,
       provider: json['provider'] as String? ?? 'unknown',
       confidence: (json['confidence'] as num?)?.toDouble() ?? 0.0,

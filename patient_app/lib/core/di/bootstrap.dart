@@ -35,6 +35,14 @@ import '../ai/chat/services/network_recovery_strategy.dart';
 import '../ai/chat/services/server_error_recovery_strategy.dart';
 import '../ai/chat/services/timeout_recovery_strategy.dart';
 import '../ai/chat/services/resilient_ai_chat_service.dart';
+import '../ai/chat/telemetry/interfaces/alert_monitoring_service.dart';
+import '../ai/chat/telemetry/interfaces/metrics_aggregation_service.dart';
+import '../ai/chat/telemetry/interfaces/telemetry_collector.dart';
+import '../ai/chat/telemetry/services/alert_monitoring_service_impl.dart';
+import '../ai/chat/telemetry/services/metrics_aggregation_service_impl.dart';
+import '../ai/chat/telemetry/services/telemetry_collector_impl.dart';
+import '../ai/chat/telemetry/services/telemetry_ingest_service.dart';
+import '../ai/chat/telemetry/storage/metrics_store.dart';
 import '../diagnostics/app_logger.dart';
 import '../infrastructure/storage/migration_service.dart';
 import '../infrastructure/storage/space_preferences.dart';
@@ -116,6 +124,23 @@ Future<void> bootstrapAppContainer() async {
       ),
     );
 
+    // Telemetry wiring
+    final telemetryCollector = TelemetryCollectorImpl();
+    container.registerSingleton<TelemetryCollector>(telemetryCollector);
+    container.registerSingleton<MetricsStore>(MetricsStore());
+    container.registerLazySingleton<MetricsAggregationService>(
+      (c) => MetricsAggregationServiceImpl(c.resolve<MetricsStore>()),
+    );
+    container.registerLazySingleton<AlertMonitoringService>(
+      (c) => AlertMonitoringServiceImpl(c.resolve<MetricsAggregationService>()),
+    );
+    container.registerSingleton<TelemetryIngestService>(
+      TelemetryIngestService(
+        collector: telemetryCollector,
+        store: container.resolve<MetricsStore>(),
+      ),
+    );
+
     // Register chat dependencies
     container.registerLazySingleton<ChatThreadRepository>(
       (_) => ChatThreadRepositoryImpl(recordsService.db),
@@ -166,6 +191,7 @@ Future<void> bootstrapAppContainer() async {
           c.resolve<ServerErrorRecoveryStrategy>(),
           c.resolve<TimeoutRecoveryStrategy>(),
         ],
+        telemetryCollector: c.resolve<TelemetryCollector>(),
       ),
     );
 

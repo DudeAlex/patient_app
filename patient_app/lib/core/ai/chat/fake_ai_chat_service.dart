@@ -156,6 +156,8 @@ class FakeAiChatService implements AiChatService {
       actionHints: actionHints,
       metadata: AiMessageMetadata(
         tokensUsed: estimatedTokens,
+        promptTokens: estimatedTokens,
+        completionTokens: 0,
         latencyMs: simulatedLatency.inMilliseconds,
         provider: 'fake',
         confidence: 0.9,

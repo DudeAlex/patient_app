@@ -18,6 +18,8 @@ class FallbackService {
       actionHints: _getActionHints(error),
       metadata: AiMessageMetadata(
         tokensUsed: errorMessage.length ~/ 4, // Rough estimation
+        promptTokens: errorMessage.length ~/ 4,
+        completionTokens: 0,
         latencyMs: 0,
         provider: 'fallback',
       ),
