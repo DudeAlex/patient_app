@@ -10,7 +10,7 @@ This document tracks the progress of LLM integration stages in the Patient App.
 | 3-4 | Context Optimization | ✅ COMPLETE | Nov 27, 2024 | 51% | `llm-context-optimization/` |
 | 6 | Intent-Driven Retrieval | ✅ COMPLETE | Dec 1, 2025 | 30% | `llm-stage-6-intent-retrieval/` |
 | 7a | Personas & Error Recovery | ✅ COMPLETE | Dec 2, 2024 | N/A | `llm-stage-7a-personas-error-recovery/` |
-| 7b | Telemetry & Analytics | ⏳ PLANNED | - | - | Not created |
+| 7b | Telemetry & Analytics | 🚧 IN PROGRESS | Dec 2024 | - | `.kiro/specs/llm-stage-7b-telemetry-analytics/` |
 | 7c | User Feedback & Quality | ⏳ PLANNED | - | - | Not created |
 | 7d | Tool Hooks & Extensions | ⏳ PLANNED | - | - | Not created |
 | 7e | Privacy & Security | ⏳ PLANNED | - | - | Not created |
@@ -145,21 +145,22 @@ This document tracks the progress of LLM integration stages in the Patient App.
 
 ---
 
-### ⏳ Stage 7b: Telemetry & Analytics
+### 🚧 Stage 7b: Telemetry & Analytics
 
-**Status:** Planned  
-**Priority:** Medium
+**Status:** In Progress  
+**Priority:** Medium  
+**Spec:** `.kiro/specs/llm-stage-7b-telemetry-analytics/`  
+**Docs:** `docs/modules/ai/STAGE_7B_TELEMETRY_ANALYTICS.md`
 
-**Planned Features:**
-- Request rate tracking (per minute, hour, day)
-- Response latency metrics
-- Token usage analytics
-- Error rate monitoring by type
-- Real-time metrics dashboard
-- Cache hit rate tracking
+**Features (current):**
+- Request rate tracking (minute/hour/day) via in-memory buffers
+- Latency metrics (total/context/LLM) with percentile stats
+- Token usage analytics (prompt/completion, by user/space)
+- Error rate tracking by type and cache hit rate
+- Alert monitoring (error rate, latency, token budget, request rate)
+- Dashboard API endpoints with admin auth + rate limiting
 
-**Estimated Time:** 3-4 days
-
+**Work Remaining:** Final validation, performance checks, manual test run, and rollout notes.
 ---
 
 ### ⏳ Stage 7c: User Feedback & Quality
@@ -287,5 +288,5 @@ This document tracks the progress of LLM integration stages in the Patient App.
 ---
 
 **Last Updated:** December 2, 2024  
-**Current Stage:** 7b (Telemetry & Analytics) - Ready to start  
-**Overall Progress:** 65% complete (Stages 1-2, 3-4, 6, 7a done; 7b-7f remaining)
+**Current Stage:** 7b (Telemetry & Analytics) - In progress  
+**Overall Progress:** 70% complete (Stages 1-2, 3-4, 6, 7a done; 7b in progress; 7c-7f remaining)
