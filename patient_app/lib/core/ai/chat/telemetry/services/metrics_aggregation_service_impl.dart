@@ -80,8 +80,14 @@ class MetricsAggregationServiceImpl implements MetricsAggregationService {
   TokenUsageStats getTokenUsage({TimeWindow window = TimeWindow.day}) {
     final now = DateTime.now();
     final windowDuration = _windowDuration(window);
-    final prompt = _store.promptTokens.getRange(now.subtract(windowDuration), now);
-    final completion = _store.completionTokens.getRange(now.subtract(windowDuration), now);
+    final prompt = _store.promptTokens
+        .getRange(now.subtract(windowDuration), now)
+        .map((p) => _Point(p.timestamp, p.value, p.metadata))
+        .toList();
+    final completion = _store.completionTokens
+        .getRange(now.subtract(windowDuration), now)
+        .map((p) => _Point(p.timestamp, p.value, p.metadata))
+        .toList();
 
     final promptTotal = prompt.fold<int>(0, (sum, p) => sum + p.value.toInt());
     final completionTotal = completion.fold<int>(0, (sum, p) => sum + p.value.toInt());
@@ -89,10 +95,30 @@ class MetricsAggregationServiceImpl implements MetricsAggregationService {
     final count = (prompt.length > completion.length) ? prompt.length : completion.length;
     final averagePerRequest = count == 0 ? 0.0 : totalTokens / count;
 
+    final byUser = <String, int>{};
+    final bySpace = <String, int>{};
+    void accumulate(List<_Point> points) {
+      for (final point in points) {
+        final user = point.metadata['userId'] as String?;
+        final space = point.metadata['spaceId'] as String?;
+        if (user != null) {
+          byUser[user] = (byUser[user] ?? 0) + point.value.toInt();
+        }
+        if (space != null) {
+          bySpace[space] = (bySpace[space] ?? 0) + point.value.toInt();
+        }
+      }
+    }
+
+    accumulate(prompt);
+    accumulate(completion);
+
     return TokenUsageStats(
       totalTokens: totalTokens,
       promptTokens: promptTotal,
       completionTokens: completionTotal,
+      byUser: byUser,
+      bySpace: bySpace,
       averagePerRequest: averagePerRequest,
     );
   }
@@ -196,7 +222,7 @@ class MetricsAggregationServiceImpl implements MetricsAggregationService {
       case MetricType.completionTokens:
         return _BufferView(_store.completionTokens);
       case MetricType.totalTokens:
-        return _BufferView(_store.promptTokens); // combined externally if needed
+        return _BufferView.merge([_store.promptTokens, _store.completionTokens]);
       case MetricType.errorRate:
         // Combine all error buffers into a synthetic view.
         return _BufferView.merge(_store.errorsByType.values.toList());

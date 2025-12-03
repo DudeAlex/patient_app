@@ -357,72 +357,72 @@ Wire up telemetry collection in the existing AI chat service.
 
 Write property tests for all 12 correctness properties.
 
-- [ ] 8.1 Property 1: Request counting accuracy
+- [x] 8.1 Property 1: Request counting accuracy
   - File: `test/core/ai/chat/telemetry/properties/counting_properties_test.dart`
   - Generate random requests, verify count matches
   - **Feature: llm-stage-7b-telemetry-analytics, Property 1: Request counting accuracy**
   - **Validates: Requirements 1.1, 1.2, 1.3**
 
-- [ ] 8.2 Property 2: Time window aggregation
+- [x] 8.2 Property 2: Time window aggregation
   - Generate requests with timestamps, verify window counts
   - **Feature: llm-stage-7b-telemetry-analytics, Property 2: Time window aggregation**
   - **Validates: Requirements 1.1, 1.2, 1.3**
 
-- [ ] 8.3 Property 3: Dimensional aggregation consistency
+- [x] 8.3 Property 3: Dimensional aggregation consistency
   - Generate requests with user/Space, verify sum equals total
   - **Feature: llm-stage-7b-telemetry-analytics, Property 3: Dimensional aggregation consistency**
   - **Validates: Requirements 1.4, 1.5, 3.3, 3.4, 5.4**
 
-- [ ] 8.4 Property 4: Latency measurement completeness
+- [x] 8.4 Property 4: Latency measurement completeness
   - File: `test/core/ai/chat/telemetry/properties/latency_properties_test.dart`
   - Verify context + LLM ≤ total latency
   - **Feature: llm-stage-7b-telemetry-analytics, Property 4: Latency measurement completeness**
   - **Validates: Requirements 2.1, 2.2, 2.3**
 
-- [ ] 8.5 Property 5: Statistical calculation accuracy
+- [x] 8.5 Property 5: Statistical calculation accuracy
   - Generate random latencies, verify average and median
   - **Feature: llm-stage-7b-telemetry-analytics, Property 5: Statistical calculation accuracy**
   - **Validates: Requirements 2.4**
 
-- [ ] 8.6 Property 6: Token sum consistency
+- [x] 8.6 Property 6: Token sum consistency
   - File: `test/core/ai/chat/telemetry/properties/token_properties_test.dart`
   - Verify total = prompt + completion
   - **Feature: llm-stage-7b-telemetry-analytics, Property 6: Token sum consistency**
   - **Validates: Requirements 3.1, 3.2**
 
-- [ ] 8.7 Property 7: Error rate calculation
+- [x] 8.7 Property 7: Error rate calculation
   - File: `test/core/ai/chat/telemetry/properties/error_properties_test.dart`
   - Verify error rate = (errors / total) * 100
   - **Feature: llm-stage-7b-telemetry-analytics, Property 7: Error rate calculation**
   - **Validates: Requirements 4.1**
 
-- [ ] 8.8 Property 8: Error categorization completeness
+- [x] 8.8 Property 8: Error categorization completeness
   - Verify sum of errors by type = total errors
   - **Feature: llm-stage-7b-telemetry-analytics, Property 8: Error categorization completeness**
   - **Validates: Requirements 4.2, 4.3**
 
-- [ ] 8.9 Property 9: Cache hit rate calculation
+- [x] 8.9 Property 9: Cache hit rate calculation
   - File: `test/core/ai/chat/telemetry/properties/cache_properties_test.dart`
   - Verify hit rate = (hits / total) * 100
   - Verify hits + misses = total
   - **Feature: llm-stage-7b-telemetry-analytics, Property 9: Cache hit rate calculation**
   - **Validates: Requirements 5.1, 5.2, 5.3**
 
-- [ ] 8.10 Property 10: Alert threshold triggering
+- [x] 8.10 Property 10: Alert threshold triggering
   - File: `test/core/ai/chat/telemetry/properties/alert_properties_test.dart`
   - Verify alerts trigger when threshold exceeded
   - Verify no alerts when below threshold
   - **Feature: llm-stage-7b-telemetry-analytics, Property 10: Alert threshold triggering**
   - **Validates: Requirements 8.1, 8.2, 8.3, 8.4**
 
-- [ ] 8.11 Property 11: Metric collection timing
+- [x] 8.11 Property 11: Metric collection timing
   - File: `test/core/ai/chat/telemetry/properties/performance_properties_test.dart`
   - Verify collection completes in < 10ms
   - Verify non-blocking behavior
   - **Feature: llm-stage-7b-telemetry-analytics, Property 11: Metric collection timing**
   - **Validates: Requirements 9.4**
 
-- [ ] 8.12 Property 12: Privacy preservation
+- [x] 8.12 Property 12: Privacy preservation
   - File: `test/core/ai/chat/telemetry/properties/privacy_properties_test.dart`
   - Verify no message content in metrics
   - Verify no PII in metrics

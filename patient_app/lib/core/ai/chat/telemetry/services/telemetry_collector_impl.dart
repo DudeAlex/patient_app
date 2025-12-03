@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 class TelemetryCollectorImpl implements TelemetryCollector {
   final Uuid _uuid;
   final StreamController<TelemetryEvent> _controller;
+  final Map<String, Map<String, String>> _requestContext = {};
 
   TelemetryCollectorImpl({
     Uuid? uuid,
@@ -25,12 +26,18 @@ class TelemetryCollectorImpl implements TelemetryCollector {
     required String messageId,
   }) {
     final requestId = _uuid.v4();
+    final anonymizedUserId = _anonymize(userId);
+    _requestContext[requestId] = {
+      'userId': anonymizedUserId,
+      'spaceId': spaceId,
+      'messageId': messageId,
+    };
     _emitAsync(
       TelemetryEvent(
         requestId: requestId,
         type: 'start',
         payload: {
-          'userId': userId,
+          'userId': anonymizedUserId,
           'spaceId': spaceId,
           'messageId': messageId,
         },
@@ -49,11 +56,13 @@ class TelemetryCollectorImpl implements TelemetryCollector {
     required int completionTokens,
     bool fromCache = false,
   }) async {
+    final context = _requestContext.remove(requestId) ?? {};
     _emitAsync(
       TelemetryEvent(
         requestId: requestId,
         type: 'complete',
         payload: {
+          ...context,
           'totalLatencyMs': totalLatency.inMilliseconds,
           'contextAssemblyMs': contextAssemblyTime.inMilliseconds,
           'llmCallMs': llmCallTime.inMilliseconds,
@@ -71,11 +80,13 @@ class TelemetryCollectorImpl implements TelemetryCollector {
     required String errorType,
     required String errorMessage,
   }) async {
+    final context = _requestContext.remove(requestId) ?? {};
     _emitAsync(
       TelemetryEvent(
         requestId: requestId,
         type: 'error',
         payload: {
+          ...context,
           'errorType': errorType,
           'errorMessage': errorMessage,
         },
@@ -95,5 +106,10 @@ class TelemetryCollectorImpl implements TelemetryCollector {
   /// Dispose the underlying stream controller.
   Future<void> dispose() async {
     await _controller.close();
+  }
+
+  String _anonymize(String userId) {
+    // Lightweight, deterministic hashing to avoid storing raw identifiers.
+    return userId.hashCode.toRadixString(16);
   }
 }
