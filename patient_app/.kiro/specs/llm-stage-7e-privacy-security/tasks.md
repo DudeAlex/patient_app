@@ -177,6 +177,43 @@ Create the rate limiting service.
   - Test custom patterns
   - Test edge cases
   - _Requirements: 3.1-3.5, 4.1-4.5_
+
+### Task 4: Implement input validator
+
+- [x] 4.1 Create InputValidator interface
+  - File: `lib/core/ai/chat/security/interfaces/input_validator.dart`
+  - Methods: validateMessage(), validateSpaceId(), sanitize()
+  - _Requirements: 5.1-5.5_
+
+- [x] 4.2 Implement InputValidatorImpl skeleton
+  - File: `lib/core/ai/chat/security/services/input_validator_impl.dart`
+  - _Requirements: 5.1-5.5_
+
+- [x] 4.3 Add length validation (1-10,000 chars)
+  - _Requirements: 5.1_
+
+- [x] 4.4 Add whitespace-only check
+  - _Requirements: 5.2_
+
+- [x] 4.5 Add invalid character check
+  - Reject control chars
+  - _Requirements: 5.3_
+
+- [x] 4.6 Add injection detection
+  - Detect `<script>`, SQL keywords, `--`
+  - _Requirements: 5.4_
+
+- [x] 4.7 Implement sanitize()
+  - Remove control chars, trim whitespace
+  - _Requirements: 5.5_
+
+- [x] 4.8 Validate Space IDs
+  - Regex for `[A-Za-z0-9_-]+`, max length 64
+  - _Requirements: 5.6_
+
+- [x] 4.9 Write InputValidator tests
+  - File: `test/core/ai/chat/security/services/input_validator_test.dart`
+  - _Requirements: 5.1-5.6_
   - File: `test/core/ai/chat/security/services/rate_limiter_test.dart`
   - Test quota enforcement
   - Test soft limits

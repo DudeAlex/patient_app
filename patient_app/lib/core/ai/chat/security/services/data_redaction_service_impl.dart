@@ -34,23 +34,26 @@ class DataRedactionServiceImpl implements DataRedactionService {
   static final List<RedactionPattern> _defaultPatterns = [
     RedactionPattern(
       name: 'name',
-      pattern: RegExp(r'\\b[A-Z][a-z]+ [A-Z][a-z]+\\b'),
+      pattern: RegExp(r'\b[A-Z][a-z]+ [A-Z][a-z]+\b'),
     ),
     RedactionPattern(
       name: 'email',
-      pattern: RegExp(r'\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\\b'),
+      pattern: RegExp(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b'),
     ),
     RedactionPattern(
       name: 'phone',
-      pattern: RegExp(r'\\b\\d{3}[-.]?\\d{3}[-.]?\\d{4}\\b'),
+      pattern: RegExp(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b'),
     ),
     RedactionPattern(
       name: 'ssn',
-      pattern: RegExp(r'\\b\\d{3}-\\d{2}-\\d{4}\\b'),
+      pattern: RegExp(r'\b\d{3}-\d{2}-\d{4}\b'),
     ),
     RedactionPattern(
       name: 'address',
-      pattern: RegExp(r'\\b\\d+\\s+[A-Za-z0-9\\.\\-\\s]+\\s+(Street|St\\.|Avenue|Ave\\.|Road|Rd\\.|Boulevard|Blvd\\.|Lane|Ln\\.|Drive|Dr\\.)\\b', caseSensitive: false),
+      pattern: RegExp(
+        r'\b\d+\s+[A-Za-z0-9\.\-\s]+\s+(Street|St\.|Avenue|Ave\.|Road|Rd\.|Boulevard|Blvd\.|Lane|Ln\.|Drive|Dr\.)\b',
+        caseSensitive: false,
+      ),
     ),
   ];
 }
