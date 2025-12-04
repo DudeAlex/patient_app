@@ -73,49 +73,49 @@ Create the foundational data models and configuration for security.
 
 Create the rate limiting service.
 
-- [ ] 2.1 Create RateLimiter interface
+- [x] 2.1 Create RateLimiter interface
   - File: `lib/core/ai/chat/security/interfaces/rate_limiter.dart`
   - Methods: checkLimit(), recordRequest(), getQuota(), resetQuotas()
   - _Requirements: 1.1-1.5_
 
-- [ ] 2.2 Create RateLimiterImpl class skeleton
+- [x] 2.2 Create RateLimiterImpl class skeleton
   - File: `lib/core/ai/chat/security/services/rate_limiter_impl.dart`
   - Create class implementing RateLimiter interface
   - Add in-memory storage (Map<String, List<DateTime>>)
   - _Requirements: 1.1-1.5_
 
-- [ ] 2.3 Implement checkLimit() method
+- [x] 2.3 Implement checkLimit() method
   - Count requests in time window
   - Compare against limits (10/min, 100/hr, 500/day)
   - Return RateLimitResult
   - _Requirements: 1.1-1.3_
 
-- [ ] 2.4 Implement recordRequest() method
+- [x] 2.4 Implement recordRequest() method
   - Add timestamp to user's request list
   - Store userId → List<DateTime>
   - _Requirements: 1.1-1.3_
 
-- [ ] 2.5 Implement getQuota() method
+- [x] 2.5 Implement getQuota() method
   - Calculate remaining quota for each time window
   - Return RateLimitQuota
   - _Requirements: 1.4, 2.3_
 
-- [ ] 2.6 Implement automatic cleanup
+- [x] 2.6 Implement automatic cleanup
   - Remove timestamps older than 24 hours
   - Run cleanup periodically
   - _Requirements: 1.1-1.3_
 
-- [ ] 2.7 Implement soft limit warnings
+- [x] 2.7 Implement soft limit warnings
   - Check if usage > 80% or > 90%
   - Add warning message to RateLimitResult
   - _Requirements: 2.1-2.2_
 
-- [ ] 2.8 Implement resetQuotas() method
+- [x] 2.8 Implement resetQuotas() method
   - Clear all stored timestamps
   - Called at midnight UTC
   - _Requirements: 2.4_
 
-- [ ] 2.9 Write RateLimiter tests
+- [x] 2.9 Write RateLimiter tests
   - File: `test/core/ai/chat/security/services/rate_limiter_test.dart`
   - Test quota enforcement
   - Test soft limits
