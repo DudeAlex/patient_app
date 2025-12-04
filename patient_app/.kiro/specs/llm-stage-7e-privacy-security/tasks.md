@@ -33,28 +33,28 @@ This implementation plan breaks down Stage 7e (Privacy & Security) into detailed
 
 Create the foundational data models and configuration for security.
 
-- [ ] 1.1 Create RateLimitConfig model
+- [x] 1.1 Create RateLimitConfig model
   - File: `lib/core/ai/chat/security/models/rate_limit_config.dart`
   - Fields: perMinute, perHour, perDay, softLimitThreshold, warningThreshold
   - _Requirements: 1.1-1.3, 2.1-2.2_
 
-- [ ] 1.2 Create SecurityConfig model
+- [x] 1.2 Create SecurityConfig model
   - File: `lib/core/ai/chat/security/models/security_config.dart`
   - Fields: httpsOnly, requireAuth, tokenExpiry, rateLimits, redactionPatterns, maxMessageLength
   - _Requirements: All_
 
-- [ ] 1.3 Create RedactionPattern model
+- [x] 1.3 Create RedactionPattern model
   - File: `lib/core/ai/chat/security/models/redaction_pattern.dart`
   - Fields: name, pattern (RegExp), replacement, enabled
   - _Requirements: 3.1-3.5, 4.1-4.5_
 
-- [ ] 1.4 Create SecurityEvent model
+- [x] 1.4 Create SecurityEvent model
   - File: `lib/core/ai/chat/security/models/security_event.dart`
   - Fields: type, userId, timestamp, metadata
   - Enum: SecurityEventType
   - _Requirements: 10.1-10.5_
 
-- [ ] 1.5 Create RateLimitResult and RateLimitQuota models
+- [x] 1.5 Create RateLimitResult and RateLimitQuota models
   - File: `lib/core/ai/chat/security/models/rate_limit_result.dart`
   - _Requirements: 1.4, 2.3_
 
