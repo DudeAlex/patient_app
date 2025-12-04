@@ -402,6 +402,55 @@ Add HTTPS enforcement middleware to backend.
   - Test development mode
   - _Requirements: 7.1-7.5_
 
+### Task 6: Implement authentication service
+
+- [x] 6.1 Create AuthenticationService interface
+  - File: `lib/core/ai/chat/security/interfaces/authentication_service.dart`
+  - Methods: validateToken(), generateToken(), revokeToken()
+  - _Requirements: 8.1-8.5_
+
+- [x] 6.2 Create AuthenticationServiceImpl class skeleton
+  - File: `lib/core/ai/chat/security/services/authentication_service_impl.dart`
+  - Create class implementing AuthenticationService interface
+  - Add revocation list storage (Set<String>)
+  - _Requirements: 8.1-8.5_
+
+- [x] 6.3 Implement generateToken() method
+  - Create JWT-like payload with userId, expiry, roles
+  - Sign token with secret key
+  - Return token string
+  - _Requirements: 8.1, 8.2_
+
+- [x] 6.4 Implement validateToken() method - basic validation
+  - Parse token
+  - Verify signature
+  - Return AuthResult
+  - _Requirements: 8.1, 8.4_
+
+- [x] 6.5 Implement validateToken() method - expiry check
+  - Check if token is expired
+  - Compare expiry with current time
+  - Return isValid = false if expired
+  - _Requirements: 8.3_
+
+- [x] 6.6 Implement validateToken() method - revocation check
+  - Check if token is in revocation list
+  - Return isValid = false if revoked
+  - _Requirements: 8.5_
+
+- [x] 6.7 Implement revokeToken() method
+  - Add token to revocation list
+  - Log revocation event
+  - _Requirements: 8.5_
+
+- [x] 6.8 Write AuthenticationService tests
+  - File: `test/core/ai/chat/security/services/authentication_service_test.dart`
+  - Test token generation
+  - Test token validation
+  - Test expiry
+  - Test revocation
+  - _Requirements: 8.1-8.5_
+
 ---
 
 ## Checkpoint 5: Commit HTTPS enforcement
