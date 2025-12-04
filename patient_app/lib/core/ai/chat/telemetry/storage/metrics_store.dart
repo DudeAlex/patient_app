@@ -1,4 +1,3 @@
-import 'package:patient_app/core/ai/chat/telemetry/models/metric_data_point.dart';
 import 'package:patient_app/core/ai/chat/telemetry/storage/time_series_buffer.dart';
 
 /// Central in-memory store for telemetry metrics with simple capacity controls.

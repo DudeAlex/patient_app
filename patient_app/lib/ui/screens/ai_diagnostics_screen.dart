@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/ai/ai_providers.dart';
-import '../../core/ai/models/ai_call_log_entry.dart';
+import 'package:patient_app/core/ai/ai_providers.dart';
+import 'package:patient_app/core/ai/models/ai_call_log_entry.dart';
 
 class AiDiagnosticsScreen extends ConsumerStatefulWidget {
   const AiDiagnosticsScreen({super.key});
@@ -85,7 +85,8 @@ class _AiDiagnosticsScreenState extends ConsumerState<AiDiagnosticsScreen> {
                         padding: const EdgeInsets.all(16),
                         itemBuilder: (_, index) =>
                             _AiCallTile(entry: filtered[index]),
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        separatorBuilder: (_, index) =>
+                            const SizedBox(height: 12),
                         itemCount: filtered.length,
                       ),
               ),

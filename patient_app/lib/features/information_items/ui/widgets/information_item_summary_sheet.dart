@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/ai/ai_providers.dart';
-import '../../../../core/ai/models/ai_summary_result.dart';
-import '../../../../core/domain/entities/information_item.dart';
-import '../../../records/domain/entities/record.dart';
-import '../../application/use_cases/summarize_information_item_use_case.dart';
+import 'package:patient_app/core/ai/ai_providers.dart';
+import 'package:patient_app/core/ai/models/ai_summary_result.dart';
+import 'package:patient_app/features/information_items/application/use_cases/summarize_information_item_use_case.dart';
+import 'package:patient_app/features/records/domain/entities/record.dart';
 
 /// Bottom sheet that displays AI-generated summaries for an Information Item.
 class InformationItemSummarySheet extends ConsumerStatefulWidget {
@@ -43,7 +42,7 @@ class _InformationItemSummarySheetState
         consentRepository: consentRepo,
       );
       final item = widget.record.toItem;
-      final result = await useCase.execute(item as InformationItem);
+      final result = await useCase.execute(item);
       if (!mounted) return;
       setState(() {
         _result = result;

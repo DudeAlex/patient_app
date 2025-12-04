@@ -35,14 +35,14 @@ class GradientButton extends StatelessWidget {
   final Gradient? gradient;
 
   const GradientButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
     this.isLoading = false,
     this.icon,
     this.expanded = true,
     this.gradient,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -122,13 +122,13 @@ class SecondaryButton extends StatelessWidget {
   final bool expanded;
 
   const SecondaryButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
     this.isLoading = false,
     this.icon,
     this.expanded = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

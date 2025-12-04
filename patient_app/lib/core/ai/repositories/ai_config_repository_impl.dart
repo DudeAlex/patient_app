@@ -2,10 +2,9 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
+import 'package:patient_app/core/ai/ai_config.dart';
+import 'package:patient_app/core/ai/repositories/ai_config_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../ai/ai_config.dart';
-import 'ai_config_repository.dart';
 
 class AiConfigRepositoryImpl implements AiConfigRepository {
   AiConfigRepositoryImpl(this._preferences);

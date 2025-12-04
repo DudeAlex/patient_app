@@ -7,7 +7,7 @@ import '../models/date_range.dart';
 /// Provides stage-specific settings for record limits, date ranges, and token budgets.
 @immutable
 class ContextConfig {
-  ContextConfig({
+  const ContextConfig({
     required this.maxRecordsStage3,
     required this.maxRecordsStage4,
     required this.defaultDateRange,

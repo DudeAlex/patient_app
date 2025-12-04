@@ -18,7 +18,6 @@ import '../features/records/ui/records_home_state.dart';
 import '../features/spaces/domain/space_registry.dart';
 import '../features/spaces/providers/space_provider.dart';
 import '../features/spaces/ui/onboarding_screen.dart';
-import 'settings/settings_screen.dart';
 import 'theme/app_theme.dart';
 
 /// App lifecycle observer for logging state changes and handling shutdown

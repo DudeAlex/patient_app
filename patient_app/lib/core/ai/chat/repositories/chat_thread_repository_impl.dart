@@ -7,9 +7,9 @@ import 'package:patient_app/core/ai/chat/models/chat_message.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
+import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/models/ai_error.dart';
 import 'package:patient_app/core/diagnostics/app_logger.dart';
-import 'chat_thread_repository.dart';
 
 class ChatThreadRepositoryImpl implements ChatThreadRepository {
   final Isar _isar;

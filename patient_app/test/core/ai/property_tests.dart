@@ -21,15 +21,16 @@ import 'package:patient_app/core/ai/chat/models/chat_request.dart';
 import 'package:patient_app/core/ai/chat/models/chat_response.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
 import 'package:patient_app/core/ai/chat/models/record_summary.dart';
+import 'package:patient_app/core/ai/chat/models/date_range.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/repositories/chat_thread_repository.dart';
 import 'package:patient_app/core/ai/chat/services/message_attachment_handler.dart';
 import 'package:patient_app/core/ai/chat/services/message_queue_service.dart';
 import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
-import 'package:patient_app/core/ai/exceptions/ai_exceptions.dart';
 import 'package:patient_app/core/ai/chat/logging_ai_chat_service.dart';
 import 'package:patient_app/core/ai/repositories/ai_call_log_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'chat/fakes/fake_token_budget_allocator.dart';
 import 'package:uuid/uuid.dart';
 
@@ -341,7 +342,8 @@ void main() {
         final content = 'msg_${rand.nextInt(1000)}';
         final aiMsg = await useCase.execute(
           threadId: threadId,
-          spaceContext: SpaceContext(
+          spaceId: 'space_${i % 3}',
+          spaceContextOverride: SpaceContext(
             spaceId: 'space_${i % 3}',
             spaceName: 'Space',
             description: 'Test space',
@@ -402,6 +404,9 @@ void main() {
         createdAt: DateTime(2025, 1, 1),
       ));
 
+      SharedPreferences.setMockInitialValues(const {});
+      final prefs = await SharedPreferences.getInstance();
+
       final failingUseCase = SendChatMessageUseCase(
         aiChatService: _StubChatService(
           ChatResponse.success(messageContent: 'ok'),
@@ -425,6 +430,7 @@ void main() {
       final queue = MessageQueueService(
         sendChatMessageUseCase: failingUseCase,
         chatThreadRepository: repo,
+        preferences: prefs,
       );
 
       await queue.enqueue(

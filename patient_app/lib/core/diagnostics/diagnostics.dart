@@ -1,8 +1,5 @@
-/// Public API for the diagnostic system.
-/// 
-/// Import this file to access logging functionality throughout the app.
-library diagnostics;
-
+// Public API for the diagnostic system.
+// Import this file to access logging functionality throughout the app.
 // Main API
 export 'app_logger.dart';
 export 'diagnostic_system.dart';

@@ -27,10 +27,10 @@ class SpaceSwitcherButton extends StatelessWidget {
   final String? tooltip;
 
   const SpaceSwitcherButton({
-    Key? key,
+    super.key,
     required this.onPressed,
     this.tooltip,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

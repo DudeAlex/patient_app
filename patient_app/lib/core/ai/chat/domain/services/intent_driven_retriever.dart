@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:patient_app/core/ai/chat/domain/services/relevance_scorer.dart';
 import 'package:patient_app/core/ai/chat/domain/services/privacy_filter.dart';
 import 'package:patient_app/core/ai/chat/models/query_analysis.dart';

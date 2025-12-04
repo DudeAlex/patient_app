@@ -62,7 +62,7 @@ class GradientHeader extends StatelessWidget {
   final bool useSafeArea;
 
   const GradientHeader({
-    Key? key,
+    super.key,
     required this.title,
     this.subtitle,
     this.space,
@@ -71,7 +71,7 @@ class GradientHeader extends StatelessWidget {
     this.child,
     this.bottomPadding = 32,
     this.useSafeArea = true,
-  }) : super(key: key);
+  });
 
   /// Creates a GradientHeader from a Space object
   /// 
@@ -92,9 +92,9 @@ class GradientHeader extends StatelessWidget {
       space: space,
       onBackPressed: onBackPressed,
       actions: actions,
-      child: child,
       bottomPadding: bottomPadding,
       useSafeArea: useSafeArea,
+      child: child,
     );
   }
 
@@ -206,11 +206,11 @@ class GradientHeaderActionButton extends StatelessWidget {
   final String? tooltip;
 
   const GradientHeaderActionButton({
-    Key? key,
+    super.key,
     required this.icon,
     required this.onPressed,
     this.tooltip,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

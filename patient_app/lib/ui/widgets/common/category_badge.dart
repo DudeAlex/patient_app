@@ -18,10 +18,10 @@ class CategoryBadge extends StatelessWidget {
   final CategoryBadgeSize size;
 
   const CategoryBadge({
-    Key? key,
+    super.key,
     required this.category,
     this.size = CategoryBadgeSize.medium,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

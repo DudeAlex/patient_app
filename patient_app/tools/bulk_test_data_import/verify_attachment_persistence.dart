@@ -6,8 +6,8 @@ import 'dart:io';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../lib/features/records/adapters/storage/record_isar_model.dart';
-import '../lib/features/records/model/attachment.dart';
+import 'package:patient_app/features/records/adapters/storage/record_isar_model.dart';
+import 'package:patient_app/features/records/model/attachment.dart';
 
 /// Utility to inspect and verify attachment persistence in the database.
 /// 

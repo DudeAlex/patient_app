@@ -1,5 +1,6 @@
 name: patient_app
 description: A new Flutter project.
+publish_to: "none"
 
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.

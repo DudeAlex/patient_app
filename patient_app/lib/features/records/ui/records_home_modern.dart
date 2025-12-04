@@ -6,20 +6,20 @@ import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:provider/provider.dart';
 
-import '../../../core/ai/ai_config.dart';
-import '../../../core/ai/repositories/ai_config_repository.dart';
-import '../../../core/diagnostics/app_logger.dart';
-import '../../../core/di/app_container.dart';
-import '../../../ui/settings/settings_screen.dart';
-import '../../../ui/theme/app_colors.dart';
-import '../../../ui/theme/app_text_styles.dart';
-import '../../../ui/widgets/common/gradient_header.dart';
-import '../../ai_chat/ui/screens/ai_chat_screen.dart';
-import '../../spaces/providers/space_provider.dart';
-import '../../spaces/ui/space_selector_screen.dart';
-import '../domain/entities/record.dart';
-import 'record_detail_screen.dart';
-import 'records_home_state.dart';
+import 'package:patient_app/core/ai/ai_config.dart';
+import 'package:patient_app/core/ai/repositories/ai_config_repository.dart';
+import 'package:patient_app/core/diagnostics/app_logger.dart';
+import 'package:patient_app/core/di/app_container.dart';
+import 'package:patient_app/features/ai_chat/ui/screens/ai_chat_screen.dart';
+import 'package:patient_app/features/records/domain/entities/record.dart';
+import 'package:patient_app/features/records/ui/record_detail_screen.dart';
+import 'package:patient_app/features/records/ui/records_home_state.dart';
+import 'package:patient_app/features/spaces/providers/space_provider.dart';
+import 'package:patient_app/features/spaces/ui/space_selector_screen.dart';
+import 'package:patient_app/ui/settings/settings_screen.dart';
+import 'package:patient_app/ui/theme/app_colors.dart';
+import 'package:patient_app/ui/theme/app_text_styles.dart';
+import 'package:patient_app/ui/widgets/common/gradient_header.dart';
 
 /// Modern redesigned records list with gradient header and card-based layout.
 /// 

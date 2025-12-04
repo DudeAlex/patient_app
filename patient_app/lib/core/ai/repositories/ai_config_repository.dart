@@ -1,4 +1,4 @@
-import '../../ai/ai_config.dart';
+import 'package:patient_app/core/ai/ai_config.dart';
 
 /// Persists high-level AI configuration flags (enabled/mode/urls).
 abstract class AiConfigRepository {

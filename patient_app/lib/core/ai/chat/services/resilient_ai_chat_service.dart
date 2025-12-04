@@ -315,7 +315,8 @@ class ResilientAiChatService implements AiChatService {
     required ChatResponse response,
     required Duration totalLatency,
   }) async {
-    if (_telemetryCollector == null || requestId == null) return;
+    final collector = _telemetryCollector;
+    if (collector == null || requestId == null) return;
     final contextAssemblyTime = _contextAssemblyTime(request);
     final llmCallTime = Duration(milliseconds: response.metadata.latencyMs);
 
@@ -325,7 +326,7 @@ class ResilientAiChatService implements AiChatService {
       promptTokens = response.metadata.tokensUsed;
     }
 
-    await _telemetryCollector!.completeRequest(
+    await collector.completeRequest(
       requestId: requestId,
       totalLatency: totalLatency + contextAssemblyTime,
       contextAssemblyTime: contextAssemblyTime,
@@ -341,8 +342,9 @@ class ResilientAiChatService implements AiChatService {
     required String errorType,
     required String message,
   }) async {
-    if (_telemetryCollector == null || requestId == null) return;
-    await _telemetryCollector!.recordError(
+    final collector = _telemetryCollector;
+    if (collector == null || requestId == null) return;
+    await collector.recordError(
       requestId: requestId,
       errorType: errorType,
       errorMessage: message,

@@ -2,7 +2,6 @@ import 'models/log_config.dart';
 import 'models/environment_context.dart';
 import 'models/crash_info.dart';
 import 'services/logger_service.dart';
-import 'services/privacy_filter.dart';
 import 'services/crash_detector.dart';
 import 'writers/log_writer.dart';
 import 'writers/console_log_writer.dart';

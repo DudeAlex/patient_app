@@ -10,7 +10,7 @@ import '../widgets/common/category_badge.dart';
 /// This screen demonstrates all the design elements from the Figma design
 /// including colors, typography, buttons, badges, and layouts.
 class DesignShowcaseScreen extends StatelessWidget {
-  const DesignShowcaseScreen({Key? key}) : super(key: key);
+  const DesignShowcaseScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

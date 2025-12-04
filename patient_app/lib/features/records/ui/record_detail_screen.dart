@@ -3,18 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/ai/ai_config.dart';
-import '../../../core/ai/repositories/ai_config_repository.dart';
-import '../../../core/diagnostics/app_logger.dart';
-import '../../../core/di/app_container.dart';
-import '../../information_items/ui/widgets/information_item_summary_sheet.dart';
-import '../../ai_chat/ui/screens/ai_chat_screen.dart';
-import '../model/attachment.dart';
-import '../model/record_types.dart';
-import '../domain/entities/record.dart';
-import 'add_record_screen.dart';
-import 'records_home_state.dart';
-import '../../spaces/providers/space_provider.dart';
+import 'package:patient_app/core/ai/ai_config.dart';
+import 'package:patient_app/core/ai/repositories/ai_config_repository.dart';
+import 'package:patient_app/core/diagnostics/app_logger.dart';
+import 'package:patient_app/core/di/app_container.dart';
+import 'package:patient_app/features/ai_chat/ui/screens/ai_chat_screen.dart';
+import 'package:patient_app/features/information_items/ui/widgets/information_item_summary_sheet.dart';
+import 'package:patient_app/features/records/domain/entities/record.dart';
+import 'package:patient_app/features/records/model/attachment.dart';
+import 'package:patient_app/features/records/model/record_types.dart';
+import 'package:patient_app/features/records/ui/add_record_screen.dart';
+import 'package:patient_app/features/records/ui/records_home_state.dart';
+import 'package:patient_app/features/spaces/providers/space_provider.dart';
 
 /// Temporary detail screen that shows the core fields for the selected record.
 /// This keeps navigation wiring incremental while the full detail design is
@@ -119,7 +119,6 @@ class _RecordDetailScreenState extends State<RecordDetailScreen> {
     final dateTimeFormatter = DateFormat.yMMMMd().add_jm();
     final aiConfigRepository =
         AppContainer.instance.resolve<AiConfigRepository>();
-    final spaceProvider = context.watch<SpaceProvider>();
     final spaceId = record.spaceId;
 
     return Scaffold(

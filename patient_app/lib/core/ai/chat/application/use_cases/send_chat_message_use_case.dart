@@ -8,7 +8,6 @@ import 'package:patient_app/core/ai/chat/models/message_attachment.dart';
 import 'package:patient_app/core/ai/chat/models/space_context.dart';
 import 'package:patient_app/core/ai/chat/models/context_filters.dart';
 import 'package:patient_app/core/ai/chat/models/date_range.dart';
-import 'package:patient_app/core/ai/chat/models/token_allocation.dart';
 import 'package:patient_app/core/ai/chat/context/token_budget_allocator.dart';
 import 'package:patient_app/core/ai/chat/application/interfaces/space_context_builder.dart';
 import 'package:patient_app/core/ai/chat/models/chat_thread.dart';
