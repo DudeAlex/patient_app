@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:patient_app/core/ai/chat/ai_chat_service.dart';
 import 'package:patient_app/core/ai/chat/exceptions/chat_exceptions.dart';
@@ -42,6 +43,8 @@ class HttpAiChatService implements AiChatService {
   final Random _random = Random();
   final Duration Function(int attempt)? backoffCalculator;
   final void Function(Duration delay)? backoffObserver;
+  static const bool _logContent =
+      kDebugMode || const bool.fromEnvironment('DEBUG_AI_LOGS', defaultValue: false);
 
   @override
   Future<ChatResponse> sendMessage(ChatRequest request) async {
@@ -64,7 +67,7 @@ class HttpAiChatService implements AiChatService {
               'threadId': request.threadId,
               'endpoint': uri.toString(),
               'attempt': attempt,
-              'userMessage': request.messageContent, // Log user message in dev
+              if (_logContent) 'userMessage': request.messageContent,
               'messageLength': request.messageContent.length,
               'attachments': request.attachments.length,
               'stage': 1,
@@ -98,7 +101,7 @@ class HttpAiChatService implements AiChatService {
                 'provider': chatResponse.metadata.provider,
                 'latencyMs': latency,
                 'tokensUsed': chatResponse.metadata.tokensUsed,
-                'responseContent': chatResponse.messageContent, // Log actual response in dev
+                if (_logContent) 'responseContent': chatResponse.messageContent,
                 'responseLength': chatResponse.messageContent.length,
                 'actionHints': chatResponse.actionHints,
               },

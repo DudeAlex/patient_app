@@ -31,7 +31,7 @@ Stage 7b adds end-to-end telemetry for AI chat: request/latency/token tracking, 
 - Aggregation: `lib/core/ai/chat/telemetry/services/metrics_aggregation_service_impl.dart`
 - Alerts: `lib/core/ai/chat/telemetry/services/alert_monitoring_service_impl.dart`
 - DI wiring: `lib/core/di/bootstrap.dart`
-- Dashboard API: `server/src/telemetry/metrics_controller.js`
+- Dashboard API (Node, in-memory): `server/src/telemetry/metrics_controller.js` + `metrics_service.js` ingest chat endpoint traffic (counts, latency, tokens, errors, cache flag) and expose `/api/metrics/*`. Data is ephemeral (capped buffer, no PII stored) and resets on server restart.
 
 ## Configuration
 - **Memory budget:** `MetricsStore.totalMemoryBudgetBytes` (default 50MB); `bytesPerPointEstimate` (128B) and `maxDataPointsPerBuffer` control capacity.

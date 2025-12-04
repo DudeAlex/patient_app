@@ -45,4 +45,30 @@ metricsRouter.get('/alerts', (req, res) => {
   res.json({ alerts: data });
 });
 
+// POST /api/metrics/simulate
+// Helper endpoint for manual testing: injects synthetic samples (no PII).
+metricsRouter.post('/simulate', (req, res) => {
+  const {
+    count = 1,
+    latencyMs = 100,
+    promptTokens = 0,
+    completionTokens = 0,
+    errorType = null,
+    cacheHit = null,
+  } = req.body ?? {};
+
+  const samples = Math.max(1, Math.min(Number(count) || 1, 1000));
+  for (let i = 0; i < samples; i++) {
+    aggregation.recordSample({
+      latencyMs,
+      promptTokens,
+      completionTokens,
+      errorType,
+      cacheHit,
+    });
+  }
+  alerts.evaluateAndRecord();
+  res.json({ added: samples });
+});
+
 export { metricsRouter, aggregation, alerts };

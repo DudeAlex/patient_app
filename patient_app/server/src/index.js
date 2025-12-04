@@ -6,7 +6,7 @@ import { buildPrompt } from './llm/prompt_template.js';
 import { formatHistory } from './llm/history_manager.js';
 import { TogetherClient } from './llm/together_client.js';
 import { rateLimiter } from './middleware/rate_limiter.js';
-import { metricsRouter } from './telemetry/metrics_controller.js';
+import { metricsRouter, aggregation, alerts } from './telemetry/metrics_controller.js';
 import { PersonaManager } from './llm/persona_manager.js';
 
 dotenv.config();
@@ -87,6 +87,8 @@ app.post('/api/v1/chat/echo', (req, res) => {
 app.post('/api/v1/chat/message', async (req, res) => {
   const { message, history = [], maxTokens = 1000, spaceContext = {} } = req.body ?? {};
 
+  const startedAt = Date.now();
+
   if (!message || typeof message !== 'string' || !message.trim()) {
     return res.status(400).json({
       error: {
@@ -143,7 +145,7 @@ app.post('/api/v1/chat/message', async (req, res) => {
       maxTokens,
     });
 
-    return res.json({
+    const result = {
       message: response.message,
       metadata: {
         finishReason: response.finishReason,
@@ -152,9 +154,28 @@ app.post('/api/v1/chat/message', async (req, res) => {
         correlationId: response.correlationId,
         latencyMs: response.latencyMs,
       },
+    };
+
+    aggregation.recordSample({
+      latencyMs: Date.now() - startedAt,
+      promptTokens: response?.usage?.prompt_tokens ?? 0,
+      completionTokens: response?.usage?.completion_tokens ?? 0,
+      cacheHit: false,
+      errorType: null,
     });
+    alerts.evaluateAndRecord();
+
+    return res.json(result);
   } catch (error) {
     const status = error.status || 502;
+    aggregation.recordSample({
+      latencyMs: Date.now() - startedAt,
+      promptTokens: 0,
+      completionTokens: 0,
+      cacheHit: false,
+      errorType: error.code || 'LLM_ERROR',
+    });
+    alerts.evaluateAndRecord();
     return res.status(status).json({
       error: {
         code: error.code || 'LLM_ERROR',
