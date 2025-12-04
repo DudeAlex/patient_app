@@ -6,6 +6,7 @@ import { buildPrompt } from './llm/prompt_template.js';
 import { formatHistory } from './llm/history_manager.js';
 import { TogetherClient } from './llm/together_client.js';
 import { rateLimiter } from './middleware/rate_limiter.js';
+import { httpsEnforcer } from './security/https_enforcer.js';
 import { PersonaManager } from './llm/persona_manager.js';
 
 dotenv.config();
@@ -14,6 +15,9 @@ const app = express();
 const port = process.env.PORT || 3030;
 
 app.use(express.json());
+
+// Enforce HTTPS unless explicitly disabled for development.
+app.use(httpsEnforcer);
 
 // Initialize PersonaManager
 const personaManager = new PersonaManager();

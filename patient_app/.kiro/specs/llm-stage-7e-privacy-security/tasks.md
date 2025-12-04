@@ -379,23 +379,23 @@ Create the input validation service.
 
 Add HTTPS enforcement middleware to backend.
 
-- [ ] 5.1 Create HTTPS enforcer middleware
+- [x] 5.1 Create HTTPS enforcer middleware
   - File: `server/src/security/https_enforcer.js`
   - Check if request is HTTPS
   - Reject HTTP requests with 403
   - _Requirements: 7.1-7.2_
 
-- [ ] 5.2 Add development mode support
+- [x] 5.2 Add development mode support
   - Allow HTTP in development
   - Environment variable: HTTPS_ONLY
   - _Requirements: 7.1_
 
-- [ ] 5.3 Add reverse proxy support
+- [x] 5.3 Add reverse proxy support
   - Check x-forwarded-proto header
   - Support for load balancers
   - _Requirements: 7.1_
 
-- [ ] 5.4 Write HTTPS enforcer tests
+- [x] 5.4 Write HTTPS enforcer tests
   - File: `server/test/security/https_enforcer.test.js`
   - Test HTTPS acceptance
   - Test HTTP rejection
