@@ -116,6 +116,67 @@ Create the rate limiting service.
   - _Requirements: 2.4_
 
 - [x] 2.9 Write RateLimiter tests
+
+### Task 3: Implement data redaction service
+
+- [x] 3.1 Create DataRedactionService interface
+  - File: `lib/core/ai/chat/security/interfaces/data_redaction_service.dart`
+  - Methods: redact(), addPattern(), containsSensitiveData()
+  - _Requirements: 3.1-3.5, 4.1-4.5_
+
+- [x] 3.2 Create DataRedactionServiceImpl class skeleton
+  - File: `lib/core/ai/chat/security/services/data_redaction_service_impl.dart`
+  - Create class implementing DataRedactionService interface
+  - Add List<RedactionPattern> storage
+  - _Requirements: 3.1-3.5_
+
+- [x] 3.3 Add name redaction pattern
+  - Pattern: `\b[A-Z][a-z]+ [A-Z][a-z]+\b`
+  - Test with sample names
+  - _Requirements: 3.1_
+
+- [x] 3.4 Add email redaction pattern
+  - Pattern: `\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b`
+  - Test with sample emails
+  - _Requirements: 3.2_
+
+- [x] 3.5 Add phone redaction pattern
+  - Pattern: `\b\d{3}[-.]?\d{3}[-.]?\d{4}\b`
+  - Test with sample phone numbers
+  - _Requirements: 3.3_
+
+- [x] 3.6 Add SSN redaction pattern
+  - Pattern: `\b\d{3}-\d{2}-\d{4}\b`
+  - Test with sample SSNs
+  - _Requirements: 3.4_
+
+- [x] 3.7 Add address redaction pattern
+  - Pattern for street addresses
+  - Test with sample addresses
+  - _Requirements: 3.5_
+
+- [x] 3.8 Implement redact() method
+  - Apply all patterns to input text
+  - Replace matches with [REDACTED]
+  - Return redacted text
+  - _Requirements: 3.1-3.5, 4.2_
+
+- [x] 3.9 Implement addPattern() method
+  - Add custom pattern to list
+  - Validate pattern is valid regex
+  - _Requirements: 4.1, 4.3_
+
+- [x] 3.10 Implement containsSensitiveData() method
+  - Check if text matches any pattern
+  - Return boolean
+  - _Requirements: 4.4_
+
+- [x] 3.11 Write DataRedactionService tests
+  - File: `test/core/ai/chat/security/services/data_redaction_service_test.dart`
+  - Test each PII type
+  - Test custom patterns
+  - Test edge cases
+  - _Requirements: 3.1-3.5, 4.1-4.5_
   - File: `test/core/ai/chat/security/services/rate_limiter_test.dart`
   - Test quota enforcement
   - Test soft limits
