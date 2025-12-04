@@ -6,7 +6,7 @@ This implementation plan breaks down Stage 7e (Privacy & Security) into detailed
 
 **Task Breakdown:**
 - **Main Tasks:** 10 task groups
-- **Total Subtasks:** 50+ individual coding tasks
+- **Total Subtasks:** 80+ individual coding tasks (broken down for clarity)
 
 **Important Notes:**
 - Each task builds on previous tasks
@@ -78,24 +78,44 @@ Create the rate limiting service.
   - Methods: checkLimit(), recordRequest(), getQuota(), resetQuotas()
   - _Requirements: 1.1-1.5_
 
-- [ ] 2.2 Implement RateLimiterImpl
+- [ ] 2.2 Create RateLimiterImpl class skeleton
   - File: `lib/core/ai/chat/security/services/rate_limiter_impl.dart`
-  - In-memory storage with sliding window
-  - Track requests per user per time window
+  - Create class implementing RateLimiter interface
+  - Add in-memory storage (Map<String, List<DateTime>>)
   - _Requirements: 1.1-1.5_
 
-- [ ] 2.3 Implement quota tracking
-  - Track per-minute, per-hour, per-day quotas
-  - Sliding window algorithm
-  - Automatic cleanup of old timestamps
+- [ ] 2.3 Implement checkLimit() method
+  - Count requests in time window
+  - Compare against limits (10/min, 100/hr, 500/day)
+  - Return RateLimitResult
   - _Requirements: 1.1-1.3_
 
-- [ ] 2.4 Implement soft limit warnings
-  - Check 80% and 90% thresholds
-  - Return warning messages
+- [ ] 2.4 Implement recordRequest() method
+  - Add timestamp to user's request list
+  - Store userId → List<DateTime>
+  - _Requirements: 1.1-1.3_
+
+- [ ] 2.5 Implement getQuota() method
+  - Calculate remaining quota for each time window
+  - Return RateLimitQuota
+  - _Requirements: 1.4, 2.3_
+
+- [ ] 2.6 Implement automatic cleanup
+  - Remove timestamps older than 24 hours
+  - Run cleanup periodically
+  - _Requirements: 1.1-1.3_
+
+- [ ] 2.7 Implement soft limit warnings
+  - Check if usage > 80% or > 90%
+  - Add warning message to RateLimitResult
   - _Requirements: 2.1-2.2_
 
-- [ ] 2.5 Write RateLimiter tests
+- [ ] 2.8 Implement resetQuotas() method
+  - Clear all stored timestamps
+  - Called at midnight UTC
+  - _Requirements: 2.4_
+
+- [ ] 2.9 Write RateLimiter tests
   - File: `test/core/ai/chat/security/services/rate_limiter_test.dart`
   - Test quota enforcement
   - Test soft limits
@@ -107,7 +127,7 @@ Create the rate limiting service.
 ## Checkpoint 2: Commit rate limiter
 
 **Actions Required:**
-1. Mark tasks 2.1-2.5 as complete [x]
+1. Mark tasks 2.1-2.9 as complete [x]
 2. Commit: `git commit -m "feat(stage7e): Add rate limiting service"`
 3. STOP and ask user before continuing
 
@@ -122,25 +142,54 @@ Create the PII redaction service.
   - Methods: redact(), addPattern(), containsSensitiveData()
   - _Requirements: 3.1-3.5, 4.1-4.5_
 
-- [ ] 3.2 Implement DataRedactionServiceImpl
+- [ ] 3.2 Create DataRedactionServiceImpl class skeleton
   - File: `lib/core/ai/chat/security/services/data_redaction_service_impl.dart`
-  - Pre-configured patterns for names, emails, phones, SSNs, addresses
-  - Pattern matching and replacement
+  - Create class implementing DataRedactionService interface
+  - Add List<RedactionPattern> storage
   - _Requirements: 3.1-3.5_
 
-- [ ] 3.3 Add default redaction patterns
-  - Names: `\b[A-Z][a-z]+ [A-Z][a-z]+\b`
-  - Emails: `\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b`
-  - Phones: `\b\d{3}[-.]?\d{3}[-.]?\d{4}\b`
-  - SSNs: `\b\d{3}-\d{2}-\d{4}\b`
-  - _Requirements: 3.1-3.5_
+- [ ] 3.3 Add name redaction pattern
+  - Pattern: `\b[A-Z][a-z]+ [A-Z][a-z]+\b`
+  - Test with sample names
+  - _Requirements: 3.1_
 
-- [ ] 3.4 Implement custom pattern support
-  - Load patterns from configuration
-  - Add/remove patterns dynamically
-  - _Requirements: 4.1-4.3_
+- [ ] 3.4 Add email redaction pattern
+  - Pattern: `\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b`
+  - Test with sample emails
+  - _Requirements: 3.2_
 
-- [ ] 3.5 Write DataRedactionService tests
+- [ ] 3.5 Add phone redaction pattern
+  - Pattern: `\b\d{3}[-.]?\d{3}[-.]?\d{4}\b`
+  - Test with sample phone numbers
+  - _Requirements: 3.3_
+
+- [ ] 3.6 Add SSN redaction pattern
+  - Pattern: `\b\d{3}-\d{2}-\d{4}\b`
+  - Test with sample SSNs
+  - _Requirements: 3.4_
+
+- [ ] 3.7 Add address redaction pattern
+  - Pattern for street addresses
+  - Test with sample addresses
+  - _Requirements: 3.5_
+
+- [ ] 3.8 Implement redact() method
+  - Apply all patterns to input text
+  - Replace matches with [REDACTED]
+  - Return redacted text
+  - _Requirements: 3.1-3.5, 4.2_
+
+- [ ] 3.9 Implement addPattern() method
+  - Add custom pattern to list
+  - Validate pattern is valid regex
+  - _Requirements: 4.1, 4.3_
+
+- [ ] 3.10 Implement containsSensitiveData() method
+  - Check if text matches any pattern
+  - Return boolean
+  - _Requirements: 4.4_
+
+- [ ] 3.11 Write DataRedactionService tests
   - File: `test/core/ai/chat/security/services/data_redaction_service_test.dart`
   - Test each PII type
   - Test custom patterns
@@ -152,7 +201,7 @@ Create the PII redaction service.
 ## Checkpoint 3: Commit data redaction
 
 **Actions Required:**
-1. Mark tasks 3.1-3.5 as complete [x]
+1. Mark tasks 3.1-3.11 as complete [x]
 2. Commit: `git commit -m "feat(stage7e): Add data redaction service"`
 3. STOP and ask user before continuing
 
@@ -167,24 +216,50 @@ Create the input validation service.
   - Methods: validateMessage(), validateSpaceId(), sanitize()
   - _Requirements: 6.1-6.5_
 
-- [ ] 4.2 Implement InputValidatorImpl
+- [ ] 4.2 Create InputValidatorImpl class skeleton
   - File: `lib/core/ai/chat/security/services/input_validator_impl.dart`
-  - Length validation (1-10,000 characters)
-  - Whitespace-only detection
-  - _Requirements: 6.1-6.2_
+  - Create class implementing InputValidator interface
+  - _Requirements: 6.1-6.5_
 
-- [ ] 4.3 Implement injection prevention
-  - SQL injection detection
-  - XSS detection
-  - Command injection detection
+- [ ] 4.3 Implement validateMessage() - length check
+  - Check min length (1 character)
+  - Check max length (10,000 characters)
+  - Return ValidationResult
+  - _Requirements: 6.1_
+
+- [ ] 4.4 Implement validateMessage() - whitespace check
+  - Detect if message is only whitespace
+  - Add to ValidationResult errors
+  - _Requirements: 6.2_
+
+- [ ] 4.5 Implement SQL injection detection
+  - Check for SQL keywords (SELECT, DROP, etc.)
+  - Check for SQL syntax patterns
   - _Requirements: 6.5_
 
-- [ ] 4.4 Implement Space ID validation
-  - Validate against known Spaces
-  - Reject invalid IDs
+- [ ] 4.6 Implement XSS detection
+  - Check for <script> tags
+  - Check for javascript: protocol
+  - Check for event handlers (onclick, etc.)
+  - _Requirements: 6.5_
+
+- [ ] 4.7 Implement command injection detection
+  - Check for shell metacharacters (;, |, &, etc.)
+  - Check for command patterns
+  - _Requirements: 6.5_
+
+- [ ] 4.8 Implement validateSpaceId() method
+  - Check if Space ID exists in known Spaces
+  - Return ValidationResult
   - _Requirements: 6.3_
 
-- [ ] 4.5 Write InputValidator tests
+- [ ] 4.9 Implement sanitize() method
+  - Remove detected malicious content
+  - Escape special characters
+  - Return sanitized string
+  - _Requirements: 6.4, 6.5_
+
+- [ ] 4.10 Write InputValidator tests
   - File: `test/core/ai/chat/security/services/input_validator_test.dart`
   - Test length validation
   - Test injection prevention
@@ -196,7 +271,7 @@ Create the input validation service.
 ## Checkpoint 4: Commit input validator
 
 **Actions Required:**
-1. Mark tasks 4.1-4.5 as complete [x]
+1. Mark tasks 4.1-4.10 as complete [x]
 2. Commit: `git commit -m "feat(stage7e): Add input validation service"`
 3. STOP and ask user before continuing
 
@@ -249,23 +324,41 @@ Create token-based authentication.
   - Methods: validateToken(), generateToken(), revokeToken()
   - _Requirements: 8.1-8.5_
 
-- [ ] 6.2 Implement AuthenticationServiceImpl
+- [ ] 6.2 Create AuthenticationServiceImpl class skeleton
   - File: `lib/core/ai/chat/security/services/authentication_service_impl.dart`
-  - JWT-based authentication
-  - Token generation and validation
-  - _Requirements: 8.1-8.4_
+  - Create class implementing AuthenticationService interface
+  - Add revocation list storage (Set<String>)
+  - _Requirements: 8.1-8.5_
 
-- [ ] 6.3 Implement token expiry
-  - 24-hour default expiry
-  - Configurable expiry duration
+- [ ] 6.3 Implement generateToken() method
+  - Create JWT payload with userId, expiry, roles
+  - Sign token with secret key
+  - Return token string
+  - _Requirements: 8.1, 8.2_
+
+- [ ] 6.4 Implement validateToken() method - basic validation
+  - Parse JWT token
+  - Verify signature
+  - Return AuthResult
+  - _Requirements: 8.1, 8.4_
+
+- [ ] 6.5 Implement validateToken() method - expiry check
+  - Check if token is expired
+  - Compare expiry with current time
+  - Return isValid = false if expired
   - _Requirements: 8.3_
 
-- [ ] 6.4 Implement token revocation
-  - Revocation list
-  - Check on validation
+- [ ] 6.6 Implement validateToken() method - revocation check
+  - Check if token is in revocation list
+  - Return isValid = false if revoked
   - _Requirements: 8.5_
 
-- [ ] 6.5 Write AuthenticationService tests
+- [ ] 6.7 Implement revokeToken() method
+  - Add token to revocation list
+  - Log revocation event
+  - _Requirements: 8.5_
+
+- [ ] 6.8 Write AuthenticationService tests
   - File: `test/core/ai/chat/security/services/authentication_service_test.dart`
   - Test token generation
   - Test token validation
@@ -278,7 +371,7 @@ Create token-based authentication.
 ## Checkpoint 6: Commit authentication
 
 **Actions Required:**
-1. Mark tasks 6.1-6.5 as complete [x]
+1. Mark tasks 6.1-6.8 as complete [x]
 2. Commit: `git commit -m "feat(stage7e): Add authentication service"`
 3. STOP and ask user before continuing
 
@@ -367,41 +460,110 @@ Create security event tracking.
 
 Wire up all security components.
 
-- [ ] 9.1 Add rate limiting to chat endpoint
-  - Check rate limit before processing
-  - Return 429 if exceeded
-  - _Requirements: 1.1-1.5_
-
-- [ ] 9.2 Add input validation to chat endpoint
-  - Validate message before processing
-  - Return 400 if invalid
-  - _Requirements: 6.1-6.5_
-
-- [ ] 9.3 Add data redaction to logging
-  - Redact PII before logging
-  - Apply to all log statements
-  - _Requirements: 3.1-3.5_
-
-- [ ] 9.4 Add authentication to all endpoints
-  - Validate token on every request
-  - Return 401 if invalid
-  - _Requirements: 8.1-8.5_
-
-- [ ] 9.5 Add security event logging
-  - Log all security events
-  - Track violations
-  - _Requirements: 10.1-10.5_
-
-- [ ] 9.6 Update dependency injection
+- [ ] 9.1 Register security services in DI
   - File: `lib/core/di/bootstrap.dart`
-  - Register all security services
-  - Wire up dependencies
+  - Register RateLimiter
+  - Register DataRedactionService
+  - Register InputValidator
+  - Register AuthenticationService
+  - Register SecurityMonitor
   - _Requirements: All_
 
-- [ ] 9.7 Write integration tests
+- [ ] 9.2 Add rate limiting to chat endpoint - check
+  - In chat endpoint, call rateLimiter.checkLimit()
+  - Get userId from request
+  - _Requirements: 1.1-1.5_
+
+- [ ] 9.3 Add rate limiting to chat endpoint - handle exceeded
+  - If limit exceeded, return 429 error
+  - Include retry-after header
+  - Include remaining quota in response
+  - _Requirements: 1.4, 1.5_
+
+- [ ] 9.4 Add rate limiting to chat endpoint - record
+  - If allowed, call rateLimiter.recordRequest()
+  - Continue with request processing
+  - _Requirements: 1.1-1.5_
+
+- [ ] 9.5 Add input validation to chat endpoint - validate message
+  - Call inputValidator.validateMessage()
+  - Check ValidationResult
+  - _Requirements: 6.1-6.2_
+
+- [ ] 9.6 Add input validation to chat endpoint - handle invalid
+  - If invalid, return 400 error
+  - Include validation errors in response
+  - _Requirements: 6.1-6.5_
+
+- [ ] 9.7 Add input validation to chat endpoint - sanitize
+  - If valid, call inputValidator.sanitize()
+  - Use sanitized input for processing
+  - _Requirements: 6.4, 6.5_
+
+- [ ] 9.8 Add data redaction to logging - wrap logger
+  - Create wrapper around AppLogger
+  - Intercept all log calls
+  - _Requirements: 3.1-3.5_
+
+- [ ] 9.9 Add data redaction to logging - apply redaction
+  - Call dataRedactionService.redact() on log messages
+  - Pass redacted message to actual logger
+  - _Requirements: 3.1-3.5_
+
+- [ ] 9.10 Add authentication to chat endpoint
+  - Extract token from request header
+  - Call authenticationService.validateToken()
+  - _Requirements: 8.1-8.4_
+
+- [ ] 9.11 Add authentication error handling
+  - If token invalid, return 401 error
+  - Include error message
+  - _Requirements: 8.1, 8.5_
+
+- [ ] 9.12 Add authentication to admin endpoints
+  - Apply same auth check to metrics endpoints
+  - Apply same auth check to config endpoints
+  - _Requirements: 9.1-9.3_
+
+- [ ] 9.13 Add security event logging - rate limit violations
+  - When rate limit exceeded, log event
+  - Call securityMonitor.logEvent()
+  - _Requirements: 10.1_
+
+- [ ] 9.14 Add security event logging - auth failures
+  - When auth fails, log event
+  - Include userId and reason
+  - _Requirements: 10.2_
+
+- [ ] 9.15 Add security event logging - validation failures
+  - When validation fails, log event
+  - Include validation errors
+  - _Requirements: 10.3_
+
+- [ ] 9.16 Write integration test - rate limiting
   - File: `test/integration/security_integration_test.dart`
-  - Test end-to-end security flow
+  - Send 11 requests, verify 11th blocked
+  - _Requirements: 1.1-1.5_
+
+- [ ] 9.17 Write integration test - input validation
+  - Send invalid input, verify rejection
+  - Send valid input, verify acceptance
+  - _Requirements: 6.1-6.5_
+
+- [ ] 9.18 Write integration test - authentication
+  - Send request without token, verify 401
+  - Send request with valid token, verify success
+  - Send request with expired token, verify 401
+  - _Requirements: 8.1-8.5_
+
+- [ ] 9.19 Write integration test - data redaction
+  - Send message with PII
+  - Check logs, verify PII is redacted
+  - _Requirements: 3.1-3.5_
+
+- [ ] 9.20 Write integration test - end-to-end
   - Test all security features together
+  - Verify they work in combination
   - _Requirements: All_
 
 ---
@@ -409,7 +571,7 @@ Wire up all security components.
 ## Checkpoint 9: Commit security integration
 
 **Actions Required:**
-1. Mark tasks 9.1-9.7 as complete [x]
+1. Mark tasks 9.1-9.20 as complete [x]
 2. Commit: `git commit -m "feat(stage7e): Integrate security into AI chat flow"`
 3. STOP and ask user before continuing
 
@@ -497,7 +659,7 @@ Write property tests and create documentation.
 Stage 7e is complete when:
 
 - [ ] All 10 task groups completed (1-10)
-- [ ] All 50+ subtasks completed
+- [ ] All 80+ subtasks completed
 - [ ] All unit tests passing
 - [ ] All 10 property-based tests passing
 - [ ] All integration tests passing
@@ -510,7 +672,7 @@ Stage 7e is complete when:
 
 ## Summary
 
-**Total Tasks**: 50+ subtasks across 10 main task groups
+**Total Tasks**: 80+ subtasks across 10 main task groups (broken down into small, manageable steps)
 **Estimated Time**: 2-3 days
 **Key Deliverables**:
 - Rate limiting service
