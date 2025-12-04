@@ -528,24 +528,24 @@ Create token-based authentication.
 
 Add role-based access control.
 
-- [ ] 7.1 Add roles to AuthResult
+- [x] 7.1 Add roles to AuthResult
   - Extend AuthResult model
   - Add roles field (List<String>)
   - _Requirements: 9.1-9.5_
 
-- [ ] 7.2 Implement role checking
+- [x] 7.2 Implement role checking
   - Check if user has required role
   - Reject if role missing
   - _Requirements: 9.1-9.3_
 
-- [ ] 7.3 Add admin middleware (Backend)
+- [x] 7.3 Add admin middleware (Backend)
   - File: `server/src/security/admin_middleware.js`
   - Check for admin role
   - Reject non-admin requests
   - _Requirements: 9.1-9.3_
 
-- [ ] 7.4 Write admin access control tests
-  - File: `test/core/ai/chat/security/services/admin_access_test.dart`
+- [x] 7.4 Write admin access control tests
+  - File: `server/test/security/admin_middleware.test.js`
   - Test admin access allowed
   - Test non-admin access denied
   - _Requirements: 9.1-9.5_
