@@ -33,28 +33,28 @@ This implementation plan breaks down Stage 7e (Privacy & Security) into detailed
 
 Create the foundational data models and configuration for security.
 
-- [ ] 1.1 Create RateLimitConfig model
+- [x] 1.1 Create RateLimitConfig model
   - File: `lib/core/ai/chat/security/models/rate_limit_config.dart`
   - Fields: perMinute, perHour, perDay, softLimitThreshold, warningThreshold
   - _Requirements: 1.1-1.3, 2.1-2.2_
 
-- [ ] 1.2 Create SecurityConfig model
+- [x] 1.2 Create SecurityConfig model
   - File: `lib/core/ai/chat/security/models/security_config.dart`
   - Fields: httpsOnly, requireAuth, tokenExpiry, rateLimits, redactionPatterns, maxMessageLength
   - _Requirements: All_
 
-- [ ] 1.3 Create RedactionPattern model
+- [x] 1.3 Create RedactionPattern model
   - File: `lib/core/ai/chat/security/models/redaction_pattern.dart`
   - Fields: name, pattern (RegExp), replacement, enabled
   - _Requirements: 3.1-3.5, 4.1-4.5_
 
-- [ ] 1.4 Create SecurityEvent model
+- [x] 1.4 Create SecurityEvent model
   - File: `lib/core/ai/chat/security/models/security_event.dart`
   - Fields: type, userId, timestamp, metadata
   - Enum: SecurityEventType
   - _Requirements: 10.1-10.5_
 
-- [ ] 1.5 Create RateLimitResult and RateLimitQuota models
+- [x] 1.5 Create RateLimitResult and RateLimitQuota models
   - File: `lib/core/ai/chat/security/models/rate_limit_result.dart`
   - _Requirements: 1.4, 2.3_
 
@@ -116,8 +116,26 @@ Create the rate limiting service.
   - _Requirements: 2.4_
 
 - [x] 2.9 Write RateLimiter tests
+  - File: `test/core/ai/chat/security/services/rate_limiter_test.dart`
+  - Test quota enforcement
+  - Test soft limits
+  - Test reset logic
+  - _Requirements: 1.1-1.5, 2.1-2.5_
+
+---
+
+## Checkpoint 2: Commit rate limiter
+
+**Actions Required:**
+1. Mark tasks 2.1-2.9 as complete [x]
+2. Commit: `git commit -m "feat(stage7e): Add rate limiting service"`
+3. STOP and ask user before continuing
+
+---
 
 ### Task 3: Implement data redaction service
+
+Create the PII redaction service.
 
 - [x] 3.1 Create DataRedactionService interface
   - File: `lib/core/ai/chat/security/interfaces/data_redaction_service.dart`
@@ -178,58 +196,84 @@ Create the rate limiting service.
   - Test edge cases
   - _Requirements: 3.1-3.5, 4.1-4.5_
 
+---
+
+## Checkpoint 3: Commit data redaction
+
+**Actions Required:**
+1. Mark tasks 3.1-3.11 as complete [x]
+2. Commit: `git commit -m "feat(stage7e): Add data redaction service"`
+3. STOP and ask user before continuing
+
+---
+
 ### Task 4: Implement input validator
+
+Create the input validation service.
 
 - [x] 4.1 Create InputValidator interface
   - File: `lib/core/ai/chat/security/interfaces/input_validator.dart`
   - Methods: validateMessage(), validateSpaceId(), sanitize()
-  - _Requirements: 5.1-5.5_
+  - _Requirements: 6.1-6.5_
 
-- [x] 4.2 Implement InputValidatorImpl skeleton
+- [x] 4.2 Create InputValidatorImpl class skeleton
   - File: `lib/core/ai/chat/security/services/input_validator_impl.dart`
-  - _Requirements: 5.1-5.5_
+  - Create class implementing InputValidator interface
+  - _Requirements: 6.1-6.5_
 
-- [x] 4.3 Add length validation (1-10,000 chars)
-  - _Requirements: 5.1_
+- [x] 4.3 Implement validateMessage() - length check
+  - Check min length (1 character)
+  - Check max length (10,000 characters)
+  - Return ValidationResult
+  - _Requirements: 6.1_
 
-- [x] 4.4 Add whitespace-only check
-  - _Requirements: 5.2_
+- [x] 4.4 Implement validateMessage() - whitespace check
+  - Detect if message is only whitespace
+  - Add to ValidationResult errors
+  - _Requirements: 6.2_
 
-- [x] 4.5 Add invalid character check
-  - Reject control chars
-  - _Requirements: 5.3_
+- [x] 4.5 Implement SQL injection detection
+  - Check for SQL keywords (SELECT, DROP, etc.)
+  - Check for SQL syntax patterns
+  - _Requirements: 6.5_
 
-- [x] 4.6 Add injection detection
-  - Detect `<script>`, SQL keywords, `--`
-  - _Requirements: 5.4_
+- [x] 4.6 Implement XSS detection
+  - Check for <script> tags
+  - Check for javascript: protocol
+  - Check for event handlers (onclick, etc.)
+  - _Requirements: 6.5_
 
-- [x] 4.7 Implement sanitize()
-  - Remove control chars, trim whitespace
-  - _Requirements: 5.5_
+- [x] 4.7 Implement command injection detection
+  - Check for shell metacharacters (;, |, &, etc.)
+  - Check for command patterns
+  - _Requirements: 6.5_
 
-- [x] 4.8 Validate Space IDs
-  - Regex for `[A-Za-z0-9_-]+`, max length 64
-  - _Requirements: 5.6_
+- [x] 4.8 Implement validateSpaceId() method
+  - Check if Space ID exists in known Spaces
+  - Return ValidationResult
+  - _Requirements: 6.3_
 
-- [x] 4.9 Write InputValidator tests
+- [x] 4.9 Implement sanitize() method
+  - Remove detected malicious content
+  - Escape special characters
+  - Return sanitized string
+  - _Requirements: 6.4, 6.5_
+
+- [x] 4.10 Write InputValidator tests
   - File: `test/core/ai/chat/security/services/input_validator_test.dart`
-  - _Requirements: 5.1-5.6_
-  - File: `test/core/ai/chat/security/services/rate_limiter_test.dart`
-  - Test quota enforcement
-  - Test soft limits
-  - Test reset logic
-  - _Requirements: 1.1-1.5, 2.1-2.5_
+  - Test length validation
+  - Test injection prevention
+  - Test Space ID validation
+  - _Requirements: 6.1-6.5_
 
 ---
 
-## Checkpoint 2: Commit rate limiter
+## Checkpoint 4: Commit input validator
 
 **Actions Required:**
-1. Mark tasks 2.1-2.9 as complete [x]
-2. Commit: `git commit -m "feat(stage7e): Add rate limiting service"`
+1. Mark tasks 4.1-4.10 as complete [x]
+2. Commit: `git commit -m "feat(stage7e): Add input validation service"`
 3. STOP and ask user before continuing
-
----
 
 ---
 
@@ -260,7 +304,20 @@ Add HTTPS enforcement middleware to backend.
   - Test development mode
   - _Requirements: 7.1-7.5_
 
+---
+
+## Checkpoint 5: Commit HTTPS enforcement
+
+**Actions Required:**
+1. Mark tasks 5.1-5.4 as complete [x]
+2. Commit: `git commit -m "feat(stage7e): Add HTTPS enforcement"`
+3. STOP and ask user before continuing
+
+---
+
 ### Task 6: Implement authentication service
+
+Create token-based authentication.
 
 - [x] 6.1 Create AuthenticationService interface
   - File: `lib/core/ai/chat/security/interfaces/authentication_service.dart`
@@ -274,13 +331,13 @@ Add HTTPS enforcement middleware to backend.
   - _Requirements: 8.1-8.5_
 
 - [x] 6.3 Implement generateToken() method
-  - Create JWT-like payload with userId, expiry, roles
+  - Create JWT payload with userId, expiry, roles
   - Sign token with secret key
   - Return token string
   - _Requirements: 8.1, 8.2_
 
 - [x] 6.4 Implement validateToken() method - basic validation
-  - Parse token
+  - Parse JWT token
   - Verify signature
   - Return AuthResult
   - _Requirements: 8.1, 8.4_
@@ -302,68 +359,6 @@ Add HTTPS enforcement middleware to backend.
   - _Requirements: 8.5_
 
 - [x] 6.8 Write AuthenticationService tests
-  - File: `test/core/ai/chat/security/services/authentication_service_test.dart`
-  - Test token generation
-  - Test token validation
-  - Test expiry
-  - Test revocation
-  - _Requirements: 8.1-8.5_
-
----
-
-## Checkpoint 5: Commit HTTPS enforcement
-
-**Actions Required:**
-1. Mark tasks 5.1-5.4 as complete [x]
-2. Commit: `git commit -m "feat(stage7e): Add HTTPS enforcement"`
-3. STOP and ask user before continuing
-
----
-
-### Task 6: Implement authentication service
-
-Create token-based authentication.
-
-- [ ] 6.1 Create AuthenticationService interface
-  - File: `lib/core/ai/chat/security/interfaces/authentication_service.dart`
-  - Methods: validateToken(), generateToken(), revokeToken()
-  - _Requirements: 8.1-8.5_
-
-- [ ] 6.2 Create AuthenticationServiceImpl class skeleton
-  - File: `lib/core/ai/chat/security/services/authentication_service_impl.dart`
-  - Create class implementing AuthenticationService interface
-  - Add revocation list storage (Set<String>)
-  - _Requirements: 8.1-8.5_
-
-- [ ] 6.3 Implement generateToken() method
-  - Create JWT payload with userId, expiry, roles
-  - Sign token with secret key
-  - Return token string
-  - _Requirements: 8.1, 8.2_
-
-- [ ] 6.4 Implement validateToken() method - basic validation
-  - Parse JWT token
-  - Verify signature
-  - Return AuthResult
-  - _Requirements: 8.1, 8.4_
-
-- [ ] 6.5 Implement validateToken() method - expiry check
-  - Check if token is expired
-  - Compare expiry with current time
-  - Return isValid = false if expired
-  - _Requirements: 8.3_
-
-- [ ] 6.6 Implement validateToken() method - revocation check
-  - Check if token is in revocation list
-  - Return isValid = false if revoked
-  - _Requirements: 8.5_
-
-- [ ] 6.7 Implement revokeToken() method
-  - Add token to revocation list
-  - Log revocation event
-  - _Requirements: 8.5_
-
-- [ ] 6.8 Write AuthenticationService tests
   - File: `test/core/ai/chat/security/services/authentication_service_test.dart`
   - Test token generation
   - Test token validation
@@ -403,7 +398,7 @@ Add role-based access control.
   - _Requirements: 9.1-9.3_
 
 - [x] 7.4 Write admin access control tests
-  - File: `server/test/security/admin_middleware.test.js`
+  - File: `test/core/ai/chat/security/services/admin_access_test.dart`
   - Test admin access allowed
   - Test non-admin access denied
   - _Requirements: 9.1-9.5_
