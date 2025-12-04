@@ -148,7 +148,7 @@ void main() {
       for (int i = 15; i <= 50; i++)
         _record(
           i,
-          date: now.subtract(Duration(days: 15 + (i - 20))),
+          date: now.subtract(Duration(days: i)),
           viewCount: 0,
         ),
     ];
