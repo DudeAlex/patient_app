@@ -6,6 +6,10 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
+    "dev:local": "cross-env DOTENV_CONFIG_PATH=./config/env/local.env nodemon src/index.js",
+    "dev:emulator": "cross-env DOTENV_CONFIG_PATH=./config/env/emulator.env nodemon src/index.js",
+    "start:staging": "cross-env DOTENV_CONFIG_PATH=./config/env/staging.env node src/index.js",
+    "start:prod": "cross-env DOTENV_CONFIG_PATH=./config/env/prod.env node src/index.js",
     "test": "node --test"
   },
   "dependencies": {
@@ -16,6 +20,7 @@
     "supertest": "^7.1.4"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "cross-env": "^7.0.3"
   }
 }
