@@ -460,7 +460,7 @@ Create security event tracking.
 
 Wire up all security components.
 
-- [ ] 9.1 Register security services in DI
+- [x] 9.1 Register security services in DI
   - File: `lib/core/di/bootstrap.dart`
   - Register RateLimiter
   - Register DataRedactionService
@@ -469,99 +469,99 @@ Wire up all security components.
   - Register SecurityMonitor
   - _Requirements: All_
 
-- [ ] 9.2 Add rate limiting to chat endpoint - check
+- [x] 9.2 Add rate limiting to chat endpoint - check
   - In chat endpoint, call rateLimiter.checkLimit()
   - Get userId from request
   - _Requirements: 1.1-1.5_
 
-- [ ] 9.3 Add rate limiting to chat endpoint - handle exceeded
+- [x] 9.3 Add rate limiting to chat endpoint - handle exceeded
   - If limit exceeded, return 429 error
   - Include retry-after header
   - Include remaining quota in response
   - _Requirements: 1.4, 1.5_
 
-- [ ] 9.4 Add rate limiting to chat endpoint - record
+- [x] 9.4 Add rate limiting to chat endpoint - record
   - If allowed, call rateLimiter.recordRequest()
   - Continue with request processing
   - _Requirements: 1.1-1.5_
 
-- [ ] 9.5 Add input validation to chat endpoint - validate message
+- [x] 9.5 Add input validation to chat endpoint - validate message
   - Call inputValidator.validateMessage()
   - Check ValidationResult
   - _Requirements: 6.1-6.2_
 
-- [ ] 9.6 Add input validation to chat endpoint - handle invalid
+- [x] 9.6 Add input validation to chat endpoint - handle invalid
   - If invalid, return 400 error
   - Include validation errors in response
   - _Requirements: 6.1-6.5_
 
-- [ ] 9.7 Add input validation to chat endpoint - sanitize
+- [x] 9.7 Add input validation to chat endpoint - sanitize
   - If valid, call inputValidator.sanitize()
   - Use sanitized input for processing
   - _Requirements: 6.4, 6.5_
 
-- [ ] 9.8 Add data redaction to logging - wrap logger
+- [x] 9.8 Add data redaction to logging - wrap logger
   - Create wrapper around AppLogger
   - Intercept all log calls
   - _Requirements: 3.1-3.5_
 
-- [ ] 9.9 Add data redaction to logging - apply redaction
+- [x] 9.9 Add data redaction to logging - apply redaction
   - Call dataRedactionService.redact() on log messages
   - Pass redacted message to actual logger
   - _Requirements: 3.1-3.5_
 
-- [ ] 9.10 Add authentication to chat endpoint
+- [x] 9.10 Add authentication to chat endpoint
   - Extract token from request header
   - Call authenticationService.validateToken()
   - _Requirements: 8.1-8.4_
 
-- [ ] 9.11 Add authentication error handling
+- [x] 9.11 Add authentication error handling
   - If token invalid, return 401 error
   - Include error message
   - _Requirements: 8.1, 8.5_
 
-- [ ] 9.12 Add authentication to admin endpoints
+- [x] 9.12 Add authentication to admin endpoints
   - Apply same auth check to metrics endpoints
   - Apply same auth check to config endpoints
   - _Requirements: 9.1-9.3_
 
-- [ ] 9.13 Add security event logging - rate limit violations
+- [x] 9.13 Add security event logging - rate limit violations
   - When rate limit exceeded, log event
   - Call securityMonitor.logEvent()
   - _Requirements: 10.1_
 
-- [ ] 9.14 Add security event logging - auth failures
+- [x] 9.14 Add security event logging - auth failures
   - When auth fails, log event
   - Include userId and reason
   - _Requirements: 10.2_
 
-- [ ] 9.15 Add security event logging - validation failures
+- [x] 9.15 Add security event logging - validation failures
   - When validation fails, log event
   - Include validation errors
   - _Requirements: 10.3_
 
-- [ ] 9.16 Write integration test - rate limiting
+- [x] 9.16 Write integration test - rate limiting
   - File: `test/integration/security_integration_test.dart`
   - Send 11 requests, verify 11th blocked
   - _Requirements: 1.1-1.5_
 
-- [ ] 9.17 Write integration test - input validation
+- [x] 9.17 Write integration test - input validation
   - Send invalid input, verify rejection
   - Send valid input, verify acceptance
   - _Requirements: 6.1-6.5_
 
-- [ ] 9.18 Write integration test - authentication
+- [x] 9.18 Write integration test - authentication
   - Send request without token, verify 401
   - Send request with valid token, verify success
   - Send request with expired token, verify 401
   - _Requirements: 8.1-8.5_
 
-- [ ] 9.19 Write integration test - data redaction
+- [x] 9.19 Write integration test - data redaction
   - Send message with PII
   - Check logs, verify PII is redacted
   - _Requirements: 3.1-3.5_
 
-- [ ] 9.20 Write integration test - end-to-end
+- [x] 9.20 Write integration test - end-to-end
   - Test all security features together
   - Verify they work in combination
   - _Requirements: All_

@@ -35,6 +35,18 @@ import '../ai/chat/services/network_recovery_strategy.dart';
 import '../ai/chat/services/server_error_recovery_strategy.dart';
 import '../ai/chat/services/timeout_recovery_strategy.dart';
 import '../ai/chat/services/resilient_ai_chat_service.dart';
+import '../ai/chat/security/interfaces/authentication_service.dart';
+import '../ai/chat/security/interfaces/data_redaction_service.dart';
+import '../ai/chat/security/interfaces/input_validator.dart';
+import '../ai/chat/security/interfaces/rate_limiter.dart';
+import '../ai/chat/security/interfaces/security_monitor.dart';
+import '../ai/chat/security/models/rate_limit_config.dart';
+import '../ai/chat/security/services/authentication_service_impl.dart';
+import '../ai/chat/security/services/data_redaction_service_impl.dart';
+import '../ai/chat/security/services/input_validator_impl.dart';
+import '../ai/chat/security/services/rate_limiter_impl.dart';
+import '../ai/chat/security/services/security_monitor_impl.dart';
+import '../ai/chat/security/services/secure_ai_chat_service.dart';
 import '../diagnostics/app_logger.dart';
 import '../infrastructure/storage/migration_service.dart';
 import '../infrastructure/storage/space_preferences.dart';
@@ -105,6 +117,23 @@ Future<void> bootstrapAppContainer() async {
         'stage': 'bootstrap',
       },
     );
+    // Security services (Stage 7e)
+    final rateLimitConfig = const RateLimitConfig(perMinute: 10, perHour: 100, perDay: 500);
+    container.registerLazySingleton<RateLimiter>(
+      (_) => RateLimiterImpl(config: rateLimitConfig),
+    );
+    container.registerLazySingleton<DataRedactionService>(
+      (_) => DataRedactionServiceImpl(),
+    );
+    container.registerLazySingleton<InputValidator>(
+      (_) => InputValidatorImpl(maxLength: 10000),
+    );
+    container.registerLazySingleton<AuthenticationService>(
+      (_) => AuthenticationServiceImpl(),
+    );
+    container.registerLazySingleton<SecurityMonitor>(
+      (_) => SecurityMonitorImpl(),
+    );
     container.registerLazySingleton<AiService>(
       (_) => LoggingAiService(
         ConfigurableAiService(
@@ -147,16 +176,23 @@ Future<void> bootstrapAppContainer() async {
     // Register resilient AI chat service with all dependencies
     container.registerLazySingleton<AiChatService>(
       (c) => ResilientAiChatService(
-        primaryService: LoggingAiChatService(
-          ConfigurableAiChatService(
-            configRepository: aiConfigRepository,
-            fakeService: FakeAiChatService(),
-            httpService: HttpAiChatService(
-              client: httpClient,
-              baseUrl: aiConfigRepository.current.remoteUrl,
+        primaryService: SecureAiChatService(
+          inner: LoggingAiChatService(
+            ConfigurableAiChatService(
+              configRepository: aiConfigRepository,
+              fakeService: FakeAiChatService(),
+              httpService: HttpAiChatService(
+                client: httpClient,
+                baseUrl: aiConfigRepository.current.remoteUrl,
+              ),
             ),
+            callLogRepository: aiCallLogRepository,
           ),
-          callLogRepository: aiCallLogRepository,
+          rateLimiter: c.resolve<RateLimiter>(),
+          dataRedactionService: c.resolve<DataRedactionService>(),
+          inputValidator: c.resolve<InputValidator>(),
+          authenticationService: c.resolve<AuthenticationService>(),
+          securityMonitor: c.resolve<SecurityMonitor>(),
         ),
         errorClassifier: c.resolve<ErrorClassifier>(),
         fallbackService: c.resolve<FallbackService>(),
