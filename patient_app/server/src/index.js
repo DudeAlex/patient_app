@@ -23,6 +23,26 @@ app.use(express.json());
 // Enforce HTTPS unless explicitly disabled for development.
 app.use(httpsEnforcer);
 
+const MAX_MESSAGE_LENGTH = Number.parseInt(
+  process.env.MAX_MESSAGE_LENGTH ?? '10000',
+  10,
+);
+
+function enforceMessageLength(req, res, next) {
+  const msg = req.body?.message;
+  if (typeof msg === 'string' && msg.length > MAX_MESSAGE_LENGTH) {
+    return res.status(400).json({
+      error: {
+        code: 'MESSAGE_TOO_LONG',
+        message: `message exceeds max length ${MAX_MESSAGE_LENGTH}`,
+        correlationId: req.correlationId,
+        retryable: false,
+      },
+    });
+  }
+  next();
+}
+
 // Initialize PersonaManager
 const personaManager = new PersonaManager();
 await personaManager.loadPersonas();
@@ -52,7 +72,7 @@ app.use(
 // Apply rate limiting to chat endpoints
 app.use(['/api/v1/chat/echo', '/api/v1/chat/message'], rateLimiter);
 
-app.post('/api/v1/chat/echo', (req, res) => {
+app.post('/api/v1/chat/echo', enforceMessageLength, (req, res) => {
   const { threadId, message, timestamp, userId } = req.body ?? {};
 
   if (!threadId || !message) {
@@ -89,7 +109,7 @@ app.post('/api/v1/chat/echo', (req, res) => {
   return res.json(responsePayload);
 });
 
-app.post('/api/v1/chat/message', async (req, res) => {
+app.post('/api/v1/chat/message', enforceMessageLength, async (req, res) => {
   const { message, history = [], maxTokens = 1000, spaceContext = {} } = req.body ?? {};
 
   if (!message || typeof message !== 'string' || !message.trim()) {
