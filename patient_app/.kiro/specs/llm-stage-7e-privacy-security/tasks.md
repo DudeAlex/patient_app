@@ -418,28 +418,28 @@ Add role-based access control.
 
 Create security event tracking.
 
-- [ ] 8.1 Create SecurityMonitor interface
+- [x] 8.1 Create SecurityMonitor interface
   - File: `lib/core/ai/chat/security/interfaces/security_monitor.dart`
   - Methods: logEvent(), getRecentEvents(), isSuspiciousActivity()
   - _Requirements: 10.1-10.5_
 
-- [ ] 8.2 Implement SecurityMonitorImpl
+- [x] 8.2 Implement SecurityMonitorImpl
   - File: `lib/core/ai/chat/security/services/security_monitor_impl.dart`
   - In-memory event storage (24 hours)
   - Event logging
   - _Requirements: 10.1-10.5_
 
-- [ ] 8.3 Implement suspicious activity detection
+- [x] 8.3 Implement suspicious activity detection
   - Pattern detection (multiple failures)
   - Alert triggering
   - _Requirements: 10.4_
 
-- [ ] 8.4 Integrate with telemetry (Stage 7b)
+- [x] 8.4 Integrate with telemetry (Stage 7b)
   - Send security events to telemetry
   - Track security metrics
   - _Requirements: 10.5_
 
-- [ ] 8.5 Write SecurityMonitor tests
+- [x] 8.5 Write SecurityMonitor tests
   - File: `test/core/ai/chat/security/services/security_monitor_test.dart`
   - Test event logging
   - Test suspicious activity detection
