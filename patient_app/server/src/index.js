@@ -9,7 +9,10 @@ import { rateLimiter } from './middleware/rate_limiter.js';
 import { httpsEnforcer } from './security/https_enforcer.js';
 import { PersonaManager } from './llm/persona_manager.js';
 
-dotenv.config();
+// Allow selecting an env preset via DOTENV_CONFIG_PATH (falls back to .env)
+dotenv.config({
+  path: process.env.DOTENV_CONFIG_PATH || '.env',
+});
 
 const app = express();
 const port = process.env.PORT || 3030;
