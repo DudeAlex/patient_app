@@ -200,18 +200,27 @@ flutter test test/core/ai/chat/security/services/security_monitor_test.dart
 flutter test test/integration/security_integration_test.dart
 ```
 
-### Manual Testing ⏳
+### Manual Testing 🧪
 
-**Status:** Documented but not yet executed
+**Status:** In Progress (December 5, 2025)
+
+**Completed:**
+- ✅ Message length enforcement (100 char limit tested via curl)
+- ✅ Environment presets configured (local, emulator, staging, prod)
+- ✅ Model configuration externalized to JSON
+- ✅ HTTPS enforcement tested with staging preset
 
 **Scenarios Ready:**
-1. Rate limiting and warnings (8, 9, 11 requests)
-2. Input validation and sanitization (whitespace, XSS, SQL, length)
-3. PII redaction (names, emails, phones, SSNs, addresses)
-4. Authentication and RBAC (no token, expired token, admin access)
-5. HTTPS enforcement (HTTP rejection, dev mode)
-6. Security monitoring (event logging, suspicious activity)
-7. On-device data protection (no encryption keys or IDs sent)
+1. ✅ Input validation - length (tested: 150 chars → 400, 100 chars → 200)
+2. ⏳ Rate limiting and warnings (11 requests within 60s)
+3. ⏳ Input validation - XSS/SQL (`<script>alert(1)</script>`)
+4. ⏳ PII redaction (names, emails, phones, SSNs, addresses)
+5. ⏳ Authentication and RBAC (no token, expired token, admin access)
+6. ⏳ HTTPS enforcement (retest with staging preset)
+7. ⏳ Security monitoring (event logging after violations)
+8. ⏳ On-device data protection (no encryption keys or IDs sent)
+
+**Test Notes:** See `docs/modules/ai/STAGE_7E_MANUAL_TEST_NOTES.md`
 
 ---
 
@@ -349,9 +358,22 @@ Stage 7e implements defense in depth with 6 security layers:
 
 ### Modified Files
 
+**Core Integration:**
 - `lib/core/di/bootstrap.dart` - Registered security services
 - `docs/modules/ai/LLM_STAGES_OVERVIEW.md` - Updated Stage 7e status
 - `.kiro/specs/llm-stage-7e-privacy-security/tasks.md` - Marked all tasks complete
+
+**Configuration Improvements (December 5, 2025):**
+- `server/src/llm/models.js` - Externalized model configuration
+- `server/config/models.json` - Model IDs configuration file
+- `server/src/index.js` - Message length enforcement
+- `server/config/env/local.env` - Local development preset
+- `server/config/env/emulator.env` - Android emulator preset
+- `server/config/env/staging.env` - Staging environment preset
+- `server/config/env/prod.env` - Production environment preset
+- `server/package.json` - Added npm scripts for presets
+- `server/test/message_length.test.mjs` - Message length validation tests
+- `docs/modules/ai/STAGE_7E_MANUAL_TEST_NOTES.md` - Manual testing progress
 
 ---
 
@@ -359,17 +381,28 @@ Stage 7e implements defense in depth with 6 security layers:
 
 ### Immediate Actions
 
-1. **Run Manual Tests** ⏳
-   - Execute all 7 manual test scenarios
-   - Document results
-   - Fix any issues found
+1. **Complete Manual Tests** 🧪 (In Progress)
+   - ✅ Message length validation tested
+   - ⏳ Rate limiting (11 requests test)
+   - ⏳ XSS/SQL injection validation
+   - ⏳ PII redaction verification
+   - ⏳ Authentication and RBAC
+   - ⏳ HTTPS enforcement (staging preset)
+   - ⏳ Security monitoring events
+   - Document final results in `STAGE_7E_MANUAL_TEST_NOTES.md`
 
-2. **Merge to Master** ⏳
+2. **Configuration Improvements** ✅ (Completed)
+   - ✅ Environment presets (local, emulator, staging, prod)
+   - ✅ Model configuration externalized
+   - ✅ Message length enforcement (configurable)
+   - ✅ Test suite for message length validation
+
+3. **Merge to Master** ⏳
    - Review all changes
    - Merge `llm-stage-7e-privacy-security` branch
    - Tag release: `v7e-privacy-security`
 
-3. **Deploy Security Features** ⏳
+4. **Deploy Security Features** ⏳
    - Enable HTTPS enforcement
    - Enable authentication
    - Enable rate limiting (start with high limits)
