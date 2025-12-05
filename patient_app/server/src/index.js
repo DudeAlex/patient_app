@@ -9,10 +9,11 @@ import { rateLimiter } from './middleware/rate_limiter.js';
 import { httpsEnforcer } from './security/https_enforcer.js';
 import { PersonaManager } from './llm/persona_manager.js';
 
-// Allow selecting an env preset via DOTENV_CONFIG_PATH (falls back to .env)
-dotenv.config({
-  path: process.env.DOTENV_CONFIG_PATH || '.env',
-});
+// Load base secrets from .env first, then overlay preset via DOTENV_CONFIG_PATH.
+dotenv.config({ path: '.env' });
+if (process.env.DOTENV_CONFIG_PATH) {
+  dotenv.config({ path: process.env.DOTENV_CONFIG_PATH, override: true });
+}
 
 const app = express();
 const port = process.env.PORT || 3030;
