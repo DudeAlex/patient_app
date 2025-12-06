@@ -8,6 +8,9 @@ import { TogetherClient } from './llm/together_client.js';
 import { rateLimiter } from './middleware/rate_limiter.js';
 import { httpsEnforcer } from './security/https_enforcer.js';
 import { PersonaManager } from './llm/persona_manager.js';
+import { authenticationService } from './security/authentication_service.js';
+import { dataRedactionService } from './security/data_redaction_service.js';
+import { inputValidator } from './security/input_validator.js';
 
 // Load base secrets from .env first, then overlay preset via DOTENV_CONFIG_PATH.
 dotenv.config({ path: '.env' });
@@ -28,18 +31,33 @@ const MAX_MESSAGE_LENGTH = Number.parseInt(
   10,
 );
 
-function enforceMessageLength(req, res, next) {
+// Configure security services with env overrides now that dotenv has loaded.
+authenticationService.configure({
+  requireAuth: process.env.REQUIRE_AUTH === 'true',
+});
+inputValidator.setMaxLength(MAX_MESSAGE_LENGTH);
+dataRedactionService.setEnabled(process.env.REDACTION_ENABLED !== 'false');
+
+function validateInput(req, res, next) {
   const msg = req.body?.message;
-  if (typeof msg === 'string' && msg.length > MAX_MESSAGE_LENGTH) {
+  const validation = inputValidator.validateMessage(msg);
+
+  if (!validation.isValid) {
     return res.status(400).json({
       error: {
-        code: 'MESSAGE_TOO_LONG',
-        message: `message exceeds max length ${MAX_MESSAGE_LENGTH}`,
+        code: 'INVALID_REQUEST',
+        message: validation.error,
         correlationId: req.correlationId,
         retryable: false,
       },
     });
   }
+
+  // Sanitize input
+  if (req.body && req.body.message) {
+    req.body.message = inputValidator.sanitize(req.body.message);
+  }
+
   next();
 }
 
@@ -69,10 +87,13 @@ app.use(
   }),
 );
 
-// Apply rate limiting to chat endpoints
-app.use(['/api/v1/chat/echo', '/api/v1/chat/message'], rateLimiter);
+// Apply rate limiting and authentication to chat endpoints
+app.use(
+  ['/api/v1/chat/echo', '/api/v1/chat/message'],
+  [rateLimiter, authenticationService.middleware()],
+);
 
-app.post('/api/v1/chat/echo', enforceMessageLength, (req, res) => {
+app.post('/api/v1/chat/echo', validateInput, (req, res) => {
   const { threadId, message, timestamp, userId } = req.body ?? {};
 
   if (!threadId || !message) {
@@ -89,7 +110,7 @@ app.post('/api/v1/chat/echo', enforceMessageLength, (req, res) => {
   const responsePayload = {
     responseId: crypto.randomUUID(),
     threadId,
-    message: `Echo: ${message}`,
+    message: `Echo: ${dataRedactionService.redact(message)}`,
     timestamp: new Date().toISOString(),
     metadata: {
       processingTimeMs: 5,
@@ -109,7 +130,7 @@ app.post('/api/v1/chat/echo', enforceMessageLength, (req, res) => {
   return res.json(responsePayload);
 });
 
-app.post('/api/v1/chat/message', enforceMessageLength, async (req, res) => {
+app.post('/api/v1/chat/message', validateInput, async (req, res) => {
   const { message, history = [], maxTokens = 1000, spaceContext = {} } = req.body ?? {};
 
   if (!message || typeof message !== 'string' || !message.trim()) {
@@ -130,7 +151,6 @@ app.post('/api/v1/chat/message', enforceMessageLength, async (req, res) => {
         ? 'None'
         : formattedHistory.map((m) => `${m.role}: ${m.content}`).join('\n');
 
-    // Get persona based on space context
     const spaceId = spaceContext?.spaceId || 'general';
     await personaManager.ensureLatestPersonas();
     const persona = personaManager.getPersona(spaceId);
@@ -154,7 +174,7 @@ app.post('/api/v1/chat/message', enforceMessageLength, async (req, res) => {
       userMessage: message,
       contextStats: spaceContext?.stats || null,
       filters: spaceContext?.filters || null,
-      persona: persona, // Pass the persona to the prompt builder
+      persona,
     });
 
     const client = new TogetherClient();
