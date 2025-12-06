@@ -280,6 +280,21 @@ This document tracks the progress of LLM integration stages in the Patient App.
 - **Query Analysis:** < 50ms
 - **Relevance Scoring:** < 100ms
 
+---
+
+## Key Metrics Across All Stages
+
+### Token Efficiency
+- **Stage 3-4:** 51% reduction (4,900 → 2,400 tokens)
+- **Stage 6:** Additional 30% reduction vs Stage 4
+- **Combined:** ~65% total token savings from baseline
+
+### Performance
+- **Context Assembly:** 99% faster (15s → 0.15s)
+- **Intent Retrieval:** < 20ms
+- **Query Analysis:** < 50ms
+- **Relevance Scoring:** < 100ms
+
 ### Quality
 - **Test Coverage:** 224+ tests passing
 - **Languages Supported:** 4+ (English, Russian, Uzbek, Arabic)
@@ -296,11 +311,11 @@ This document tracks the progress of LLM integration stages in the Patient App.
 
 ## References
 
-- **Stage 4 Testing:** `docs/modules/ai/STAGE_4_TESTING_COMPLETE.md`
-- **Stage 6 Documentation:** `docs/modules/ai/STAGE_6_INTENT_RETRIEVAL.md`
-- **Stage 6 Manual Tests:** `docs/modules/ai/STAGE_6_MANUAL_TEST_SCENARIOS.md`
-- **LLM Context Optimization:** `docs/modules/ai/LLM_CONTEXT_OPTIMIZATION.md`
-- **Date Range Comparison:** `docs/modules/ai/DATE_RANGE_COMPARISON.md`
+- **Stage 4 Testing:** `docs/modules/ai/archive/STAGE_4_TESTING_COMPLETE.md`
+- **Stage 6 Documentation:** `docs/modules/ai/archive/STAGE_6_INTENT_RETRIEVAL.md`
+- **Stage 6 Manual Tests:** `docs/modules/ai/archive/STAGE_6_MANUAL_TEST_SCENARIOS.md`
+- **LLM Context Optimization:** `docs/modules/ai/archive/LLM_CONTEXT_OPTIMIZATION.md`
+- **Date Range Comparison:** `docs/modules/ai/archive/DATE_RANGE_COMPARISON.md`
 
 ---
 

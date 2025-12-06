@@ -7,138 +7,76 @@ This directory contains documentation for AI-related features in the Patient App
 ## 📋 Current Documents
 
 ### ✅ Active & Up-to-Date
+(See `archive/` for moved reports)
 
 #### **Stage 4 Testing Results (November 30, 2024)**
-1. **STAGE_4_TESTING_COMPLETE.md** - ⭐ **PRIMARY DOCUMENT**
+1. **archive/STAGE_4_TESTING_COMPLETE.md** - ⭐ **PRIMARY DOCUMENT (Archived)**
    - Final summary of Stage 4 manual testing
-   - Token savings: 51% achieved (exceeds 20-30% target)
-   - Performance: 99% faster context assembly
    - Status: READY FOR PRODUCTION
-   - **Use this for production decisions**
 
-2. **DATE_RANGE_COMPARISON.md**
-   - Detailed comparison of all date ranges (7/14/30/90 days)
-   - Token usage analysis
-   - Performance metrics
-   - Recommendations for default settings
+2. **archive/DATE_RANGE_COMPARISON.md**
+   - Detailed comparison of all date ranges
 
-3. **COMPLETE_TEST_RESULTS.md**
+3. **archive/COMPLETE_TEST_RESULTS.md**
    - All 5 test queries analyzed
-   - Response quality ratings
-   - Performance observations
-   - Aggregate statistics
 
 4. **MANUAL_TESTING_GUIDE.md**
    - Step-by-step testing instructions
-   - Test scenarios and procedures
-   - Metrics collection templates
-   - Troubleshooting guide
+   - (Kept in root as it is a guide, not a report)
 
 #### **Feature Documentation**
-5. **LLM_CONTEXT_OPTIMIZATION.md**
-   - Complete feature documentation
-   - Architecture and design
-   - Implementation details
-   - Usage guide
+5. **LLM_STAGES_OVERVIEW.md**
+   - Master roadmap and status for all stages.
 
 ---
 
 ### 🗑️ Deprecated / Superseded
-
-These documents are **outdated** and superseded by the November 30, 2024 testing:
-
-1. **STAGE4_CHECKPOINT.md** (November 27, 2024)
-   - Status: Outdated
-   - Superseded by: STAGE_4_TESTING_COMPLETE.md
-   - Reason: Pre-manual testing, no actual token savings data
-   - **Recommendation: DELETE**
-
-2. **PRODUCTION_READINESS.md** (November 27, 2024)
-   - Status: Outdated
-   - Superseded by: STAGE_4_TESTING_COMPLETE.md
-   - Reason: Pre-manual testing, pending validation
-   - **Recommendation: DELETE**
-
-3. **STAGE_4_TESTING_FINAL_REPORT.md**
-   - Status: Empty file
-   - **Recommendation: DELETE**
-
-4. **STAGE_4_TESTING_FINAL_SUMMARY.md**
-   - Status: Empty file
-   - **Recommendation: DELETE**
-
-5. **MANUAL_TEST_SESSION.md**
-   - Status: Session tracking document (temporary)
-   - Superseded by: STAGE_4_TESTING_COMPLETE.md
-   - **Recommendation: DELETE** (data captured in final docs)
-
-6. **TEST_RESULTS_SESSION_1.md**
-   - Status: Partial results (first query only)
-   - Superseded by: COMPLETE_TEST_RESULTS.md
-   - **Recommendation: DELETE** (data captured in complete results)
-
-7. **MANUAL_TEST_LOGS.md**
-   - Status: Unknown (need to check)
-   - **Recommendation: REVIEW**
+Most deprecated files have been deleted or archived.
 
 ---
 
 ## 📊 Document Hierarchy
 
 ```
-STAGE_4_TESTING_COMPLETE.md (PRIMARY)
-├── Executive Summary
-├── Key Results (51% token savings)
-├── Production Recommendation
-└── References:
-    ├── DATE_RANGE_COMPARISON.md (detailed analysis)
-    ├── COMPLETE_TEST_RESULTS.md (all queries)
-    └── MANUAL_TESTING_GUIDE.md (procedures)
+LLM_STAGES_OVERVIEW.md (MASTER)
+├── archive/STAGE_4_TESTING_COMPLETE.md
+├── archive/STAGE_6_INTENT_RETRIEVAL.md
+└── archive/STAGE_7E_SERVER_FIX_REPORT.md
 
-LLM_CONTEXT_OPTIMIZATION.md (FEATURE DOCS)
-└── Complete feature documentation
+MANUAL_TESTING_GUIDE.md (PROCEDURES)
 ```
 
 ---
 
 ## 🎯 Recommended Actions
 
-### Keep (5 documents)
-1. ✅ STAGE_4_TESTING_COMPLETE.md
-2. ✅ DATE_RANGE_COMPARISON.md
-3. ✅ COMPLETE_TEST_RESULTS.md
-4. ✅ MANUAL_TESTING_GUIDE.md
-5. ✅ LLM_CONTEXT_OPTIMIZATION.md
+### Keep (Root)
+1. ✅ LLM_STAGES_OVERVIEW.md
+2. ✅ MANUAL_TESTING_GUIDE.md
+3. ✅ README.md
+4. ✅ ai_integration_plan.md (High level)
+5. ✅ ai_quality_journal.md (High level)
 
-### Delete (7 documents)
-1. ❌ STAGE4_CHECKPOINT.md (outdated)
-2. ❌ PRODUCTION_READINESS.md (outdated)
-3. ❌ STAGE_4_TESTING_FINAL_REPORT.md (empty)
-4. ❌ STAGE_4_TESTING_FINAL_SUMMARY.md (empty)
-5. ❌ MANUAL_TEST_SESSION.md (temporary)
-6. ❌ TEST_RESULTS_SESSION_1.md (partial)
-7. ❌ MANUAL_TEST_LOGS.md (if redundant)
+### Archive
+- All specific Stage reports and test results are now in `archive/`.
 
 ### Result
-- **Before:** 12 documents (cluttered)
-- **After:** 5 documents (clean, organized)
-- **Reduction:** 58% fewer files
+- **Before:** Cluttered with reports
+- **After:** Clean root with high-level docs only
+- **Reduction:** Significant cleanup
 
 ---
 
 ## 📖 Quick Reference
 
 ### For Production Decisions
-→ Read: **STAGE_4_TESTING_COMPLETE.md**
-
-### For Implementation Details
-→ Read: **LLM_CONTEXT_OPTIMIZATION.md**
+→ Read: **LLM_STAGES_OVERVIEW.md**
 
 ### For Testing Procedures
 → Read: **MANUAL_TESTING_GUIDE.md**
 
-### For Detailed Analysis
-→ Read: **DATE_RANGE_COMPARISON.md** or **COMPLETE_TEST_RESULTS.md**
+### For Past Reports
+→ Look in: **archive/**
 
 ---
 
